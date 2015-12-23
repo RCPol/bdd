@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "db"
+  },
+  "AccessToken": {
+    "dataSource": "db",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "db",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "db",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "db",
+    "public": false
+  },
+  "Project": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "Collection": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "Specimen": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "Species": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "Schema": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "Dataset": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  }
+}

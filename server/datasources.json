@@ -1,0 +1,13 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "BDD": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "bdd",
+    "name": "BDD",
+    "connector": "mongodb"
+  }
+}

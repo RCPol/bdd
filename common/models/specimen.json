@@ -1,0 +1,14 @@
+{
+  "name": "Specimen",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {"id": {"type": "string", "generated": false, "id": true}},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
