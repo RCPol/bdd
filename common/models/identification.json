@@ -1,18 +1,12 @@
 {
-  "name": "Collection",
+  "name": "Identification",
   "base": "PersistedModel",
   "strict": false,
   "idInjection": false,
   "options": {
     "validateUpsert": true
   },
-  "properties": {
-    "id": {
-      "type": "string",
-      "id": true,
-      "generated": false
-    }
-  },
+  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [],

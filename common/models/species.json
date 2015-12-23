@@ -6,7 +6,13 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {"id": {"type": "string", "generated": false, "id": true}},
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "generated": false
+    }
+  },
   "validations": [],
   "relations": {},
   "acls": [],

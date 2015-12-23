@@ -67,5 +67,11 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "Identification": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
