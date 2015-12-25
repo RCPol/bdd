@@ -8,7 +8,7 @@ module.exports = function(Schema) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url);
     if(name==null)
-      cb("Invalid XLSX file.",null)
+      cb("Invalid XLSX file.",null);
     var path = __dirname +"/../../uploads/"+name+".xlsx";
     saveDataset(name,url,path);
 
@@ -18,8 +18,8 @@ module.exports = function(Schema) {
       var class_ = data[1];
       var term = data[2];
       var label = data[3];
-      data =  data.slice(4,data.length)
-      var rs = {}
+      data =  data.slice(4,data.length);
+      var rs = {};
       rs.count = 0;
       async.each(data, function iterator(line, callback){
         var record = {};
@@ -29,7 +29,7 @@ module.exports = function(Schema) {
           for(var c = 2; c < term.length; c++){
             if(line[c]){
               var field = toString(schema[c])+":"+toString(term[c]);
-              record[field] = {}
+              record[field] = {};
               record[field].schema = toString(schema[c]);
               record[field].class = toString(class_[c]);
               record[field].term = toString(term[c]);
@@ -39,15 +39,15 @@ module.exports = function(Schema) {
               if(record[field].term=="bibliographicCitation"){
                 record[field].references = [];
                 record[field].value.split("|").forEach(function (ref) {
-                  record[field].references.push(ref.trim())
-                })
+                  record[field].references.push(ref.trim());
+                });
               }else
               // IMAGE
               if(record[field].term=="glossaryImage"){
                 record[field].images = [];
                 record[field].value.split("|").forEach(function (image) {
-                  record[field].images.push(image.trim())
-                })
+                  record[field].images.push(image.trim());
+                });
               }
             }
           }
@@ -55,7 +55,7 @@ module.exports = function(Schema) {
             if(err)
               console.log(err);
             callback();
-          })
+          });
         }else{
           callback();
         }
@@ -80,7 +80,7 @@ module.exports = function(Schema) {
   }
   function defineName(url) {
     if(url.indexOf("?id=")!=-1)
-      name = url.split("?id=")[1];
+      var name = url.split("?id=")[1];
     else if(url.indexOf(".xls")!=-1)
       name = hash.MD5(url);
     else return null;
@@ -92,7 +92,7 @@ module.exports = function(Schema) {
     dataset.id = name;
     dataset.urlSource = url;
     dataset.localSource = path;
-    dataset.type = "Glossary"
+    dataset.type = "Glossary";
     Dataset.upsert(dataset,function (err,instance) {
       console.log("Dataset saved: "+instance.id);
     });

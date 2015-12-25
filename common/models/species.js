@@ -4,10 +4,10 @@ module.exports = function(Species) {
   Species.fromSpecimensAggregation = function(filter,cb) {
     selectScientificNames(filter,function (scientificNames) {
       generateSpecies(scientificNames,function(species) {
-        cb(null,species)
-      })
+        cb(null,species);
+      });
     });
-  }
+  };
   Species.remoteMethod(
     'fromSpecimensAggregation',
     {
@@ -69,11 +69,11 @@ module.exports = function(Species) {
             console.log(err);
           count++;
           callback();
-        })
-      })
+        });
+      });
     }, function done(){
-      cb(count)
-    })
+      cb(count);
+    });
   }
   function selectScientificNames(filter,cb) {
     var Specimen = Species.app.models.Specimen;

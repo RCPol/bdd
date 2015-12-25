@@ -9,7 +9,7 @@ module.exports = function(Specimen) {
       url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
       var name = defineName(url);
       if(name==null)
-        cb("Invalid XLSX file.",null)
+        cb("Invalid XLSX file.",null);
       var path = __dirname +"/../../uploads/"+name+".xlsx";
       saveDataset(name,url,path);
 
@@ -20,10 +20,10 @@ module.exports = function(Specimen) {
         var term = data[2];
         var category = data[3];
         var label = data[4];
-        data =  data.slice(5,data.length)
+        data =  data.slice(5,data.length);
 
         var idIndexes = [1,2,3]; // institutionCode and collectionCode
-        var rs = {}
+        var rs = {};
         rs.count = 0;
         async.each(data, function iterator(line, callback){
           var record = {};
@@ -33,7 +33,7 @@ module.exports = function(Specimen) {
             for(var c = 1; c < term.length; c++){
               if(line[c]){
                 var field = toString(schema[c])+":"+toString(term[c]);
-                record[field] = {}
+                record[field] = {};
                 record[field].schema = toString(schema[c]);
                 record[field].term = toString(term[c]);
                 record[field].class = String(class_[c]).trim();
@@ -53,26 +53,26 @@ module.exports = function(Specimen) {
                   record[field].category = record[field].category?record[field].category:"Outro";
                   record[field].references = [];
                   record[field].value.split("|").forEach(function (ref) {
-                    record[field].references.push(ref.trim())
-                  })
+                    record[field].references.push(ref.trim());
+                  });
                 }else
                 // INTERACTION
                 if(record[field].class=="Interaction"){
                   record[field].species = [];
                   record[field].value.split("|").forEach(function (sp) {
-                    record[field].species.push(sp.trim())
-                  })
+                    record[field].species.push(sp.trim());
+                  });
                 }else
                 // FLOWERING PERIOD
                 if(record[field].term=="floweringPeriod"){
                   record[field].months = [];
                   record[field].value.split("|").forEach(function (month) {
-                    record[field].months.push(month.trim())
-                  })
+                    record[field].months.push(month.trim());
+                  });
                 }else
                 // LATITUDE
                 if(record[field].term=="decimalLatitude"){
-                  var converted = convertDMSCoordinatesToDecimal(record[field].value)
+                  var converted = convertDMSCoordinatesToDecimal(record[field].value);
                   if(converted!=record[field].value){
                     record[field].rawValue = record[field].value;
                     record[field].value = converted;
@@ -80,7 +80,7 @@ module.exports = function(Specimen) {
                 }else
                 // LONGITUDE
                 if(record[field].term=="decimalLongitude"){
-                  var converted = convertDMSCoordinatesToDecimal(record[field].value)
+                  var converted = convertDMSCoordinatesToDecimal(record[field].value);
                   if(converted!=record[field].value){
                     record[field].rawValue = record[field].value;
                     record[field].value = converted;
@@ -91,8 +91,8 @@ module.exports = function(Specimen) {
                   record[field].category = record[field].category?record[field].category:"Outro";
                   record[field].states = [];
                   record[field].value.split("|").forEach(function (state) {
-                    record[field].states.push(state.trim())
-                  })
+                    record[field].states.push(state.trim());
+                  });
                 }
                 //NUM
                 else if(record[field].class=="NumericalDescriptor"){
@@ -119,7 +119,7 @@ module.exports = function(Specimen) {
               if(err)
                 console.log(err);
               callback();
-            })
+            });
           }else{
             callback();
           }
@@ -153,7 +153,7 @@ module.exports = function(Specimen) {
     }
     function defineName(url) {
       if(url.indexOf("?id=")!=-1)
-        name = url.split("?id=")[1];
+        var name = url.split("?id=")[1];
       else if(url.indexOf(".xls")!=-1)
         name = hash.MD5(url);
       else return null;
@@ -165,7 +165,7 @@ module.exports = function(Specimen) {
       dataset.id = name;
       dataset.urlSource = url;
       dataset.localSource = path;
-      dataset.type = "Specimen"
+      dataset.type = "Specimen";
       Dataset.upsert(dataset,function (err,instance) {
         console.log("Dataset saved: "+instance.id);
       });

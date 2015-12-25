@@ -3,12 +3,14 @@ var hash = require('object-hash');
 var request = require('request');
 var async = require('async');
 var fs = require('fs');
+
 module.exports = function(Collection) {
   Collection.inputFromURL = function(url,cb) {
-    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"?
     var name = defineName(url);
     if(name==null)
-      cb("Invalid XLSX file.",null)
+      cb("Invalid XLSX file.",null);
+
     var path = __dirname +"/../../uploads/"+name+".xlsx";
     saveDataset(name,url,path);
 
@@ -18,10 +20,10 @@ module.exports = function(Collection) {
       var class_ = data[1];
       var term = data[2];
       var label = data[3];
-      data =  data.slice(4,data.length)
+      data =  data.slice(4,data.length);
 
       var idIndexes = [1,2]; // institutionCode and collectionCode
-      var rs = {}
+      var rs = {};
       rs.count = 0;
       async.each(data, function iterator(line, callback){
         var record = {};
@@ -31,7 +33,7 @@ module.exports = function(Collection) {
           for(var c = 1; c < term.length; c++){
             if(line[c]){
               var field = toString(schema[c])+":"+toString(term[c]);
-              record[field] = {}
+              record[field] = {};
               record[field].schema = toString(schema[c]);
               record[field].class = toString(class_[c]);
               record[field].term = toString(term[c]);
@@ -50,7 +52,7 @@ module.exports = function(Collection) {
             if(err)
               console.log(err);
             callback();
-          })
+          });
         }else{
           callback();
         }
@@ -84,7 +86,7 @@ module.exports = function(Collection) {
   }
   function defineName(url) {
     if(url.indexOf("?id=")!=-1)
-      name = url.split("?id=")[1];
+      var name = url.split("?id=")[1];
     else if(url.indexOf(".xls")!=-1)
       name = hash.MD5(url);
     else return null;
@@ -96,7 +98,7 @@ module.exports = function(Collection) {
     dataset.id = name;
     dataset.urlSource = url;
     dataset.localSource = path;
-    dataset.type = "Collection"
+    dataset.type = "Collection";
     Dataset.upsert(dataset,function (err,instance) {
       console.log("Dataset saved: "+instance.id);
     });
