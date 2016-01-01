@@ -2,18 +2,16 @@ var hash = require('object-hash');
 var _ = require('underscore');
 
 module.exports = function(Identification) {
-  Identification.populate = function(callback){
+  Identification.populate = function(filter, callback){
     Identification.getApp(function(err, app){
       if (err) throw new Error(err);
       var Species = app.models.Species;
       var BDD = app.dataSources.BDD;
-      getIdentificationItems(Identification, Species, BDD, callback);
+      getIdentificationItems(filter, Identification, Species, BDD, callback);
     });
   };
 
   Identification.identify = function(param, callback) {
-    // TODO hashes
-
     //examples
     //param = [{"descriptor":"7", "state":76}, {"descriptor": "7", "state": 67}, {"descriptor": "7", "state": 30}, {"descriptor": "9", "state": 31}, {"descriptor": "9", "state": 36}, {"descriptor": "8", "state": 53}];
 
@@ -48,7 +46,7 @@ module.exports = function(Identification) {
         ], function (error, states) {
           if (err) throw new Error(err);
           var results = {eligibleItems: items, eligibleStates: states};
-          console.log(results);
+          //console.log(results);
           callback(null, results);
         });
       });
@@ -58,6 +56,7 @@ module.exports = function(Identification) {
   Identification.remoteMethod(
     'populate',
     {
+      accepts: {arg: 'filter', type: 'object'},
       returns: {arg: 'response', type: 'number'}
     }
   );
@@ -71,15 +70,15 @@ module.exports = function(Identification) {
   );
 };
 
-function getIdentificationItems(Identification, Species, mongoDs, callback){
-  Species.find(function(err, all_species){
+function getIdentificationItems(filter, Identification, Species, mongoDs, callback){
+  Species.find({where: filter}, function(err, all_species){
     if (err) throw new Error(err);
 
     var list_of_items = [];
     all_species.forEach(function(species){
       var identification_item = {};
 
-      identification_item._id = species.id;
+      identification_item.id = species.id;
       identification_item["states"] = [];
       Object.keys(species).forEach(function(key){
         if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1){
