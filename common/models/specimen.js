@@ -89,14 +89,19 @@ module.exports = function(Specimen) {
                 //CAT
                 if(record[field].class=="CategoricalDescriptor"){
                   record[field].category = record[field].category?record[field].category:"Outro";
+                  record[field].id = hash.MD5(record[field].schema+":"+record[field].class+":"+record[field].term);
                   record[field].states = [];
                   record[field].value.split("|").forEach(function (state) {
-                    record[field].states.push(state.trim());
+                    var state  = {};
+                    state.id = hash.MD5(record[field].schema+":"+record[field].class+":"+record[field].term+":"+state.trim());
+                    state.value = state.trim();
+                    record[field].states.push(state);
                   });
                 }
                 //NUM
                 else if(record[field].class=="NumericalDescriptor"){
                   record[field].category = record[field].category?record[field].category:"Outro";
+                  record[field].id = hash.MD5(record[field].schema+":"+record[field].class+":"+record[field].term);
                   if(record[field].value.toUpperCase().indexOf("VALUE:")>0){
                     record[field].value = record[field].value.toUpperCase().split("VALUE:")[1].trim();
                   }else{

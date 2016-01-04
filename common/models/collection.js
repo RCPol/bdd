@@ -6,7 +6,7 @@ var fs = require('fs');
 
 module.exports = function(Collection) {
   Collection.inputFromURL = function(url,cb) {
-    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"?
+    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"? Yes, if it comes from GoogleDocs. If it comes from other source no changes (replace) will be done (of course, if there isn't "open" in the URL).
     var name = defineName(url);
     if(name==null)
       cb("Invalid XLSX file.",null);
