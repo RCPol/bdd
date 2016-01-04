@@ -91,10 +91,10 @@ module.exports = function(Specimen) {
                   record[field].category = record[field].category?record[field].category:"Outro";
                   record[field].id = hash.MD5(record[field].schema+":"+record[field].class+":"+record[field].term);
                   record[field].states = [];
-                  record[field].value.split("|").forEach(function (state) {
+                  record[field].value.split("|").forEach(function (state_) {
                     var state  = {};
-                    state.id = hash.MD5(record[field].schema+":"+record[field].class+":"+record[field].term+":"+state.trim());
-                    state.value = state.trim();
+                    state.value = state_.trim();
+                    state.id = hash.MD5(record[field].schema+":"+record[field].class+":"+record[field].term+":"+state.value);
                     record[field].states.push(state);
                   });
                 }
