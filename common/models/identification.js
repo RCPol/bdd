@@ -1,4 +1,4 @@
-var hash = require('object-hash');
+//var hash = require('object-hash');
 var _ = require('underscore');
 
 module.exports = function(Identification) {
@@ -28,10 +28,12 @@ module.exports = function(Identification) {
         IdentificationCollection.aggregate([
           { $match: queryMongo},
           { $unwind: '$states'},
+          { $unwind: '$states.states'},
           { $project: {
             _id: 0,
             'descriptor': '$states.descriptor',
-            'state': '$states.state'
+            //'state': '$states.state'
+            'state': '$states.states'
           }},
           { $group: {
             _id: { descriptor: '$descriptor', state: '$state'},
@@ -42,6 +44,15 @@ module.exports = function(Identification) {
             descriptor: '$_id.descriptor',
             state: '$_id.state',
             count: '$sum'
+          }},
+          { $group: {
+            _id: '$descriptor',
+            states: {$push: {state: '$state', count: '$count'}}
+          }},
+          { $project:{
+            //_id: 0,
+            descriptor: '$_id.descriptor',
+            states: '$states'
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
@@ -84,10 +95,18 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
         if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1){
           // we only want "rcpol"'s descriptors
           // we can have multiple states
-          var entry;
+
+          var entry = {
+            //descriptor: "rcpol:" + species[key].term, //DEBUG
+            descriptor: species[key].id,
+            states: []
+          };
+
           species[key].states.forEach(function(state){
-            entry = {descriptor: hash.MD5("rcpol:" + species[key].term) };
-            entry.state = hash.MD5("rcpol:" + species[key].term + ":" + state);
+            entry.states.push(
+              //"rcpol:" + species[key].term + ":" + state.value //DEBUG
+              state.id
+            );
           });
 
           identification_item["states"].push(entry);
