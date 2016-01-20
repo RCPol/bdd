@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="css/fichas.css">
+
+	<!-- Arquivos Leaflet Map -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+	<!-- Arquivos Grid Tabela de Amostras -->
+	<link rel="stylesheet" type="text/css" href="http://w2ui.com/src/w2ui-1.4.min.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://w2ui.com/src/w2ui-1.4.min.js"></script>
+
+	<!-- Arquivos Galeria - Fotorama -->
+	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
+
+    <!-- Javascript Documento -->
+    <script type="text/javascript" src="/javascript/especie.js"></script>
+
+	<!-- Início: Códigos para o Mapa e Tabela -->
+	<script type="text/javascript">
+		window.onload = function(){
+
+			// Início do código do Mapa
+			var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
+			mapLink = '<a href="./especie_eugenia.html">Ocorrências de Eugenia uniflora L.</a>';
+			L.tileLayer(
+					'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+						attribution: mapLink,
+						maxZoom: 18
+					}).addTo(map);
+			// Ribeirao
+			p = [-21.8067,-47.8908];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+			p = [-21.1707,-47.8238];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+			p = [-21.297,-47.4298];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+
+			//Gramado
+			p = [-29.3688,-50.8786];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+			p = [-29.0688,-50.0786];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+
+			//Fortaleza
+			p = [-3.71839,-38.5434];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+
+			//Uberlandia
+			p = [-18.9113,-48.2622];
+			var marker = L.marker(p,
+					{opacity: 0.9}
+			).addTo(map);
+
+			//Final do Código do Mapa
+
+		//Início do Código da Tabela-Grid
+		$('#grid').w2grid({
+				name: 'grid',
+				header: 'Lista de Amostras',
+				show: {
+					toolbar: true,
+					footer: true
+				},
+				columns: [
+					{ field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
+					{ field: 'species', caption: 'Nome da Espécie', size: '20%', sortable: true, resizable: true },
+					{ field: 'palinoteca', caption: 'Palinoteca', size: '30%', sortable: true, resizable: true },
+					{ field: 'tipo', caption: 'Nome do Coletor', size: '25%', resizable: true },
+					{ field: 'cidade', caption: 'Cidade', size: '25%', resizable: true }
+				],
+				searches: [
+					{ field: 'palinoteca', caption: 'Palinotéca', type: 'text' },
+					{ field: 'tipo', caption: 'Nome do Coletor', type: 'text' },
+					{ field: 'cidade', caption: 'Cidade', type: 'text' }
+				],
+				sortData: [{ field: 'recid', direction: 'ASC' }],
+				records: [
+					{ recid: 1, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
+					{ recid: 2, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
+					{ recid: 3, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da UFC', tipo: 'Dr. Ednardo Rodrigues Freitas',cidade: 'Fortaleza – CE'},
+					{ recid: 4, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da ULBRA', tipo: 'Dra. Soraia Girardi Bauermann',cidade: 'Gramado – RS'},
+					{ recid: 5, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da UFU', tipo: 'Priscila Ferreira de Sousa Moreira',cidade: 'Uberlândia – MG'},
+					{ recid: 6, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da ULBRA', tipo: 'Dra. Soraia Girardi Bauermann',cidade: 'Gramado – RS'},
+					{ recid: 7, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'}
+				]
+			});
+			w2ui.grid.on('select', function(event) {
+				window.open("especime_eugenia.html");
+			});
+			//Final do Código da Tabela-Grid
+
+		}
+	</script>
+	<!-- Final: Códigos para o Mapa e Tabela -->
+
+
+	<!-- <title>RCPol - Eugenia uniflora L.</title> -->
+</head>
+<body>
+
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="#">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<!-- Início das informações da espécie -->
+	<article>
+		
+		<!-- Nome da espécie -->
+	    <h1> <i> <div id="nomeDaEspecie"></div> </i> L.</h1>
+
+		<!-- Início: Características da Planta -->
+		<div class="info-planta">
+		    <p><b>H&aacute;bito:</b> <span id="habito"></span> </p>
+			<p><b>Origem:</b> <span id="origem"></span></p>
+			<p><b>Per&iacute;odo de Flora&ccedil;&atilde;o:</b> <span id="periodoDeFloracao"></span></p>
+
+			<h2>Caracter&iacute;sticas da Flor:</h2>
+
+			<p><b>S&iacute;ndrome de poliniza&ccedil;&atilde;o:</b> <span id="origem"></span>melitofilia</p>
+			<p><b>Unidade de atra&ccedil;&atilde;o:</b> <span id="origem"></span>inflorescência</p>
+			<p><b>Sexualidade:</b> <span id="origem"></span>hermafrodita</p>
+			<p><b>Tamanho da flor:</b> <span id="origem"></span>pequena</p>
+			<p><b>Forma:</b> <span id="origem"></span>taça</p>
+			<p><b>Simetria:</b> <span id="origem"></span>actinomorfa</p>
+			<p><b>Cor da flor:</b> <span id="origem"></span>branca</p>
+			<p><b>Antese:</b> <span id="origem"></span>diurna</p>
+			<p><b>Deisc&ecirc;ncia da antera:</b> <span id="origem"></span></p>
+			<p><b>Odor:</b> <span id="origem"></span></p>
+			<p><b>Tipo de recurso floral:</b> <span id="origem"></span> </p>
+
+		</div>
+		<!-- Final: Características da Planta -->
+
+		<!-- Início: Slideshow com as imagens da planta -->
+		<div class="img-planta">
+			
+			<h2>Imagens da Planta, Flor e Frutos:</h2>
+			
+			<div class="fotorama" data-allowfullscreen="native" data-width="425" data-height="365">
+				<img src="img_sp/plaflo/plaflo48.jpg">
+				<img src="img_sp/plahab/plahab48.jpg">
+				<img src="http://mlb-s1-p.mlstatic.com/muda-certificada-de-pitanga-eugenia-uniflora-brinde-10656-MLB5697478606_012014-F.jpg">
+				<img src="http://upload.wikimedia.org/wikipedia/commons/4/4f/Starr_080610-8163_Eugenia_uniflora.jpg">
+			</div>
+
+		</div>
+		<!-- Final: Slideshow com as imagens da planta -->
+
+		<!-- Início: Descrição Polínica -->
+		<div class="info-polen">
+			
+			<h2>Descri&ccedil;&atilde;o pol&iacute;nica:</h2>
+			
+			<p>Mônade, pequeno a médio, P = 16,22 ± 1,69 (11,56-19,61), E = 24,88 ± 2,01 (18,25- 28,10), radial, isopolar, âmbito triangular, oblato, P/E = 0,65 ± 0,04 (0,58-0,73). Tricolporado, ectoabertura do tipo parassincolporado, endoabertura circular, presença de fastígio. Exina de espessura 1,39 ± 0,10 (1,27-1,54), superfície verrucada-escabrada (visível em até 2.500x).</p>
+
+		</div>
+		<!-- Final: Descrição Polínica -->
+
+		<!-- Início: Fotos do Grão de Pólen -->
+		<div class="img-polen">
+			
+			<h2>Imagens do Gr&atilde;o de P&oacute;len:</h2>
+			
+			<div class="fotorama" data-allowfullscreen="native" data-width="900" data-height="300">
+				<img src="img_sp/polen/48.jpg">
+				<img src="img_sp/polen/48.jpg">
+			</div>
+
+		</div>
+		<!-- Final: Fotos do Grão de Pólen -->
+
+		<!-- Início: Mapa de distribuição -->
+		<div class="mapa">
+			
+			<h2>Localiza&ccedil;&atilde;o dos Esp&eacute;cimes:</h2>
+
+			<!-- Início Código Leaflet -->
+			<div id="map" class="esize">
+				
+			</div>
+			<!-- Final Código Leaflet -->
+
+		</div>
+		<!-- Final: Mapa de distribuição -->
+
+		<!-- Início: Amostras -->
+		<div class="amostras">
+			
+			<h2>Amostras:</h2>
+
+			<div id="grid"></div>
+
+		</div>
+		<!-- Final: Amostras -->
+
+	</article>
+	<!-- Final das informações da espécie -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+</html>

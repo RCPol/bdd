@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="css/fichas.css">
+
+	<!-- Arquivos Leaflet Map -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+	<!-- Arquivos Grid Tabela de Amostras -->
+	<link rel="stylesheet" type="text/css" href="http://w2ui.com/src/w2ui-1.4.min.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://w2ui.com/src/w2ui-1.4.min.js"></script>
+
+	<!-- Arquivos Galeria - Fotorama -->
+	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
+
+	<!-- Início: Códigos para o Mapa -->
+	<script type="text/javascript">
+		window.onload = function(){
+
+			// Início do código do Mapa
+			    var map = L.map('map',{scrollWheelZoom:false}).setView([-29.0688,-50.0786], 17);
+			    mapLink = '';
+			    L.tileLayer(
+			            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			                attribution: mapLink,
+			                maxZoom: 17
+			            }).addTo(map);
+
+			    var p = [-29.0688,-50.0786];
+			    var marker = L.marker(p,
+			            {opacity: 0.85}
+			    ).addTo(map);
+			};
+
+			//Final do Código do Mapa
+
+	</script>
+	<!-- Final: Códigos para o Mapa e Tabela -->
+
+
+	<title>RCPol - Eugenia uniflora L.</title>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="#">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<!-- Início das informações do especieme -->
+	<article>
+		
+		<!-- Nome da espécie e onde se encontra o espécime -->
+		<h1 class="spm">Esp&eacute;cime de <i>Eugenia uniflora</i> L. depositado na cole&ccedil;&atilde;o do Laborat&oacute;rio de Palinologia da Universidade Luterana do Brasil - ULBRA</h1>
+
+		<!-- Início: Embrulho Informações e Logo -->
+		<div class="cspm">
+
+			<!-- Início: Informações Palinoteca -->
+			<div class="info-spal">
+				
+				<p><b>Cole&ccedil;&atilde;o:</b> PALIULBRA</p>
+				<p><b>Respons&aacute;vel:</b> Dra. Soraia Girardi Bauermann</p>
+				<p><b>Endere&ccedil;o:</b> Av. Farroupilha, 8001, Pr&eacute;dio 29, Sala 206, S&atilde;o Jos&eacute;, 	Canoas - RS, CEP: 92425-900</p>
+				<p><b>Telefone:</b> 51 3477.4000 – Ramal – 2654</p>
+				<p><b>E-mail:</b> lab.palinologia@ulbra.br</p>
+	
+				<!-- Link para homepage da palinoteca -->
+				<p><b>Homepage:</b> <a href="http://www.ulbra.br/palinologia/" target="_blank">http://www.ulbra.br/palinologia/</a></p>
+	
+				<p>&nbsp;</p>
+	
+				<!-- Link para página da Palinoteca -->
+				<p><a href="#">Veja outras esp&eacute;cies depositadas nesta cole&ccedil;&atilde;o</a></p>
+	
+				<!-- Link para página da Espécie -->
+				<p><a href="#">Veja a ficha desta esp&eacute;cie</a></p>
+				
+			</div>
+			<!-- Final: Informações Palinoteca -->
+	
+			<!-- Início: Logotipo da Palinoteca -->
+			<div class="img-spal">
+				
+				<img src="img/lspm.jpg">
+	
+			</div>
+			<!-- Final: Logotipo da Palinoteca -->
+
+		</div>
+		<!-- Final: Embrulho Informações e Logo -->
+
+		<!-- Início: Embrulho Informações da Coleta e Mapa -->
+		<div class="cspm">
+
+			<!-- Início: Informações da Coleta -->
+			<div class="info-col">
+				
+				<h2>Informações da Coleta</h2>
+				
+				<p><b>Coletor:</b> Dra. Soraia Girardi Bauermann</p>
+				<p><b>N&uacute;mero do Coletor:</b> 0671</p>
+				<p><b>Herb&aacute;rio:</b> Nome do Herbário</p>
+				<p><b>N&uacute;mero de Registro no Herb&aacute;rio:</b> 00000</p>
+				<p><b>N&uacute;mero de Registro na Palinoteca:</b> 013</p>
+				<p><b>Pa&iacute;s:</b> Brasil</p>
+				<p><b>Estado:</b> RS</p>
+				<p><b>Munic&iacute;pio:</b> Gramado</p>
+				<p><b>Bioma:</b> Cerrado</p>
+				<p><b>Latitude:</b> -29.0688</p>
+				<p><b>Longitude:</b> -50.0786</p>
+
+				<h2>Informa&ccedil;&otilde;es Adicionais</h2>
+
+				<p>Foi coletada em &aacute;reas de Cerrado, Floresta Estacional Semidecidual, Caatinga e pr&oacute;xima a Mata de Arauc&aacute;rias. Possui ampla distribui&ccedil;&atilde;o no Brasil e &eacute; nativa.</p>
+	
+			</div>
+			<!-- Final: Informações da Coleta -->
+	
+			<!-- Início: Mapa -->
+			<div class="mspm">
+				
+				<h2>Localiza&ccedil;&atilde;o do Esp&eacute;cime:</h2>
+	
+				<!-- Início Código Leaflet -->
+				<div id="map" class="msize">
+					
+				</div>
+				<!-- Final Código Leaflet -->
+	
+			</div>
+			<!-- Final: Mapa -->
+
+		</div>
+		<!-- Final: Embrulho Informações da Coleta e Mapa -->
+
+		<!-- Início: Galeria de Imagens -->
+		<div class="gal-spm">
+			
+			<h2>Galeria de Imagens</h2>
+			
+			<div class="fotorama" data-allowfullscreen="native" data-width="900" data-height="450">
+				<img src="img_sp/plaflo/plaflo48.jpg">
+				<img src="img_sp/plahab/plahab48.jpg">
+				<img src="http://mlb-s1-p.mlstatic.com/muda-certificada-de-pitanga-eugenia-uniflora-brinde-10656-MLB5697478606_012014-F.jpg">
+				<img src="http://upload.wikimedia.org/wikipedia/commons/4/4f/Starr_080610-8163_Eugenia_uniflora.jpg">
+				<img src="img_sp/polen/48.jpg">
+				<img src="img_sp/polen/48.jpg">
+			</div>
+
+		</div>
+		<!-- Final: Galeria de Imagens -->
+
+		<!-- Início: Referências relacionadas ao espécime -->
+		<div class="rre">
+			
+			<h2>Refer&ecirc;ncias relacionadas ao esp&eacute;cime:</h2>
+
+			<!-- Início Loop Referências -->
+			<div class="r1f">
+
+				<!-- Início DIV Ícone/Link -->
+				<div class="pdficon">
+
+					<!-- Link DOI/PDF -->
+					<a href="#">
+						<img src="img/pdfi.png" width="16px" height="16px">
+					</a>
+
+				</div>
+				<!-- Final DIV Ícone/Link -->
+
+				<div class="txtref">
+
+					<p>Barth, O. M., & Barbosa, A. F. (1972). Catálogo sistemático dos pólens das plantas arbóreas do Brasil meridional XV. Myrtaceae. Memórias do Instituto Oswaldo Cruz, 70(4), 467-496.</p>
+
+				</div>
+
+			</div>
+			<!-- Final Loop Referências -->
+
+			<!-- Início Loop Referências exemplo sem link -->
+			<div class="r1f">
+
+				<!-- Início DIV Ícone/Link -->
+				<div class="pdficon">
+
+					<img src="img/sp.png" width="16px" height="16px">
+
+				</div>
+				<!-- Final DIV Ícone/Link -->
+
+				<div class="txtref">
+
+					<p>Evaldt, A. C. P., Bauermann, S. G., Fuchs, S. C. B., Diesel, S., & Cancelli, R. R. (2009). Grãos de pólen e esporos do Vale do Rio Caí, nordeste do Rio Grande do Sul, Brasil: descrições morfológicas e implicações paleoecológicas. Gaea-Journal of Geoscience, 5(2), 86-106.</p>
+
+				</div>
+
+			</div>
+			<!-- Final Loop Referências exemplo sem link -->
+
+		</div>
+		<!-- Final: Referências relacionadas ao espécime -->
+
+	</article>
+	<!-- Final das informações do espécime -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+</html>

@@ -1,0 +1,234 @@
+/* CSS reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+/* Fundo, links e caixa central */
+body {
+	background: url(random/rotate.php) no-repeat center top;
+	background-color: #F0E6FF;
+	font-family: Georgia, serif;
+	font-size: 14px;
+	line-height: 21px;
+}
+
+a:link, a:visited {
+	text-decoration: none;
+	color: #510A5E;
+}
+
+a:hover, a:active {
+	background-color: #DAC1DD;
+	color: black;
+}
+
+div.contem {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+/* Header */
+
+header {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	overflow: auto;
+}
+
+/* Menu */
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	float: right;
+}
+
+li {
+	float: left;
+	padding: 0 5px;
+}
+
+li a {
+	display: block;
+	background-color: #F0E6FF;
+	color: #470054;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-weight: bold;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+li a:hover {
+	background-color: #DAC1DD;
+}
+
+/* Logotipo */
+div.logo {
+	display: block;
+	float: left;
+	margin: 50px 0 44px 50px;
+}
+
+/* Fundo translucido artigo*/
+article {
+	overflow: auto;
+	background-color: rgba(255,255,255,0.8);
+	padding: 40px 50px;
+}
+
+/* Título */
+article h1 {
+	font-size: 35px;
+	font-weight: normal;
+	line-height: 35px;
+	margin: 0 0 25px 0;
+	color: #470054;
+}
+
+/* Título Espécime */
+article h1.spm {
+	line-height: 35px;
+	font-size: 28px;
+	margin: 0 0 25px 0;
+}
+
+/* Título Palinoteca */
+article h1.pal {
+	line-height: 35px;
+	font-size: 28px;
+	margin: 0 0 25px 0;
+}
+
+article h2 {
+	font-size: 21px;
+	font-weight: normal;
+	color: #470054;
+	margin: 25px 0;
+}
+
+/* Características da Planta */
+div.info-planta {
+	display: block;
+	float: left;
+	width: 425px;
+}
+
+/* Fotos da Planta */
+div.img-planta {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 0 0 0 50px;
+}
+
+div.img-planta h2 {
+	display: none;
+}
+
+/* Informações Palinoteca*/
+div.cspm {
+	overflow: auto;
+}
+
+div.info-spal {
+	display: block;
+	float: left;
+	width: 650px;
+}
+
+div.info-pal {
+	display: block;
+	float: left;
+	width: 650px;
+	margin: 0;
+}
+
+div.img-spal {
+	display: block;
+	float: left;
+	width: 200px;
+	margin: 0 0 0 50px;
+}
+
+/* Informações da Coleta */
+div.info-col {
+	display: block;
+	float: left;
+	width: 425px;
+}
+
+div.mspm {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 0 0 0 50px;
+}
+
+/* Referências */
+div.rre {
+	margin: 0 0 -12px 0;
+}
+
+div.r1f {
+	display: flex;
+	align-itens: center;
+	margin: 0 0 12px 0;
+}
+
+div.pdficon {
+	order: <integer>;
+	text-align: center;
+	margin: auto 0;
+}
+
+div.pdficon img {
+	margin: 0 17px;
+}
+
+div.txtref {
+	order: <integer>;
+}
+
+div.r1f a:link, a:visited, a:hover, a:active {
+	text-decoration: none;
+	background-color: transparent;
+}
+
+
+
+/* Rodapé */
+footer {
+	display: block;
+	background-color: #DAC1DD;
+	padding: 25px 50px;
+	text-align: center;
+	margin: 0 0 50px 0;
+	color: #470054;
+	font-size: 12px;
+}
+
+/* Tamanho Mapa Espécie */
+div.esize {
+	height: 450px;
+	width: 900px;
+}
+
+/* Tamanho Mapa Espécime */
+div.msize {
+	height: 425px;
+	width: 425px;
+}
+
+/* Tamanho Tabela Amostras */
+#grid {
+	height: 450px;
+	width: 900px;
+}

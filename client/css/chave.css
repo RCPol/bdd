@@ -1,0 +1,474 @@
+/* CSS reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+/* Fundo, links e caixa central */
+body {
+	background: url(random/rotate.php) no-repeat center top;
+	background-color: #F0E6FF;
+	font-family: Georgia, serif;
+	font-size: 14px;
+	line-height: 21px;
+}
+
+/* Barra de rolagem */
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+/* Fundo */
+::-webkit-scrollbar-track {
+	background-color: #DAC1DD;
+}
+ 
+/* Indicador */
+::-webkit-scrollbar-thumb {
+	background-color: rgba(81,10,84,0.4);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+	background-color: rgba(81,10,84,0.2); 
+}
+
+/* Links */
+a:link, a:visited {
+	text-decoration: none;
+	color: #510A5E;
+}
+
+div.contem {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+/* Header */
+
+header {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	overflow: auto;
+}
+
+/* Menu */
+nav ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0 50px;
+	float: right;
+}
+
+nav li {
+	float: left;
+	padding: 0 5px;
+}
+
+nav li a {
+	display: block;
+	background-color: #F0E6FF;
+	color: #470054;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-weight: bold;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+nav li a:hover {
+	background-color: #DAC1DD;
+}
+
+/* Logotipo */
+div.logo {
+	display: block;
+	float: left;
+	margin: 50px 0 44px 50px;
+}
+
+/* Fundo translucido artigo*/
+div.qbranco {
+	overflow: auto;
+	background-color: rgba(255,255,255,0.8);
+	padding: 40px 50px;
+}
+
+/* Título */
+div.qbranco h1 {
+	font-size: 21px;
+	line-height: 21px;
+	font-weight: normal;
+	margin: 5px 0 16px 13px;
+	color: #470054;
+	float: left;
+}
+
+div.qbranco h2 {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: normal;
+	color: #470054;
+	margin: 13px 13px;
+}
+
+/* Div esquerda */
+div.cesquerda {
+	width: 437px;
+	margin: 0 13px 0 0;
+	float: left;
+}
+
+/* Div direita */
+div.cdireita {
+	width: 437px;
+	margin: 0 0 0 13px;
+	float: left;
+}
+
+
+/* Busca */
+.formbusca {
+	float:right;
+	width: 225px;
+	padding-right: 50px;
+	text-align: right;
+}
+
+.fbcampo {
+	margin: 0;
+	padding: 5px 10px;
+	font-family: Georgia, serif;
+	font-size: 14px;
+	color: #470054;
+	border:1px solid #F0E6FF;
+	border-right:0px;
+}
+
+.fbbotao {
+	margin: 0;
+	padding: 5px 7px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight:bold;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	color: #470054;
+	border: solid 1px #F0E6FF;
+	background: #F0E6FF;
+}
+
+.fbbotao:hover {
+	text-decoration: none;
+	background: #DAC1DD;
+}
+
+.fbbotao::-moz-focus-inner {
+  border: 0;
+}
+
+.fbclear{
+	clear:both;
+}
+
+/* Quadrados conteúdo */
+div.roxinho {
+	background-color: rgba(240, 230, 255, 0.5);
+	width: 375px;
+	height: 387px;
+	padding: 25px 37px 25px 25px;
+	overflow: auto;
+}
+
+/* Botões expandir/ocultar */
+.expocu {
+	margin: 0;
+	padding: 5px 7px;
+	font-size: 13px;
+	font-weight:bold;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	color: #470054;
+	border: solid 1px #F0E6FF;
+	background: #F0E6FF;
+}
+
+.expocu:hover {
+	background-color: #DAC1DD;
+}
+
+div.divaeh {
+	width: 100%;
+	text-align: right;
+	margin: 0 0 7px 0;
+	display: block;
+	clear: both;
+}
+
+div.agregadordescritores {
+	width: 356px;
+}
+
+div.descritor {
+	padding: 0 0 7px 19px !important;
+	width: 356px;
+}
+
+div.valoresn {
+	padding: 0 0 7px 19px !important;
+	width: 337px;
+	font-size: 14px;
+}
+
+form.valornum {
+	margin: 0;
+}
+
+img.lala {
+	padding: 0 6px 0 0;
+}
+
+/* Textos descritores*/
+div.agregadordescritores h3 {
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+}
+
+div.agregadordescritores p {
+	font-size: 16px;
+	line-height: 21px;
+}
+
+/* Campos descritores numéricos */
+.numnum {
+	margin: 0;
+	padding: 5px 10px;
+	font-family: Georgia, serif;
+	font-size: 14px;
+	color: #470054;
+	border:1px solid #F0E6FF;
+}
+
+/* Imagens descritores */
+ul.valoresi {
+	list-style-type: none;
+	padding: 0 0 0 10px !important;
+	width: 333px;
+	margin: 0;
+	float: none;
+	overflow: auto;
+}
+
+li.vimagens {
+	float: left;
+	width: 100px;
+	padding: 0 0 7px 10px;
+	margin: 0;
+	position: relative;
+	left: 0;
+	top: 0;
+}
+
+img.vimg {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+img.vglos {
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	padding: 0 0 7px 10px;
+}
+
+li.vimagens p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+}
+
+/* Accordion Jquery */
+.ui-accordion .ui-accordion-header {
+	padding: 0 0 7px 0 !important;
+	margin: 0 !important;
+}
+
+.ui-accordion .ui-accordion-icons {
+	padding-left: 0 !important;
+}
+
+.ui-accordion .ui-accordion-icons .ui-accordion-icons {
+	padding-left: 0 !important;
+}
+
+.ui-accordion .ui-accordion-header .ui-accordion-header-icon {
+	position: relative !important;
+	left: 0 !important;
+	top: 0 !important;
+	padding: 3px 5px 0 0 !important;
+	margin: 0 !important;
+}
+
+.ui-accordion .ui-accordion-content {
+	padding: 0;
+}
+
+.ui-accordion-content {
+	height: auto !important;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight,
+.ui-widget-header .ui-state-highlight {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.ui-widget-content {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.ui-widget-header {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+/* Icone Jquery Accordion */
+.ui-icon {
+	padding: 3px 5px 0 0 !important;
+	margin: 0 !important;
+	float: left;
+	display: block;
+	text-indent: 0 !important;
+	overflow: hidden;
+	background-repeat: no-repeat;
+	width: 14px !important;
+	height: 14px !important;
+}
+
+.ui-icon,
+.ui-widget-content .ui-icon {
+	background-image: url("../img/mais.png") !important;
+}
+
+.ui-widget-header .ui-icon {
+	background-image: url("../img/mais.png") !important;
+}
+
+.ui-state-default .ui-icon {
+	background-image: url("../img/mais.png") !important;
+}
+
+.ui-state-hover .ui-icon,
+.ui-state-focus .ui-icon {
+	background-image: url("../img/mais.png") !important;
+}
+
+.ui-state-active .ui-icon {
+	background-image: url("../img/menos.png") !important;
+}
+
+.ui-state-highlight .ui-icon {
+	background-image: url("../img/mais.png") !important;
+}
+
+.ui-state-error .ui-icon,
+.ui-state-error-text .ui-icon {
+	background-image: url("../img/mais.png") !important;
+}
+
+.ui-icon-triangle-1-e {
+	background-position: 0 !important;
+}
+
+.ui-icon-triangle-1-s { 
+	background-position: 0 !important;
+}
+
+/* Espécies */
+div.especies {
+	margin: 0 0 12px 0;
+	padding: 12px;
+	width: 351px;
+	background-color: #DAC1DD;
+	overflow: auto;
+	display: flex;
+	align-itens: center;
+}
+
+div.especies img {
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin: 0 12px 0 0;
+	order: <integer>;
+	text-align: center;
+}
+
+div.nsp {
+	order: <integer>;
+	margin: auto 0;
+}
+
+p.nomesp {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: normal;
+}
+
+p.famisp {
+	font-weight: normal;
+	line-height: 21px;
+	font-size: 16px;
+	margin: 7px 0 0 0;
+}
+
+/* Rodapé */
+footer {
+	display: block;
+	background-color: #DAC1DD;
+	padding: 25px 50px;
+	text-align: center;
+	margin: 0 0 50px 0;
+	color: #470054;
+	font-size: 12px;
+}
