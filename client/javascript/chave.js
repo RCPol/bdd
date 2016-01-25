@@ -5,7 +5,7 @@ $(document).ready(function(){
     //TODO: Agregador de descritores
     console.log(data.response.eligibleStates);
     data.response.eligibleStates.forEach(function(descritor){
-      $.getJSON("/api/Species/findOnw")
+      //$.getJSON("/api/Species/findOnw")
     });
 
     /* itens */

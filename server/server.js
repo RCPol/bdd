@@ -4,8 +4,23 @@ var path = require("path");
 
 var app = module.exports = loopback();
 
-app.use('/profile/species', function(req, res, next){
-  var file = path.resolve(__dirname, "../", "client/ficha_especie.html");
+app.get('/profile/especies', function(req, res){
+  var file = path.resolve(__dirname, "../client/ficha_especie.html");
+  res.sendFile(file);
+});
+
+app.get('/profile/especimes', function(req, res){
+  var file = path.resolve(__dirname, "../client/ficha_especime.html");
+  res.sendFile(file);
+});
+
+app.get('/profile/palinotecas', function(req, res){
+  var file = path.resolve(__dirname, "../client/ficha_palinoteca.html");
+  res.sendFile(file);
+});
+
+app.get('/profile/chave', function(req, res){
+  var file = path.resolve(__dirname, "../client/chave.html");
   res.sendFile(file);
 });
 
