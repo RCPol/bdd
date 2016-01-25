@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="css/fichas.css">
+	<link rel="stylesheet" href="/css/fichas.css">
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
@@ -24,6 +24,10 @@
 
 	<!-- Início: Códigos para o Mapa e Tabela -->
 	<script type="text/javascript">
+	$(document).ready(function(){
+		readSpecies("{{id}}");
+	});
+	
 		window.onload = function(){
 
 			// Início do código do Mapa
@@ -131,7 +135,7 @@
 
 		<!-- logotipo -->
 		<div class="logo">
-			<img src="img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
 		</div>
 		<!-- logotipo -->
 
@@ -173,8 +177,8 @@
 			<h2>Imagens da Planta, Flor e Frutos:</h2>
 
 			<div class="fotorama" data-allowfullscreen="native" data-width="425" data-height="365">
-				<img src="img_sp/plaflo/plaflo48.jpg">
-				<img src="img_sp/plahab/plahab48.jpg">
+				<img src="/img_sp/plaflo/plaflo48.jpg">
+				<img src="/img_sp/plahab/plahab48.jpg">
 				<img src="http://mlb-s1-p.mlstatic.com/muda-certificada-de-pitanga-eugenia-uniflora-brinde-10656-MLB5697478606_012014-F.jpg">
 				<img src="http://upload.wikimedia.org/wikipedia/commons/4/4f/Starr_080610-8163_Eugenia_uniflora.jpg">
 			</div>
@@ -198,8 +202,8 @@
 			<h2>Imagens do Gr&atilde;o de P&oacute;len:</h2>
 
 			<div class="fotorama" data-allowfullscreen="native" data-width="900" data-height="300">
-				<img src="img_sp/polen/48.jpg">
-				<img src="img_sp/polen/48.jpg">
+				<img src="/img_sp/polen/48.jpg">
+				<img src="/img_sp/polen/48.jpg">
 			</div>
 
 		</div>

@@ -13,6 +13,7 @@
     "loopback-component-explorer": "^2.1.0",
     "loopback-connector-mongodb": "^1.13.1",
     "loopback-datasource-juggler": "^2.39.0",
+    "mustache": "^2.2.1",
     "node-xlsx": "^0.6.0",
     "object-hash": "^0.9.5",
     "serve-favicon": "^2.0.1",

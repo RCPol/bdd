@@ -9,15 +9,15 @@
 	<!-- JQuery Accordion -->
 	<link rel="stylesheet" href="chave/jquery-ui.css">
 	<script src="chave/jquery.js"></script>
-	<script src="chave/jquery-ui.js"></script> 
+	<script src="chave/jquery-ui.js"></script>
 
 	<!-- Campos de busca e JQuery Accordion -->
 	<script type="text/javascript">
-	window.onload = function(){ 
-		
+	window.onload = function(){
+
 		//Limpa texto da busca dos descritores
 		var btpdescritores = document.getElementById("buscadescritores");
-		
+
 		if(btpdescritores.addEventListener){
 			btpdescritores.addEventListener("click", function() {
 				if (btpdescritores.value == 'Pesquisar'){
@@ -25,10 +25,10 @@
 				}
 			});
 		}
-		
+
 		//Limpa texto da busca das espécies
 		var submitbutton2 = document.getElementById("buscaespecies");
-		
+
 		if(submitbutton2.addEventListener){
 			submitbutton2.addEventListener("click", function() {
 				if (submitbutton2.value == 'Pesquisar'){
@@ -107,12 +107,12 @@
 
 	<!-- Início do quadrado branco de fundo -->
 	<div class="qbranco">
-		
+
 		<!-- Início: Caixa da esquerda -->
 		<div class="cesquerda">
 
 			<!-- Título -->
-			<h1>Descritores</h1>
+			<h1>Descritores {{id}}</h1>
 
 			<!-- Início: Busca Descritores -->
 			<form class="formbusca" method="get" action="">
@@ -151,13 +151,13 @@
 
 								<!-- Link para glossário -->
 								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
-								
+
 								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								<input type="submit" value="&#9654;" class="fbbotao">
 
 							</form>
-						
+
 						</div>
 						<!-- Final: Valores a serem inseridos -->
 						<!-- Final: Exemplo de descritor numérico -->
@@ -285,13 +285,13 @@
 
 								<!-- Link para glossário -->
 								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
-								
+
 								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								<input type="submit" value="&#9654;" class="fbbotao">
 
 							</form>
-						
+
 						</div>
 						<!-- Final: Valores a serem inseridos -->
 						<!-- Final: Exemplo de descritor numérico -->
@@ -428,13 +428,13 @@
 
 								<!-- Link para glossário -->
 								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
-								
+
 								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								<input type="submit" value="&#9654;" class="fbbotao">
 
 							</form>
-						
+
 						</div>
 						<!-- Final: Valores a serem inseridos -->
 						<!-- Final: Exemplo de descritor numérico -->
@@ -562,13 +562,13 @@
 
 								<!-- Link para glossário -->
 								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
-								
+
 								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
 								<input type="submit" value="&#9654;" class="fbbotao">
 
 							</form>
-						
+
 						</div>
 						<!-- Final: Valores a serem inseridos -->
 						<!-- Final: Exemplo de descritor numérico -->
@@ -690,7 +690,7 @@
 
 				</div>
 				<!-- Final: Div Descritor superior -->
-				
+
 			</div>
 			<!-- Final: Descritores disponíveis -->
 
@@ -759,7 +759,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -780,7 +780,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -801,7 +801,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -822,7 +822,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -843,7 +843,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -864,7 +864,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -885,7 +885,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -906,7 +906,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -936,7 +936,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -957,7 +957,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -978,7 +978,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -999,7 +999,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1020,7 +1020,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1041,7 +1041,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1062,7 +1062,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1083,7 +1083,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1104,7 +1104,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1125,7 +1125,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1146,7 +1146,7 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
@@ -1167,13 +1167,13 @@
 
 						<!-- Família da espécie -->
 						<p class="famisp">Família</p>
-						
+
 					</div>
 					<!-- Final: Div Texto espécie -->
 
 				</div>
 				<!-- Final: Div individual espécie -->
-				
+
 			</div>
 			<!-- Final: Espécies descartadas -->
 
