@@ -1,3 +1,5 @@
+//TODO: só chamar api 1 vez (p cada especie e especime)
+
 $(document).ready(function(){
   $.post("/api/Identification/identify", {param: []}, function(data){
 
@@ -20,7 +22,7 @@ $(document).ready(function(){
           var autor = especime["dwc:scientificNameAuthorship"].value;
           var familia = especime["dwc:family"].value;
           console.log(nome, autor, familia);
-          $("#" + item.id + " > .nsp").append("<p class='nomesp'><i>" + nome + " </i>" + autor + "</p>");
+          $("#" + item.id + " > .nsp").append("<a href='/profile/especies?id=" + item.id + "'><p class='nomesp'><i>" + nome + " </i>" + autor + "</p></a>");
           $("#" + item.id + " > .nsp").append("<p class='famisp'>" + familia + "</p>");
         });
       });
