@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="css/chave.css">
+
+	<!-- JQuery Accordion -->
+	<link rel="stylesheet" href="chave/jquery-ui.css">
+	<script src="chave/jquery.js"></script>
+	<script src="chave/jquery-ui.js"></script>
+
+    <script type="text/javascript" src="/javascript/chave.js"></script>
+
+	<!-- Campos de busca e JQuery Accordion -->
+	<script type="text/javascript">
+	window.onload = function(){
+
+		//Limpa texto da busca dos descritores
+		var btpdescritores = document.getElementById("buscadescritores");
+
+		if(btpdescritores.addEventListener){
+			btpdescritores.addEventListener("click", function() {
+				if (btpdescritores.value == 'Pesquisar'){
+					btpdescritores.value = '';
+				}
+			});
+		}
+
+		//Limpa texto da busca das espécies
+		var submitbutton2 = document.getElementById("buscaespecies");
+
+		if(submitbutton2.addEventListener){
+			submitbutton2.addEventListener("click", function() {
+				if (submitbutton2.value == 'Pesquisar'){
+					submitbutton2.value = '';
+				}
+			});
+		}
+
+	//Código das Chaves - JQuery Accordion
+	$(function () {
+	    $(".accordion").accordion({
+	        collapsible: true,
+	        active: false,
+	        autoHeight: false
+	    });
+	    var icons = $(".accordion").accordion("option", "icons");
+	    $('.open').click(function () {
+	        $('.ui-accordion-header').removeClass('ui-corner-all').addClass('ui-accordion-header-active ui-state-active ui-corner-top').attr({
+	            'aria-selected': 'true',
+	                'tabindex': '0'
+	        });
+	        $('.ui-accordion-header-icon').removeClass(icons.header).addClass(icons.headerSelected);
+	        $('.ui-accordion-content').addClass('ui-accordion-content-active').attr({
+	            'aria-expanded': 'true',
+	                'aria-hidden': 'false'
+	        }).show();
+	        $(this).attr("disabled", "disabled");
+	        $('.close').removeAttr("disabled");
+	    });
+	    $('.close').click(function () {
+	        $('.ui-accordion-header').removeClass('ui-accordion-header-active ui-state-active ui-corner-top').addClass('ui-corner-all').attr({
+	            'aria-selected': 'false',
+	                'tabindex': '-1'
+	        });
+	        $('.ui-accordion-header-icon').removeClass(icons.headerSelected).addClass(icons.header);
+	        $('.ui-accordion-content').removeClass('ui-accordion-content-active').attr({
+	            'aria-expanded': 'false',
+	                'aria-hidden': 'true'
+	        }).hide();
+	        $(this).attr("disabled", "disabled");
+	        $('.open').removeAttr("disabled");
+	    });
+	    $('.ui-accordion-header').click(function () {
+	        $('.open').removeAttr("disabled");
+	        $('.close').removeAttr("disabled");
+
+	    });
+	});
+
+	}
+	</script>
+
+	<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<!-- Início do quadrado branco de fundo -->
+	<div class="qbranco">
+
+		<!-- Início: Caixa da esquerda -->
+		<div class="cesquerda">
+
+			<!-- Título -->
+			<h1>Descritores</h1>
+
+			<!-- Início: Busca Descritores -->
+			<form class="formbusca" method="get" action="">
+				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			</form>
+
+			<div class="tfclear"></div>
+			<!-- Final: Busca Descritores -->
+
+			<!-- Início: Descritores disponíveis -->
+			<div class="roxinho">
+
+				<!-- Botões de Expandir/Ocultar -->
+				<div class="divaeh">
+					<button type="button" class="open expocu">Mostrar todos</button>
+					<button type="button" class="close expocu">Ocultar todos</button>
+				</div>
+
+				<!-- Início: Div descritores superiores -->
+				<div class="agregadordescritores accordion">
+
+					<!-- Nome do descritor superior -->
+					<h3>Agregador de Descritores</h3>
+
+					<!-- Início: Div contendo todos os descritores dentro do descritor superior -->
+					<div class="descritor accordion">
+
+						<!-- Início: Exemplo de descritor numérico -->
+						<!-- Nome de descritor numérico -->
+						<h3>Descritor numérico</h3>
+
+						<!-- Início: Valores numéricos a serem inseridos -->
+						<div class="valoresn">
+
+							<form class="valornum" method="get" action="">
+
+								<!-- Link para glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
+
+								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								<input type="submit" value="&#9654;" class="fbbotao">
+
+							</form>
+
+						</div>
+						<!-- Final: Valores a serem inseridos -->
+						<!-- Final: Exemplo de descritor numérico -->
+
+						<!-- Início: Exemplo descritor de valor fixo -->
+						<!-- Nome de descritor de valor fixo -->
+						<h3> Descritor fixo</h3>
+
+						<!-- Início: Valores fixos a serem selecionados -->
+						<ul class="valoresi">
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						</ul>
+						<!-- Final: Valores fixos a serem selecionados -->
+
+						<!-- Início: Exemplo de descritor numérico -->
+						<!-- Nome de descritor numérico -->
+						<h3> Descritor numérico </h3>
+
+						<!-- Início: Valores numéricos a serem inseridos -->
+						<div class="valoresn">
+
+							<form class="valornum" method="get" action="">
+
+								<!-- Link para glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
+
+								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								<input type="submit" value="&#9654;" class="fbbotao">
+
+							</form>
+
+						</div>
+						<!-- Final: Valores a serem inseridos -->
+						<!-- Final: Exemplo de descritor numérico -->
+
+						<!-- Início: Exemplo descritor de valor fixo -->
+						<!-- Nome de descritor de valor fixo -->
+						<h3> Descritor fixo</h3>
+
+						<!-- Início: Valores fixos a serem selecionados -->
+						<ul class="valoresi">
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						</ul>
+						<!-- Final: Valores fixos a serem selecionados -->
+
+					</div>
+					<!-- Final: Div contendo todos os descritores dentro do descritor superior -->
+
+					<!-- Nome do descritor superior -->
+					<h3> Agregador de Descritores</h3>
+
+					<!-- Início: Div contendo todos os descritores dentro do descritor superior -->
+					<div class="descritor accordion">
+
+						<!-- Início: Exemplo de descritor numérico -->
+						<!-- Nome de descritor numérico -->
+						<h3> Descritor numérico </h3>
+
+						<!-- Início: Valores numéricos a serem inseridos -->
+						<div class="valoresn">
+
+							<form class="valornum" method="get" action="">
+
+								<!-- Link para glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
+
+								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								<input type="submit" value="&#9654;" class="fbbotao">
+
+							</form>
+
+						</div>
+						<!-- Final: Valores a serem inseridos -->
+						<!-- Final: Exemplo de descritor numérico -->
+
+						<!-- Início: Exemplo descritor de valor fixo -->
+						<!-- Nome de descritor de valor fixo -->
+						<h3> Descritor fixo</h3>
+
+						<!-- Início: Valores fixos a serem selecionados -->
+						<ul class="valoresi">
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						</ul>
+						<!-- Final: Valores fixos a serem selecionados -->
+
+						<!-- Início: Exemplo de descritor numérico -->
+						<!-- Nome de descritor numérico -->
+						<h3> Descritor numérico </h3>
+
+						<!-- Início: Valores numéricos a serem inseridos -->
+						<div class="valoresn">
+
+							<form class="valornum" method="get" action="">
+
+								<!-- Link para glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="lala"></a>
+
+								Min <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								Max <input type="text" class="numnum" size="5" maxlength="12" value="00.00"> un &nbsp;&nbsp;&nbsp;
+								<input type="submit" value="&#9654;" class="fbbotao">
+
+							</form>
+
+						</div>
+						<!-- Final: Valores a serem inseridos -->
+						<!-- Final: Exemplo de descritor numérico -->
+
+						<!-- Início: Exemplo descritor de valor fixo -->
+						<!-- Nome de descritor de valor fixo -->
+						<h3> Descritor fixo</h3>
+
+						<!-- Início: Valores fixos a serem selecionados -->
+						<ul class="valoresi">
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						<!-- Início: Valor fixo com imagem -->
+						<li class="vimagens">
+							<p>
+
+								<!-- Imagem representante do valor fixo -->
+								<img src="img/lspm.jpg" class="vimg">
+
+								<!-- Link e icone para o glossário -->
+								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
+
+								<!-- Texto com o nome do descrito fixo -->
+								Valor do descritor
+
+							</p>
+						</li>
+						<!-- Final: Valor fixo com imagem -->
+
+						</ul>
+						<!-- Final: Valores fixos a serem selecionados -->
+
+					</div>
+					<!-- Final: Div contendo todos os descritores dentro do descritor superior -->
+
+				</div>
+				<!-- Final: Div Descritor superior -->
+
+			</div>
+			<!-- Final: Descritores disponíveis -->
+
+			<!-- Título -->
+			<h2>Descritores selecionados</h2>
+
+			<!-- Início: Descritores selecionados -->
+			<div class="roxinho">
+
+
+
+			</div>
+			<!-- Final: Descritores selecionados -->
+
+		</div>
+		<!-- Final: Caixa da esquerda -->
+
+		<!-- Início: Caixa da direita -->
+		<div class="cdireita">
+
+			<!-- Título -->
+			<h1>Espécies</h1>
+
+			<!-- Início: Busca Espécies -->
+			<form class="formbusca" method="get" action="">
+				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			</form>
+			<div class="tfclear"></div>
+			<!-- Final: Busca Espécies -->
+
+			<!-- Início: Espécies disponíveis -->
+			<div class="roxinho">
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+			</div>
+			<!-- Final: Espécies disponíveis -->
+
+			<!-- Título -->
+			<h2>Espécies descartadas</h2>
+
+			<!-- Início: Espécies descartadas -->
+			<div class="roxinho">
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+				<!-- Início: Div individual espécie -->
+				<div class="especies">
+
+					<!-- Imagem da espécie -->
+					<img src="img/lspm.jpg">
+
+					<!-- Início: Div Texto espécie -->
+					<div class="nsp">
+
+						<!-- Nome e autor da espécie -->
+						<p class="nomesp"><i>Nome espécie</i> Autor espécie</p>
+
+						<!-- Família da espécie -->
+						<p class="famisp">Família</p>
+
+					</div>
+					<!-- Final: Div Texto espécie -->
+
+				</div>
+				<!-- Final: Div individual espécie -->
+
+			</div>
+			<!-- Final: Espécies descartadas -->
+
+		</div>
+		<!-- Final: Caixa da direita -->
+
+	</div>
+	<!-- Final do quadrado branco de fundo -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+</html>

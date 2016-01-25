@@ -1,7 +1,13 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
+var path = require("path");
 
 var app = module.exports = loopback();
+
+app.use('/profile/species', function(req, res, next){
+  var file = path.resolve(__dirname, "../", "client/ficha_especie.html");
+  res.sendFile(file);
+});
 
 app.start = function() {
   // start the web server
