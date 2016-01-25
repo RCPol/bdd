@@ -1,20 +1,9 @@
-<<<<<<< HEAD
 
   //$.getJSON("/api/Species/89ce2d9a768ac2605cc1d82df590dd54", {}, function(data){
   //16e63286e2bc9d76a5ea2718a5109a43
   function readSpecies(id){
 
   $.getJSON("/api/Species/"+id, {}, function(data){
-=======
-//TODO: só chamar api 1 vez
-
-$(document).ready(function(){
-  //TODO: como acessar diretamente o parametro GET da url?
-  var id = window.location.search.replace("?", "").split("=")[1];
-
-  //$.getJSON("/api/Species/16e63286e2bc9d76a5ea2718a5109a43", {}, function(data){
-  $.getJSON("/api/Species/" + id, {}, function(data){
->>>>>>> origin/master
     $.getJSON("/api/Specimens/" + data.specimens[0].id, {}, function(specimen){
       // titulo
       document.title = specimen["dwc:scientificName"].value + " " + specimen["dwc:scientificNameAuthorship"].value;
@@ -43,7 +32,7 @@ $(document).ready(function(){
       //TODO: imagens da planta
 
       //TODO: Descrição Polínica
-      $("#unidadeDeDispersaoDoPolen").append(data["rcpol:pollenDispersalUnit"].value);
+
     });
   });
 };

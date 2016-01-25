@@ -6,26 +6,6 @@ var fs = require('fs');
 
 var app = module.exports = loopback();
 
-app.get('/profile/especies', function(req, res){
-  var file = path.resolve(__dirname, "../client/ficha_especie.html");
-  res.sendFile(file);
-});
-
-app.get('/profile/especimes', function(req, res){
-  var file = path.resolve(__dirname, "../client/ficha_especime.html");
-  res.sendFile(file);
-});
-
-app.get('/profile/palinotecas', function(req, res){
-  var file = path.resolve(__dirname, "../client/ficha_palinoteca.html");
-  res.sendFile(file);
-});
-
-app.get('/profile/chave', function(req, res){
-  var file = path.resolve(__dirname, "../client/chave.html");
-  res.sendFile(file);
-});
-
 app.start = function() {
   // start the web server
   return app.listen(function() {
@@ -41,8 +21,8 @@ app.start = function() {
 app.use(loopback.compress());
 app.use(loopback.static(path.resolve(__dirname, '../client')));
 
-// Aqui vai ter que ser diferente porque a quantidade de parâmetros é variável. Vai ter que usar os parametros do tipo ?parmA=X&paramB=Y
-app.get('/:id', function(req, res) {
+// Aqui (para a chave) vai ter que ser diferente porque a quantidade de parâmetros é variável. Vai ter que usar os parametros do tipo ?parmA=X&paramB=Y
+app.get('/', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');
   // var partials = {
   //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
