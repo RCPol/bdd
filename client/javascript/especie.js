@@ -1,7 +1,4 @@
-
-  //$.getJSON("/api/Species/89ce2d9a768ac2605cc1d82df590dd54", {}, function(data){
-  //16e63286e2bc9d76a5ea2718a5109a43
-  function readSpecies(id){
+function readSpecies(id){
 
   $.getJSON("/api/Species/"+id, {}, function(data){
     $.getJSON("/api/Specimens/" + data.specimens[0].id, {}, function(specimen){

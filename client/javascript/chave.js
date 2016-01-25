@@ -5,7 +5,6 @@ $(document).ready(function(){
 
     /* estados */
     //TODO: Agregador de descritores
-    console.log(data.response.eligibleStates);
     data.response.eligibleStates.forEach(function(descritor){
       //$.getJSON("/api/Species/findOnw")
     });
@@ -21,8 +20,8 @@ $(document).ready(function(){
           var nome = especime["dwc:scientificName"].value;
           var autor = especime["dwc:scientificNameAuthorship"].value;
           var familia = especime["dwc:family"].value;
-          console.log(nome, autor, familia);
-          $("#" + item.id + " > .nsp").append("<a href='/profile/especies?id=" + item.id + "'><p class='nomesp'><i>" + nome + " </i>" + autor + "</p></a>");
+
+          $("#" + item.id + " > .nsp").append("<a href='/profile/species/" + item.id + "'><p class='nomesp'><i>" + nome + " </i>" + autor + "</p></a>");
           $("#" + item.id + " > .nsp").append("<p class='famisp'>" + familia + "</p>");
         });
       });
