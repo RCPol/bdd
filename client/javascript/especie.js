@@ -32,7 +32,7 @@
       //TODO: imagens da planta
 
       //TODO: Descrição Polínica
-
+      $("#unidadeDeDispersaoDoPolen").append(data["rcpol:pollenDispersalUnit"].value);
     });
   });
 };
