@@ -11,12 +11,9 @@
 	<script src="/javascript/jquery.js"></script>
 	<script src="/javascript/jquery-ui.js"></script>
 
-    <script type="text/javascript" src="/javascript/chave.js"</script>
-
 	<!-- Campos de busca e JQuery Accordion -->
 	<script type="text/javascript">
-	window.onload = function(){
-
+	  window.onload = function(){
 		//Limpa texto da busca dos descritores
 		var btpdescritores = document.getElementById("buscadescritores");
 
@@ -38,10 +35,10 @@
 				}
 			});
 		}
-
+     }
 	//Código das Chaves - JQuery Accordion
-	$(function () {
-	    $(".accordion").accordion({
+     function createAccordion(){
+	  $(".accordion").accordion({
 	        collapsible: true,
 	        active: false,
 	        autoHeight: false
@@ -78,10 +75,10 @@
 	        $('.close').removeAttr("disabled");
 
 	    });
-	});
-
 	}
 	</script>
+
+    <script type="text/javascript" src="/javascript/chave.js"></script>
 
 	<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
 </head>
@@ -140,119 +137,7 @@
 					<h3>Agregador de Descritores</h3>
 
 					<!-- Início: Div contendo todos os descritores dentro do descritor superior -->
-					<div id="descritores" class="descritor accordion">
-
-						<!-- Início: Exemplo descritor de valor fixo -->
-						<!-- Nome de descritor de valor fixo -->
-						<h3> Descritor fixo</h3>
-
-						<!-- Início: Valores fixos a serem selecionados -->
-						<ul class="valoresi">
-
-						<!-- Início: Valor fixo com imagem -->
-						<li class="vimagens">
-							<p>
-
-								<!-- Imagem representante do valor fixo -->
-								<img src="/img/lspm.jpg" class="vimg">
-
-								<!-- Link e icone para o glossário -->
-								<a href="#" target="_blank"><img src="/img/glo.png" class="vglos"></a>
-
-								<!-- Texto com o nome do descrito fixo -->
-								Valor do descritor
-
-							</p>
-						</li>
-						<!-- Final: Valor fixo com imagem -->
-
-						<!-- Início: Valor fixo com imagem -->
-						<li class="vimagens">
-							<p>
-
-								<!-- Imagem representante do valor fixo -->
-								<img src="/img/lspm.jpg" class="vimg">
-
-								<!-- Link e icone para o glossário -->
-								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
-
-								<!-- Texto com o nome do descrito fixo -->
-								Valor do descritor
-
-							</p>
-						</li>
-						<!-- Final: Valor fixo com imagem -->
-
-						<!-- Início: Valor fixo com imagem -->
-						<li class="vimagens">
-							<p>
-
-								<!-- Imagem representante do valor fixo -->
-								<img src="img/lspm.jpg" class="vimg">
-
-								<!-- Link e icone para o glossário -->
-								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
-
-								<!-- Texto com o nome do descrito fixo -->
-								Valor do descritor
-
-							</p>
-						</li>
-						<!-- Final: Valor fixo com imagem -->
-
-						<!-- Início: Valor fixo com imagem -->
-						<li class="vimagens">
-							<p>
-
-								<!-- Imagem representante do valor fixo -->
-								<img src="img/lspm.jpg" class="vimg">
-
-								<!-- Link e icone para o glossário -->
-								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
-
-								<!-- Texto com o nome do descrito fixo -->
-								Valor do descritor
-
-							</p>
-						</li>
-						<!-- Final: Valor fixo com imagem -->
-
-						<!-- Início: Valor fixo com imagem -->
-						<li class="vimagens">
-							<p>
-
-								<!-- Imagem representante do valor fixo -->
-								<img src="img/lspm.jpg" class="vimg">
-
-								<!-- Link e icone para o glossário -->
-								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
-
-								<!-- Texto com o nome do descrito fixo -->
-								Valor do descritor
-
-							</p>
-						</li>
-						<!-- Final: Valor fixo com imagem -->
-
-						<!-- Início: Valor fixo com imagem -->
-						<li class="vimagens">
-							<p>
-
-								<!-- Imagem representante do valor fixo -->
-								<img src="img/lspm.jpg" class="vimg">
-
-								<!-- Link e icone para o glossário -->
-								<a href="#" target="_blank"><img src="img/glo.png" class="vglos"></a>
-
-								<!-- Texto com o nome do descrito fixo -->
-								Valor do descritor
-
-							</p>
-						</li>
-						<!-- Final: Valor fixo com imagem -->
-
-						</ul>
-						<!-- Final: Valores fixos a serem selecionados -->
+					<div class="descritor accordion">
 
 					</div>
 					<!-- Final: Div contendo todos os descritores dentro do descritor superior -->

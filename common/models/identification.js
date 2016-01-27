@@ -1,5 +1,6 @@
 //var hash = require('object-hash');
 var _ = require('underscore');
+//var mad = require('mongo-aggregation-debugger')(); //FOR DEBUGGING THE AGGREGATION
 
 module.exports = function(Identification) {
   Identification.populate = function(filter, callback){
@@ -25,6 +26,44 @@ module.exports = function(Identification) {
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
 
+        /*FOR DEBUGGING THE AGGREGATION
+         Identification.find(function(err, id_items){
+
+          mad.log(id_items, [
+            { $unwind: '$states'},
+            { $unwind: '$states.states'},
+            { $project: {
+              _id: 0,
+              'descriptor': '$states.descriptor',
+              'id': '$states.id',
+              'state': '$states.states'
+            }},
+            { $group: {
+              _id: { descriptor: '$descriptor', id: '$id', state: '$state'},
+              sum: {$sum:1}
+            }},
+            { $project: {
+              _id: 0,
+              descriptor: '$_id.descriptor',
+              id: '$_id.id',
+              state: '$_id.state',
+              count: '$sum'
+            }},
+            { $group: {
+              _id: { descriptor: '$descriptor', id: '$id'},
+              states: {$push: {state: '$state', count: '$count'}}
+            }},
+            { $project:{
+              _id: 0,
+              descriptor: '$_id.descriptor',
+              id: '$_id.id',
+              states: '$states'
+            }}
+          ], function(err){
+            if(err) throw new Error(err);
+          });
+        });*/
+
         IdentificationCollection.aggregate([
           { $match: queryMongo},
           { $unwind: '$states'},
@@ -32,26 +71,28 @@ module.exports = function(Identification) {
           { $project: {
             _id: 0,
             'descriptor': '$states.descriptor',
-            //'state': '$states.state'
+            'id': '$states.id',
             'state': '$states.states'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor', state: '$state'},
+            _id: { descriptor: '$descriptor', id: '$id', state: '$state'},
             sum: {$sum:1}
           }},
           { $project: {
             _id: 0,
             descriptor: '$_id.descriptor',
+            id: '$_id.id',
             state: '$_id.state',
             count: '$sum'
           }},
           { $group: {
-            _id: '$descriptor',
+            _id: { descriptor: '$descriptor', id: '$id'},
             states: {$push: {state: '$state', count: '$count'}}
           }},
           { $project:{
-            //_id: 0,
-            descriptor: '$_id.descriptor',
+            _id: 0,
+            descriptor_name: '$_id.descriptor',
+            descriptor_id: '$_id.id',
             states: '$states'
           }}
         ], function (error, states) {
@@ -97,15 +138,15 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
           // we can have multiple states
 
           var entry = {
-            //descriptor: "rcpol:" + species[key].term, //DEBUG
-            descriptor: species[key].id,
+            descriptor: species[key].label,
+            id: species[key].id,
             states: []
           };
 
           species[key].states.forEach(function(state){
             entry.states.push(
-              //"rcpol:" + species[key].term + ":" + state.value //DEBUG
-              state.id
+              state.value //DEBUG
+              //state.id
             );
           });
 
