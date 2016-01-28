@@ -1,10 +1,12 @@
-$(document).ready(function(){
-  //var query = [{"descriptor": "Cor da flor", "state": "lilás"}, {"descriptor": "Forma do pólen P/E", "state": "Muito pequeno"}];
+function identify(query_string){
+  console.log("query: ")
+  console.log(query_string);
+  if(query_string = ''){
+    var query = JSON.parse(query_string);
+  } else {
+    query = {};
+  }
 
-  identify(query);
-});
-
-function identify(query){
   // limpar tudo
   $("#especiesElegiveis").empty();
   $(".descritor").empty();

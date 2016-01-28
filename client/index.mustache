@@ -75,7 +75,12 @@
 	        $('.close').removeAttr("disabled");
 
 	    });
-	}
+	  }
+
+      $(document).ready(function(){
+        //identify(query);
+        identify("{{query}}");
+      });
 	</script>
 
     <script type="text/javascript" src="/javascript/chave.js"></script>
@@ -111,7 +116,7 @@
 		<div class="cesquerda">
 
 			<!-- Título -->
-			<h1>Descritores {{id}}</h1>
+			<h1>Descritores</h1>
 
 			<!-- Início: Busca Descritores -->
 			<form class="formbusca" method="get" action="">

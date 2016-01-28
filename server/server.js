@@ -27,9 +27,10 @@ app.get('/', function(req, res) {
   // var partials = {
   //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
   // };
-  var params = {id: req.params.id};
+  var params = {query: req.query};
   res.send(mustache.render(template, params));
 });
+
 // Repetir para os outros profiles
 app.get('/profile/species/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
