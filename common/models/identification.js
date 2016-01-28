@@ -173,16 +173,16 @@ function composeQuery(param, callback){
    for mongoDB
 
    query: {$and: [
-       {$or: [{"states.descriptor": "7", "states.state": 76}, {"states.descriptor": "7", "states.state": 67}, {"states.descriptor": "7", "states.state": 30}]},
-       {$or: [{"states.descriptor": "9", "states.state": 31}, {"states.descriptor": "9", "states.state": 36}]},
-       {$or: [{"states.descriptor": "8", "states.state": 53}]}]}
+       {$or: [{"states.descriptor": "7", "states.states": 76}, {"states.descriptor": "7", "states.states": 67}, {"states.descriptor": "7", "states.states": 30}]},
+       {$or: [{"states.descriptor": "9", "states.states": 31}, {"states.descriptor": "9", "states.states": 36}]},
+       {$or: [{"states.descriptor": "8", "states.states": 53}]}]}
 
    for loopback
 
    query: {and: [
-   {or: [{"states.descriptor": "7", "states.state": 76}, {"states.descriptor": "7", "states.state": 67}, {"states.descriptor": "7", "states.state": 30}]},
-   {or: [{"states.descriptor": "9", "states.state": 31}, {"states.descriptor": "9", "states.state": 36}]},
-   {or: [{"states.descriptor": "8", "states.state": 53}]}]}
+   {or: [{"states.descriptor": "7", "states.states": 76}, {"states.descriptor": "7", "states.states": 67}, {"states.descriptor": "7", "states.states": 30}]},
+   {or: [{"states.descriptor": "9", "states.states": 31}, {"states.descriptor": "9", "states.states": 36}]},
+   {or: [{"states.descriptor": "8", "states.states": 53}]}]}
 
    */
 
@@ -191,7 +191,7 @@ function composeQuery(param, callback){
   param.forEach(function(elem){
     param_fixed.push({
       "states.descriptor": elem['descriptor'],
-      "states.state": elem['state']
+      "states.states": elem['state']
     });
   });
   param = param_fixed;

@@ -10,8 +10,8 @@ function readSpecies(id){
 
       //TODO: iterar nas propriedades de "data"
       $("#habito").append(data["rcpol:habit"].value); //TODO: do for each state
-      $("#origem").append(specimen["dwc:establishmentMean"].value);
-      $("#periodoDeFloracao").append(specimen["rcpol:floweringPeriod"].value); //TODO
+      $("#origem").append(specimen["dwc:establishmentMean"].value); //TODO: pular se nao tiver a informação
+      $("#periodoDeFloracao").append(specimen["rcpol:floweringPeriod"].value); //TODO janeiro e fevereiro e março e abril....
 
       // caracteristicas da flor
       $("#sindromeDePolinizacao").append(data["rcpol:pollinationSyndrome"].value);
