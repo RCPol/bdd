@@ -1,11 +1,5 @@
 function identify(query_string){
-  console.log("query: ")
-  console.log(query_string);
-  if(query_string = ''){
-    var query = JSON.parse(query_string);
-  } else {
-    query = {};
-  }
+  var query = [{descriptor: "Cor da flor", state: "azul"}];
 
   // limpar tudo
   $("#especiesElegiveis").empty();
@@ -14,8 +8,8 @@ function identify(query_string){
 
   $.post("/api/Identification/identify", {param: query}, function(data){
 
-    var ids = data.response.eligibleItems.map(function(item) {return item.id});
-    var species_query = {where: {id: {inq: ids}}}
+    var ids = data.response.eligibleItems.map(function(item) {return item.id;});
+    var species_query = {where: {id: {inq: ids}}};
 
     $.getJSON("/api/Species/", {filter : species_query}, function(especies){
 
@@ -25,10 +19,16 @@ function identify(query_string){
       });
 
       /* descritores */
-      //TODO: Agregador de descritores
-      data.response.eligibleStates.forEach(function(descritor){
-        escreverDescritor(descritor);
-      });
+      // apenas se houver ainda mais de uma especie
+      if (especies.length > 1){
+        //TODO: Agregador de descritores
+        data.response.eligibleStates.forEach(function(descritor){
+          /* apenas escrever descritores com mais de um estado */
+          if(descritor.states.length > 1){
+            escreverDescritor(descritor);
+          }
+        });
+      }
 
       createAccordion();
       escreverEspeciesDescartadas(ids, query);
@@ -39,9 +39,8 @@ function identify(query_string){
 function escreverEspeciesDescartadas(ids, query){
   $.post("/api/Identification/identify", {}, function(data){
 
-    //var excluding_ids = data.response.eligibleItems.map(function(item) { if(ids.indexOf(item.id) == -1){ return item.id}});
-    var excluding_ids = $.map( data.response.eligibleItems, function(item) { if(ids.indexOf(item.id) == -1){ return item.id}});
-    var excluding_species_query = {where: {id: {inq: excluding_ids}}}
+    var excluding_ids = $.map( data.response.eligibleItems, function(item) { if(ids.indexOf(item.id) == -1){ return item.id;}});
+    var excluding_species_query = {where: {id: {inq: excluding_ids}}};
 
     if(excluding_ids.length > 0){
       $.getJSON("/api/Species/", {filter : excluding_species_query}, function(especies){
@@ -51,7 +50,7 @@ function escreverEspeciesDescartadas(ids, query){
           escreverEspecie(especie, "#especiesDescartadas");
         });
 
-        /* descritores descartados */
+        /* descritores selecionados */
         query.forEach(function(estado){
           $("#descritoresSelecionados").append("<h3>" + estado.descriptor + ": " + estado.state + "</h3>");
         });
