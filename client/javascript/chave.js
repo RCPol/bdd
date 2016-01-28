@@ -1,10 +1,32 @@
-function identify(query_string){
-  var query = [{descriptor: "Cor da flor", state: "azul"}];
+//TODO: campos de busca
+var query = [];
+
+function composeQuery(){
+  $(":checked").each( function(){
+    var name = $(this).attr('name');
+    var d = name.split(":")[0];
+    var s = name.split(":")[1];
+
+    query.push({descriptor: d, state: s});
+  });
+
+
+  identify(query);
+}
+
+function resetQuery(){
+  query = [];
+  identify(query);
+}
+
+function identify(query){
+  //query = [{descriptor:"Cor da flor", state: "azul"}];
 
   // limpar tudo
   $("#especiesElegiveis").empty();
   $(".descritor").empty();
   $("#especiesDescartadas").empty();
+  $("#descritoresSelecionados").empty();
 
   $.post("/api/Identification/identify", {param: query}, function(data){
 
@@ -69,7 +91,7 @@ function escreverEspecie(especie, nicho){
     var autor = especime['dwc:scientificNameAuthorship'].value;
     var familia = especime['dwc:family'].value;
 
-    $(nicho + " > #" + especie.id + " > .nsp").append("<a href='/profile/species/" + especie.id + "'><p class='nomesp'><i>" + nome + " </i>" + autor + "</p></a>");
+    $(nicho + " > #" + especie.id + " > .nsp").append("<a href='/profile/species/" + especie.id + "' target='_blank' ><p class='nomesp'><i>" + nome + " </i>" + autor + "</p></a>");
     $(nicho + " > #" + especie.id + " > .nsp").append("<p class='famisp'>" + familia + "</p>");
   });
 }
@@ -80,6 +102,6 @@ function escreverDescritor(descritor){
   $(".descritor").append("<ul class='valoresi'></ul>");
 
   descritor.states.forEach(function(estado){
-    $(".descritor ul").last().append("<li class='vimagens'><p><!-- Imagem representante do valor fixo --><img src='/img/lspm.jpg' class='vimg'><!-- Link e icone para o glossário --><a href='#' target='_blank'><img src='/img/glo.png' class='vglos'></a>" + estado.state + " - " + estado.count + "</p></li>");
+    $(".descritor ul").last().append("<input name='" + descritor.descriptor_name + ":" + estado.state + "' type='checkbox' class='vimagens'><p><!-- Imagem representante do valor fixo --><img src='/img/lspm.jpg' class='vimg'><!-- Link e icone para o glossário --><a href='#' target='_blank'><img src='/img/glo.png' class='vglos'></a>" + estado.state + " - " + estado.count + "</p></input>");
   });
 }
