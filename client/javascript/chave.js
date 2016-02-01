@@ -52,7 +52,7 @@ function identify(query){
         });
       }
 
-      createAccordion();
+      $(".accordion").accordion("refresh");
       escreverEspeciesDescartadas(ids, query);
     });
   });
