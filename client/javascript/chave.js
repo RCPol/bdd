@@ -1,5 +1,47 @@
-//TODO: campos de busca
 var query = [];
+var descritoresElegiveis = [];
+
+function buscaDescritores() {
+  $(".descritor").empty();
+
+  var key = $("#buscadescritores").val().trim().toLowerCase();
+
+  descritoresElegiveis.forEach(function(descritor){
+    // checar se a palavra pesquisada é substring do descritor ou de algum estado deste descritor
+    var is_in_states = false;
+    descritor.states.forEach(function(estado){
+      if (estado.state.toLowerCase().indexOf(key) != -1){
+        is_in_states = true;
+      }
+    });
+    if(descritor.descriptor_name.toLowerCase().indexOf(key) != -1 || is_in_states){
+      escreverDescritor(descritor);
+    }
+  });
+  $(".accordion").accordion("refresh");
+}
+
+function buscaEspecies() {
+  //$("#especiesElegiveis").empty();
+
+  var key = $("#buscaespecies").val().trim().toLowerCase();
+
+  $("#especiesElegiveis div").each(function(){
+    if( $(this).find("p").text().toLowerCase().indexOf(key) === -1 ){
+      $(this).fadeOut();
+    }
+    else { // queremos que as outras divs fiquem invisiveis, mas que nao sejam deletadas
+           // caso o usuario precise fazer uma nova pesquisa
+      $(this).fadeIn();
+    }
+  });
+
+  /*especiesElegiveis.forEach(function(especie){
+    if( especie.nome.toLowerCase().indexOf(key) != -1 || especie.familia.toLowerCase().indexOf(key) != -1 ){
+      escreverEspecie(especie, "#especiesElegiveis");
+    }
+  });*/
+}
 
 function composeQuery(){
   $(":checked").each( function(){
@@ -27,6 +69,7 @@ function identify(query){
   $(".descritor").empty();
   $("#especiesDescartadas").empty();
   $("#descritoresSelecionados").empty();
+  descritoresElegiveis = [];
 
   $.post("/api/Identification/identify", {param: query}, function(data){
 
@@ -47,18 +90,19 @@ function identify(query){
         data.response.eligibleStates.forEach(function(descritor){
           /* apenas escrever descritores com mais de um estado */
           if(descritor.states.length > 1){
+            descritoresElegiveis.push(descritor);
             escreverDescritor(descritor);
           }
         });
       }
 
       $(".accordion").accordion("refresh");
-      escreverEspeciesDescartadas(ids, query);
+      escreverDescartados(ids, query);
     });
   });
 }
 
-function escreverEspeciesDescartadas(ids, query){
+function escreverDescartados(ids, query){
   $.post("/api/Identification/identify", {}, function(data){
 
     var excluding_ids = $.map( data.response.eligibleItems, function(item) { if(ids.indexOf(item.id) == -1){ return item.id;}});
