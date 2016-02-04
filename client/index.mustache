@@ -6,14 +6,23 @@
 	<!-- Css Documento -->
 	<link rel="stylesheet" href="/css/chave.css">
 
-	<!-- JQuery Accordion -->
-	<link rel="stylesheet" href="/javascript/jquery-ui.css">
+	<!-- JQuery -->
 	<script src="/javascript/jquery.js"></script>
-	<script src="/javascript/jquery-ui.js"></script>
 
-	<!-- Campos de busca e JQuery Accordion -->
+    <!-- JQuery Rolagem -->
+	<link rel="stylesheet" href="/javascript/jquery.mCustomScrollbar.css">
+	<script src="/javascript/jquery.mCustomScrollbar.concat.min.js"></script>
+
+	<!-- Campos de busca, scrollbar e botões  -->
 	<script type="text/javascript">
 	  window.onload = function(){
+
+        //Barras de Rolagem das caixas
+		$(".roxinho").mCustomScrollbar({
+		  scrollButtons:{ enable: true },
+		  theme: "dark"
+		});
+
 		//Limpa texto da busca dos descritores
 		var btpdescritores = document.getElementById("buscadescritores");
 
@@ -35,51 +44,52 @@
 				}
 			});
 		}
-     }
-	//Código das Chaves - JQuery Accordion
-     function createAccordion(){
-			 this.created = true;
-	  $(".accordion").accordion({
-	        collapsible: true,
-	        active: false,
-	        autoHeight: false
-	    });
-	    var icons = $(".accordion").accordion("option", "icons");
-	    $('.open').click(function () {
-	        $('.ui-accordion-header').removeClass('ui-corner-all').addClass('ui-accordion-header-active ui-state-active ui-corner-top').attr({
-	            'aria-selected': 'true',
-	                'tabindex': '0'
-	        });
-	        $('.ui-accordion-header-icon').removeClass(icons.header).addClass(icons.headerSelected);
-	        $('.ui-accordion-content').addClass('ui-accordion-content-active').attr({
-	            'aria-expanded': 'true',
-	                'aria-hidden': 'false'
-	        }).show();
-	        $(this).attr("disabled", "disabled");
-	        $('.close').removeAttr("disabled");
-	    });
-	    $('.close').click(function () {
-	        $('.ui-accordion-header').removeClass('ui-accordion-header-active ui-state-active ui-corner-top').addClass('ui-corner-all').attr({
-	            'aria-selected': 'false',
-	                'tabindex': '-1'
-	        });
-	        $('.ui-accordion-header-icon').removeClass(icons.headerSelected).addClass(icons.header);
-	        $('.ui-accordion-content').removeClass('ui-accordion-content-active').attr({
-	            'aria-expanded': 'false',
-	                'aria-hidden': 'true'
-	        }).hide();
-	        $(this).attr("disabled", "disabled");
-	        $('.open').removeAttr("disabled");
-	    });
-	    $('.ui-accordion-header').click(function () {
-	        $('.open').removeAttr("disabled");
-	        $('.close').removeAttr("disabled");
-	    });
-	  }
+
+        //Toggle Descritores
+        $(".accordion").on("click", ".toggle", function(e){
+		  e.preventDefault();
+
+		  var $this = $(this);
+
+		  if ($this.next().hasClass('show')) {
+			$this.next().removeClass('show');
+			$this.next().slideUp(350);
+			$this.children('span').html('+');
+		  } else {
+			$this.parent().parent().find('li .inner').removeClass('show');
+			$this.parent().parent().find('li .inner').slideUp(350);
+			$this.next().toggleClass('show');
+			$this.next().slideToggle(350);
+			$this.children('span').html('&minus;');
+		  }
+		});
+
+		//Botão Mostrar todos
+		$('.open').click(function(){
+		  $('.inner').addClass('show');
+		  $('li .inner').slideUp(350);
+		  $('li .inner').slideToggle(350);
+		  $('.accordion').find('span').html('&minus;');
+		});
+
+		//Botão Ocultar todos
+		$('.close').click(function(){
+		  $('.inner').removeClass('show');
+		  $('li .inner').slideUp(350);
+		  $('.accordion').find('span').html('+');
+		});
+
+		//Ao clicar adiciona a classe selecionado à div vimagens
+        $(".accordion").on("click", ".vimagens", function(){
+		  if ($(this).hasClass('selecionado')) {
+			$(this).removeClass('selecionado');
+		  } else {
+			$(this).addClass('selecionado');
+		  }
+		});
+      }
 
       $(document).ready(function(){
-				createAccordion.created = false;
-        //createAccordion();
         identify('');
       });
 	</script>
@@ -131,21 +141,18 @@
 			<div class="roxinho">
 				<!-- Botões de Expandir/Ocultar -->
 				<div class="divaeh">
-                    <button type="button" class="expocu" onclick="composeQuery()"> Identificar </button>
-                    <button type="button" class="expocu" onclick="resetQuery()"> Restaurar </button>
                     <button type="button" class="open expocu">Ver todos</button>
 					<button type="button" class="close expocu">Ocultar todos</button>
+                    <button type="button" class="btnident" onclick="composeQuery()">Identificar &#9654;</button>
 				</div>
 
 				<!-- Início: Div descritores superiores -->
-				<div class="agregadordescritores accordion">
-					<!-- <h3 id="category_">Agregador de Descritores 1</h3>
-					<div class="descritor accordion"></div> -->
-					<!-- <h3 id="category_">Agregador de Descritores 1</h3><div class="descritor accordion"></div> -->
-					<!-- Nome do descritor superior -->
-					<!-- Início: Div contendo todos os descritores dentro do descritor superior -->
+				<div class="agregadordescritores">
 
-					<!-- Final: Div contendo todos os descritores dentro do descritor superior -->
+                  <ul class="accordion">
+
+                  </ul>
+
 				</div>
 				<!-- Final: Div Descritor superior -->
 			</div>
@@ -155,9 +162,16 @@
 			<h2>Descritores selecionados</h2>
 
 			<!-- Início: Descritores selecionados -->
-			<div id="descritoresSelecionados" class="roxinho">
+			<div class="roxinho">
 
+              <!-- Botões de Expandir/Ocultar -->
+				<div class="divaeh">
+					<button type="button" class="expocu" onclick="resetQuery()">Remover todos</button>
+					<button type="button" class="expocu" onclick="removeSelected()">Remover Selecionados</button>
+				</div>
 
+                <div id="descritoresSelecionados" class="descel">
+                </div>
 
 			</div>
 			<!-- Final: Descritores selecionados -->
@@ -179,8 +193,8 @@
 			<!-- Final: Busca Espécies -->
 
 			<!-- Início: Espécies disponíveis -->
-			<div id="especiesElegiveis" class="roxinho">
-
+			<div class="roxinho">
+              <div id="especiesElegiveis"></div>
 			</div>
 			<!-- Final: Espécies disponíveis -->
 
@@ -188,8 +202,10 @@
 			<h2>Espécies descartadas</h2>
 
 			<!-- Início: Espécies descartadas -->
-			<div id="especiesDescartadas" class="roxinho">
+			<div class="roxinho">
 
+              <div id="especiesDescartadas">
+              </div>
 
 			</div>
 			<!-- Final: Espécies descartadas -->

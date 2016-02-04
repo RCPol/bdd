@@ -5,7 +5,7 @@ var statesDb = {};
 var eligibleSpeciesDB = {};
 
 function composeQuery(){
-  $(":checked").each( function(){
+  $(".selecionado").each( function(){
     var name = $(this).attr('name');
     var d = name.split(":")[0];
     var s = name.split(":")[1];
@@ -17,7 +17,18 @@ function resetQuery(){
   query = [];
   identify(query);
 }
-
+function removeSelected(){
+  $("input:checked").each(function(){
+    var $this = $(this);
+    query = query.filter(function(elem){
+      if(elem.descriptor == $this.attr('descriptor') && elem.state == $this.attr('state'))
+        return false;
+      else
+        return true;
+    });
+  });
+  identify(query);
+}
 function identify(query){
   //query = [{descriptor:"Cor da flor", state: "azul"}];
   // limpar tudo
@@ -32,9 +43,11 @@ function identify(query){
     console.log("Identify()", data.response);
     var ids = data.response.eligibleItems.map(function(item) {return item.id;});
     var species_query = {where: {id: {inq: ids}}};
+    if (ids.length == 0)
+      species_query = {where: {id: ""}};
     $.getJSON("/api/Species/", {filter : species_query}, function(species){
       // clean eligible itens
-      eligibleSpeciesDB = {}
+      eligibleSpeciesDB = {};
       /* especies */
       $("#elegibleCount").html("#"+species.length+" espécies elegiveis");
       species.forEach(function(item){
@@ -42,11 +55,6 @@ function identify(query){
         getSpecies(item, "#especiesElegiveis", writeSpecies);
       });
       setDiscartedSpecies();
-      // apenas se houver ainda mais de uma especie
-      // PATRICK, Pq existe isso? Teoricamente, se só há uma espécie, o estados elegiveis deveria ser zerado, não?
-      if (species.length > 1){
-        //TODO: Agregador de descritores
-      }
     });
     data.response.eligibleStates.forEach(function(descriptor){
       /* apenas escrever descritores com mais de um estado */
@@ -55,9 +63,7 @@ function identify(query){
         writeDescriptor(descriptor);
       }
     });
-    if(!createAccordion.created)
-      createAccordion();
-    $(".accordion").accordion("refresh");
+
   });
 }
 function setEligibleSpecies(species){
@@ -66,13 +72,13 @@ function setEligibleSpecies(species){
 function setDiscartedSpecies(){
   for (var id in speciesDb) {
     if(typeof eligibleSpeciesDB[id] == 'undefined'){
-        writeSpecies(id,"#especiesDescartadas")
+      writeSpecies(id,"#especiesDescartadas");
     }
   }
 }
 function writeSelectedState(){
-    query.forEach(function(selected){
-      $("#descritoresSelecionados").append("<b>" + selected.descriptor + "</b>: " + selected.state + "<br>");
+  query.forEach(function(selected, i){
+    $(".descel").append("<input descriptor='" + selected.descriptor +"' state='" + selected.state +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + selected.descriptor + ": " + selected.state + "</label><br>");
     });
 };
 function getSpecies(species, nicho, callback){
@@ -95,27 +101,27 @@ function writeSpecies(id, nicho){
   $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
   $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
 }
-
 function writeDescriptor(descritor){
-   if(!$('#category_'+descritor.category_name).html()){
-     var cat = '<h3 id="category_'+descritor.category_name+'">'+descritor.category_name+'</h3>';
-     var des = '<div id="desc_for_'+descritor.category_name+'" class="descritor accordion"></div>';
-     $('.agregadordescritores').html(cat+"\n"+des+$('.agregadordescritores').html());
-   }
+
+  if(!$('#category_'+descritor.category_name).html()){
+    var cat = "<a id='category_" + descritor.category_name + "' class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.category_name + "</a>";
+    var des = '<ul id="desc_for_'+descritor.category_name+'" class="descritor inner"></ul>';
+    $('.accordion').append("<li>" + cat+"\n"+des + "</li>");
+  }
+
   //TODO: usar ids para consultar Schema
-  $("#desc_for_"+descritor.category_name).append("<h3>" + descritor.descriptor_name + "</h3>");
-  $("#desc_for_"+descritor.category_name).append("<ul class='valoresi'></ul>");
+  $("#desc_for_"+descritor.category_name).append("<li><a class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.descriptor_name + "</a></li>");
+  $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
+
   descritor.states.forEach(function(estado){
-    $("#desc_for_"+descritor.category_name+" ul").last().append(
-    "<p>"+
-      "<input name='" + descritor.descriptor_name + ":" + estado.state + "' type='checkbox' class='vimagens'></input>"+
-      "<!-- Imagem representante do valor fixo -->"+
-      "<img src='/img/lspm.jpg' class='vimg'>"+
-      "<!-- Link e icone para o glossário -->"+
-      "<a href='#' target='_blank'>"+
+    $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
+      "<div class='vimagens' name='" + descritor.descriptor_name + ":" + estado.state + "'>"
+      + "<p>"+
+        "<img src='/img/lspm.jpg' class='vimg'>"+
+        "<a href='#' target='_blank'>"+
         "<img src='/img/glo.png' class='vglos'>"+
-      "</a>  " + estado.state + " (" + estado.count+ ")" +
-    "</p>");
+        "</a>  " + estado.state + " (" + estado.count+ ")" +
+    "</p></div>");
   });
 }
 
@@ -134,10 +140,8 @@ function buscaDescritores() {
       writeDescriptor(descritor);
     }
   });
-  $(".accordion").accordion("refresh");
 }
 function buscaEspecies() {
-  //$("#especiesElegiveis").empty();
   var key = $("#buscaespecies").val().trim().toLowerCase();
   $("#especiesElegiveis div").each(function(){
     if( $(this).find("p").text().toLowerCase().indexOf(key) === -1 ){
@@ -148,9 +152,4 @@ function buscaEspecies() {
       $(this).fadeIn();
     }
   });
-  /*especiesElegiveis.forEach(function(especie){
-    if( especie.nome.toLowerCase().indexOf(key) != -1 || especie.familia.toLowerCase().indexOf(key) != -1 ){
-      writeSpecies(especie, "#especiesElegiveis");
-    }
-  });*/
 }

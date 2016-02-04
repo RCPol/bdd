@@ -20,20 +20,20 @@ body {
 
 /* Barra de rolagem */
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
 }
-
+ 
 /* Fundo */
 ::-webkit-scrollbar-track {
 	background-color: #DAC1DD;
 }
-
+ 
 /* Indicador */
 ::-webkit-scrollbar-thumb {
 	background-color: rgba(81,10,84,0.4);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-	background-color: rgba(81,10,84,0.2);
+	background-color: rgba(81,10,84,0.2); 
 }
 
 /* Links */
@@ -180,10 +180,11 @@ div.cdireita {
 /* Quadrados conteúdo */
 div.roxinho {
 	background-color: rgba(240, 230, 255, 0.5);
-	width: 375px;
+	width: 412px;
 	height: 387px;
-	padding: 25px 37px 25px 25px;
+	padding: 25px 0 25px 25px;
 	overflow: auto;
+	position: relative;
 }
 
 /* Botões expandir/ocultar */
@@ -205,10 +206,28 @@ div.roxinho {
 	background-color: #DAC1DD;
 }
 
+.btnident {
+	margin: 0;
+	padding: 5px 7px;
+	font-size: 13px;
+	font-weight:bold;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	border: solid 1px #470054;
+	background: #470054;
+	color: #DAC1DD;
+}
+
+.btnident:hover {
+	color: #f27121;
+}
+
 div.divaeh {
-	width: 100%;
+	width: 375px;
 	text-align: right;
-	margin: 0 0 7px 0;
+	margin: 0 37px 7px 0;
 	display: block;
 	clear: both;
 }
@@ -217,7 +236,7 @@ div.agregadordescritores {
 	width: 356px;
 }
 
-div.descritor {
+ul.descritor {
 	padding: 0 0 7px 19px !important;
 	width: 356px;
 }
@@ -237,12 +256,6 @@ img.lala {
 }
 
 /* Textos descritores*/
-div.agregadordescritores h3 {
-	font-size: 16px;
-	line-height: 21px;
-	font-weight: normal;
-}
-
 div.agregadordescritores p {
 	font-size: 16px;
 	line-height: 21px;
@@ -259,8 +272,7 @@ div.agregadordescritores p {
 }
 
 /* Imagens descritores */
-ul.valoresi {
-	list-style-type: none;
+div.valoresi {
 	padding: 0 0 0 10px !important;
 	width: 333px;
 	margin: 0;
@@ -268,14 +280,21 @@ ul.valoresi {
 	overflow: auto;
 }
 
-li.vimagens {
+div.vimagens {
 	float: left;
 	width: 100px;
-	padding: 0 0 7px 10px;
-	margin: 0;
+	margin: 2px 0 5px 10px;
 	position: relative;
 	left: 0;
 	top: 0;
+	cursor: pointer;
+}
+
+div.vimagens.selecionado {
+	background-color: #F0E6FF;
+	-moz-box-shadow: 0px 0px 0px 2px #470054;
+	-webkit-box-shadow: 0px 0px 0px 2px #470054;
+	box-shadow: 0px 0px 0px 2px #470054;
 }
 
 img.vimg {
@@ -292,136 +311,111 @@ img.vglos {
 	position: absolute;
 	top: 3px;
 	left: 3px;
-	padding: 0 0 7px 10px;
 }
 
-li.vimagens p {
+div.vimagens p {
 	font-size: 14px;
 	line-height: 16px;
 	text-align: center;
 }
 
-/* Accordion Jquery */
-.ui-accordion .ui-accordion-header {
-	padding: 0 0 7px 0 !important;
-	margin: 0 !important;
-}
-
-.ui-accordion .ui-accordion-icons {
-	padding-left: 0 !important;
-}
-
-.ui-accordion .ui-accordion-icons .ui-accordion-icons {
-	padding-left: 0 !important;
-}
-
-.ui-accordion .ui-accordion-header .ui-accordion-header-icon {
-	position: relative !important;
-	left: 0 !important;
-	top: 0 !important;
-	padding: 3px 5px 0 0 !important;
-	margin: 0 !important;
-}
-
-.ui-accordion .ui-accordion-content {
+/* Toggle Chaves */
+ul.accordion {
+	list-style: none;
 	padding: 0;
 }
 
-.ui-accordion-content {
-	height: auto !important;
-}
-
-.ui-state-default,
-.ui-widget-content .ui-state-default,
-.ui-widget-header .ui-state-default {
-	border: 0 !important;
-	background: transparent !important;
-}
-
-.ui-state-hover,
-.ui-widget-content .ui-state-hover,
-.ui-widget-header .ui-state-hover,
-.ui-state-focus,
-.ui-widget-content .ui-state-focus,
-.ui-widget-header .ui-state-focus {
-	border: 0 !important;
-	background: transparent !important;
-}
-
-.ui-state-active,
-.ui-widget-content .ui-state-active,
-.ui-widget-header .ui-state-active {
-	border: 0 !important;
-	background: transparent !important;
-}
-
-.ui-state-highlight,
-.ui-widget-content .ui-state-highlight,
-.ui-widget-header .ui-state-highlight {
-	border: 0 !important;
-	background: transparent !important;
-}
-
-.ui-widget-content {
-	border: 0 !important;
-	background: transparent !important;
-}
-
-.ui-widget-header {
-	border: 0 !important;
-	background: transparent !important;
-}
-
-/* Icone Jquery Accordion */
-.ui-icon {
-	padding: 3px 5px 0 0 !important;
-	margin: 0 !important;
-	float: left;
-	display: block;
-	text-indent: 0 !important;
+ul .inner {
+	list-style: none;
 	overflow: hidden;
-	background-repeat: no-repeat;
-	width: 14px !important;
-	height: 14px !important;
+	display: none;
 }
 
-.ui-icon,
-.ui-widget-content .ui-icon {
-	background-image: url("../img/mais.png") !important;
+ul .inner.show {
+	/*display: block;*/
 }
 
-.ui-widget-header .ui-icon {
-	background-image: url("../img/mais.png") !important;
+ul li {
+	margin: 0;
 }
 
-.ui-state-default .ui-icon {
-	background-image: url("../img/mais.png") !important;
+ul li a.toggle {
+	display: block;
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+	padding: 0 0 3px 0;
 }
 
-.ui-state-hover .ui-icon,
-.ui-state-focus .ui-icon {
-	background-image: url("../img/mais.png") !important;
+ul li a.toggle span {
+	display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #A978B3;
+	color: #A978B3;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 10px;
+	text-align: center;
 }
 
-.ui-state-active .ui-icon {
-	background-image: url("../img/menos.png") !important;
+/* Descritores Selecionados*/
+.descsel {
+	width: width: 356px;
 }
 
-.ui-state-highlight .ui-icon {
-	background-image: url("../img/mais.png") !important;
+.descsel input[type=checkbox] {
+	display:none;
 }
 
-.ui-state-error .ui-icon,
-.ui-state-error-text .ui-icon {
-	background-image: url("../img/mais.png") !important;
+.descsel label {
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+	color: #470054;
 }
 
-.ui-icon-triangle-1-e {
-	background-position: 0 !important;
+.descsel input[type=checkbox] + label:before {
+	content: "\00a0";  
+	display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #A978B3;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #A978B3;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 5px 0 0;
 }
 
-.ui-icon-triangle-1-s {
-	background-position: 0 !important;
+.descsel input[type=checkbox]:checked + label:before {
+	content: "\00d7";
+    display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #A978B3;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #A978B3;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 5px 0 0;
 }
 
 /* Espécies */
@@ -440,12 +434,12 @@ div.especies img {
 	height: 100px;
 	float: left;
 	margin: 0 12px 0 0;
-	order: 0;
+	order: <integer>;
 	text-align: center;
 }
 
 div.nsp {
-	order: 0;
+	order: <integer>;
 	margin: auto 0;
 }
 

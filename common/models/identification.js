@@ -101,7 +101,6 @@ module.exports = function(Identification) {
         ], function (error, states) {
           if (err) throw new Error(err);
           var results = {eligibleItems: items, eligibleStates: states};
-          //console.log(results);
           callback(null, results);
         });
       });
