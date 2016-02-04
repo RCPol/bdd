@@ -106,7 +106,16 @@ function writeDescriptor(descritor){
   $("#desc_for_"+descritor.category_name).append("<h3>" + descritor.descriptor_name + "</h3>");
   $("#desc_for_"+descritor.category_name).append("<ul class='valoresi'></ul>");
   descritor.states.forEach(function(estado){
-    $("#desc_for_"+descritor.category_name+" ul").last().append("<input name='" + descritor.descriptor_name + ":" + estado.state + "' type='checkbox' class='vimagens'><p><!-- Imagem representante do valor fixo --><img src='/img/lspm.jpg' class='vimg'><!-- Link e icone para o glossário --><a href='#' target='_blank'><img src='/img/glo.png' class='vglos'></a>" + estado.state + " - " + estado.count + "</p></input>");
+    $("#desc_for_"+descritor.category_name+" ul").last().append(
+    "<p>"+
+      "<input name='" + descritor.descriptor_name + ":" + estado.state + "' type='checkbox' class='vimagens'></input>"+
+      "<!-- Imagem representante do valor fixo -->"+
+      "<img src='/img/lspm.jpg' class='vimg'>"+
+      "<!-- Link e icone para o glossário -->"+
+      "<a href='#' target='_blank'>"+
+        "<img src='/img/glo.png' class='vglos'>"+
+      "</a>  " + estado.state + " (" + estado.count+ ")" +
+    "</p>");
   });
 }
 
