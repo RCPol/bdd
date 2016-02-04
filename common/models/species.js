@@ -25,6 +25,9 @@ module.exports = function(Species) {
       Specimen.find({where:{"dwc:scientificName.value":name}}, function (err,specimens) {
         var species = {};
         species.specimens = [];
+        species["dwc:family"] = specimens[0]["dwc:family"];
+        species["dwc:scientificName"] = specimens[0]["dwc:scientificName"];
+        species["dwc:scientificNameAuthorship"] = specimens[0]["dwc:scientificNameAuthorship"];
         specimens.forEach(function (sp) {
           species.specimens.push({id:sp.id});
           Object.keys(sp).forEach(function(key,index) {
@@ -38,7 +41,6 @@ module.exports = function(Species) {
               } else if(sp[key].class=="NumericalDescriptor"){
                 if(!species[key]){
                   //if(sp[key].term=="pollenShapePE"){
-
                   //}else{
                     species[key] = sp[key];
                     species[key].states = [];

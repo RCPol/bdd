@@ -38,6 +38,7 @@
      }
 	//Código das Chaves - JQuery Accordion
      function createAccordion(){
+			 this.created = true;
 	  $(".accordion").accordion({
 	        collapsible: true,
 	        active: false,
@@ -77,7 +78,8 @@
 	  }
 
       $(document).ready(function(){
-        createAccordion();
+				createAccordion.created = false;
+        //createAccordion();
         identify('');
       });
 	</script>
@@ -127,27 +129,23 @@
 
 			<!-- Início: Descritores disponíveis -->
 			<div class="roxinho">
-
 				<!-- Botões de Expandir/Ocultar -->
 				<div class="divaeh">
                     <button type="button" class="expocu" onclick="composeQuery()"> Identificar </button>
-                    <button type="button" class="expocu" onclick="resetQuery()"> R </button>
-                    <button type="button" class="open expocu">Mostrar todos</button>
+                    <button type="button" class="expocu" onclick="resetQuery()"> Restaurar </button>
+                    <button type="button" class="open expocu">Ver todos</button>
 					<button type="button" class="close expocu">Ocultar todos</button>
 				</div>
 
 				<!-- Início: Div descritores superiores -->
 				<div class="agregadordescritores accordion">
-
+					<!-- <h3 id="category_">Agregador de Descritores 1</h3>
+					<div class="descritor accordion"></div> -->
+					<!-- <h3 id="category_">Agregador de Descritores 1</h3><div class="descritor accordion"></div> -->
 					<!-- Nome do descritor superior -->
-					<h3>Agregador de Descritores</h3>
-
 					<!-- Início: Div contendo todos os descritores dentro do descritor superior -->
-					<div class="descritor accordion">
 
-					</div>
 					<!-- Final: Div contendo todos os descritores dentro do descritor superior -->
-
 				</div>
 				<!-- Final: Div Descritor superior -->
 			</div>

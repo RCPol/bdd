@@ -22,18 +22,18 @@ body {
 ::-webkit-scrollbar {
     width: 12px;
 }
- 
+
 /* Fundo */
 ::-webkit-scrollbar-track {
 	background-color: #DAC1DD;
 }
- 
+
 /* Indicador */
 ::-webkit-scrollbar-thumb {
 	background-color: rgba(81,10,84,0.4);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-	background-color: rgba(81,10,84,0.2); 
+	background-color: rgba(81,10,84,0.2);
 }
 
 /* Links */
@@ -420,7 +420,7 @@ li.vimagens p {
 	background-position: 0 !important;
 }
 
-.ui-icon-triangle-1-s { 
+.ui-icon-triangle-1-s {
 	background-position: 0 !important;
 }
 
@@ -440,12 +440,12 @@ div.especies img {
 	height: 100px;
 	float: left;
 	margin: 0 12px 0 0;
-	order: <integer>;
+	order: 0;
 	text-align: center;
 }
 
 div.nsp {
-	order: <integer>;
+	order: 0;
 	margin: auto 0;
 }
 

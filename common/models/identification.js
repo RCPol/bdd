@@ -71,11 +71,12 @@ module.exports = function(Identification) {
           { $project: {
             _id: 0,
             'descriptor': '$states.descriptor',
+            'category': '$states.category',
             'id': '$states.id',
             'state': '$states.states'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor', id: '$id', state: '$state'},
+            _id: { descriptor: '$descriptor', id: '$id', state: '$state', category:"$category"},
             sum: {$sum:1}
           }},
           { $project: {
@@ -83,14 +84,16 @@ module.exports = function(Identification) {
             descriptor: '$_id.descriptor',
             id: '$_id.id',
             state: '$_id.state',
+            category: '$_id.category',
             count: '$sum'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor', id: '$id'},
+            _id: { descriptor: '$descriptor',category: '$category', id: '$id'},
             states: {$push: {state: '$state', count: '$count'}}
           }},
           { $project:{
             _id: 0,
+            category_name: '$_id.category',
             descriptor_name: '$_id.descriptor',
             descriptor_id: '$_id.id',
             states: '$states'
@@ -138,6 +141,7 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
           // we can have multiple states
 
           var entry = {
+            category: species[key].category,
             descriptor: species[key].label,
             id: species[key].id,
             states: []
