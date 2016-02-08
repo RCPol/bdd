@@ -38,6 +38,18 @@ app.get('/profile/species/:id', function(req, res) {
   res.send(mustache.render(template, params));
 });
 
+app.get('/profile/specimen/:id', function(req, res) {
+  var template = fs.readFileSync('./client/specimen.mustache', 'utf8');
+  var params = {id: req.params.id};
+  res.send(mustache.render(template, params));
+});
+
+app.get('/profile/palinoteca/:id', function(req, res) {
+  var template = fs.readFileSync('./client/palinoteca.mustache', 'utf8');
+  var params = {id: req.params.id};
+  res.send(mustache.render(template, params));
+});
+
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
