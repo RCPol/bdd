@@ -24,56 +24,57 @@
 
 	<!-- Início: Códigos para o Mapa e Tabela -->
 	<script type="text/javascript">
-	$(document).ready(function(){
+	  $(document).ready(function(){
 		readSpecies("{{id}}");
-	});
-		window.onload = function(){
+	  });
 
-			// Início do código do Mapa
-			var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
-			mapLink = '<a href="./especie_eugenia.html">Ocorrências de Eugenia uniflora L.</a>';
-			L.tileLayer(
-					'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-						attribution: mapLink,
-						maxZoom: 18
-					}).addTo(map);
-			// Ribeirao
-			p = [-21.8067,-47.8908];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
-			p = [-21.1707,-47.8238];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
-			p = [-21.297,-47.4298];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
+	  window.onload = function(){
 
-			//Gramado
-			p = [-29.3688,-50.8786];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
-			p = [-29.0688,-50.0786];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
+		// Início do código do Mapa
+		var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
+		mapLink = '<a href="./{{id}}">Ocorrências de <span id="mapLink"></span></a>';
+		L.tileLayer(
+		  'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: mapLink,
+			maxZoom: 18
+		  }).addTo(map);
+		// Ribeirao
+		p = [-21.8067,-47.8908];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
+		p = [-21.1707,-47.8238];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
+		p = [-21.297,-47.4298];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
 
-			//Fortaleza
-			p = [-3.71839,-38.5434];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
+		//Gramado
+		p = [-29.3688,-50.8786];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
+		p = [-29.0688,-50.0786];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
 
-			//Uberlandia
-			p = [-18.9113,-48.2622];
-			var marker = L.marker(p,
-					{opacity: 0.9}
-			).addTo(map);
+		//Fortaleza
+		p = [-3.71839,-38.5434];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
 
-			//Final do Código do Mapa
+		//Uberlandia
+		p = [-18.9113,-48.2622];
+		var marker = L.marker(p,
+					          {opacity: 0.9}
+		).addTo(map);
+
+		//Final do Código do Mapa
 
 		//Início do Código da Tabela-Grid
 		$('#grid').w2grid({
@@ -115,8 +116,6 @@
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
 
-
-	<!-- <title>RCPol - Eugenia uniflora L.</title> -->
 </head>
 <body>
 <div class="contem">

@@ -28,6 +28,7 @@ module.exports = function(Species) {
         species["dwc:family"] = specimens[0]["dwc:family"];
         species["dwc:scientificName"] = specimens[0]["dwc:scientificName"];
         species["dwc:scientificNameAuthorship"] = specimens[0]["dwc:scientificNameAuthorship"];
+        species["dwc:establishmentMean"] = specimens[0]["dwc:establishmentMean"];
         specimens.forEach(function (sp) {
           species.specimens.push({id:sp.id});
           Object.keys(sp).forEach(function(key,index) {

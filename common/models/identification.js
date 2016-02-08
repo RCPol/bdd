@@ -146,12 +146,17 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
             states: []
           };
 
+          console.log(key);
+          console.log(species[key]);
+
+          if(species[key].states){
           species[key].states.forEach(function(state){
             entry.states.push(
               state.value //DEBUG
               //state.id
             );
           });
+          }
 
           identification_item["states"].push(entry);
         }
