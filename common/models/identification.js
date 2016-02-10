@@ -22,7 +22,9 @@ module.exports = function(Identification) {
     console.log(param);
 
     composeQuery(param, function(query, queryMongo){
+      console.log(JSON.stringify(query));
       Identification.find({where: query, fields: 'id'}, function (err, items) {
+        console.log(items);
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
 
