@@ -1,9 +1,9 @@
-function readSpecies(id){
+function readSpecies(id, map){
 
-  $.getJSON("/api/Species/"+id, {}, function(data){
+  $.getJSON("/api/Species/"+id, function(data){
     // titulo
-    document.title = data["dwc:scientificName"].value + " " + data["dwc:scientificNameAuthorship"].value;
-    $("#mapLink").append(document.title);
+    var name = data["dwc:scientificName"].value + " " + data["dwc:scientificNameAuthorship"].value;
+    document.title = name;
 
     // nome da espécie
     $("#nomeDaEspecie").append(document.title);
@@ -58,11 +58,23 @@ function readSpecies(id){
 
     escreverEstados("#ornamentacaoDaExina", data["rcpol:exineOrnamentation"].states);
 
+    // mapa
+    map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
+
     //especimes
     var specimen_ids = data.specimens.map(function(elem){return elem.id;});
-    $.getJSON("/api/Specimens/", {where: {id: {inq: specimen_ids}}}, function(specimens){
-      console.log(specimen_ids);
-      console.log(specimens);
+    var specimen_query = "filter[where][id][inq]=" + specimen_ids[0];
+    specimen_ids.forEach(function(id){
+      specimen_query += "&filter[where][id][inq]=" + id;
+    });
+
+    $.getJSON("/api/Specimens?" + specimen_query, function(specimens){
+      specimens.forEach(function(specimen, id){
+        var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
+        var marker = L.marker(p, {opacity:0.9}).addTo(map);
+        //TODO: nome da palinoteca, recorDedBy, abreviação do estado (SP, RJ)
+        w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recoredBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value});
+      });
     });
 
   });

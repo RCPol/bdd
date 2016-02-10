@@ -25,55 +25,17 @@
 	<!-- Início: Códigos para o Mapa e Tabela -->
 	<script type="text/javascript">
 	  $(document).ready(function(){
-		readSpecies("{{id}}");
-	  });
+		//readSpecies("{{id}}");
+	  //});
 
-	  window.onload = function(){
+	  //window.onload = function(){
 
 		// Início do código do Mapa
 		var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
-		mapLink = '<a href="./{{id}}">Ocorrências de <span id="mapLink"></span></a>';
 		L.tileLayer(
 		  'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: mapLink,
 			maxZoom: 18
 		  }).addTo(map);
-		// Ribeirao
-		p = [-21.8067,-47.8908];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-		p = [-21.1707,-47.8238];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-		p = [-21.297,-47.4298];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-
-		//Gramado
-		p = [-29.3688,-50.8786];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-		p = [-29.0688,-50.0786];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-
-		//Fortaleza
-		p = [-3.71839,-38.5434];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-
-		//Uberlandia
-		p = [-18.9113,-48.2622];
-		var marker = L.marker(p,
-					          {opacity: 0.9}
-		).addTo(map);
-
 		//Final do Código do Mapa
 
 		//Início do Código da Tabela-Grid
@@ -96,23 +58,14 @@
 					{ field: 'tipo', caption: 'Nome do Coletor', type: 'text' },
 					{ field: 'cidade', caption: 'Cidade', type: 'text' }
 				],
-				sortData: [{ field: 'recid', direction: 'ASC' }],
-				records: [
-					{ recid: 1, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-					{ recid: 2, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-					{ recid: 3, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da UFC', tipo: 'Dr. Ednardo Rodrigues Freitas',cidade: 'Fortaleza – CE'},
-					{ recid: 4, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da ULBRA', tipo: 'Dra. Soraia Girardi Bauermann',cidade: 'Gramado – RS'},
-					{ recid: 5, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da UFU', tipo: 'Priscila Ferreira de Sousa Moreira',cidade: 'Uberlândia – MG'},
-					{ recid: 6, species: 'Eugenia uniflora L.', palinoteca: 'Palinoteca da ULBRA', tipo: 'Dra. Soraia Girardi Bauermann',cidade: 'Gramado – RS'},
-					{ recid: 7, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'}
-				]
+				sortData: [{ field: 'recid', direction: 'ASC' }]
 			});
 			w2ui.grid.on('select', function(event) {
 				window.open("especime_eugenia.html");
 			});
 			//Final do Código da Tabela-Grid
-
-		}
+        readSpecies("{{id}}", map);
+		});
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
 
