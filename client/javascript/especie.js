@@ -100,7 +100,7 @@ function readSpecies(id, map){
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
         //TODO: nome da palinoteca, recorDedBy, abreviação do estado (SP, RJ)
-        w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recoredBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value});
+        w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recoredBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
       });
     });
 

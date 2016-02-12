@@ -19,12 +19,15 @@
 	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
 
+    <!-- Javascript Documento -->
+    <script type="text/javascript" src="/javascript/especime.js"></script>
+
 	<!-- Início: Códigos para o Mapa -->
 	<script type="text/javascript">
 		window.onload = function(){
 
 			// Início do código do Mapa
-			    var map = L.map('map',{scrollWheelZoom:false}).setView([-29.0688,-50.0786], 17);
+			    var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
 			    mapLink = '';
 			    L.tileLayer(
 			            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -32,10 +35,7 @@
 			                maxZoom: 17
 			            }).addTo(map);
 
-			    var p = [-29.0688,-50.0786];
-			    var marker = L.marker(p,
-			            {opacity: 0.85}
-			    ).addTo(map);
+                readSpecimen("{{id}}", map);
 			};
 
 			//Final do Código do Mapa
@@ -73,7 +73,7 @@
 	<article>
 
 		<!-- Nome da espécie e onde se encontra o espécime -->
-		<h1 class="spm">Esp&eacute;cime de <i>Eugenia uniflora</i> L. depositado na cole&ccedil;&atilde;o do Laborat&oacute;rio de Palinologia da Universidade Luterana do Brasil - ULBRA</h1>
+	  <h1 class="spm">Esp&eacute;cime de <i><span id="nome"></span></i> L. depositado na cole&ccedil;&atilde;o do Laborat&oacute;rio de Palinologia da Universidade Luterana do Brasil - ULBRA</h1>
 
 		<!-- Início: Embrulho Informações e Logo -->
 		<div class="cspm">
@@ -120,17 +120,17 @@
 
 				<h2>Informações da Coleta</h2>
 
-				<p><b>Coletor:</b> Dra. Soraia Girardi Bauermann</p>
+				<p><b>Coletor:</b> <span id="coletor"></span></p>
 				<p><b>N&uacute;mero do Coletor:</b> 0671</p>
 				<p><b>Herb&aacute;rio:</b> Nome do Herbário</p>
-				<p><b>N&uacute;mero de Registro no Herb&aacute;rio:</b> 00000</p>
+				<p><b>N&uacute;mero de Registro no Herb&aacute;rio:</b> <span id="numeroDeRegistroNoHerbario"></span></p>
 				<p><b>N&uacute;mero de Registro na Palinoteca:</b> 013</p>
-				<p><b>Pa&iacute;s:</b> Brasil</p>
-				<p><b>Estado:</b> RS</p>
-				<p><b>Munic&iacute;pio:</b> Gramado</p>
-				<p><b>Bioma:</b> Cerrado</p>
-				<p><b>Latitude:</b> -29.0688</p>
-				<p><b>Longitude:</b> -50.0786</p>
+				<p><b>Pa&iacute;s:</b> <span id="pais"></span></p>
+				<p><b>Estado:</b> <span id="estado"></span></p>
+				<p><b>Munic&iacute;pio:</b> <span id="municipio"></span></p>
+				<p><b>Bioma:</b> <span id="bioma"></span></p>
+				<p><b>Latitude:</b> <span id="latitude"></span></p>
+				<p><b>Longitude:</b> <span id="longitude"></span></p>
 
 				<h2>Informa&ccedil;&otilde;es Adicionais</h2>
 

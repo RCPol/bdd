@@ -51,7 +51,8 @@
 					{ field: 'species', caption: 'Nome da Espécie', size: '20%', sortable: true, resizable: true },
 					{ field: 'palinoteca', caption: 'Palinoteca', size: '30%', sortable: true, resizable: true },
 					{ field: 'tipo', caption: 'Nome do Coletor', size: '25%', resizable: true },
-					{ field: 'cidade', caption: 'Cidade', size: '25%', resizable: true }
+				    { field: 'cidade', caption: 'Cidade', size: '25%', resizable: true },
+                    { field: 'specimen_id', caption: 'Specimen_id', size: '20px', resizable: true, hidden: true }
 				],
 				searches: [
 					{ field: 'palinoteca', caption: 'Palinotéca', type: 'text' },
@@ -60,9 +61,9 @@
 				],
 				sortData: [{ field: 'recid', direction: 'ASC' }]
 			});
-			w2ui.grid.on('select', function(event) {
-				window.open("especime_eugenia.html");
-			});
+		    w2ui.grid.on('click', function(event) {
+                window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
+            });
 			//Final do Código da Tabela-Grid
         readSpecies("{{id}}", map);
 		});
