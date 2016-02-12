@@ -29,6 +29,7 @@ module.exports = function(Species) {
         species["dwc:scientificName"] = specimens[0]["dwc:scientificName"];
         species["dwc:scientificNameAuthorship"] = specimens[0]["dwc:scientificNameAuthorship"];
         species["dwc:establishmentMean"] = specimens[0]["dwc:establishmentMean"];
+        species["rcpol:floweringPeriod"] = specimens[0]["rcpol:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
         specimens.forEach(function (sp) {
           species.specimens.push({id:sp.id});
           Object.keys(sp).forEach(function(key,index) {
