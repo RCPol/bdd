@@ -24,27 +24,33 @@
 
 	<!-- Início: Códigos para o Mapa -->
 	<script type="text/javascript">
-		window.onload = function(){
+		var specimenDb = {};
+		var marker = null;
+		$(document).ready(function(){
+			readSpecimen("{{id}}", function() {
+				var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
+				map.on("layeradd",function (e) {
+					if(marker == null){
+				    var p = [specimenDb["dwc:decimalLatitude"].value, specimenDb["dwc:decimalLongitude"].value];
+				    $("#latitude").append(p[0]);
+				    $("#longitude").append(p[1]);
+						marker = "Not null";
+						L.marker(p,{opacity:0.9}).addTo(map);
+				    map.setView(p, 17);
+				  }
+				})
+				mapLink = '';
+				L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: mapLink, maxZoom: 17}).addTo(map);
+			});
+		});
 
-			// Início do código do Mapa
-			    var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
-			    mapLink = '';
-			    L.tileLayer(
-			            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-			                attribution: mapLink,
-			                maxZoom: 17
-			            }).addTo(map);
-
-                readSpecimen("{{id}}", map);
-			};
-
-			//Final do Código do Mapa
+  	//Final do Código do Mapa
 
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
 
 
-	<title>RCPol - Eugenia uniflora L.</title>
+	<title>RCPol</title>
 </head>
 <body>
 <div class="contem">
