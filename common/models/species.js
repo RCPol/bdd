@@ -1,6 +1,29 @@
 var async = require('async');
 var hash = require('object-hash');
 module.exports = function(Species) {
+  Species.mainImage = function(id,cb) {
+    Species.findById(id, function (err, data) {
+      if(data["dwc:associatedMedia"]){
+        if(data["dwc:associatedMedia"].length>0){
+          cb(err,{url:data["dwc:associatedMedia"][data["dwc:associatedMedia"].length-1].url});
+        } else {
+          cb(err,{url:""});
+        }
+      } else {
+        cb(err,{url:""});
+      }
+    });
+  };
+  Species.remoteMethod(
+    'mainImage',
+    {
+      http: {path: '/mainImage', verb: 'get'},
+      accepts: [
+        {arg: 'id', type: 'array', required:true}
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Species.fromSpecimensAggregation = function(filter,cb) {
     selectScientificNames(filter,function (scientificNames) {
       generateSpecies(scientificNames,function(species) {
@@ -30,6 +53,7 @@ module.exports = function(Species) {
         species["dwc:scientificNameAuthorship"] = specimens[0]["dwc:scientificNameAuthorship"];
         species["dwc:establishmentMean"] = specimens[0]["dwc:establishmentMean"];
         species["rcpol:floweringPeriod"] = specimens[0]["rcpol:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
+        species["dwc:associatedMedia"] = specimens[0]["dwc:associatedMedia"];
         specimens.forEach(function (sp) {
           species.specimens.push({id:sp.id});
           Object.keys(sp).forEach(function(key,index) {

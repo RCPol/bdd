@@ -29,25 +29,39 @@ module.exports = function(Schema) {
           for(var c = 2; c < term.length; c++){
             if(line[c]){
               var field = toString(schema[c])+":"+toString(term[c]);
-              record[field] = {};
-              record[field].schema = toString(schema[c]);
-              record[field].class = toString(class_[c]);
-              record[field].term = toString(term[c]);
-              record[field].label = toString(label[c]);
-              record[field].value = toString(line[c]);
+              var current = {};
+              current.schema = toString(schema[c]);
+              current.class = toString(class_[c]);
+              current.term = toString(term[c]);
+              current.label = toString(label[c]);
+              current.value = toString(line[c]);
               // REFERENCE
-              if(record[field].term=="bibliographicCitation"){
-                record[field].references = [];
-                record[field].value.split("|").forEach(function (ref) {
-                  record[field].references.push(ref.trim());
+              if(current.term=="bibliographicCitation"){
+                current.references = [];
+                current.value.split("|").forEach(function (ref) {
+                  current.references.push(ref.trim());
                 });
               }else
               // IMAGE
-              if(record[field].term=="glossaryImage"){
-                record[field].images = [];
-                record[field].value.split("|").forEach(function (image) {
-                  record[field].images.push(image.trim());
+              if(current.term=="glossaryImage"){
+                current.images = [];
+                current.value.split("|").forEach(function (image) {
+                  current.images.push(image.trim());
                 });
+              }
+              // Check if exist field with the same key
+              if(record[field]){
+                // Check if the field is the is an Array
+                if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
+                    record[field].push(current);
+                } else {
+                  var old = Object.create(record[field]);
+                  record[field] = [];
+                  record[field].push(old);
+                  record[field].push(current);
+                }
+              } else {
+                record[field] = current;
               }
             }
           }
