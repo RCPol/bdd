@@ -26,7 +26,7 @@ function readSpecies(id, map){
     escreverEstados("#antese", data["rcpol:flowerOpeningTime"]);
     escreverEstados("#deiscenciaDaAntera", data["rcpol:antherDehiscence"]);
     escreverEstados("#odor", data["rcpol:odorPresence"]);
-    escreverEstados("#tipoDeRecursoFloral", data["rcpol:mainFloralResourceCollecteByVisitors"]); //TODO collecteD
+    escreverEstados("#tipoDeRecursoFloral", data["rcpol:mainFloralResourceCollectedByVisitors"]);
 
     //TODO: imagens da planta
 
@@ -34,6 +34,21 @@ function readSpecies(id, map){
     escreverEstados("#unidadeDeDispersaoDoPolen", data["rcpol:pollenDispersalUnit"], true);
 
     //$("#tamanhoDoPolen").append(data["rcpol:pollenDiameter"].value); //TODO
+
+    if (data["rcpol:pollenDiameter"]){
+      var d = data["rcpol:pollenDiameter"];
+      $("#pollenDiameter").append("D = " +d.mean + " ± " + d.sd + " (" + d.min + " - " + d.max + "), " );
+    }
+
+    if (data["rcpol:smallerPollenDiameter"]){
+      var smalld = data["rcpol:smallerPollenDiameter"];
+      $("#smallerPollenDiameter").append("Dmenor = " +smalld.mean + " ± " + smalld.sd + " (" + smalld.min + " - " + smalld.max + "), " );
+    }
+
+    if (data["rcpol:largerPollenDiameter"]){
+      var larged = data["rcpol:largerPollenDiameter"];
+      $("#largerPollenDiameter").append("Dmaior = " +larged.mean + " ± " + larged.sd + " (" + larged.min + " - " + larged.max + "), " );
+    }
 
     if (data["rcpol:polarAxis"]){
       var p = data["rcpol:polarAxis"];
@@ -100,7 +115,7 @@ function readSpecies(id, map){
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
         //TODO: nome da palinoteca, recorDedBy, abreviação do estado (SP, RJ)
-        w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recoredBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
+        w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recordedBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
       });
     });
 
