@@ -79,6 +79,30 @@ module.exports = function(Schema) {
     });
     request(url).pipe(w);
   };
+  Schema.mainImage = function(id, cb){
+    Schema.findById(id, function(err, data){
+      if(data["dwc:glossaryImage"]){
+        if(data["dwc:glossaryImage"].length > 0){
+          // check if url exists
+          cb(err,{url:data["dwc:associatedMedia"][data["dwc:associatedMedia"].length-1].url});
+        } else {
+          cb(err, {url:""});
+        }
+      } else {
+        cb(err, {url:""});
+      }
+    });
+  };
+  Schema.remoteMethod(
+    'mainImage',
+    {
+      http: {path: '/mainImage', verb: 'get'},
+      accepts: [
+        {arg: 'id', type: 'array', required:true}
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Schema.remoteMethod(
     'inputFromURL',
     {

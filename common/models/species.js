@@ -5,6 +5,7 @@ module.exports = function(Species) {
     Species.findById(id, function (err, data) {
       if(data["dwc:associatedMedia"]){
         if(data["dwc:associatedMedia"].length>0){
+          // check if url exists
           cb(err,{url:data["dwc:associatedMedia"][data["dwc:associatedMedia"].length-1].url});
         } else {
           cb(err,{url:""});

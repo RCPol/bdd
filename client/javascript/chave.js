@@ -101,19 +101,21 @@ function writeSpecies(id, nicho){
   $(nicho + " > #" + id).append("<div class='nsp'></div>");
   $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
   $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
-  getImage(id, nicho);
+  getImage(id, nicho, "Species");
 }
-function getImage(id, nicho){
-  $.getJSON('/api/Species/mainImage?id=' + id, {}, function(res){
-      // TODO: Fazer essa verificação no back-end
-      var status = jQuery.ajax({
+function getImage(id, nicho, model){
+  //$.getJSON('/api/Species/mainImage?id=' + id, {}, function(res){
+  $.getJSON('/api/' + model +'/mainImage?id=' + id, {}, function(res){
+    // TODO: Fazer essa verificação no back-end
+    /*var status = jQuery.ajax({
          type:"HEAD",
          url: res.response.url,
          async: false
-       }).status;
-      if(status != 404){
+     }).status;*/
+    var status = res.response.status;
+    if(status != 404){
         $(nicho+"_img_"+id).attr("src",res.response.url);
-      }
+    }
   });
 }
 function writeDescriptor(descritor){
@@ -132,11 +134,12 @@ function writeDescriptor(descritor){
     $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
       "<div class='vimagens' name='" + descritor.descriptor_name + ":" + estado.state + "'>"
       + "<p>"+
-        "<img src='/img/lspm.jpg' class='vimg'>"+
+        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
         "<a href='#' target='_blank'>"+
         "<img src='/img/glo.png' class='vglos'>"+
         "</a>  " + estado.state + " (" + estado.count+ ")" +
-    "</p></div>");
+        "</p></div>");
+    getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schema");
   });
 }
 

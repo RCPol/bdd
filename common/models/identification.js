@@ -75,10 +75,11 @@ module.exports = function(Identification) {
             'descriptor': '$states.descriptor',
             'category': '$states.category',
             'id': '$states.id',
+            'term': '$states.term',
             'state': '$states.states'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor', id: '$id', state: '$state', category:"$category"},
+            _id: { descriptor: '$descriptor', id: '$id', state: '$state', category:"$category", term:"$term"},
             sum: {$sum:1}
           }},
           { $project: {
@@ -87,10 +88,11 @@ module.exports = function(Identification) {
             id: '$_id.id',
             state: '$_id.state',
             category: '$_id.category',
+            term: '$_id.term',
             count: '$sum'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor',category: '$category', id: '$id'},
+            _id: { descriptor: '$descriptor',category: '$category', id: '$id', term:'$id'},
             states: {$push: {state: '$state', count: '$count'}}
           }},
           { $project:{
@@ -98,6 +100,7 @@ module.exports = function(Identification) {
             category_name: '$_id.category',
             descriptor_name: '$_id.descriptor',
             descriptor_id: '$_id.id',
+            descriptor_term: '$_id.term',
             states: '$states'
           }}
         ], function (error, states) {
@@ -145,6 +148,7 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
             category: species[key].category,
             descriptor: species[key].label,
             id: species[key].id,
+            term: species[key].term,
             states: []
           };
 

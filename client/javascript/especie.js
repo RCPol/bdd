@@ -28,7 +28,8 @@ function readSpecies(id, map){
     escreverEstados("#odor", data["rcpol:odorPresence"]);
     escreverEstados("#tipoDeRecursoFloral", data["rcpol:mainFloralResourceCollectedByVisitors"]);
 
-    //TODO: imagens da planta
+    // imagens da planta
+    imagem("#foto_planta", data["dwc:associatedMedia"], "Planta");
 
     // Descrição Polínica
     escreverEstados("#unidadeDeDispersaoDoPolen", data["rcpol:pollenDispersalUnit"], true);
@@ -87,18 +88,21 @@ function readSpecies(id, map){
     if (data["rcpol:poreFeature"]){
       $("#caracteristicaDoPoro").append("endoabertura ");
       escreverEstados("#caracteristicaDoPoro", data["rcpol:poreFeature"]);
-      //TODO:  por a figura mesmo se estiver ausente?
-      $("#caracteristicaDoPoro").append(" (Figuras C-D). ");
+      //$("#caracteristicaDoPoro").append(" (Figuras C-D). ");
     }
 
     if (data["rcpol:espexi"]){
       var espexi = data["rcpol:espexi"];
-      $("#espexi").append("Exina de espessura " + espexi.mean + " ± " + espexi.sd + " (" + espexi.min + " - " + espexi.max + "), " );
+      $("#espexi").append(". Exina de espessura " + espexi.mean + " ± " + espexi.sd + " (" + espexi.min + " - " + espexi.max + "), " );
     }
 
     $("#ornamentacaoDaExina").append("superficie ");
     escreverEstados("#ornamentacaoDaExina", data["rcpol:exineOrnamentation"]);
-    $("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
+    //$("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
+    $("#ornamentacaoDaExina").append(".");
+
+    //imagens do polen
+    imagem("#foto_polen", data["dwc:associatedMedia"], "Pólen");
 
     // mapa
     map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
@@ -114,7 +118,7 @@ function readSpecies(id, map){
       specimens.forEach(function(specimen, id){
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
-        //TODO: nome da palinoteca, recorDedBy, abreviação do estado (SP, RJ)
+        //TODO: nome da palinoteca
         w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recordedBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
       });
     });
@@ -133,5 +137,19 @@ function escreverEstados(seletor, descritor, adicionarVirgula){
       $(seletor).append(estados[0].value);
     if (adicionarVirgula)
       $(seletor).append(", ");
+  }
+}
+function imagem(nicho, descritor, categoria){
+  //TODO: se não for uma array
+  console.log(descritor);
+  if(descritor.length > 0){
+    console.log("ohai");
+    descritor.forEach(function(img_object){
+      console.log("mark");
+      if(img_object.category == categoria){
+        console.log("denny");
+        $(nicho).append("<img src="+ img_object.url +">");
+      }
+    });
   }
 }
