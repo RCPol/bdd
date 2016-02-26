@@ -11,7 +11,7 @@ function readSpecies(id, map){
     escreverEstados("#habito", data["rcpol:habit"]);
 
     if (data["dwc:establishmentMean"])
-      $("#origem").append(data["dwc:establishmentMean"].value); //TODO: pular se nao tiver a informação
+      $("#origem").append(data["dwc:establishmentMean"].value);
 
     $("#periodoDeFloracao").append(data["rcpol:floweringPeriod"].months.join(', '));
 
@@ -74,7 +74,6 @@ function readSpecies(id, map){
 
     escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra maiuscula
     // primeira letra maiuscula após o ponto
-    //TODO: e se houverem dois estados?
     if (data["rcpol:pollenShapePE"]){ // se o ponto foi colocado
       $("#tipoDeAberturaDoPolen").css('text-transform', 'capitalize');
     }
@@ -144,16 +143,15 @@ function escreverEstados(seletor, descritor, adicionarVirgula){
   }
 }
 function imagem(nicho, descritor, categoria){
-  //TODO: se não for uma array
-  console.log(descritor);
   if(descritor.length > 0){
-    console.log("ohai");
     descritor.forEach(function(img_object){
-      console.log("mark");
       if(img_object.category == categoria){
-        console.log("denny");
         $(nicho).append("<img src="+ img_object.url +">");
       }
     });
+  } else { // se não for um array
+    if (descritor.category == categoria){
+      $(nicho).append("<img src="+ descritor.url +">");
+    }
   }
 }

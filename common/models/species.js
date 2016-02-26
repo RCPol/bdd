@@ -1,17 +1,30 @@
 var async = require('async');
 var hash = require('object-hash');
+var request = require('request');
 module.exports = function(Species) {
   Species.mainImage = function(id,cb) {
     Species.findById(id, function (err, data) {
+      if(err) throw new Error(err);
       if(data["dwc:associatedMedia"]){
-        if(data["dwc:associatedMedia"].length>0){
+        // ensure it is an array
+        var associatedMedia = data["dwc:associatedMedia"];
+        if (!(Array.isArray(associatedMedia))) associatedMedia = [associatedMedia];
+        if(associatedMedia.length>0){
           // check if url exists
-          cb(err,{url:data["dwc:associatedMedia"][data["dwc:associatedMedia"].length-1].url});
+          var url = associatedMedia[associatedMedia.length-1].url;
+          var status;
+          request(url, function(err, response){
+            if(!err)
+              status = response.statusCode;
+            else
+              status = 404;
+          });
+          cb(err,{url:url, status: status});
         } else {
-          cb(err,{url:""});
+          cb(err,{url:"", status: 404});
         }
       } else {
-        cb(err,{url:""});
+        cb(err,{url:"", status:404});
       }
     });
   };

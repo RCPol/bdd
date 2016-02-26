@@ -81,16 +81,27 @@ module.exports = function(Schema) {
   };
   Schema.mainImage = function(id, cb){
     Schema.findById(id, function(err, data){
-      console.log("ohai");
-      if(data["dwc:glossaryImage"]){
-        if(data["dwc:glossaryImage"].length > 0){
+      if (err) throw new Error(err);
+      if(data && data["dwc:glossaryImage"]){
+        // ensure it is an array
+        var glossaryImage = data["dwc:glossaryImage"];
+        if (!(Array.isArray(glossaryImage))) glossaryImage = [glossaryImage];
+        if(glossaryImage.length > 0){
           // check if url exists
-          cb(err,{url:data["dwc:glossaryImage"][data["dwc:glossaryImage"].length-1].url});
+          var url = glossaryImage[glossaryImage.length-1].url;
+          var status;
+          request(url, function(err, response){
+            if(!err)
+              status = response.statusCode;
+            else
+              status = 404;
+          });
+          cb(err,{url:url, status: status});
         } else {
-          cb(err, {url:""});
+          cb(err, {url:"", status:404});
         }
       } else {
-        cb(err, {url:""});
+        cb(err, {url:"", status:404});
       }
     });
   };
@@ -99,7 +110,7 @@ module.exports = function(Schema) {
     {
       http: {path: '/mainImage', verb: 'get'},
       accepts: [
-        {arg: 'id', type: 'array', required:true}
+        {arg: 'id', type: 'string', required:true}
       ],
       returns: {arg: 'response', type: 'object'}
     }
