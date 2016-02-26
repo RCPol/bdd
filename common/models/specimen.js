@@ -151,14 +151,35 @@ module.exports = function(Specimen) {
   };
   Specimen.cleanDB = function(cb) {
     Specimen.destroyAll(function (err,callback) {
-      cb(err,callback)
+      cb(err,callback);
     });
-  }
+  };
+  Specimen.getCollection = function(code, cb) {
+    Specimen.getApp(function(err, app){
+      if (err) throw new Error(err);
+      var Collection = app.models.Collection;
+      var filter = {"dwc\:collectionCode.value": code};
+      Collection.find({where: filter}, function(err, collection){
+        if (err) throw new Error(err);
+        cb(null, collection);
+      });
+    });
+  };
   Specimen.remoteMethod(
     'cleanDB',
     {
       http: {path: '/clean', verb: 'get'},
       accepts: [
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+  Specimen.remoteMethod(
+    'getCollection',
+    {
+      http: {path: '/getCollection', verb: 'get'},
+      accepts: [
+        {arg: 'code', type: 'string', required:true}
       ],
       returns: {arg: 'response', type: 'object'}
     }

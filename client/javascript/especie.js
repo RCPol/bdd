@@ -6,7 +6,7 @@ function readSpecies(id, map){
     document.title = name;
 
     // nome da espécie
-    $("#nomeDaEspecie").append(document.title);
+    $("#nomeDaEspecie").append(name);
 
     escreverEstados("#habito", data["rcpol:habit"]);
 
@@ -118,8 +118,12 @@ function readSpecies(id, map){
       specimens.forEach(function(specimen, id){
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
-        //TODO: nome da palinoteca
-        w2ui['grid'].add({recid: id, species: name, palinoteca: specimen["dwc:collectionCode"].value, tipo: specimen["dwc:recordedBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
+        var palinoteca = "";
+        specimen["dwc:collectionCode"].forEach(function(c_code){
+          if(c_code.label == "Sigla da Palinoteca")
+            palinoteca = c_code.value;
+        });
+        w2ui['grid'].add({recid: id, species: name, palinoteca: palinoteca, tipo: specimen["dwc:recordedBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
       });
     });
 

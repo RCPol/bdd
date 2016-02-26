@@ -54,6 +54,9 @@ function identify(query){
         setEligibleSpecies(item);
         getSpecies(item, "#especiesElegiveis", writeSpecies);
       });
+      if(species.length == 1){
+        window.open($("#especiesElegiveis .nsp > a").attr("href"));
+      }
       setDiscartedSpecies();
     });
     data.response.eligibleStates.forEach(function(descriptor){

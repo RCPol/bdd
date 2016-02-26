@@ -81,10 +81,11 @@ module.exports = function(Schema) {
   };
   Schema.mainImage = function(id, cb){
     Schema.findById(id, function(err, data){
+      console.log("ohai");
       if(data["dwc:glossaryImage"]){
         if(data["dwc:glossaryImage"].length > 0){
           // check if url exists
-          cb(err,{url:data["dwc:associatedMedia"][data["dwc:associatedMedia"].length-1].url});
+          cb(err,{url:data["dwc:glossaryImage"][data["dwc:glossaryImage"].length-1].url});
         } else {
           cb(err, {url:""});
         }

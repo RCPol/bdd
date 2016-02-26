@@ -19,31 +19,33 @@
 	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
 
+    <script type="text/javascript" src="/javascript/palinoteca.js"></script>
+
 	<!-- Início: Códigos para o Mapa -->
 	<script type="text/javascript">
-		window.onload = function(){
+ 	  $(document).ready(function(){
 
-			// Início do código do Grid-Tabela
-			    $('#grid').w2grid({
-			        name: 'grid',
-			        header: 'Lista de Amostras',
-			        show: {
-			            toolbar: true,
-			            footer: true
-			        },
-			        columns: [
-			            { field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-			            { field: 'species', caption: 'Nome da Espécie', size: '30%', sortable: true, resizable: true },
-			            { field: 'palinoteca', caption: 'Palinoteca', size: '40%', sortable: true, resizable: true },
-			            { field: 'tipo', caption: 'Nome do Coletor', size: '20%', resizable: true },
-			            { field: 'cidade', caption: 'Cidade', size: '10%', resizable: true }
-			        ],
-			        searches: [
-			            { field: 'palinoteca', caption: 'Palinotéca', type: 'text' },
-			            { field: 'tipo', caption: 'Nome do Coletor', type: 'text' },
-			            { field: 'cidade', caption: 'Cidade', type: 'text' }
-			        ],
-			        sortData: [{ field: 'recid', direction: 'ASC' }],
+		// Início do código do Grid-Tabela
+		$('#grid').w2grid({
+		  name: 'grid',
+		  header: 'Lista de Amostras',
+		  show: {
+			toolbar: true,
+			footer: true
+		  },
+		  columns: [
+			{ field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
+			{ field: 'species', caption: 'Nome da Espécie', size: '30%', sortable: true, resizable: true },
+			{ field: 'palinoteca', caption: 'Palinoteca', size: '40%', sortable: true, resizable: true },
+			{ field: 'tipo', caption: 'Nome do Coletor', size: '20%', resizable: true },
+			{ field: 'cidade', caption: 'Cidade', size: '10%', resizable: true }
+		  ],
+		  searches: [
+			{ field: 'palinoteca', caption: 'Palinotéca', type: 'text' },
+			{ field: 'tipo', caption: 'Nome do Coletor', type: 'text' },
+			{ field: 'cidade', caption: 'Cidade', type: 'text' }
+		  ],
+		  sortData: [{ field: 'recid', direction: 'ASC' }],
 			        records: [
 			            { recid: 1, species: 'Anadenanthera macrocarpa (Benth.) Brenan', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
 			            { recid: 2, species: 'Anadenanthera macrocarpa (Benth.) Brenan', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
@@ -58,18 +60,20 @@
 			            { recid: 11, species: 'Tecoma stans (L.) Juss. ex Kunth', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
 			            { recid: 12, species: 'Anadenanthera macrocarpa (Benth.) Brenan', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'}
 			        ]
-			    });
-			    w2ui.grid.on('select', function(event) {
-			        window.open("especime_anadenanthera.html");
-			    });
-			};
-			//Final do Código do Grid-Tabela
+		});
+		w2ui.grid.on('select', function(event) {
+		  window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
+		});
+
+        readPalinoteca("{{id}}");
+	  });
+	  //Final do Código do Grid-Tabela
 
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
 
 
-	<title>RCPol - Palinoteca do Laborat&oacute;rio de Palinologia da Universidade Luterana do Brasil</title>
+	<title>RCPol</title>
 </head>
 <body>
 <div class="contem">
@@ -98,7 +102,7 @@
 	<article>
 
 		<!-- Nome da Palinoteca -->
-		<h1 class="pal">Palinoteca do Laborat&oacute;rio de Palinologia da Universidade Luterana do Brasil</h1>
+		<h1 id="nomeDaPalinoteca" class="pal"></h1>
 
 		<!-- Início: Embrulho Informações e Logo -->
 		<div class="cspm">
@@ -106,18 +110,18 @@
 		<!-- Início: Informações Palinoteca -->
 		<div class="info-pal">
 
-			<p>Nome da Institui&ccedil;&atilde;o - Sigla da Institui&ccedil;&atilde;o</p>
-			<p>Nome do Instituto</p>
-			<p>Nome do Departamento</p>
-			<p>Nome do Laborat&oacute;rio</p>
-			<p>Nome da Palinoteca - Sigla da Cole&ccedil;&atilde;o</p>
-			<p><b>Respons&aacute;vel:</b> Dra. Soraia Girardi Bauermann</p>
-			<p><b>Endere&ccedil;o:</b> Av. Farroupilha, 8001, Pr&eacute;dio 29, Sala 206, S&atilde;o Jos&eacute;, 	Canoas - RS, CEP: 92425-900</p>
-			<p><b>Telefone:</b> 51 3477.4000 – Ramal – 2654</p>
-			<p><b>E-mail:</b> lab.palinologia@ulbra.br</p>
+		  <p><span id="nomeDaInstituicao"></span> - <span id="codigoDaInstituicao"></span></p>
+		  <p><span id="nomeDoInstituto"></span></p>
+		  <p><span id="nomeDoDepartamento"></span></p>
+		  <p><span id="nomeDoLaboratorio"></span></p>
+		  <p><span id="palinoteca"></span> - <span id="siglaDaPalinoteca"></span></p>
+		  <p><b>Respons&aacute;vel:</b> <span id="responsavel"></span></p>
+		  <p><b>Endere&ccedil;o:</b> <span id="endereco"></span></p>
+		  <p><b>Telefone:</b> <span id="telefone">,</span></p>
+		  <p><b>E-mail:</b> <span id="email"></span></p>
 
-			<!-- Link para homepage da palinoteca -->
-			<p><b>Homepage:</b> <a href="http://www.ulbra.br/palinologia/" target="_blank">http://www.ulbra.br/palinologia/</a></p>
+		  <!-- Link para homepage da palinoteca -->
+		  <p><b>Homepage:</b> <a id="homepage_link" target="_blank"><span id="homepage"></span></a></p>
 
 		</div>
 		<!-- Final: Informações Palinoteca -->

@@ -92,7 +92,7 @@ module.exports = function(Identification) {
             count: '$sum'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor',category: '$category', id: '$id', term:'$id'},
+            _id: { descriptor: '$descriptor',category: '$category', id: '$id', term:'$term'},
             states: {$push: {state: '$state', count: '$count'}}
           }},
           { $project:{

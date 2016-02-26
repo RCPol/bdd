@@ -79,7 +79,7 @@
 	<article>
 
 		<!-- Nome da espécie e onde se encontra o espécime -->
-	  <h1 class="spm">Esp&eacute;cime de <i><span id="nome"></span></i> L. depositado na cole&ccedil;&atilde;o do Laborat&oacute;rio de Palinologia da Universidade Luterana do Brasil - ULBRA</h1>
+	  <h1 class="spm">Esp&eacute;cime de <i><span id="nome"></span></i> <span id="laboratorio"></span> da <span id="instituicao"></span> - <span id="codigoDaInstituicao"></span></h1>
 
 		<!-- Início: Embrulho Informações e Logo -->
 		<div class="cspm">
@@ -87,19 +87,19 @@
 			<!-- Início: Informações Palinoteca -->
 			<div class="info-spal">
 
-				<p><b>Cole&ccedil;&atilde;o:</b> PALIULBRA</p>
-				<p><b>Respons&aacute;vel:</b> Dra. Soraia Girardi Bauermann</p>
-				<p><b>Endere&ccedil;o:</b> Av. Farroupilha, 8001, Pr&eacute;dio 29, Sala 206, S&atilde;o Jos&eacute;, 	Canoas - RS, CEP: 92425-900</p>
-				<p><b>Telefone:</b> 51 3477.4000 – Ramal – 2654</p>
-				<p><b>E-mail:</b> lab.palinologia@ulbra.br</p>
+			  <p><b>Cole&ccedil;&atilde;o:</b> <span id="colecao"></span></p>
+			  <p><b>Respons&aacute;vel:</b> <span id="responsavel"></span></p>
+			  <p><b>Endere&ccedil;o:</b> <span id="endereco"></span></p>
+			  <p><b>Telefone:</b> <span id="telefone"></span></p>
+			  <p><b>E-mail:</b> <span id="email"></span></p>
 
-				<!-- Link para homepage da palinoteca -->
-				<p><b>Homepage:</b> <a href="http://www.ulbra.br/palinologia/" target="_blank">http://www.ulbra.br/palinologia/</a></p>
+			  <!-- Link para homepage da palinoteca -->
+			  <p><b>Homepage:</b> <a id="homepage_link" target="_blank"><span id="homepage"></span></a></p>
 
 				<p>&nbsp;</p>
 
 				<!-- Link para página da Palinoteca -->
-				<p><a href="#">Veja outras esp&eacute;cies depositadas nesta cole&ccedil;&atilde;o</a></p>
+				<p><a target="_blank" id="link_palinoteca">Veja outras esp&eacute;cies depositadas nesta cole&ccedil;&atilde;o</a></p>
 
 				<!-- Link para página da Espécie -->
 				<p><a href="#">Veja a ficha desta esp&eacute;cie</a></p>
@@ -167,13 +167,7 @@
 
 			<h2>Galeria de Imagens</h2>
 
-			<div class="fotorama" data-allowfullscreen="native" data-width="900" data-height="450">
-				<img src="/img_sp/plaflo/plaflo48.jpg">
-				<img src="/img_sp/plahab/plahab48.jpg">
-				<img src="http://mlb-s1-p.mlstatic.com/muda-certificada-de-pitanga-eugenia-uniflora-brinde-10656-MLB5697478606_012014-F.jpg">
-				<img src="http://upload.wikimedia.org/wikipedia/commons/4/4f/Starr_080610-8163_Eugenia_uniflora.jpg">
-				<img src="/img_sp/polen/48.jpg">
-				<img src="/img_sp/polen/48.jpg">
+			<div id="galeria_fotos" class="fotorama" data-allowfullscreen="native" data-width="900" data-height="450">
 			</div>
 
 		</div>

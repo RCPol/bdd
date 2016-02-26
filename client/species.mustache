@@ -62,7 +62,7 @@
 				sortData: [{ field: 'recid', direction: 'ASC' }]
 			});
 		    w2ui.grid.on('click', function(event) {
-                window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
+              window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
             });
 			//Final do Código da Tabela-Grid
         readSpecies("{{id}}", map);
