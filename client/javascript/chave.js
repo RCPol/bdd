@@ -61,10 +61,10 @@ function identify(query){
     });
     data.response.eligibleStates.forEach(function(descriptor){
       /* apenas escrever descritores com mais de um estado */
-      if(descriptor.states.length > 1){
+      //if(descriptor.states.length > 1){
         eligibleDescriptor.push(descriptor);
         writeDescriptor(descriptor);
-      }
+      //}
     });
 
   });

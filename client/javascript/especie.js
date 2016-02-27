@@ -34,7 +34,10 @@ function readSpecies(id, map){
     // Descrição Polínica
     escreverEstados("#unidadeDeDispersaoDoPolen", data["rcpol:pollenDispersalUnit"], true);
 
-    //$("#tamanhoDoPolen").append(data["rcpol:pollenDiameter"].value); //TODO
+    if (data["rcpol:pollenDiameter"])
+      escreverEstados("#tamanhoDoPolen", data["rcpol:pollenDiameter"], true);
+    else if (data["rcpol:smallerPollenDiameter"])
+      $("#tamanhoDoPolen").append("tamanho do pólen maior: ", data["rcpol:smallerPollenDiameter"].value, ", tamanho do pólen menor: ", data["rcpol:largerPollenDiameter"].value);
 
     if (data["rcpol:pollenDiameter"]){
       var d = data["rcpol:pollenDiameter"];
@@ -118,8 +121,10 @@ function readSpecies(id, map){
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
         var palinoteca = "";
+        console.log(specimen);
+        if (!(Array.isArray(specimen["dwc:collectionCode"]))) specimen["dwc:collectionCode"] = [specimen["dwc:collectionCode"]];
         specimen["dwc:collectionCode"].forEach(function(c_code){
-          if(c_code.label == "Sigla da Palinoteca")
+          if(c_code.label == "Código da Palinoteca")
             palinoteca = c_code.value;
         });
         w2ui['grid'].add({recid: id, species: name, palinoteca: palinoteca, tipo: specimen["dwc:recordedBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});

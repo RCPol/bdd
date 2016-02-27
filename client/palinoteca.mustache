@@ -45,21 +45,7 @@
 			{ field: 'tipo', caption: 'Nome do Coletor', type: 'text' },
 			{ field: 'cidade', caption: 'Cidade', type: 'text' }
 		  ],
-		  sortData: [{ field: 'recid', direction: 'ASC' }],
-			        records: [
-			            { recid: 1, species: 'Anadenanthera macrocarpa (Benth.) Brenan', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 2, species: 'Anadenanthera macrocarpa (Benth.) Brenan', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 3, species: 'Sida spinosa L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 4, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 5, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 6, species: 'Eugenia uniflora L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 7, species: 'Sida spinosa L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 8, species: 'Sida spinosa L.', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 9, species: 'Tecoma stans (L.) Juss. ex Kunth', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 10, species: 'Tecoma stans (L.) Juss. ex Kunth', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 11, species: 'Tecoma stans (L.) Juss. ex Kunth', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'},
-			            { recid: 12, species: 'Anadenanthera macrocarpa (Benth.) Brenan', palinoteca: 'Laboratório de Palinoecologia do Depto. de Biologia de FFCLRP-USP', tipo: 'Dra. Cláudia Inês da Silva',cidade: 'Ribeirão Preto – SP'}
-			        ]
+		  sortData: [{ field: 'recid', direction: 'ASC' }]
 		});
 		w2ui.grid.on('select', function(event) {
 		  window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);

@@ -12,14 +12,15 @@ function readSpecimen(id, cb){
     var collectionCode = specimenDb["dwc:collectionCode"];
     if (!(Array.isArray(collectionCode))) collectionCode = [collectionCode]; // se houver apenas um valor
     collectionCode.forEach(function(c_code){
-      if (c_code.label == "Sigla da Palinoteca")
+      if (c_code.label == "Código da Palinoteca")
         codigo_palinoteca = c_code.value;
-      else if (c_code.label == "Sigla do Herbário")
+      else if (c_code.label == "Código do Herbário")
         codigo_herbario = c_code.value;
     });
 
     $.getJSON("/api/Specimens/getCollection?code="+codigo_palinoteca, function(res){
       var palinoteca = res.response[0];
+      console.log(palinoteca);
       $("#laboratorio").append(palinoteca["rcpol:laboratory"].value);
       $("#instituicao").append(palinoteca["rcpol:institutionName"].value);
       $("#codigoDaInstituicao").append(palinoteca["dwc:institutionCode"].value);
@@ -33,7 +34,9 @@ function readSpecimen(id, cb){
       $("#link_palinoteca").attr("href", "/profile/palinoteca/"+palinoteca["id"]);
     });
 
-    //TODO: link especie
+    $.getJSON("/api/Species?filter[where][dwc:scientificName.value]="+specimenDb["dwc:scientificName"].value, function(especies){
+      $("#link_especie").attr("href", "/profile/species/"+especies[0].id);
+    });
 
     $("#coletor").append(specimenDb['dwc:recordedBy'].value);
 
@@ -55,16 +58,26 @@ function readSpecimen(id, cb){
     $("#pais").append(specimenDb['dwc:country'].value);
     $("#estado").append(specimenDb['dwc:stateProvince'].value);
     $("#municipio").append(specimenDb['dwc:municipality'].value);
-    $("#bioma").append(specimenDb['rcpol:vegetalFormationType'].value); //TODO: vegetalFormationType = bioma?
+    $("#tipoDeFormacaoVegetal").append(specimenDb['rcpol:vegetalFormationType'].value);
 
     //TODO: informações adicionais
 
     // Galeria de Imagens
     var associatedMedia = specimenDb['dwc:associatedMedia'];
     if (!(Array.isArray(associatedMedia))) associatedMedia = [associatedMedia];
-    specimenDb['dwc:associatedMedia'].forEach(function(media_object){
+      associatedMedia.forEach(function(media_object){
       $("#galeria_fotos").append("<img src=" + media_object.url + ">");
     });
+
+    var biblio = specimenDb["dwc:bibliographicCitation"];
+    if(biblio){
+      if (!(Array.isArray(biblio))) biblio = [biblio];
+      biblio.forEach(function(citation){
+        //TODO: link para referencias
+        //$("#referencias").append('<div class="r1f"><div class="pdficon"><a href="#"><img src="/img/pdfi.png" width="16px" height="16px"></a></div><div class="txtref"> <p>' + citation.value + '</p></div></div>');
+        $("#referencias").append('<div class="r1f"><div class="pdficon"><img src="/img/pdfi.png" width="16px" height="16px"></div><div class="txtref"> <p>' + citation.value + '</p></div></div>');
+      });
+    }
 
     cb();
   });

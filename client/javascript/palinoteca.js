@@ -18,5 +18,13 @@ function readPalinoteca(id){
     $("#email").append(data["rcpol:email"].value);
     $("#homepage_link").attr("href", data["rcpol:homepage"].value);
     $("#homepage").append(data["rcpol:homepage"].value);
+
+    //lista de especimes
+    var url = "/api/Specimens?filter[where][and][0][dwc:institutionCode.value]="+data["dwc:institutionCode"].value+"&filter[where][and][1][dwc:collectionCode.value]="+data["dwc:collectionCode"].value;
+    $.getJSON(url, function(especimes){
+      especimes.forEach(function(especime, id){
+        w2ui['grid'].add({recid: id, species: especime["dwc:scientificName"].value + " " + especime["dwc:scientificNameAuthorship"].value, palinoteca: name, tipo: especime["dwc:recordedBy"].value, cidade: especime["dwc:municipality"].value + " - " + especime["dwc:stateProvince"].value});
+      });
+    });
   });
 }
