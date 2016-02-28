@@ -100,11 +100,12 @@ function getSpecies(species, nicho, callback){
 function writeSpecies(id, nicho){
   $(nicho).append("<div class='especies' id = " + id + "></div>");
 
-  $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg' style='width:100px; height:100px;'>");
+  $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg'>");
   $(nicho + " > #" + id).append("<div class='nsp'></div>");
   $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
   $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
   getImage(id, nicho, "Species");
+  $(nicho + " > #" + id + " img").width(100).height(100);
 }
 
 function writeDescriptor(descritor){

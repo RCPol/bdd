@@ -13,7 +13,7 @@ module.exports = function(Species) {
         if(associatedMedia.length>0){
           associatedMedia.forEach(function(media){
             if (media.category == "Flor"){
-              var url = "/thumbnails/" + media.name + "-100x100.jpg";
+              var url = "/thumbnails/" + media.name + ".jpg";
               cb(err, url);
             }
           });

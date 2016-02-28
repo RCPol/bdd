@@ -17,9 +17,9 @@
     "mustache": "^2.2.1",
     "node-xlsx": "^0.6.0",
     "object-hash": "^0.9.5",
+    "quickthumb": "0.0.12",
     "requestretry": "^1.6.0",
     "serve-favicon": "^2.0.1",
-    "thumbnail": "^0.1.9",
     "underscore": "^1.8.3",
     "validator": "^4.4.0"
   },
