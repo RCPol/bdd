@@ -302,7 +302,6 @@ module.exports = function(Specimen) {
     async.whilst(function(){
       return i < end;
     }, function(callback){
-      i++;
       var url = queue[i].url;
       var name = queue[i].name;
       console.log(i + " of " + end);
@@ -319,6 +318,7 @@ module.exports = function(Specimen) {
           });
         });
       });
+      i++;
     }, function(err){
       if(err) throw new Error(err);
       console.log("done.");
