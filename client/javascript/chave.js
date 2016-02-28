@@ -100,7 +100,7 @@ function getSpecies(species, nicho, callback){
 function writeSpecies(id, nicho){
   $(nicho).append("<div class='especies' id = " + id + "></div>");
 
-  $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg'>");
+  $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg' style='width:100px; height:100px;'>");
   $(nicho + " > #" + id).append("<div class='nsp'></div>");
   $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
   $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
@@ -125,7 +125,7 @@ function writeDescriptor(descritor){
       + "<p>"+
         "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
         "<a href='#' target='_blank'>"+
-        "<img src='/img/glo.png' class='vglos'>"+
+        "<!--img src='/img/glo.png' class='vglos'-->"+
         "</a>  " + estado.state + " (" + estado.count+ ")" +
         "</p></div>");
     getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
@@ -134,9 +134,7 @@ function writeDescriptor(descritor){
 
 function getImage(id, nicho, model){
   $.getJSON('/api/' + model +'/mainImage?id=' + id, {}, function(res){
-    if(res.response.status != 404){
-        $(nicho+"_img_"+id).attr("src",res.response.url);
-    }
+    $(nicho+"_img_"+id).attr("src",res.response);
   });
 }
 function buscaDescritores() {

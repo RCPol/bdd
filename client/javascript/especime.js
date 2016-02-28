@@ -65,9 +65,10 @@ function readSpecimen(id, cb){
     // Galeria de Imagens
     var associatedMedia = specimenDb['dwc:associatedMedia'];
     if (!(Array.isArray(associatedMedia))) associatedMedia = [associatedMedia];
-      associatedMedia.forEach(function(media_object){
+    associatedMedia.forEach(function(media_object){
       $("#galeria_fotos").append("<img src=" + media_object.url + ">");
     });
+    $(".fotorama").fotorama();
 
     var biblio = specimenDb["dwc:bibliographicCitation"];
     if(biblio){

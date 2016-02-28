@@ -4,6 +4,8 @@ var request = require('request');
 var async = require('async');
 var validator = require('validator');
 var fs = require('fs');
+var Thumbnail = require('thumbnail');
+var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
   Specimen.inputFromURL = function(url,cb) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
@@ -12,6 +14,7 @@ module.exports = function(Specimen) {
     cb("Invalid XLSX file.",null);
     var path = __dirname +"/../../uploads/"+name+".xlsx";
     saveDataset(name,url,path);
+    var downloadQueue = [];
 
     var w = fs.createWriteStream(path).on("close",function (argument) {
       var data = xlsx.parse(path)[0].data;
@@ -45,8 +48,21 @@ module.exports = function(Specimen) {
               // IMAGE
               if(current.term=="associatedMedia"){
                 current.category = current.category?current.category:"Outro";
+                current.name = current.category + current.value.replace("https://drive.google.com/open?id=", "");
                 if(typeof current.value === "string"){
                   current.url = current.value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+                }
+                // save flower image
+                if (current.category == "Flor"){
+                  // check if file exists
+                  var file = __dirname + "/../../client/thumbnails/"+current.name+"-100x100.jpg";
+                  fs.exists(file, function(exists){
+                    if (exists) {
+                      console.log("thumbnail aLreadly exists");
+                    } else {
+                      downloadQueue.push({url:current.url, name:current.name});
+                    }
+                  });
                 }
               }else
               // REFERENCE
@@ -144,6 +160,7 @@ module.exports = function(Specimen) {
           callback();
         }
       }, function done(){
+        downloadImages(downloadQueue);
         cb(null, rs);
       });
     });
@@ -222,6 +239,7 @@ module.exports = function(Specimen) {
     dataset.localSource = path;
     dataset.type = "Specimen";
     Dataset.upsert(dataset,function (err,instance) {
+      if (err) throw new Error(err);
       //console.log("Dataset saved: "+instance.id);
     });
   }
@@ -277,5 +295,33 @@ module.exports = function(Specimen) {
   }
   function isNumeric (str){
     return validator.isFloat(str);
+  };
+  function downloadImages(queue){
+    var i = 0;
+    var end = queue.length;
+    async.whilst(function(){
+      return i < end;
+    }, function(callback){
+      i++;
+      var url = queue[i].url;
+      var name = queue[i].name;
+      console.log(i + " of " + end);
+      console.log("making request to "+url);
+      request(url, {encoding: 'binary'} ,function(err, response, body){
+        if (err) throw new Error(err);
+        console.log(response.statusCode);
+        fs.writeFile("client/images/"+name+".jpg", body, 'binary', function(err){
+          if(err) throw new Error(err);
+          thumbnail.ensureThumbnail(name, 100, 100, function(err, filename){
+            if (err) throw new Error(err);
+            console.log("converted to thumbnail");
+            callback();
+          });
+        });
+      });
+    }, function(err){
+      if(err) throw new Error(err);
+      console.log("done.");
+    });
   };
 };

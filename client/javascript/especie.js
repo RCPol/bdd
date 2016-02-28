@@ -29,7 +29,14 @@ function readSpecies(id, map){
     escreverEstados("#tipoDeRecursoFloral", data["rcpol:mainFloralResourceCollectedByVisitors"]);
 
     // imagens da planta
-    imagem("#foto_planta", data["dwc:associatedMedia"], "Planta");
+    if(!(Array.isArray(data['dwc:associatedMedia']))) data['dwc:associatedMedia'] = [data['dwc:associatedMedia']];
+    data["dwc:associatedMedia"].forEach(function(media){
+      if (media.category != "Pólen"){
+        imagem("#foto_planta", data["dwc:associatedMedia"], media.category);
+        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+      }
+    });
+    $(".fotorama").fotorama();
 
     // Descrição Polínica
     escreverEstados("#unidadeDeDispersaoDoPolen", data["rcpol:pollenDispersalUnit"], true);
@@ -104,7 +111,12 @@ function readSpecies(id, map){
     $("#ornamentacaoDaExina").append(".");
 
     //imagens do polen
-    imagem("#foto_polen", data["dwc:associatedMedia"], "Pólen");
+    data["dwc:associatedMedia"].forEach(function(media){
+      if (media.category == "Pólen"){
+        imagem("#foto_polen", data["dwc:associatedMedia"], media.category);
+      }
+    });
+    $(".fotorama").fotorama();
 
     // mapa
     map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
@@ -121,7 +133,6 @@ function readSpecies(id, map){
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
         var palinoteca = "";
-        console.log(specimen);
         if (!(Array.isArray(specimen["dwc:collectionCode"]))) specimen["dwc:collectionCode"] = [specimen["dwc:collectionCode"]];
         specimen["dwc:collectionCode"].forEach(function(c_code){
           if(c_code.label == "Código da Palinoteca")
@@ -156,7 +167,7 @@ function imagem(nicho, descritor, categoria){
     });
   } else { // se não for um array
     if (descritor.category == categoria){
-      $(nicho).append("<img src="+ descritor.url +">");
+      $(nicho).append("<img style='max-width:500px;' src="+ descritor.url +">");
     }
   }
 }
