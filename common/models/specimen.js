@@ -312,7 +312,7 @@ module.exports = function(Specimen) {
         console.log(response.statusCode);
         fs.writeFile("client/images/"+name+".jpg", body, 'binary', function(err){
           if(err) throw new Error(err);
-          thumbnail.ensureThumbnail(name, 100, 100, function(err, filename){
+          thumbnail.ensureThumbnail(name+".jpg", 100, 100, function(err, filename){
             if (err) throw new Error(err);
             console.log("converted to thumbnail");
             callback();
