@@ -7,9 +7,10 @@ var eligibleSpeciesDB = {};
 function composeQuery(){
   $(".selecionado").each( function(){
     var name = $(this).attr('name');
-    var d = name.split(":")[0];
-    var s = name.split(":")[1];
-    query.push({descriptor: d, state: s});
+    //var d = name.split(":")[0];
+    //var s = name.split(":")[1];
+    //query.push({descriptor: d, state: s});
+    query.push(name);
   });
   identify(query);
 }
@@ -21,7 +22,7 @@ function removeSelected(){
   $("input:checked").each(function(){
     var $this = $(this);
     query = query.filter(function(elem){
-      if(elem.descriptor == $this.attr('descriptor') && elem.state == $this.attr('state'))
+      if(elem == $this.attr('state'))
         return false;
       else
         return true;
@@ -39,13 +40,14 @@ function identify(query){
   $("#descritoresSelecionados").empty();
   eligibleDescriptor = [];
   writeSelectedState();
-  $.post("/api/Identification/identify", {param: query}, function(data){
+  $.get("/api/Identification/identify", {param: query}, function(data){
     console.log("Identify()", data.response);
     var ids = data.response.eligibleItems.map(function(item) {return item.id;});
     var species_query = {where: {id: {inq: ids}}};
     if (ids.length == 0)
       species_query = {where: {id: ""}};
-    $.getJSON("/api/Species/", {filter : species_query}, function(species){
+    $.getJSON("/api/Species?filter[fields][id]=true", { filter : species_query}, function(species){
+      console.log(species);
       // clean eligible itens
       eligibleSpeciesDB = {};
       /* especies */
@@ -58,13 +60,13 @@ function identify(query){
         window.open($("#especiesElegiveis .nsp > a").attr("href"));
       }
       setDiscartedSpecies();
-    });
-    data.response.eligibleStates.forEach(function(descriptor){
-      /* apenas escrever descritores com mais de um estado */
-      //if(descriptor.states.length > 1){
-        eligibleDescriptor.push(descriptor);
-        writeDescriptor(descriptor);
-      //}
+      data.response.eligibleStates.forEach(function(descriptor){
+        /* apenas escrever descritores com mais de um estado */
+        if(descriptor.states.length > 1){
+          eligibleDescriptor.push(descriptor);
+          writeDescriptor(descriptor, species.length);
+        }
+      });
     });
 
   });
@@ -81,7 +83,7 @@ function setDiscartedSpecies(){
 }
 function writeSelectedState(){
   query.forEach(function(selected, i){
-    $(".descel").append("<input descriptor='" + selected.descriptor +"' state='" + selected.state +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + selected.descriptor + ": " + selected.state + "</label><br>");
+    $(".descel").append("<input state='" + selected +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + selected + "</label><br>");
     });
 };
 function getSpecies(species, nicho, callback){
@@ -108,7 +110,7 @@ function writeSpecies(id, nicho){
   $(nicho + " > #" + id + " img").width(100).height(100);
 }
 
-function writeDescriptor(descritor){
+function writeDescriptor(descritor, species_length){
 
   if(!$('#category_'+descritor.category_name).html()){
     var cat = "<a id='category_" + descritor.category_name + "' class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.category_name + "</a>";
@@ -121,15 +123,17 @@ function writeDescriptor(descritor){
   $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
 
   descritor.states.forEach(function(estado){
-    $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
-      "<div class='vimagens' name='" + descritor.descriptor_name + ":" + estado.state + "'>"
-      + "<p>"+
-        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
-        "<a href='#' target='_blank'>"+
-        "<!--img src='/img/glo.png' class='vglos'-->"+
-        "</a>  " + estado.state + " (" + estado.count+ ")" +
-        "</p></div>");
-    getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
+    if (estado.count < species_length){
+      $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
+        "<div class='vimagens' name='" + estado.state + "'>"
+          + "<p>"+
+          "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
+          "<a href='#' target='_blank'>"+
+          "<!--img src='/img/glo.png' class='vglos'-->"+
+          "</a>  " + estado.state.split(":")[2] + " (" + estado.count+ ")" +
+          "</p></div>");
+      getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
+    }
   });
 }
 

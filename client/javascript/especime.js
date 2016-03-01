@@ -18,9 +18,10 @@ function readSpecimen(id, cb){
         codigo_herbario = c_code.value;
     });
 
+
     $.getJSON("/api/Specimens/getCollection?code="+codigo_palinoteca, function(res){
+      console.log(res);
       var palinoteca = res.response[0];
-      console.log(palinoteca);
       $("#laboratorio").append(palinoteca["rcpol:laboratory"].value);
       $("#instituicao").append(palinoteca["rcpol:institutionName"].value);
       $("#codigoDaInstituicao").append(palinoteca["dwc:institutionCode"].value);
@@ -34,7 +35,7 @@ function readSpecimen(id, cb){
       $("#link_palinoteca").attr("href", "/profile/palinoteca/"+palinoteca["id"]);
     });
 
-    $.getJSON("/api/Species?filter[where][dwc:scientificName.value]="+specimenDb["dwc:scientificName"].value, function(especies){
+    $.getJSON("/api/Species?filter[fields][id]=true&filter[where][dwc:scientificName.value]="+specimenDb["dwc:scientificName"].value, function(especies){
       $("#link_especie").attr("href", "/profile/species/"+especies[0].id);
     });
 

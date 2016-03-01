@@ -123,7 +123,7 @@ function readSpecies(id, map){
 
     //especimes
     var specimen_ids = data.specimens.map(function(elem){return elem.id;});
-    var specimen_query = "filter[where][id][inq]=" + specimen_ids[0];
+    var specimen_query = "filter[fields][dwc:decimalLatitude]=true&filter[fields][dwc:decimalLongitude]=true&filter[fields][dwc:collectionCode]=true&filter[fields][dwc:recordedBy]=true&filter[fields][dwc:municipality]=true&filter[fields][dwc:stateProvince]=true&filter[fields][id]=true&filter[where][id][inq]=" + specimen_ids[0];
     specimen_ids.forEach(function(id){
       specimen_query += "&filter[where][id][inq]=" + id;
     });

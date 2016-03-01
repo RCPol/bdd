@@ -20,10 +20,11 @@ function readPalinoteca(id){
     $("#homepage").append(data["rcpol:homepage"].value);
 
     //lista de especimes
-    var url = "/api/Specimens?filter[where][and][0][dwc:institutionCode.value]="+data["dwc:institutionCode"].value+"&filter[where][and][1][dwc:collectionCode.value]="+data["dwc:collectionCode"].value;
+    var url = "/api/Specimens?filter[fields][id]=true&filter[fields][dwc:scientificName]=true&filter[fields][dwc:scientificNameAuthorship]=true&filter[fields][dwc:recordedBy]=true&filter[fields][dwc:municipality]=true&filter[fields][dwc:stateProvince]=true&filter[where][and][0][dwc:institutionCode.value]="+data["dwc:institutionCode"].value+"&filter[where][and][1][dwc:collectionCode.value]="+data["dwc:collectionCode"].value;
     $.getJSON(url, function(especimes){
+      console.log(especimes);
       especimes.forEach(function(especime, id){
-        w2ui['grid'].add({recid: id, species: especime["dwc:scientificName"].value + " " + especime["dwc:scientificNameAuthorship"].value, palinoteca: name, tipo: especime["dwc:recordedBy"].value, cidade: especime["dwc:municipality"].value + " - " + especime["dwc:stateProvince"].value});
+        w2ui['grid'].add({recid: id, species: especime["dwc:scientificName"].value + " " + especime["dwc:scientificNameAuthorship"].value, palinoteca: name, tipo: especime["dwc:recordedBy"].value, cidade: especime["dwc:municipality"].value + " - " + especime["dwc:stateProvince"].value, specimen_id: especime.id});
       });
     });
   });

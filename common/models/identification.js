@@ -14,7 +14,7 @@ module.exports = function(Identification) {
 
   Identification.identify = function(param, callback) {
     //examples
-    //param = [{"descriptor":"7", "state":76}, {"descriptor": "7", "state": 67}, {"descriptor": "7", "state": 30}, {"descriptor": "9", "state": 31}, {"descriptor": "9", "state": 36}, {"descriptor": "8", "state": 53}];
+    //param = ['schema:term:state'];
 
     //TODO: validate query
 
@@ -24,7 +24,7 @@ module.exports = function(Identification) {
     composeQuery(param, function(query, queryMongo){
       console.log(JSON.stringify(query));
       Identification.find({where: query, fields: 'id'}, function (err, items) {
-        console.log(items);
+        console.log(items.length);
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
 
@@ -115,6 +115,7 @@ module.exports = function(Identification) {
   Identification.remoteMethod(
     'populate',
     {
+      http: {verb: 'get'},
       accepts: {arg: 'filter', type: 'object'},
       returns: {arg: 'response', type: 'number'}
     }
@@ -123,6 +124,7 @@ module.exports = function(Identification) {
   Identification.remoteMethod(
     'identify',
     {
+      http: {verb:'get'},
       accepts: {arg: 'param', type: 'array'},
       returns: {arg: 'response', type: 'object'}
     }
@@ -155,13 +157,13 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
           console.log(key);
           console.log(species[key]);
 
+          var prefix = species[key].schema + ":" + species[key].term + ":";
           if(species[key].states){
-          species[key].states.forEach(function(state){
-            entry.states.push(
-              state.value //DEBUG
-              //state.id
-            );
-          });
+            species[key].states.forEach(function(state){
+              entry.states.push(
+                prefix + state.value
+              );
+            });
           }
 
           identification_item["states"].push(entry);
@@ -182,21 +184,21 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
 
 function composeQuery(param, callback){
   /*
-   param: [{"descriptor":"7", "state":76}, {"descriptor": "7", "state": 67}, {"descriptor": "7", "state": 30}, {"descriptor": "9", "state": 31}, {"descriptor": "9", "state": 36}, {"descriptor": "8", "state": 53}]
+   param: ["schema:term1:state1", "schema:term1:state2", "schema:term2:state3"]
 
    for mongoDB
 
-   query: {$and: [
-       {$or: [{"states.descriptor": "7", "states.states": 76}, {"states.descriptor": "7", "states.states": 67}, {"states.descriptor": "7", "states.states": 30}]},
-       {$or: [{"states.descriptor": "9", "states.states": 31}, {"states.descriptor": "9", "states.states": 36}]},
-       {$or: [{"states.descriptor": "8", "states.states": 53}]}]}
+   query: {$and :[
+        {$or: [{"states.descritor": "term1", "states.states": "schema:term1:state1"}, {"states.descritor": "term1", "states.states": "schema:term1:state2"}]},
+        {$or: [{"states.descritor": "term2", "states.states": "schema:term2:state3"}]}
+   ]}
 
    for loopback
 
-   query: {and: [
-   {or: [{"states.descriptor": "7", "states.states": 76}, {"states.descriptor": "7", "states.states": 67}, {"states.descriptor": "7", "states.states": 30}]},
-   {or: [{"states.descriptor": "9", "states.states": 31}, {"states.descriptor": "9", "states.states": 36}]},
-   {or: [{"states.descriptor": "8", "states.states": 53}]}]}
+   query: {and :[
+        {or: [{"states.descritor": "term1", "states.states": "schema:term1:state1"}, {"states.descritor": "term1", "states.states": "schema:term1:state2"}]},
+        {or: [{"states.descritor": "term2", "states.states": "schema:term2:state3"}]}
+   ]}
 
    */
 
@@ -204,13 +206,13 @@ function composeQuery(param, callback){
   //append "states." to each field
   param.forEach(function(elem){
     param_fixed.push({
-      "states.descriptor": elem['descriptor'],
-      "states.states": elem['state']
+      "states.term": elem.split(":")[1],
+      "states.states": elem
     });
   });
   param = param_fixed;
 
-  var param_grouped_by_descriptor = _.groupBy(param, function(elem){ return elem["states.descriptor"]; });
+  var param_grouped_by_descriptor = _.groupBy(param, function(elem){ return elem["states.term"]; });
 
   if (param.length == 0) callback({}, {});
   else {
