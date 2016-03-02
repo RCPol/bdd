@@ -88,11 +88,13 @@ function readSpecies(id, map){
       $("#tipoDeAberturaDoPolen").css('text-transform', 'capitalize');
     }
 
-    if (data["rcpol:colpeFeature"].value.indexOf("ausente") == -1){
-      $("#caracteristicaDoColpo").append("ectoabertura do tipo colpo ");
-      escreverEstados("#caracteristicaDoColpo", data["rcpol:colpeFeature"], true);
-    } else
-      $("#caracteristicaDoColpo").append("ectoabertura ausente, ");
+    if(data["rcpol:colpeFeature"]){
+      if (data["rcpol:colpeFeature"].value.indexOf("ausente") == -1){
+        $("#caracteristicaDoColpo").append("ectoabertura do tipo colpo ");
+        escreverEstados("#caracteristicaDoColpo", data["rcpol:colpeFeature"], true);
+      } else
+        $("#caracteristicaDoColpo").append("ectoabertura ausente, ");
+    }
 
     if (data["rcpol:poreFeature"]){
       $("#caracteristicaDoPoro").append("endoabertura ");
