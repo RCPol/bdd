@@ -47,7 +47,6 @@ function identify(query){
     if (ids.length == 0)
       species_query = {where: {id: ""}};
     $.getJSON("/api/Species?filter[fields][id]=true", { filter : species_query}, function(species){
-      console.log(species);
       // clean eligible itens
       eligibleSpeciesDB = {};
       /* especies */
@@ -56,9 +55,6 @@ function identify(query){
         setEligibleSpecies(item);
         getSpecies(item, "#especiesElegiveis", writeSpecies);
       });
-      if(species.length == 1){
-        window.open($("#especiesElegiveis .nsp > a").attr("href"));
-      }
       setDiscartedSpecies();
       data.response.eligibleStates.forEach(function(descriptor){
         /* apenas escrever descritores com mais de um estado */
@@ -67,6 +63,9 @@ function identify(query){
           writeDescriptor(descriptor, species.length);
         }
       });
+      if(species.length == 1){
+        window.open($("#especiesElegiveis .nsp > a").attr("href"));
+      }
     });
 
   });
@@ -83,8 +82,10 @@ function setDiscartedSpecies(){
 }
 function writeSelectedState(){
   query.forEach(function(selected, i){
-    $(".descel").append("<input state='" + selected +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + selected + "</label><br>");
+    $.getJSON('/api/Schemas/'+selected.split(":")[1], function(schema){
+      $(".descel").append("<input state='" + selected +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.split(":")[2] + "</label><br>");
     });
+  });
 };
 function getSpecies(species, nicho, callback){
   if(typeof speciesDb[species.id] == 'undefined'){
@@ -112,28 +113,37 @@ function writeSpecies(id, nicho){
 
 function writeDescriptor(descritor, species_length){
 
+  // adicionar categoria
   if(!$('#category_'+descritor.category_name).html()){
     var cat = "<a id='category_" + descritor.category_name + "' class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.category_name + "</a>";
     var des = '<ul id="desc_for_'+descritor.category_name+'" class="descritor inner"></ul>';
     $('.accordion').append("<li>" + cat+"\n"+des + "</li>");
   }
 
-  //TODO: usar ids para consultar Schema
-  $("#desc_for_"+descritor.category_name).append("<li><a class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.descriptor_name + "</a></li>");
-  $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
-
+  // retirar estados com count >= species_length
+  var copia_descritor = [];
   descritor.states.forEach(function(estado){
-    if (estado.count < species_length){
-      $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
-        "<div class='vimagens' name='" + estado.state + "'>"
-          + "<p>"+
-          "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
-          "<a href='#' target='_blank'>"+
-          "<!--img src='/img/glo.png' class='vglos'-->"+
-          "</a>  " + estado.state.split(":")[2] + " (" + estado.count+ ")" +
-          "</p></div>");
-      getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
-    }
+    if (estado.count < species_length)
+      copia_descritor.push(estado);
+  });
+
+  //TODO: usar ids para consultar Schema
+  // adicionar descritor, se houver algum estado
+  if (copia_descritor.length > 0){
+    $("#desc_for_"+descritor.category_name).append("<li><a class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.descriptor_name + "</a></li>");
+    $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
+  }
+
+  copia_descritor.forEach(function(estado){
+    $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
+      "<div class='vimagens' name='" + estado.state + "'>"
+        + "<p>"+
+        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
+        "<a href='#' target='_blank'>"+
+        "<!--img src='/img/glo.png' class='vglos'-->"+
+        "</a>  " + estado.state.split(":")[2] + " (" + estado.count+ ")" +
+        "</p></div>");
+    getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
   });
 }
 
