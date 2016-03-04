@@ -67,7 +67,7 @@ function readSpecimen(id, cb){
     var associatedMedia = specimenDb['dwc:associatedMedia'];
     if (!(Array.isArray(associatedMedia))) associatedMedia = [associatedMedia];
     associatedMedia.forEach(function(media_object){
-      $("#galeria_fotos").append("<img src=" + media_object.url + ">");
+      $("#galeria_fotos").append("<img src='/resized_images/" + media_object.name + ".jpg'>");
     });
     $(".fotorama").fotorama();
 

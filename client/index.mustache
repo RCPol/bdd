@@ -130,8 +130,8 @@
 			<h1>Descritores</h1>
 
 			<!-- Início: Busca Descritores -->
-			<form class="formbusca" onsubmit="buscaDescritores(); return false;">
-				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			<form class="formbusca" onreset="buscaDescritores(true);" onsubmit="buscaDescritores(false); return false;">
+				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset">
 			</form>
 
 			<div class="tfclear"></div>
@@ -186,8 +186,8 @@
 			<h1>Espécies</h1>
 
 			<!-- Início: Busca Espécies -->
-			<form class="formbusca" onsubmit="buscaEspecies(); return false;">
-				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			<form class="formbusca" onreset="buscaEspecies(true);" onsubmit="buscaEspecies(false); return false;">
+				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset">
 			</form>
 			<div class="tfclear"></div>
 			<!-- Final: Busca Espécies -->

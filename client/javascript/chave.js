@@ -33,6 +33,7 @@ function removeSelected(){
 function identify(query){
   //query = [{descriptor:"Cor da flor", state: "azul"}];
   // limpar tudo
+  $(".btnident").attr('disabled', 'disabled');
   $("#especiesElegiveis").empty();
   $("#especiesElegiveis").append('<p style="margin-bottom:10px" id="elegibleCount"></p>');
   $(".descritor").empty();
@@ -66,6 +67,7 @@ function identify(query){
       if(species.length == 1){
         window.open($("#especiesElegiveis .nsp > a").attr("href"));
       }
+      $(".btnident").removeAttr('disabled');
     });
 
   });
@@ -152,9 +154,11 @@ function getImage(id, nicho, model){
     $(nicho+"_img_"+id).attr("src",res.response);
   });
 }
-function buscaDescritores() {
+function buscaDescritores(nothing) {
+  console.log(nothing);
   $(".descritor").empty();
   var key = $("#buscadescritores").val().trim().toLowerCase();
+  if (nothing) key = "";
   eligibleDescriptor.forEach(function(descritor){
     // checar se a palavra pesquisada é substring do descritor ou de algum estado deste descritor
     var is_in_states = false;
@@ -168,8 +172,9 @@ function buscaDescritores() {
     }
   });
 }
-function buscaEspecies() {
+function buscaEspecies(nothing) {
   var key = $("#buscaespecies").val().trim().toLowerCase();
+  if(nothing) key = "";
   $("#especiesElegiveis div").each(function(){
     if( $(this).find("p").text().toLowerCase().indexOf(key) === -1 ){
       $(this).fadeOut();

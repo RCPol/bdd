@@ -164,7 +164,7 @@ function imagem(nicho, descritor, categoria){
   if(descritor.length > 0){
     descritor.forEach(function(img_object){
       if(img_object.category == categoria){
-        $(nicho).append("<img src="+ img_object.url +">");
+        $(nicho).append("<img src='/resized_images/" + img_object.name + ".jpg'>");
       }
     });
   } else { // se não for um array

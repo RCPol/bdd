@@ -53,11 +53,9 @@ module.exports = function(Specimen) {
                 if(typeof current.value === "string"){
                   current.url = current.value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
                 }
-                if (current.category == "Flor"){
-                  // save flower image
-                  var image = {url: current.url, name: current.name};
-                  downloadQueue.push(image);
-                }
+                // save images
+                var image = {url: current.url, name: current.name};
+                downloadQueue.push(image);
               }else
               // REFERENCE
               if(current.term=="bibliographicCitation"){
@@ -299,10 +297,10 @@ module.exports = function(Specimen) {
       console.log(i + " of " + end);
       var url = queue[i].url;
       var name = queue[i].name;
-      var file = __dirname + "/../../client/thumbnails/"+name+".jpg";
+      var file = __dirname + "/../../client/resized_images/"+name+".jpg";
       fs.exists(file, function(exists){
         if (exists) {
-          console.log("thumbnail alreadly exists");
+          console.log("image alreadly exists");
           i++;
           callback();
         } else {
@@ -312,11 +310,19 @@ module.exports = function(Specimen) {
             console.log(response.statusCode);
             fs.writeFile("client/images/"+name+".jpg", body, 'binary', function(err){
               if(err) throw new Error(err);
-              qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/thumbnails/" + name + ".jpg", width:100, height:100}, function(err, filename){
+              // salvar imagem
+              qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/resized_images/" + name + ".jpg", width:1500}, function(err, filename){
                 if (err) throw new Error(err);
-                console.log("converted to thumbnail");
                 i++;
-                callback();
+                // se é flor, salvar thumbnail tambem
+                if (name.substring(0,4) == 'Flor'){
+                  qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/thumbnails/" + name + ".jpg", width:100, height:100}, function(err, filename){
+                    if (err) throw new Error(err);
+                    console.log("converted to thumbnail");
+                    callback();
+                  });
+                } else
+                  callback();
               });
             });
           });
