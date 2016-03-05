@@ -4,7 +4,8 @@ function readSpecimen(id, cb){
     var name = specimenDb["dwc:scientificName"].value + " " + specimenDb["dwc:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
 
-    $("#nome").append(name);
+    $("#nome").append(specimenDb["dwc:scientificName"].value);
+    $("#autor").append(specimenDb["dwc:scientificNameAuthorship"].value);
 
     //dados da palinoteca
     var codigo_palinoteca;
@@ -73,6 +74,7 @@ function readSpecimen(id, cb){
 
     var biblio = specimenDb["dwc:bibliographicCitation"];
     if(biblio){
+      $("#referencias").append("<h2>Refer&ecirc;ncias relacionadas ao esp&eacute;cime:</h2>");
       if (!(Array.isArray(biblio))) biblio = [biblio];
       biblio.forEach(function(citation){
         //TODO: link para referencias

@@ -11,6 +11,7 @@ module.exports = function(Schema) {
       cb("Invalid XLSX file.",null);
     var path = __dirname +"/../../uploads/"+name+".xlsx";
     saveDataset(name,url,path);
+    var downloadQueue = [];
 
     var w = fs.createWriteStream(path).on("close",function (argument) {
       var data = xlsx.parse(path)[0].data;
@@ -41,7 +42,7 @@ module.exports = function(Schema) {
                 current.value.split("|").forEach(function (ref) {
                   current.references.push(ref.trim());
                 });
-              }else
+              }
               // IMAGE
               if(current.term=="glossaryImage"){
                 current.images = [];
@@ -71,9 +72,26 @@ module.exports = function(Schema) {
             callback();
           });
         }else{
+          // adicionar estados
+          record = {};
+          if (line[5] == "Estado"){
+            record.id= line[3].toLowerCase().split(" ").join("-") + "-" + line[4].toLowerCase().split(" ").join("-");
+            record.image = line[10];
+            record.url = "/images/" + record.id + ".jpeg";
+            if (record.image != undefined){
+              record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+              downloadQueue.push({url:record.image, name:record.id});
+            }
+          }
+          Schema.upsert(record, function(err, instance){
+            if(err)
+              console.log(err);
+            rs.count++;
+          });
           callback();
         }
       }, function done(){
+        downloadImages(downloadQueue);
         cb(null, rs);
       });
     });
@@ -82,26 +100,12 @@ module.exports = function(Schema) {
   Schema.mainImage = function(id, cb){
     Schema.findById(id, function(err, data){
       if (err) throw new Error(err);
-      if(data && data["dwc:glossaryImage"]){
-        // ensure it is an array
-        var glossaryImage = data["dwc:glossaryImage"];
-        if (!(Array.isArray(glossaryImage))) glossaryImage = [glossaryImage];
-        if(glossaryImage.length > 0){
-          // check if url exists
-          var url = glossaryImage[glossaryImage.length-1].url;
-          var status;
-          request(url, function(err, response){
-            if(!err)
-              status = response.statusCode;
-            else
-              status = 404;
-          });
-          cb(err,{url:url, status: status});
-        } else {
-          cb(err, {url:"", status:404});
-        }
+      // check if url exists
+      if(data && data.url && data.image){
+        var url = data.url;
+        cb(err, url);
       } else {
-        cb(err, {url:"", status:404});
+        cb("", "");
       }
     });
   };
@@ -147,4 +151,37 @@ module.exports = function(Schema) {
       console.log("Dataset saved: "+instance.id);
     });
   }
+  function downloadImages(queue){
+    var i = 0;
+    var end = queue.length;
+    async.whilst(function(){
+      return i < end;
+    }, function(callback){
+      console.log(i + " of " + end);
+      var url = queue[i].url;
+      var name = queue[i].name;
+      var file = __dirname + "/../../client/images/" + name + ".jpeg";
+      fs.exists(file, function(exists){
+        if (exists) {
+          console.log("image alreadly exists");
+          i++;
+          callback();
+        } else {
+          console.log("making request to " + url);
+          request(url, {encoding: 'binary'}, function(err, response, body){
+            if (err) throw new Error(err);
+            console.log(response.statusCode);
+            fs.writeFile("client/images/"+name+".jpeg", body, 'binary', function(err){
+              if (err) throw new Error(err);
+              i++;
+              callback();
+            });
+          });
+        }
+      });
+    }, function(err){
+        if (err) throw new Error(err);
+        console.log("done.");
+      });
+    }
 };

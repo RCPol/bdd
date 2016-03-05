@@ -6,7 +6,8 @@ function readSpecies(id, map){
     document.title = name;
 
     // nome da espécie
-    $("#nomeDaEspecie").append(name);
+    $("#nomeDaEspecie").append(data["dwc:scientificName"].value);
+    $("#nomeDoAutor").append(data["dwc:scientificNameAuthorship"].value);
 
     escreverEstados("#habito", data["rcpol:habit"]);
 

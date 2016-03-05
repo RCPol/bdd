@@ -7,9 +7,6 @@ var eligibleSpeciesDB = {};
 function composeQuery(){
   $(".selecionado").each( function(){
     var name = $(this).attr('name');
-    //var d = name.split(":")[0];
-    //var s = name.split(":")[1];
-    //query.push({descriptor: d, state: s});
     query.push(name);
   });
   identify(query);
@@ -31,7 +28,6 @@ function removeSelected(){
   identify(query);
 }
 function identify(query){
-  //query = [{descriptor:"Cor da flor", state: "azul"}];
   // limpar tudo
   $(".btnident").attr('disabled', 'disabled');
   $("#especiesElegiveis").empty();
@@ -40,7 +36,8 @@ function identify(query){
   $("#especiesDescartadas").empty();
   $("#descritoresSelecionados").empty();
   eligibleDescriptor = [];
-  writeSelectedState();
+  console.log(query);
+  writeSelectedState(query);
   $.get("/api/Identification/identify", {param: query}, function(data){
     console.log("Identify()", data.response);
     var ids = data.response.eligibleItems.map(function(item) {return item.id;});
@@ -58,16 +55,23 @@ function identify(query){
       });
       setDiscartedSpecies();
       data.response.eligibleStates.forEach(function(descriptor){
-        /* apenas escrever descritores com mais de um estado */
-        if(descriptor.states.length > 1){
+        /* apenas escrever descritores não selecionados, com mais de um estado */
+        //TODO
+        var selected = false;
+        query.forEach(function(element){
+          if (element.split(":")[1] == descriptor.descriptor_term){
+            selected = true;
+          }
+        });
+        if(descriptor.states.length > 1 && !selected){
           eligibleDescriptor.push(descriptor);
           writeDescriptor(descriptor, species.length);
         }
       });
+      $(".btnident").removeAttr('disabled');
       if(species.length == 1){
         window.open($("#especiesElegiveis .nsp > a").attr("href"));
       }
-      $(".btnident").removeAttr('disabled');
     });
 
   });
@@ -82,7 +86,7 @@ function setDiscartedSpecies(){
     }
   }
 }
-function writeSelectedState(){
+function writeSelectedState(query){
   query.forEach(function(selected, i){
     $.getJSON('/api/Schemas/'+selected.split(":")[1], function(schema){
       $(".descel").append("<input state='" + selected +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.split(":")[2] + "</label><br>");
@@ -114,14 +118,6 @@ function writeSpecies(id, nicho){
 }
 
 function writeDescriptor(descritor, species_length){
-
-  // adicionar categoria
-  if(!$('#category_'+descritor.category_name).html()){
-    var cat = "<a id='category_" + descritor.category_name + "' class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.category_name + "</a>";
-    var des = '<ul id="desc_for_'+descritor.category_name+'" class="descritor inner"></ul>';
-    $('.accordion').append("<li>" + cat+"\n"+des + "</li>");
-  }
-
   // retirar estados com count >= species_length
   var copia_descritor = [];
   descritor.states.forEach(function(estado){
@@ -138,24 +134,26 @@ function writeDescriptor(descritor, species_length){
 
   copia_descritor.forEach(function(estado){
     $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
-      "<div class='vimagens' name='" + estado.state + "'>"
+      "<div class='vimagens' id='" + estado.state.split(":").join("-") + "' name='" + estado.state + "'>"
         + "<p>"+
-        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
+        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.split(":")[2].toLowerCase().split(" ").join("-") +"'>"+
         "<a href='#' target='_blank'>"+
         "<!--img src='/img/glo.png' class='vglos'-->"+
         "</a>  " + estado.state.split(":")[2] + " (" + estado.count+ ")" +
         "</p></div>");
-    getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
+
+    getImage(descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.split(":")[2].toLowerCase().split(" ").join("-"), "#desc_for_"+descritor.category_name, "Schemas");
   });
 }
 
 function getImage(id, nicho, model){
   $.getJSON('/api/' + model +'/mainImage?id=' + id, {}, function(res){
-    $(nicho+"_img_"+id).attr("src",res.response);
+    if (res.response && res.response != ""){
+      $(nicho+"_img_"+id).attr("src", res.response);
+    }
   });
 }
 function buscaDescritores(nothing) {
-  console.log(nothing);
   $(".descritor").empty();
   var key = $("#buscadescritores").val().trim().toLowerCase();
   if (nothing) key = "";
@@ -168,7 +166,7 @@ function buscaDescritores(nothing) {
       }
     });
     if(descritor.descriptor_name.toLowerCase().indexOf(key) != -1 || is_in_states){
-      writeDescriptor(descritor);
+      writeDescriptor(descritor, Object.keys(eligibleSpeciesDB).length);
     }
   });
 }
