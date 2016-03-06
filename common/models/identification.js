@@ -174,9 +174,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               });
             }
 
+            identification_item["states"].push(entry);
           });
-
-          identification_item["states"].push(entry);
         }
       });
       list_of_items.push(identification_item);
