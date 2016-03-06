@@ -25,8 +25,9 @@ module.exports = function(Schema) {
       async.each(data, function iterator(line, callback){
         var record = {};
         record.id = line[1];
+        record.order = rs.count;
+        rs.count ++;
         if(record.id){
-          rs.count ++;
           for(var c = 2; c < term.length; c++){
             if(line[c]){
               var field = toString(schema[c])+":"+toString(term[c]);
@@ -73,7 +74,6 @@ module.exports = function(Schema) {
           });
         }else{
           // adicionar estados
-          record = {};
           if (line[5] == "Estado"){
             record.id= line[3].toLowerCase().split(" ").join("-") + "-" + line[4].toLowerCase().split(" ").join("-");
             record.image = line[10];
