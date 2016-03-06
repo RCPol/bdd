@@ -7,8 +7,9 @@ module.exports = function(Identification) {
     Identification.getApp(function(err, app){
       if (err) throw new Error(err);
       var Species = app.models.Species;
+      var Schema = app.models.Schema;
       var BDD = app.dataSources.BDD;
-      getIdentificationItems(filter, Identification, Species, BDD, callback);
+      getIdentificationItems(filter, Identification, Species, Schema, BDD, callback);
     });
   };
 
@@ -76,10 +77,11 @@ module.exports = function(Identification) {
             'category': '$states.category',
             'id': '$states.id',
             'term': '$states.term',
+            'order': '$states.order',
             'state': '$states.states'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor', id: '$id', state: '$state', category:"$category", term:"$term"},
+            _id: { descriptor: '$descriptor', id: '$id', state: '$state', category:"$category", term:"$term", order:'$order'},
             sum: {$sum:1}
           }},
           { $project: {
@@ -89,10 +91,11 @@ module.exports = function(Identification) {
             state: '$_id.state',
             category: '$_id.category',
             term: '$_id.term',
+            order: '$_id.order',
             count: '$sum'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor',category: '$category', id: '$id', term:'$term'},
+            _id: { descriptor: '$descriptor',category: '$category', id: '$id', term:'$term', order:'$order'},
             states: {$push: {state: '$state', count: '$count'}}
           }},
           { $project:{
@@ -101,11 +104,13 @@ module.exports = function(Identification) {
             descriptor_name: '$_id.descriptor',
             descriptor_id: '$_id.id',
             descriptor_term: '$_id.term',
+            order: '$_id.order',
             states: '$states'
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
-          var results = {eligibleItems: items, eligibleStates: states};
+          var ordered_states = _.sortBy(states, 'order');
+          var results = {eligibleItems: items, eligibleStates: ordered_states};
           callback(null, results);
         });
       });
@@ -131,7 +136,7 @@ module.exports = function(Identification) {
   );
 };
 
-function getIdentificationItems(filter, Identification, Species, mongoDs, callback){
+function getIdentificationItems(filter, Identification, Species, Schema, mongoDs, callback){
   Species.find({where: filter}, function(err, all_species){
     if (err) throw new Error(err);
 
@@ -154,17 +159,22 @@ function getIdentificationItems(filter, Identification, Species, mongoDs, callba
             states: []
           };
 
-          console.log(key);
-          console.log(species[key]);
+          Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
+            console.log(schemas);
+            if (schemas.length >= 1){
+              entry.order = schemas[0].order;
+            }
 
-          var prefix = species[key].schema + ":" + species[key].term + ":";
-          if(species[key].states){
-            species[key].states.forEach(function(state){
-              entry.states.push(
-                prefix + state.value
-              );
-            });
-          }
+            var prefix = species[key].schema + ":" + species[key].term + ":";
+            if(species[key].states){
+              species[key].states.forEach(function(state){
+                entry.states.push(
+                  prefix + state.value
+                );
+              });
+            }
+
+          });
 
           identification_item["states"].push(entry);
         }
