@@ -169,15 +169,26 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
-              species[key].states.forEach(function(state){
-                entry.states.push(
-                  prefix + state.value
-                );
-              });
-            }
+              async.eachSeries(species[key].states, function(state, callback3){
+              //species[key].states.forEach(function(state){
+                //entry.states.push( prefix + state.value );
+                var id = species[key].label.toLowerCase().split(" ").join("-") + "-" + state.value.toLowerCase().split(" ").join("-");
 
-            identification_item["states"].push(entry);
-            callback2();
+                Schema.getOrder(id, function(err, state_order){
+                  if (err) throw Error(err);
+                  entry.states.push( {value:prefix + state.value, order:state_order} );
+                  callback3();
+                });
+
+              }, function(err){
+                if (err) throw new Error(err);
+                identification_item["states"].push(entry);
+                callback2();
+              });
+            } else {
+              identification_item["states"].push(entry);
+              callback2();
+            }
 
           });
         } else callback2();
@@ -226,7 +237,7 @@ function composeQuery(param, callback){
   param.forEach(function(elem){
     param_fixed.push({
       "states.term": elem.split(":")[1],
-      "states.states": elem
+      "states.states.value": elem
     });
   });
   param = param_fixed;
