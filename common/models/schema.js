@@ -109,6 +109,16 @@ module.exports = function(Schema) {
       }
     });
   };
+  Schema.getOrder = function(id, cb){
+    Schema.findById(id, function(err, data){
+      if (err) throw new Error(err);
+      if(data){
+        cb(err, data.order);
+      } else {
+        cb(err, "");
+      }
+    });
+  };
   Schema.remoteMethod(
     'mainImage',
     {
@@ -127,6 +137,16 @@ module.exports = function(Schema) {
         {arg: 'url', type: 'string', required:true}
       ],
       returns: {arg: 'response', type: 'object'}
+    }
+  );
+  Schema.remoteMethod(
+    'getOrder',
+    {
+      http: {path: '/getOrder', verb: 'get'},
+      accepts: [
+        {arg: 'id', type: 'string', required: true}
+      ],
+      returns: {arg: 'response', type: Number}
     }
   );
   function toString(arg) {
