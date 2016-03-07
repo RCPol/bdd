@@ -151,6 +151,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           // we only want "rcpol"'s descriptors
           // we can have multiple states
 
+          console.log(species[key].term);
           Schema.getOrder(species[key].term, function(err, order){
             if (err) throw new Error(err);
             var entry = {
