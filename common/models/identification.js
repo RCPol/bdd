@@ -152,30 +152,33 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           // we can have multiple states
 
 
-          console.log(species[key].term);
-          Schema.getOrder(species[key].term, function(err, order){
-            if (err) {throw new Error(err);}
-            var entry = {
-              category: species[key].category,
-              descriptor: species[key].label,
-              id: species[key].id,
-              term: species[key].term,
-              order: Schema.getOrder() ,
-              states: []
-            };
+          if (species[key].term){
 
-            var prefix = species[key].schema + ":" + species[key].term + ":";
-            if(species[key].states){
-              species[key].states.forEach(function(state){
-                entry.states.push(
-                  prefix + state.value
-                );
-              });
-            }
+            Schema.getOrder(species[key].term, function(err, order){
+              if (err) {throw new Error(err);}
+              var entry = {
+                category: species[key].category,
+                descriptor: species[key].label,
+                id: species[key].id,
+                term: species[key].term,
+                order: Schema.getOrder() ,
+                states: []
+              };
 
-            identification_item["states"].push(entry);
+              var prefix = species[key].schema + ":" + species[key].term + ":";
+              if(species[key].states){
+                species[key].states.forEach(function(state){
+                  entry.states.push(
+                    prefix + state.value
+                  );
+                });
+              }
 
-          });
+              identification_item["states"].push(entry);
+
+            });
+
+          }
 
 
           /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
