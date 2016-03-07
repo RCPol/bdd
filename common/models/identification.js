@@ -1,5 +1,6 @@
 //var hash = require('object-hash');
 var _ = require('underscore');
+var async = require('async');
 //var mad = require('mongo-aggregation-debugger')(); //FOR DEBUGGING THE AGGREGATION
 
 module.exports = function(Identification) {
@@ -141,17 +142,20 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
     if (err) throw new Error(err);
 
     var list_of_items = [];
-    all_species.forEach(function(species){
+    async.eachSeries(all_species, function(species, callback1){
+
+    //all_species.forEach(function(species){
       var identification_item = {};
 
       identification_item.id = species.id;
       identification_item["states"] = [];
-      Object.keys(species).forEach(function(key, i){
+      async.forEachOfSeries(species, function(item, key, callback2){
+        //Object.keys(species).forEach(function(key, i){
         if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1){
           // we only want "rcpol"'s descriptors
           // we can have multiple states
 
-          //Schema.getOrder(species[key].term, function(err, order){
+          Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
 
             var entry = {
@@ -159,7 +163,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
-              order: "",
+              order: order,
               states: []
             };
 
@@ -173,28 +177,27 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             }
 
             identification_item["states"].push(entry);
+            callback2();
 
-          //});
-
-
-          /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
-            if (err) throw new Error(err);
-            if (schemas.length >= 1){
-              entry.order = schemas[0].order;
-            }
-          });*/
-        }
-      });
-      list_of_items.push(identification_item);
-    });
-
-    mongoDs.automigrate('Identification', function(err){
-      if (err) throw new Error(err);
-      Identification.upsert(list_of_items, function(err, results){
+          });
+        } else callback2();
+      }, function(err){
         if (err) throw new Error(err);
-        callback(null, list_of_items.length);
+        list_of_items.push(identification_item);
+        callback1();
       });
+    }, function(err) {
+      if (err) throw new Error(err);
+      mongoDs.automigrate('Identification', function(err){
+        if (err) throw new Error(err);
+        Identification.upsert(list_of_items, function(err, results){
+          if (err) throw new Error(err);
+          callback(null, list_of_items.length);
+        });
+      });
+
     });
+
   });
 };
 

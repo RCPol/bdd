@@ -6,6 +6,7 @@
     "pretest": "jshint ."
   },
   "dependencies": {
+    "async": "^1.5.2",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "http-request": "^0.7.0",
