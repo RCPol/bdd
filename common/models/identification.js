@@ -29,7 +29,7 @@ module.exports = function(Identification) {
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
 
-        /*FOR DEBUGGING THE AGGREGATION
+        //FOR DEBUGGING THE AGGREGATION
          Identification.find(function(err, id_items){
 
           mad.log(id_items, [
@@ -65,9 +65,9 @@ module.exports = function(Identification) {
           ], function(err){
             if(err) throw new Error(err);
           });
-        });*/
+        });
 
-        IdentificationCollection.aggregate([
+        /*IdentificationCollection.aggregate([
           { $match: queryMongo},
           { $unwind: '$states'},
           { $unwind: '$states.states'},
@@ -109,11 +109,10 @@ module.exports = function(Identification) {
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
-          console.log(JSON.stringify(states, null, 4));
           var ordered_states = _.sortBy(states, 'order');
           var results = {eligibleItems: items, eligibleStates: ordered_states};
           callback(null, results);
-        });
+        });*/
       });
     });
   };
