@@ -154,18 +154,21 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
 
-            if (order == "") {console.log("ohai"); console.log(typeof(order)); console.log(order);}
-
             var entry = {
               category: species[key].category,
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
-              order: order == "" ? order : "10",
               states: []
             };
 
-            if (entry.order == ""){console.log("mark");}
+            if (order == "") {
+              console.log("ohai");
+              entry.order = "10";
+              console.log(entry.order);
+            } else {
+              entry.order = order;
+            }
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
