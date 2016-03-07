@@ -143,6 +143,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
     var list_of_items = [];
     all_species.forEach(function(species){
       var identification_item = {};
+
       identification_item.id = species.id;
       identification_item["states"] = [];
       Object.keys(species).forEach(function(key, i){
@@ -150,33 +151,31 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           // we only want "rcpol"'s descriptors
           // we can have multiple states
 
-          Schema.find({fields: 'order', where: {id: species[key].term}}, function(err, schemas){
+          var entry = {
+            category: species[key].category,
+            descriptor: species[key].label,
+            id: species[key].id,
+            term: species[key].term,
+            states: []
+          };
+
+          var prefix = species[key].schema + ":" + species[key].term + ":";
+          if(species[key].states){
+            species[key].states.forEach(function(state){
+              entry.states.push(
+                prefix + state.value
+              );
+            });
+          }
+
+          identification_item["states"].push(entry);
+
+          /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
             if (err) throw new Error(err);
-
-            var entry = {
-              category: species[key].category,
-              descriptor: species[key].label,
-              id: species[key].id,
-              term: species[key].term,
-              states: []
-            };
-
             if (schemas.length >= 1){
               entry.order = schemas[0].order;
             }
-
-            var prefix = species[key].schema + ":" + species[key].term + ":";
-            if(species[key].states){
-              species[key].states.forEach(function(state){
-                entry.states.push(
-                  prefix + state.value
-                );
-              });
-            }
-
-            identification_item["states"].push(entry);
-
-          });
+          });*/
         }
       });
       list_of_items.push(identification_item);
