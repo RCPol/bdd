@@ -146,7 +146,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
       identification_item.id = species.id;
       identification_item["states"] = [];
-      Object.keys(species).forEach(function(key){
+      Object.keys(species).forEach(function(key, i){
         if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1){
           // we only want "rcpol"'s descriptors
           // we can have multiple states
@@ -168,14 +168,15 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             });
           }
 
-          identification_item["states"].push(entry);
-
-          /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
+          Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
             if (err) throw new Error(err);
             if (schemas.length >= 1){
+              console.log("schema" + i);
               entry.order = schemas[0].order;
             }
-          });*/
+            console.log("entry" + i);
+            identification_item["states"].push(entry);
+          });
         }
       });
       list_of_items.push(identification_item);
