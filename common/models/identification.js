@@ -153,15 +153,20 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
           Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
-            console.log(order);
+
             var entry = {
               category: species[key].category,
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
-              order: order,
               states: []
             };
+
+            if (order == ""){
+              console.log("ohai");
+            } else {
+              entry.order = order;
+            }
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
