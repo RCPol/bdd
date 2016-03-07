@@ -165,6 +165,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               states: []
             };
 
+            if (entry.order == ""){console.log("mark");}
+
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
               species[key].states.forEach(function(state){
