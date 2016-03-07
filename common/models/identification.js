@@ -159,13 +159,6 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             states: []
           };
 
-          /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
-            console.log(schemas);
-            if (schemas.length >= 1){
-              entry.order = schemas[0].order;
-            }
-          });*/
-
           var prefix = species[key].schema + ":" + species[key].term + ":";
           if(species[key].states){
             species[key].states.forEach(function(state){
@@ -175,7 +168,13 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             });
           }
 
-          identification_item["states"].push(entry);
+          Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
+            console.log(schemas);
+            if (schemas.length >= 1){
+              entry.order = schemas[0].order;
+              identification_item["states"].push(entry);
+            }
+          });
         }
       });
       list_of_items.push(identification_item);
