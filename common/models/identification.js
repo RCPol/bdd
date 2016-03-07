@@ -172,8 +172,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             console.log(schemas);
             if (schemas.length >= 1){
               entry.order = schemas[0].order;
-              identification_item["states"].push(entry);
             }
+            identification_item["states"].push(entry);
           });
         }
       });
