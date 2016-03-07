@@ -170,6 +170,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
           Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
             if (err) throw new Error(err);
+            console.log(i);
+            console.log(schemas);
             if (schemas.length >= 1){
               console.log("schema" + i);
               entry.order = schemas[0].order;
