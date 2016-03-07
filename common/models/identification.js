@@ -159,13 +159,12 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             states: []
           };
 
-          Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
+          /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
             console.log(schemas);
             if (schemas.length >= 1){
               entry.order = schemas[0].order;
             }
-
-          });
+          });*/
 
           var prefix = species[key].schema + ":" + species[key].term + ":";
           if(species[key].states){
