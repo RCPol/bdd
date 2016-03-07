@@ -109,7 +109,7 @@ module.exports = function(Identification) {
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
-          console.log(states);
+          console.log(JSON.stringify(states, null, 4));
           var ordered_states = _.sortBy(states, 'order');
           var results = {eligibleItems: items, eligibleStates: ordered_states};
           callback(null, results);
