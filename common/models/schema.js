@@ -146,7 +146,7 @@ module.exports = function(Schema) {
       accepts: [
         {arg: 'id', type: 'string', required: true}
       ],
-      returns: {arg: 'response', type: Number}
+      returns: {arg: 'response', type: 'object'}
     }
   );
   function toString(arg) {
