@@ -159,7 +159,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
-              order: 10,
+              order: "10",
               states: []
             };
 
