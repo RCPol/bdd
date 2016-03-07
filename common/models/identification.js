@@ -153,7 +153,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
 
           Schema.getOrder(species[key].term, function(err, order){
-            if (err) {console.log(species[key].term); throw new Error(err);}
+            if (err) {console.log(species[key].term); console.log(err);}
             var entry = {
               category: species[key].category,
               descriptor: species[key].label,
