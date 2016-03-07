@@ -165,17 +165,18 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               entry.order = schemas[0].order;
             }
 
-            var prefix = species[key].schema + ":" + species[key].term + ":";
-            if(species[key].states){
-              species[key].states.forEach(function(state){
-                entry.states.push(
-                  prefix + state.value
-                );
-              });
-            }
-
-            identification_item["states"].push(entry);
           });
+
+          var prefix = species[key].schema + ":" + species[key].term + ":";
+          if(species[key].states){
+            species[key].states.forEach(function(state){
+              entry.states.push(
+                prefix + state.value
+              );
+            });
+          }
+
+          identification_item["states"].push(entry);
         }
       });
       list_of_items.push(identification_item);
