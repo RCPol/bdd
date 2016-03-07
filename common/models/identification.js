@@ -110,7 +110,7 @@ module.exports = function(Identification) {
         ], function (error, states) {
           if (err) throw new Error(err);
           var ordered_states = _.sortBy(states, 'order');
-          var results = {eligibleItems: items, eligibleStates: ordered_states, states: states};
+          var results = {eligibleItems: items, eligibleStates: ordered_states};
           callback(null, results);
         });
       });
@@ -153,6 +153,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
           Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
+
+            if (order == "") order = 0;
 
             var entry = {
               category: species[key].category,
