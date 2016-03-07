@@ -151,7 +151,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           // we only want "rcpol"'s descriptors
           // we can have multiple states
 
-          Schema.getOrder(species[key].term, function(err, order){
+          //Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
 
             var entry = {
@@ -159,7 +159,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
-              order: order,
+              //order: order,
               states: []
             };
 
@@ -174,7 +174,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
             identification_item["states"].push(entry);
 
-          });
+          //});
 
 
           /*Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
