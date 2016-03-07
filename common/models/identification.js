@@ -154,14 +154,14 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
 
-            if (order == "") {console.log("ohai"); order = 0;}
+            if (order == "") {console.log("ohai");}
 
             var entry = {
               category: species[key].category,
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
-              order: order,
+              order: order == "" ? order : 10,
               states: []
             };
 
