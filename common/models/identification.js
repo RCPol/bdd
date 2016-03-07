@@ -165,10 +165,10 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             if (order == "") {
               console.log("ohai");
               entry.order = "10";
-              console.log(entry.order);
             } else {
               entry.order = order;
             }
+            console.log(entry.order);
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
