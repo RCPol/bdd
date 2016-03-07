@@ -109,6 +109,7 @@ module.exports = function(Identification) {
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
+          console.log(states);
           var ordered_states = _.sortBy(states, 'order');
           var results = {eligibleItems: items, eligibleStates: ordered_states};
           callback(null, results);
@@ -159,16 +160,9 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
+              order: order,
               states: []
             };
-
-            if (order == "") {
-              console.log("ohai");
-              entry.order = "10";
-            } else {
-              entry.order = order;
-            }
-            console.log(entry.order);
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
