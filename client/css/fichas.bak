@@ -11,8 +11,8 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 
 /* Fundo, links e caixa central */
 body {
-	background: url(21.jpg) no-repeat center top;
-	background-color: #FFAD60;
+	background: url(random/rotate.php) no-repeat center top;
+	background-color: #F0E6FF;
 	font-family: Georgia, serif;
 	font-size: 14px;
 	line-height: 21px;
@@ -24,7 +24,7 @@ a:link, a:visited {
 }
 
 a:hover, a:active {
-	background-color: #F27224;
+	background-color: #DAC1DD;
 	color: black;
 }
 
@@ -57,8 +57,8 @@ li {
 
 li a {
 	display: block;
-	background-color: #FFAD60;
-	color: #F27224;
+	background-color: #F0E6FF;
+	color: #470054;
 	text-align: center;
 	padding: 14px 16px;
 	text-decoration: none;
@@ -67,7 +67,7 @@ li a {
 }
 
 li a:hover {
-	background-color: #F27224;
+	background-color: #DAC1DD;
 }
 
 /* Logotipo */
@@ -90,7 +90,7 @@ article h1 {
 	font-weight: normal;
 	line-height: 35px;
 	margin: 0 0 25px 0;
-	color: #F27224;
+	color: #470054;
 }
 
 /* Título Espécime */
@@ -110,7 +110,7 @@ article h1.pal {
 article h2 {
 	font-size: 21px;
 	font-weight: normal;
-	color: #F27224;
+	color: #470054;
 	margin: 25px 0;
 }
 
@@ -202,14 +202,16 @@ div.r1f a:link, a:visited, a:hover, a:active {
 	background-color: transparent;
 }
 
+
+
 /* Rodapé */
 footer {
 	display: block;
-	background-color: #F27224;
+	background-color: #DAC1DD;
 	padding: 25px 50px;
 	text-align: center;
 	margin: 0 0 50px 0;
-	color: white;
+	color: #470054;
 	font-size: 12px;
 }
 
