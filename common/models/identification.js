@@ -168,12 +168,13 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             });
           }
 
+          identification_item["states"].push(entry);
+
           Schema.find({fields: 'order', where: {id: entry.term}}, function(err, schemas){
-            console.log(schemas);
+            if (err) throw new Error(err);
             if (schemas.length >= 1){
               entry.order = schemas[0].order;
             }
-            identification_item["states"].push(entry);
           });
         }
       });
