@@ -110,7 +110,7 @@ module.exports = function(Identification) {
         ], function (error, states) {
           if (err) throw new Error(err);
           var ordered_states = _.sortBy(states, 'order');
-          var results = {eligibleItems: items, eligibleStates: ordered_states};
+          var results = {eligibleItems: items, eligibleStates: ordered_states, states: states};
           callback(null, results);
         });
       });
@@ -159,14 +159,9 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               descriptor: species[key].label,
               id: species[key].id,
               term: species[key].term,
+              order: order,
               states: []
             };
-
-            if (order == ""){
-              console.log("ohai");
-            } else {
-              entry.order = order;
-            }
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
