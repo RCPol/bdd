@@ -166,7 +166,7 @@ function buscaDescritores(nothing) {
     // checar se a palavra pesquisada é substring do descritor ou de algum estado deste descritor
     var is_in_states = false;
     descritor.states.forEach(function(estado){
-      if (estado.state.toLowerCase().indexOf(key) != -1){
+      if (estado.state.value.toLowerCase().indexOf(key) != -1){
         is_in_states = true;
       }
     });
