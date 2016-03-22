@@ -75,7 +75,7 @@ module.exports = function(Species) {
                 }else{
                   species[key] = sp[key];
                 }
-              } else if(sp[key].class=="NumericalDescriptor"){
+              } else if(sp[key].class=="NumericalDescriptor" && sp[key].term!="pollenShapePE"){
                 if(!species[key]){
                   //if(sp[key].term=="pollenShapePE"){
                   //}else{
@@ -83,31 +83,31 @@ module.exports = function(Species) {
                     species[key].states = [];
                     var min = parseFloat(species[key].min.replace(",","."));
                     var max = parseFloat(species[key].max.replace(",","."));
-                    if(min < 10 ||  max < 10){
+                    if(min <= 10 ||  max <= 10){
                       var state = {};
                       state.value = "Muito pequeno";
                       state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
                       species[key].states.push(state);
                     }
-                    if((min >= 10 && min < 25) ||  (max >= 10 && max < 25)){
+                    if((min >= 10 && min <= 25) ||  (max >= 10 && max <= 25)){
                       var state = {};
                       state.value = "Pequeno";
                       state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
                       species[key].states.push(state);
                     }
-                    if((min >= 25 && min < 50) ||  (max >= 25 && max < 50)){
+                    if((min >= 25 && min <= 50) ||  (max >= 25 && max <= 50)){
                       var state = {};
                       state.value = "Médio";
                       state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
                       species[key].states.push(state);
                     }
-                    if((min >= 50 && min < 100) ||  (max >= 50 && max < 100)){
+                    if((min >= 50 && min <= 100) ||  (max >= 50 && max <= 100)){
                       var state = {};
                       state.value = "Grande";
                       state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
                       species[key].states.push(state);
                     }
-                    if((min >= 100 && min < 200) ||  (max >= 100 && max < 200)){
+                    if((min >= 100 && min <= 200) ||  (max >= 100 && max <= 200)){
                       var state = {};
                       state.value = "Muito Grande";
                       state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
@@ -119,7 +119,67 @@ module.exports = function(Species) {
                       state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
                       species[key].states.push(state);
                     }
-                  //}
+                }
+              } else if(sp[key].class=="NumericalDescriptor" && sp[key].term=="pollenShapePE"){
+                if(!species[key]){
+                    species[key] = sp[key];
+                    species[key].states = [];
+                    var min = parseFloat(species[key].min.replace(",","."));
+                    var max = parseFloat(species[key].max.replace(",","."));
+                    if(min <= 0.5 ||  max <= 0.5){
+                      var state = {};
+                      state.value = "Peroblato";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 0.5 && min <= 0.74) ||  (max > 0.5 && max <= 0.74)){
+                      var state = {};
+                      state.value = "Oblato";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 0.74 && min <= 0.87) ||  (max > 0.74 && max <= 0.87)){
+                      var state = {};
+                      state.value = "Suboblato";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 0.87 && min <= 0.99) ||  (max > 0.87 && max <= 0.99)){
+                      var state = {};
+                      state.value = "Oblato-esferoidal";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 0.99 && min <= 1) ||  (max > 0.99 && max <= 1)){
+                      var state = {};
+                      state.value = "Esfeirodal";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 1 && min <= 1.14) ||  (max > 1 && max <= 1.14)){
+                      var state = {};
+                      state.value = "Prolato-esferoidal";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 1.14 && min <= 1.33) ||  (max > 1.14 && max <= 1.33)){
+                      var state = {};
+                      state.value = "Subprolato";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if((min > 1.33 && min <= 2) ||  (max > 1.33 && max <= 2)){
+                      var state = {};
+                      state.value = "Prolato";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
+                    if(min >= 2 || max >= 2){
+                      var state = {};
+                      state.value = "Perprolato";
+                      state.id = hash.MD5(sp[key].schema+":"+sp[key].class+":"+sp[key].term+":"+state.value);
+                      species[key].states.push(state);
+                    }
                 }
               }
             }
