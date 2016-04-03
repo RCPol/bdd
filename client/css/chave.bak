@@ -11,8 +11,8 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 
 /* Fundo, links e caixa central */
 body {
-	background: url(random/rotate.php) no-repeat center top;
-	background-color: #F0E6FF;
+	background: url(21.jpg) no-repeat center top;
+	background-color: #FFAD60;
 	font-family: Georgia, serif;
 	font-size: 14px;
 	line-height: 21px;
@@ -25,7 +25,7 @@ body {
  
 /* Fundo */
 ::-webkit-scrollbar-track {
-	background-color: #DAC1DD;
+	background-color: #F27224;
 }
  
 /* Indicador */
@@ -39,7 +39,7 @@ body {
 /* Links */
 a:link, a:visited {
 	text-decoration: none;
-	color: #510A5E;
+	color: #470054;
 }
 
 div.contem {
@@ -71,7 +71,7 @@ nav li {
 
 nav li a {
 	display: block;
-	background-color: #F0E6FF;
+	background-color: #FFAD60;
 	color: #470054;
 	text-align: center;
 	padding: 14px 16px;
@@ -81,7 +81,7 @@ nav li a {
 }
 
 nav li a:hover {
-	background-color: #DAC1DD;
+	background-color: #F27224;
 }
 
 /* Logotipo */
@@ -94,7 +94,7 @@ div.logo {
 /* Fundo translucido artigo*/
 div.qbranco {
 	overflow: auto;
-	background-color: rgba(255,255,255,0.8);
+	background-color: white;
 	padding: 40px 50px;
 }
 
@@ -104,7 +104,7 @@ div.qbranco h1 {
 	line-height: 21px;
 	font-weight: normal;
 	margin: 5px 0 16px 13px;
-	color: #470054;
+	color: #F27224;
 	float: left;
 }
 
@@ -112,7 +112,7 @@ div.qbranco h2 {
 	font-size: 18px;
 	line-height: 21px;
 	font-weight: normal;
-	color: #470054;
+	color: #F27224;
 	margin: 13px 13px;
 }
 
@@ -144,8 +144,8 @@ div.cdireita {
 	padding: 5px 10px;
 	font-family: Georgia, serif;
 	font-size: 14px;
-	color: #470054;
-	border:1px solid #F0E6FF;
+	color: #F27224;
+	border:1px solid #FFAD60;
 	border-right:0px;
 }
 
@@ -159,14 +159,14 @@ div.cdireita {
 	cursor: pointer;
 	text-align: center;
 	text-decoration: none;
-	color: #470054;
-	border: solid 1px #F0E6FF;
-	background: #F0E6FF;
+	color: #F27224;
+	border: solid 1px #FFAD60;
+	background: #FFAD60;
 }
 
 .fbbotao:hover {
 	text-decoration: none;
-	background: #DAC1DD;
+	background: #F27224;
 }
 
 .fbbotao::-moz-focus-inner {
@@ -179,7 +179,7 @@ div.cdireita {
 
 /* Quadrados conteúdo */
 div.roxinho {
-	background-color: rgba(240, 230, 255, 0.5);
+	background-color: #FDF0E9;
 	width: 412px;
 	height: 387px;
 	padding: 25px 0 25px 25px;
@@ -198,12 +198,12 @@ div.roxinho {
 	text-align: center;
 	text-decoration: none;
 	color: #470054;
-	border: solid 1px #F0E6FF;
-	background: #F0E6FF;
+	border: solid 1px #FFAD60;
+	background: #FFAD60;
 }
 
 .expocu:hover {
-	background-color: #DAC1DD;
+	background-color: #F27224;
 }
 
 .btnident {
@@ -215,13 +215,13 @@ div.roxinho {
 	cursor: pointer;
 	text-align: center;
 	text-decoration: none;
-	border: solid 1px #470054;
-	background: #470054;
-	color: #DAC1DD;
+	border: solid 1px #F27224;
+	background: #F27224;
+	color: white;
 }
 
 .btnident:hover {
-	color: #f27121;
+	color: #470054;
 }
 
 div.divaeh {
@@ -267,8 +267,8 @@ div.agregadordescritores p {
 	padding: 5px 10px;
 	font-family: Georgia, serif;
 	font-size: 14px;
-	color: #470054;
-	border:1px solid #F0E6FF;
+	color: #F27224;
+	border:1px solid #FFAD60;
 }
 
 /* Imagens descritores */
@@ -291,10 +291,10 @@ div.vimagens {
 }
 
 div.vimagens.selecionado {
-	background-color: #F0E6FF;
-	-moz-box-shadow: 0px 0px 0px 2px #470054;
-	-webkit-box-shadow: 0px 0px 0px 2px #470054;
-	box-shadow: 0px 0px 0px 2px #470054;
+	background-color: #FFAD60;
+	-moz-box-shadow: 0px 0px 0px 2px #F27224;
+	-webkit-box-shadow: 0px 0px 0px 2px #F27224;
+	box-shadow: 0px 0px 0px 2px #F27224;
 }
 
 img.vimg {
@@ -377,7 +377,7 @@ ul li a.toggle span {
 	font-size: 16px;
 	line-height: 21px;
 	font-weight: normal;
-	color: #470054;
+	color: #F27224;
 }
 
 .descsel input[type=checkbox] + label:before {
@@ -423,7 +423,7 @@ div.especies {
 	margin: 0 0 12px 0;
 	padding: 12px;
 	width: 351px;
-	background-color: #DAC1DD;
+	background-color: #F9C6A7;
 	overflow: auto;
 	display: flex;
 	align-itens: center;
@@ -461,10 +461,10 @@ p.famisp {
 /* Rodapé */
 footer {
 	display: block;
-	background-color: #DAC1DD;
+	background-color: #F27224;
 	padding: 25px 50px;
 	text-align: center;
 	margin: 0 0 50px 0;
-	color: #470054;
+	color: white;
 	font-size: 12px;
 }

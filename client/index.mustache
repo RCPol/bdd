@@ -3,7 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 
-	<!-- Css Documento -->
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+    <!-- Css Documento -->
 	<link rel="stylesheet" href="/css/chave.css">
 
 	<!-- JQuery -->
@@ -19,8 +22,13 @@
 
         //Barras de Rolagem das caixas
 		$(".roxinho").mCustomScrollbar({
-		  scrollButtons:{ enable: true },
-		  theme: "dark"
+			scrollButtons:{ enable: true },
+			theme: "dark",
+		});
+
+		$(".roxinhodesc").mCustomScrollbar({
+			scrollButtons:{ enable: true },
+			theme: "dark",
 		});
 
 		//Limpa texto da busca dos descritores
@@ -131,21 +139,23 @@
 
 			<!-- Início: Busca Descritores -->
 			<form class="formbusca" onreset="buscaDescritores(true);" onsubmit="buscaDescritores(false); return false;">
-				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset">
+				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset" value="Limpar">
 			</form>
 
 			<div class="tfclear"></div>
 			<!-- Final: Busca Descritores -->
 
 			<!-- Início: Descritores disponíveis -->
-			<div class="roxinho">
+			<div class="roxinhobtn">
 				<!-- Botões de Expandir/Ocultar -->
 				<div class="divaeh">
                     <button type="button" class="open expocu">Ver todos</button>
 					<button type="button" class="close expocu">Ocultar todos</button>
                     <button type="button" class="btnident" onclick="composeQuery()">Identificar &#9654;</button>
 				</div>
+            </div>
 
+            <div class="roxinhodesc">
 				<!-- Início: Div descritores superiores -->
 				<div class="agregadordescritores">
 
@@ -189,7 +199,7 @@
 
 			<!-- Início: Busca Espécies -->
 			<form class="formbusca" onreset="buscaEspecies(true);" onsubmit="buscaEspecies(false); return false;">
-				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset">
+				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset" value="Limpar">
 			</form>
 			<div class="tfclear"></div>
 			<!-- Final: Busca Espécies -->
