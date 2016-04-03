@@ -169,17 +169,19 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
             var prefix = species[key].schema + ":" + species[key].term + ":";
             if(species[key].states){
+              console.log(species[key].states);
               async.eachSeries(species[key].states, function(state, callback3){
               //species[key].states.forEach(function(state){
                 //entry.states.push( prefix + state.value );
                 var id = species[key].label.toLowerCase().split(" ").join("-") + "-" + state.value.toLowerCase().split(" ").join("-");
-
+                // console.log("before",id);
+                id = state.id;
+                console.log("after",id);
                 Schema.getOrder(id, function(err, state_order){
                   if (err) throw Error(err);
-                  entry.states.push( {value:prefix + state.value, order:state_order} );
+                  entry.states.push( {value:prefix + state.value, order:state_order, id:state.id} );
                   callback3();
                 });
-
               }, function(err){
                 if (err) throw new Error(err);
                 identification_item["states"].push(entry);

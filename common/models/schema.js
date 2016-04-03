@@ -75,7 +75,57 @@ module.exports = function(Schema) {
         }else{
           // adicionar estados
           if (line[5] == "Estado"){
-            record.id= line[3].toLowerCase().split(" ").join("-") + "-" + line[4].toLowerCase().split(" ").join("-");
+            //record.id= line[3].toLowerCase().split(" ").join("-") + "-" + line[4].toLowerCase().split(" ").join("-");
+            for(var c = 2; c < term.length; c++){
+              if(line[c]){
+                var field = toString(schema[c])+":"+toString(term[c]);
+                var current = {};
+                current.schema = toString(schema[c]);
+                current.class = toString(class_[c]);
+                current.term = toString(term[c]);
+                current.label = toString(label[c]);
+                current.value = toString(line[c]);
+                // REFERENCE
+                if(current.term=="bibliographicCitation"){
+                  current.references = [];
+                  current.value.split("|").forEach(function (ref) {
+                    current.references.push(ref.trim());
+                  });
+                }
+                // IMAGE
+                if(current.term=="glossaryImage"){
+                  current.images = [];
+                  current.value.split("|").forEach(function (image) {
+                    current.images.push(image.trim());
+                  });
+                }
+                // Check if exist field with the same key
+                if(record[field]){
+                  // Check if the field is the is an Array
+                  if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
+                      record[field].push(current);
+                  } else {
+                    var old = Object.create(record[field]);
+                    record[field] = [];
+                    record[field].push(old);
+                    record[field].push(current);
+                  }
+                } else {
+                  record[field] = current;
+                }
+              }
+            }
+            if (!line[2]) {
+              line[2] = "";
+            }
+            if (!line[3]) {
+              line[3] = "";
+            }
+            if (!line[4]) {
+              line[4] = "";
+            }
+            console.log(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
+            record.id = hash.MD5(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
             record.image = line[10];
             record.url = "/images/" + record.id + ".jpeg";
             if (record.image != undefined){

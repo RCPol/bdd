@@ -117,6 +117,7 @@ function writeSpecies(id, nicho){
   $(nicho + " > #" + id + " img").width(100).height(100);
 }
 
+<<<<<<< Updated upstream
 function writeDescriptor(descritor, species_length){
   // retirar estados com count >= species_length
   var copia_descritor = [];
@@ -141,22 +142,52 @@ function writeDescriptor(descritor, species_length){
     $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
       "<div class='vimagens' id='" + estado.state.value.split(":").join("-") + "' name='" + estado.state.value + "'>"
         + "<p>"+
-        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ estado.state.id +"'>"+
+        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-") +"'>"+
         "<a href='#' target='_blank'>"+
         "<!--img src='/img/glo.png' class='vglos'-->"+
         "</a>  " + estado.state.value.split(":")[2] + " (" + estado.count+ ")" +
         "</p></div>");
 
-    //getImage(descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-"), "#desc_for_"+descritor.category_name, "Schemas");
-    getImage(estado.state.id, "#desc_for_"+descritor.category_name, "Schemas");
+    getImage(descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-"), "#desc_for_"+descritor.category_name, "Schemas");
   });
+=======
+function writeDescriptor(descritor){
+  if(descritor.states.length>1){
+    if(!$('#category_'+descritor.category_name).html()){
+      var cat = "<a id='category_" + descritor.category_name + "' class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.category_name + "</a>";
+      var des = '<ul id="desc_for_'+descritor.category_name+'" class="descritor inner"></ul>';
+      $('.accordion').append("<li>" + cat+"\n"+des + "</li>");
+    }
+
+    //TODO: usar ids para consultar Schema
+    $("#desc_for_"+descritor.category_name).append("<li><a class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.descriptor_name + "</a></li>");
+    $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
+
+    descritor.states.forEach(function(estado){
+      $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
+        "<div class='vimagens' name='" + descritor.descriptor_name + ":" + estado.state + "'>"
+        + "<p>"+
+          "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_'"+ descritor.term +">"+
+          "<a href='#' target='_blank'>"+
+          "<!--img src='/img/glo.png' class='vglos'-->"+
+          "</a>  " + estado.state + " (" + estado.count+ ")" +
+          "</p></div>");
+      getImage(descritor.descriptor_term, "#desc_for_"+descritor.category_name, "Schemas");
+    });
+  }
+>>>>>>> Stashed changes
 }
 
 function getImage(id, nicho, model){
   $.getJSON('/api/' + model +'/mainImage?id=' + id, {}, function(res){
+<<<<<<< Updated upstream
     if (res.response && res.response != ""){
       $(nicho+"_img_"+id).attr("src", res.response);
     }
+=======
+    $(nicho+"_img_"+id).attr("src",res.response);
+    console.log(res.response);
+>>>>>>> Stashed changes
   });
 }
 function buscaDescritores(nothing) {

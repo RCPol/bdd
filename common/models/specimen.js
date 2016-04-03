@@ -103,7 +103,9 @@ module.exports = function(Specimen) {
                 current.value.split("|").forEach(function (state_) {
                   var state  = {};
                   state.value = state_.trim();
-                  state.id = hash.MD5(current.schema+":"+current.class+":"+current.term+":"+state.value);
+                  console.log(current.category+":"+current.label+":"+state.value);
+                  state.id = hash.MD5(current.category.trim().toLowerCase()+":"+current.label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
+                  //state.id = hash.MD5(current.schema+":"+current.class+":"+current.term+":"+state.value);
                   current.states.push(state);
                 });
               }

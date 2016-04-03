@@ -141,14 +141,13 @@ function writeDescriptor(descritor, species_length){
     $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
       "<div class='vimagens' id='" + estado.state.value.split(":").join("-") + "' name='" + estado.state.value + "'>"
         + "<p>"+
-        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ estado.state.id +"'>"+
+        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-") +"'>"+
         "<a href='#' target='_blank'>"+
         "<!--img src='/img/glo.png' class='vglos'-->"+
         "</a>  " + estado.state.value.split(":")[2] + " (" + estado.count+ ")" +
         "</p></div>");
 
-    //getImage(descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-"), "#desc_for_"+descritor.category_name, "Schemas");
-    getImage(estado.state.id, "#desc_for_"+descritor.category_name, "Schemas");
+    getImage(descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-"), "#desc_for_"+descritor.category_name, "Schemas");
   });
 }
 

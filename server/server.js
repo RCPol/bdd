@@ -50,6 +50,12 @@ app.get('/profile/palinoteca/:id', function(req, res) {
   res.send(mustache.render(template, params));
 });
 
+app.get('/profile/glossary/:id', function(req, res) {
+  var template = fs.readFileSync('./client/glossary.mustache', 'utf8');
+  var params = {id: req.params.id};
+  res.send(mustache.render(template, params));
+});
+
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
