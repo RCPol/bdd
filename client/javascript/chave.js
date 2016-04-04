@@ -128,7 +128,7 @@ function writeDescriptor(descritor, species_length){
   //TODO: usar ids para consultar Schema
   // adicionar descritor, se houver algum estado
   if (copia_descritor.length > 0){
-    $("#desc_for_"+descritor.category_name).append("<li><a class='toggle' href='javascript:void(0);'><span>+</span>" + descritor.descriptor_name + "</a></li>");
+    $("#desc_for_"+descritor.category_name).append("<li><section class='toggle'><span>+</span>" + descritor.descriptor_name + "<a href='#'><img src='img/glo.png' class='lala'></a></section></li>");
     $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
   }
 
@@ -143,7 +143,7 @@ function writeDescriptor(descritor, species_length){
         + "<p>"+
         "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ estado.state.id +"'>"+
         "<a href='#' target='_blank'>"+
-        "<!--img src='/img/glo.png' class='vglos'-->"+
+        "<img src='/img/glo.png' class='vglos'>"+
         "</a>  " + estado.state.value.split(":")[2] + " (" + estado.count+ ")" +
         "</p></div>");
 
@@ -153,9 +153,12 @@ function writeDescriptor(descritor, species_length){
 }
 
 function getImage(id, nicho, model){
-  $.getJSON('/api/' + model +'/mainImage?id=' + id, {}, function(res){
+  var url = '/api/' + model +'/mainImage?id=' + id;
+  $.getJSON(url, {}, function(res){
     if (res.response && res.response != ""){
       $(nicho+"_img_"+id).attr("src", res.response);
+    } else {
+      console.log(url);
     }
   });
 }
@@ -175,6 +178,8 @@ function buscaDescritores(nothing) {
       writeDescriptor(descritor, Object.keys(eligibleSpeciesDB).length);
     }
   });
+  // expandir descritores
+  $('.open').trigger("click");
 }
 function buscaEspecies(nothing) {
   var key = $("#buscaespecies").val().trim().toLowerCase();

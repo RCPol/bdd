@@ -280,7 +280,7 @@ form.valornum {
 }
 
 img.lala {
-	padding: 0 6px 0 0;
+	padding: 0 0 0 3px;
 }
 
 /* Textos descritores*/
@@ -369,15 +369,17 @@ ul li {
 	margin: 0;
 }
 
-ul li a.toggle {
+ul li section.toggle {
 	display: block;
 	font-size: 16px;
 	line-height: 21px;
 	font-weight: normal;
 	padding: 0 0 3px 0;
+	color: #470054;
+	cursor: pointer;
 }
 
-ul li a.toggle span {
+ul li section.toggle span {
 	display: inline-block;
 	vertical-align: 1px;
 	width: 8px;
@@ -394,7 +396,6 @@ ul li a.toggle span {
 	text-align: center;
 	margin: 0 3px 0 0;
 }
-
 /* Descritores Selecionados*/
 .descel {
 	width: width: 356px;
