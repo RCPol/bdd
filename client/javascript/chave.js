@@ -88,6 +88,7 @@ function setDiscartedSpecies(){
 }
 function writeSelectedState(query){
   query.forEach(function(selected, i){
+    console.log(selected);
     $.getJSON('/api/Schemas/'+selected.split(":")[1], function(schema){
       $(".descel").append("<input state='" + selected +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.split(":")[2] + "</label><br>");
     });
@@ -128,7 +129,7 @@ function writeDescriptor(descritor, species_length){
   //TODO: usar ids para consultar Schema
   // adicionar descritor, se houver algum estado
   if (copia_descritor.length > 0){
-    $("#desc_for_"+descritor.category_name).append("<li><section class='toggle'><span>+</span>" + descritor.descriptor_name + "<a href='#'><img src='img/glo.png' class='lala'></a></section></li>");
+    $("#desc_for_"+descritor.category_name).append("<li><section class='toggle'><span>+</span>" + descritor.descriptor_name + "<a target='_blank' href='/profile/glossary/"+descritor.descriptor_term+"'><img src='img/glo.png' class='lala'></a></section></li>");
     $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
   }
 
@@ -142,12 +143,11 @@ function writeDescriptor(descritor, species_length){
       "<div class='vimagens' id='" + estado.state.value.split(":").join("-") + "' name='" + estado.state.value + "'>"
         + "<p>"+
         "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ estado.state.id +"'>"+
-        "<a href='#' target='_blank'>"+
+        "<a href='/profile/glossary/" + estado.state.id + "' target='_blank'>"+
         "<img src='/img/glo.png' class='vglos'>"+
         "</a>  " + estado.state.value.split(":")[2] + " (" + estado.count+ ")" +
         "</p></div>");
 
-    //getImage(descritor.descriptor_name.toLowerCase().split(" ").join("-") + "-" + estado.state.value.split(":")[2].toLowerCase().split(" ").join("-"), "#desc_for_"+descritor.category_name, "Schemas");
     getImage(estado.state.id, "#desc_for_"+descritor.category_name, "Schemas");
   });
 }
@@ -157,8 +157,6 @@ function getImage(id, nicho, model){
   $.getJSON(url, {}, function(res){
     if (res.response && res.response != ""){
       $(nicho+"_img_"+id).attr("src", res.response);
-    } else {
-      console.log(url);
     }
   });
 }
@@ -179,7 +177,9 @@ function buscaDescritores(nothing) {
     }
   });
   // expandir descritores
-  $('.open').trigger("click");
+  if (!nothing){
+    $('.open').trigger("click");
+  }
 }
 function buscaEspecies(nothing) {
   var key = $("#buscaespecies").val().trim().toLowerCase();

@@ -124,8 +124,8 @@ module.exports = function(Schema) {
             if (!line[4]) {
               line[4] = "";
             }
-            console.log(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
             record.id = hash.MD5(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
+            console.log(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase()+" "+record.id);
             record.image = line[10];
             record.url = "/images/" + record.id + ".jpeg";
             if (record.image != undefined){

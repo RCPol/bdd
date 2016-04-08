@@ -49,13 +49,15 @@ module.exports = function(Specimen) {
               // IMAGE
               if(current.term=="associatedMedia"){
                 current.category = current.category?current.category:"Outro";
-                current.name = current.category + current.value.replace("https://drive.google.com/open?id=", "");
-                if(typeof current.value === "string"){
-                  current.url = current.value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-                }
-                // save images
-                var image = {url: current.url, name: current.name};
-                downloadQueue.push(image);
+                current.value.split("|").forEach(function(value){
+                  current.name = current.category + value.replace("https://drive.google.com/open?id=", "");
+                  if(typeof value === "string"){
+                    current.url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+                  }
+                  // save images
+                  var image = {url: current.url, name: current.name};
+                  downloadQueue.push(image);
+                });
               }else
               // REFERENCE
               if(current.term=="bibliographicCitation"){
@@ -151,6 +153,7 @@ module.exports = function(Specimen) {
             callback();
           });
         }else{
+          console.log("can't find id");
           callback();
         }
       }, function done(){
@@ -211,10 +214,12 @@ module.exports = function(Specimen) {
   function defineId(line,idIndexes) {
     var idValue = '';
     for(var j = 0; j < idIndexes.length; j++){
-      if(toString(line[idIndexes[j]])=='')
-      return null;
+      /*if(toString(line[idIndexes[j]])=='')
+      return null;*/
       idValue = idValue+":"+ String(line[idIndexes[j]]).trim();
     };
+    if (idValue == ":::")
+      return null;
     return hash.MD5(idValue);
   }
   function defineName(url) {
@@ -299,6 +304,7 @@ module.exports = function(Specimen) {
       console.log(i + " of " + end);
       var url = queue[i].url;
       var name = queue[i].name;
+      console.log(queue[i]);
       var file = __dirname + "/../../client/resized_images/"+name+".jpg";
       fs.exists(file, function(exists){
         if (exists) {
