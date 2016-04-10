@@ -101,7 +101,8 @@ function getSpecies(species, nicho, callback){
       speciesDb[species.id].scientificName = sp['dwc:scientificName'].value;
       speciesDb[species.id].family = sp['dwc:family'].value;
       speciesDb[species.id].scientificNameAuthorship = sp['dwc:scientificNameAuthorship'].value;
-      speciesDb[species.id].vernacularName = sp['dwc:vernacularName'].value.split("|");
+      if (sp['dwc:vernacularName'] != undefined)
+        speciesDb[species.id].vernacularName = sp['dwc:vernacularName'].value.split("|");
       callback(species.id,nicho);
     });
   }else{
@@ -115,7 +116,8 @@ function writeSpecies(id, nicho){
   $(nicho + " > #" + id).append("<div class='nsp'></div>");
   $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
   $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
-  $(nicho + " > #" + id + " > .nsp").append("<p class='popn'>" + speciesDb[id].vernacularName + "</p>");
+  if (speciesDb[id].vernacularName != undefined)
+    $(nicho + " > #" + id + " > .nsp").append("<p class='popn'>" + speciesDb[id].vernacularName + "</p>");
   getImage(id, nicho, "Species");
   $(nicho + " > #" + id + " img").width(100).height(100);
 }
