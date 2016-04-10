@@ -133,8 +133,12 @@ function readSpecies(id, map){
 
     $.getJSON("/api/Specimens?" + specimen_query, function(specimens){
       specimens.forEach(function(specimen, id){
+        // mapa
         var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
+                console.log(p);
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
+
+        // especimes
         var palinoteca = "";
         if (!(Array.isArray(specimen["dwc:collectionCode"]))) specimen["dwc:collectionCode"] = [specimen["dwc:collectionCode"]];
         specimen["dwc:collectionCode"].forEach(function(c_code){

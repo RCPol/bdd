@@ -62,6 +62,9 @@ module.exports = function(Species) {
         species["dwc:family"] = specimens[0]["dwc:family"];
         species["dwc:scientificName"] = specimens[0]["dwc:scientificName"];
         species["dwc:scientificNameAuthorship"] = specimens[0]["dwc:scientificNameAuthorship"];
+        // TODO multiple specimens with different popular names
+        species["dwc:vernacularName"] = specimens[0]["dwc:vernacularName"];
+
         species["dwc:establishmentMean"] = specimens[0]["dwc:establishmentMean"];
         species["rcpol:floweringPeriod"] = specimens[0]["rcpol:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
         species["dwc:associatedMedia"] = specimens[0]["dwc:associatedMedia"];

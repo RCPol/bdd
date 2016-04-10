@@ -96,11 +96,12 @@ function writeSelectedState(query){
 };
 function getSpecies(species, nicho, callback){
   if(typeof speciesDb[species.id] == 'undefined'){
-    $.getJSON('/api/Species/' + species.id + '?filter=%7B%20%22fields%22%3A%20%7B%22dwc%3AscientificName%22%3Atrue%2C%20%22dwc%3Afamily%22%3Atrue%2C%20%22dwc%3AscientificNameAuthorship%22%3Atrue%7D%20%7D', {}, function(sp){
+    $.getJSON('/api/Species/' + species.id + '?filter=%7B%20%22fields%22%3A%20%7B%22dwc%3AscientificName%22%3Atrue%2C%20%22dwc%3Afamily%22%3Atrue%2C%20%22dwc%3AscientificNameAuthorship%22%3Atrue%2C%20%22dwc%3AvernacularName%22%3Atrue%7D%20%7D', {}, function(sp){
       speciesDb[species.id] = {};
       speciesDb[species.id].scientificName = sp['dwc:scientificName'].value;
-      speciesDb[species.id].scientificNameAuthorship = sp['dwc:scientificNameAuthorship'].value;
       speciesDb[species.id].family = sp['dwc:family'].value;
+      speciesDb[species.id].scientificNameAuthorship = sp['dwc:scientificNameAuthorship'].value;
+      speciesDb[species.id].vernacularName = sp['dwc:vernacularName'].value.split("|");
       callback(species.id,nicho);
     });
   }else{
@@ -112,8 +113,9 @@ function writeSpecies(id, nicho){
 
   $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg'>");
   $(nicho + " > #" + id).append("<div class='nsp'></div>");
-  $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
   $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
+  $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
+  $(nicho + " > #" + id + " > .nsp").append("<p class='popn'>" + speciesDb[id].vernacularName + "</p>");
   getImage(id, nicho, "Species");
   $(nicho + " > #" + id + " img").width(100).height(100);
 }

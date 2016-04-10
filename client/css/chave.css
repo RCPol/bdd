@@ -57,19 +57,25 @@ header {
 }
 
 /* Menu */
+nav {
+	margin: 0;
+}
+
 nav ul {
 	list-style-type: none;
-	margin: 0;
-	padding: 0 50px;
+	margin: 12px 0 0 0;
+	padding: 0;
 	float: right;
 }
 
-nav li {
-	float: left;
-	padding: 0 5px;
+nav ul li {
+	float: right;
+	clear: both;
+	padding: 0 0 12px 0;
+	margin: 0;
 }
 
-nav li a {
+nav ul li a {
 	display: block;
 	background-color: #FFAD60;
 	color: #470054;
@@ -77,9 +83,10 @@ nav li a {
 	padding: 14px 16px;
 	text-decoration: none;
 	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 16px;
 }
 
-nav li a:hover {
+nav ul li a:hover {
 	background-color: #F27224;
 }
 
@@ -396,6 +403,35 @@ ul li section.toggle span {
 	text-align: center;
 	margin: 0 3px 0 0;
 }
+
+ul li a.toggle {
+	display: block;
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+	padding: 0 0 3px 0;
+	color: #470054;
+	cursor: pointer;
+}
+
+ul li a.toggle span {
+	display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #F27224;
+	color: #F27224;
+	font-weight: bold;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 12px;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 3px 0 0;
+}
+
 /* Descritores Selecionados*/
 .descel {
 	width: width: 356px;
@@ -489,6 +525,14 @@ p.famisp {
 	font-weight: normal;
 	line-height: 21px;
 	font-size: 16px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+p.popn {
+	font-weight: normal;
+	line-height: 16px;
+	font-size: 13px;
 	margin: 7px 0 0 0;
 	font-family: 'Roboto Condensed', sans-serif;
 }

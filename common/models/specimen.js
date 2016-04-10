@@ -304,7 +304,6 @@ module.exports = function(Specimen) {
       console.log(i + " of " + end);
       var url = queue[i].url;
       var name = queue[i].name;
-      console.log(queue[i]);
       var file = __dirname + "/../../client/resized_images/"+name+".jpg";
       fs.exists(file, function(exists){
         if (exists) {
