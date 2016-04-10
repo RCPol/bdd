@@ -56,6 +56,11 @@ app.get('/profile/glossary/:id', function(req, res) {
   res.send(mustache.render(template, params));
 });
 
+app.get('/profile/glossary', function(req, res){
+  var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
+  res.send(mustache.render(template));
+});
+
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {

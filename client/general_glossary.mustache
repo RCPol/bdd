@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/glossario.css">
+
+	<!-- jQuery -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- Javascript Documento -->
+    <script type="text/javascript" src="/javascript/glossary.js"></script>
+
+	<script type="text/javascript">
+		window.onload = function(){
+
+			//Limpa texto da busca dos descritores
+			var btpglossario = document.getElementById("buscaglossario");
+
+			if(btpglossario.addEventListener){
+				btpglossario.addEventListener("click", function() {
+					if (btpglossario.value == 'Pesquisar'){
+						btpglossario.value = '';
+					}
+				});
+			}
+
+          $.getJSON("/api/Schemas?filter[fields][id]=true&filter[fields][rcpol:type]=true&filter[order]=order%20asc", function(schemas){
+            schemas.forEach(function(schema){
+              writeSchema(schema);
+            })
+          });
+	    }
+
+	</script>
+
+	<title>RCPol - Gloss&aacute;rio</title>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<article>
+
+		<h1 class="glo-tit">Glossário</h1>
+
+		<form class="formbusca" onreset="busca(true)" onsubmit="busca(false); return false;">
+			<input type="text" id="buscaglossario" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			<input class="fbbotao" type="reset" value="Limpar">
+		</form>
+
+
+	</article>
+	<!-- Final das informações da Palinoteca -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+</html>
