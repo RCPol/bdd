@@ -91,7 +91,7 @@ module.exports = function(Specimen) {
               }else
               // LONGITUDE
               if(current.term=="decimalLongitude"){
-                var converted = convertDMSCoordinatesToDecimal(current.value);
+                var converted = convertDMSCoordinatesToDecimal(current.value.toUpperCase().replace("O","W").replace("L","E"));
                 if(converted!=current.value){
                   current.rawValue = current.value;
                   current.value = converted;
