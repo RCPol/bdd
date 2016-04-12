@@ -44,7 +44,7 @@ function readSpecies(id, map){
 
     if (data["rcpol:pollenDiameter"])
       escreverEstados("#tamanhoDoPolen", data["rcpol:pollenDiameter"], true);
-    else if (data["rcpol:smallerPollenDiameter"])
+    else if (data["rcpol:smallerPollenDiameter"] && data["rcpol:largerPollenDiameter"])
       $("#tamanhoDoPolen").append("tamanho do pólen maior: ", data["rcpol:smallerPollenDiameter"].value, ", tamanho do pólen menor: ", data["rcpol:largerPollenDiameter"].value);
 
     if (data["rcpol:pollenDiameter"]){
