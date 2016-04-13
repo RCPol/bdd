@@ -23,7 +23,7 @@ function readSpecimen(id, cb){
     $.getJSON("/api/Specimens/getCollection?code="+codigo_palinoteca, function(res){
       console.log(res);
       var palinoteca = res.response[0];
-      $("#laboratorio").append(palinoteca["rcpol:laboratory"].value);
+      if (palinoteca["rcpol:laboratory"]) $("#laboratorio").append("do " + palinoteca["rcpol:laboratory"].value);
       $("#instituicao").append(palinoteca["rcpol:institutionName"].value);
       $("#codigoDaInstituicao").append(palinoteca["dwc:institutionCode"].value);
       $("#colecao").append(codigo_palinoteca);

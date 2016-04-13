@@ -9,7 +9,7 @@ function readPalinoteca(id){
     if(data["rcpol:instituteName"])
       $("#nomeDoInstituto").append(data["rcpol:instituteName"].value);
     $("#nomeDoDepartamento").append(data["rcpol:departament"].value);
-    $("#nomeDoLaboratorio").append(data["rcpol:laboratory"].value);
+    if (data["rcpol:laboratory"]) $("#nomeDoLaboratorio").append(data["rcpol:laboratory"].value);
     $("#palinoteca").append(data["rcpol:collectionName"].value);
     $("#siglaDaPalinoteca").append(data["dwc:collectionCode"].value);
     $("#responsavel").append(data["rcpol:responsable"].value);
