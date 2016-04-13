@@ -1,7 +1,7 @@
 function writeSchema(schema){
   var id= schema.id;
   if (schema["rcpol:type"].value == "Estado"){
-    $("article").append('<div class="glossario-m" id="'+id+'"><img id="image"><h2></h2><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
+    $("article").append('<div class="glossario-s" id="'+id+'"><img id="image"><h2></h2><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
   } else {
     $("article").append('<div class="glossario-s" id="'+id+'"><img id="image"><h2></h2><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
   }
