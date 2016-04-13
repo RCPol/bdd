@@ -141,6 +141,14 @@ div.img-planta h2 {
 	display: none;
 }
 
+/* Descrição Polínica */
+div.iinfo-polen {
+	display: block;
+	clear: both;
+	margin: 25px 0 0 0;
+	overflow: auto;
+}
+
 /* Informações Palinoteca*/
 div.cspm {
 	overflow: auto;
