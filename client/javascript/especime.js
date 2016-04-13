@@ -34,6 +34,7 @@ function readSpecimen(id, cb){
       $("#homepage").append(palinoteca["rcpol:homepage"].value);
       $("#homepage_link").attr("href", palinoteca["rcpol:homepage"].value);
       $("#link_palinoteca").attr("href", "/profile/palinoteca/"+palinoteca["id"]);
+      $("#logo").attr("src", palinoteca["rcpol:logotipo"].url);
     });
 
     $.getJSON("/api/Species?filter[fields][id]=true&filter[where][dwc:scientificName.value]="+specimenDb["dwc:scientificName"].value, function(especies){

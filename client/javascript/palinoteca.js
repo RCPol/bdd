@@ -18,6 +18,7 @@ function readPalinoteca(id){
     $("#email").append(data["rcpol:email"].value);
     $("#homepage_link").attr("href", data["rcpol:homepage"].value);
     $("#homepage").append(data["rcpol:homepage"].value);
+    $("#logo").attr("src", data["rcpol:logotipo"].url);
 
     //lista de especimes
     var url = "/api/Specimens?filter[fields][id]=true&filter[fields][dwc:scientificName]=true&filter[fields][dwc:scientificNameAuthorship]=true&filter[fields][dwc:recordedBy]=true&filter[fields][dwc:municipality]=true&filter[fields][dwc:stateProvince]=true&filter[where][and][0][dwc:institutionCode.value]="+data["dwc:institutionCode"].value+"&filter[where][and][1][dwc:collectionCode.value]="+data["dwc:collectionCode"].value;
