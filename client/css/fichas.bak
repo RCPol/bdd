@@ -122,6 +122,18 @@ article h2 {
 	font-family: 'Roboto Condensed', sans-serif;
 }
 
+#link_palinoteca {
+	color: #F27224;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+}
+
+#link_especie {
+	color: #F27224;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+}
+
 /* Características da Planta */
 div.info-planta {
 	display: block;
@@ -142,11 +154,15 @@ div.img-planta h2 {
 }
 
 /* Descrição Polínica */
-div.iinfo-polen {
+div.info-polen {
 	display: block;
 	clear: both;
 	margin: 25px 0 0 0;
 	overflow: auto;
+}
+
+span:first-letter {
+	text-transform: uppercase;
 }
 
 /* Informações Palinoteca*/

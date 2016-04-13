@@ -12,6 +12,7 @@ function readSpecimen(id, cb){
     var codigo_herbario;
     var collectionCode = specimenDb["dwc:collectionCode"];
     if (!(Array.isArray(collectionCode))) collectionCode = [collectionCode]; // se houver apenas um valor
+    console.log(collectionCode);
     collectionCode.forEach(function(c_code){
       if (c_code.label == "Código da Palinoteca")
         codigo_palinoteca = c_code.value;
@@ -21,7 +22,6 @@ function readSpecimen(id, cb){
 
 
     $.getJSON("/api/Specimens/getCollection?code="+codigo_palinoteca, function(res){
-      console.log(res);
       var palinoteca = res.response[0];
       if (palinoteca["rcpol:laboratory"]) $("#laboratorio").append("do " + palinoteca["rcpol:laboratory"].value);
       $("#instituicao").append(palinoteca["rcpol:institutionName"].value);

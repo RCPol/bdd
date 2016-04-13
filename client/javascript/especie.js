@@ -6,6 +6,7 @@ function readSpecies(id, map){
     document.title = name;
 
     // nome da espécie
+    $("#familia").append(data["dwc:family"].value);
     $("#nomeDaEspecie").append(data["dwc:scientificName"].value);
     $("#nomeDoAutor").append(data["dwc:scientificNameAuthorship"].value);
 
@@ -82,12 +83,10 @@ function readSpecies(id, map){
     if(data["rcpol:pollenShapePE"]){
       var p_e = data["rcpol:pollenShapePE"];
       $("#formaDoPolenPE").append("P/E = " + p_e.mean + " ± " + p_e.sd + " (" + p_e.min + " - " + p_e.max + "). " );
-    }
-
-    escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra maiuscula
-    // primeira letra maiuscula após o ponto
-    if (data["rcpol:pollenShapePE"]){ // se o ponto foi colocado
-      $("#tipoDeAberturaDoPolen::first-letter").css('text-transform', 'capitalize');
+      escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra maiuscula
+    } else {
+      escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra minuscula
+      $("#tipoDeAberturaDoPolen").addClass("tipoDeAberturaDoPolen-minusculo").removeClass("tipoDeAberturaDoPolen");
     }
 
     if(data["rcpol:colpeFeature"]){

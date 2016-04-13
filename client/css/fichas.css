@@ -134,6 +134,12 @@ article h2 {
 	font-size: 18px;
 }
 
+/* Familia Espécie */
+h2.famesp {
+	margin: 0 0 12px 0;
+	color: #470054;
+}
+
 /* Características da Planta */
 div.info-planta {
 	display: block;
@@ -159,6 +165,18 @@ div.info-polen {
 	clear: both;
 	margin: 25px 0 0 0;
 	overflow: auto;
+}
+
+span{
+    display:inline-block;
+}
+
+p span.tipoDeAberturaDoPolen:first-letter {
+	text-transform: uppercase;
+}
+
+.tipoDeAberturaDoPolen-minusculo {
+    text-transform: lowercase;
 }
 
 /* Informações Palinoteca*/
