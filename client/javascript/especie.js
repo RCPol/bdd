@@ -14,7 +14,7 @@ function readSpecies(id, map){
     if (data["dwc:establishmentMean"])
       $("#origem").append(data["dwc:establishmentMean"].value);
 
-    if (data["recpol:floweringPeriod"])
+    if (data["rcpol:floweringPeriod"])
       $("#periodoDeFloracao").append(data["rcpol:floweringPeriod"].months.join(', '));
 
     // caracteristicas da flor
@@ -87,7 +87,7 @@ function readSpecies(id, map){
     escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra maiuscula
     // primeira letra maiuscula após o ponto
     if (data["rcpol:pollenShapePE"]){ // se o ponto foi colocado
-      $("#tipoDeAberturaDoPolen").css('text-transform', 'capitalize');
+      $("#tipoDeAberturaDoPolen::first-letter").css('text-transform', 'capitalize');
     }
 
     if(data["rcpol:colpeFeature"]){
