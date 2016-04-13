@@ -14,7 +14,8 @@ function readSpecies(id, map){
     if (data["dwc:establishmentMean"])
       $("#origem").append(data["dwc:establishmentMean"].value);
 
-    $("#periodoDeFloracao").append(data["rcpol:floweringPeriod"].months.join(', '));
+    if (data["recpol:floweringPeriod"])
+      $("#periodoDeFloracao").append(data["rcpol:floweringPeriod"].months.join(', '));
 
     // caracteristicas da flor
     escreverEstados("#sindromeDePolinizacao", data["rcpol:pollinationSyndrome"]);
