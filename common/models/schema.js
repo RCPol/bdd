@@ -151,6 +151,7 @@ module.exports = function(Schema) {
     Schema.findById(id, function(err, data){
       if (err) throw new Error(err);
       // check if url exists
+      console.log(data)
       if(data && data.url){
         var url = data.url;
         cb(err, url);
