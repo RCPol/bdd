@@ -8,7 +8,7 @@ var qt = require('quickthumb');
 var Thumbnail = require('thumbnail');
 var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
-  Specimen.inputFromURL = function(url,cb) {
+  Specimen.inputFromURL = function(url,redownload, cb) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url);
     if(name==null)
@@ -157,7 +157,7 @@ module.exports = function(Specimen) {
           callback();
         }
       }, function done(){
-        downloadImages(downloadQueue);
+        downloadImages(downloadQueue, redownload);
         cb(null, rs);
       });
     });
@@ -203,7 +203,8 @@ module.exports = function(Specimen) {
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
-        {arg: 'url', type: 'string', required:true}
+        {arg: 'url', type: 'string', required:true, description: 'link para tabela de espécimes'},
+        {arg: 'url', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
     }
@@ -295,7 +296,7 @@ module.exports = function(Specimen) {
   function isNumeric (str){
     return validator.isFloat(str);
   };
-  function downloadImages(queue){
+  function downloadImages(queue, redownload){
     var i = 0;
     var end = queue.length;
     async.whilst(function(){
@@ -306,7 +307,7 @@ module.exports = function(Specimen) {
       var name = queue[i].name;
       var file = __dirname + "/../../client/resized_images/"+name+".jpg";
       fs.exists(file, function(exists){
-        if (exists) {
+        if (exists & !redownload) {
           console.log("image alreadly exists");
           i++;
           callback();

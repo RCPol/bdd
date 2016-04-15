@@ -4,7 +4,7 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 module.exports = function(Schema) {
-  Schema.inputFromURL = function(url,cb) {
+  Schema.inputFromURL = function(url, redownload, cb) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url);
     if(name==null)
@@ -141,7 +141,7 @@ module.exports = function(Schema) {
           callback();
         }
       }, function done(){
-        downloadImages(downloadQueue);
+        downloadImages(downloadQueue, redownload);
         cb(null, rs);
       });
     });
@@ -184,7 +184,8 @@ module.exports = function(Schema) {
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
-        {arg: 'url', type: 'string', required:true}
+        {arg: 'url', type: 'string', required:true, description: 'link para tabela do glossário'},
+        {arg: 'url', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
     }
@@ -221,7 +222,7 @@ module.exports = function(Schema) {
       console.log("Dataset saved: "+instance.id);
     });
   }
-  function downloadImages(queue){
+  function downloadImages(queue, redownload){
     var i = 0;
     var end = queue.length;
     async.whilst(function(){
@@ -232,7 +233,7 @@ module.exports = function(Schema) {
       var name = queue[i].name;
       var file = __dirname + "/../../client/images/" + name + ".jpeg";
       fs.exists(file, function(exists){
-        if (exists) {
+        if (exists & !(redownload)) {
           console.log("image alreadly exists");
           i++;
           callback();

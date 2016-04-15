@@ -151,7 +151,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
         //Object.keys(species).forEach(function(key, i){
-        if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1){
+        if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1 && species[key].term != "pollenShape" && species[key].term != "espexi"){
+          //TODO: handle pollenShape and espexi
           // we only want "rcpol"'s descriptors
           // we can have multiple states
 
