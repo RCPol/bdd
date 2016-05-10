@@ -1,9 +1,9 @@
 function writeSchema(schema){
   var id= schema.id;
   if (schema["rcpol:type"].value == "Estado"){
-    $("article").append('<div class="glossario-s" id="'+id+'"><img id="image"><h2></h2><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
+    $("article").append('<div class="glossario-s" id="'+id+'"><img id="image"><h2></h2><h3></h3><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
   } else {
-    $("article").append('<div class="glossario-s" id="'+id+'"><img id="image"><h2></h2><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
+    $("article").append('<div class="glossario-s" id="'+id+'"><img id="image"><h2></h2><h3></h3><p id="description"></p><h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3><div class="ref-glossario" id="references"></div></div>');
   }
   readGlossary(id);
 }
@@ -27,6 +27,10 @@ function readGlossary(id){
       references = data["rcpol:bibliographicCitation"].references;
 
     $("#" + id).find("h2").html(name);
+    if (data["rcpol:descriptor"] && data["rcpol:state"])
+      $("#" + id).find("h3").html(data["rcpol:category"].value + ": " + data["rcpol:descriptor"].value);
+    else if (data["rcpol:descriptor"])
+      $("#" + id).find("h3").html(data["rcpol:category"].value);
     $("#" + id + " > #description").html(description);
     if(references.length==0){
       $("#" + id + " > #ref_title").hide();

@@ -75,12 +75,13 @@ function readSpecimen(id, cb){
 
     var biblio = specimenDb["dwc:bibliographicCitation"];
     if(biblio){
-      $("#referencias").append("<h2>Refer&ecirc;ncias relacionadas ao esp&eacute;cime:</h2>");
+      //$("#referencias").append("<h2>Refer&ecirc;ncias relacionadas ao esp&eacute;cime:</h2>");
       if (!(Array.isArray(biblio))) biblio = [biblio];
       biblio.forEach(function(citation){
         //TODO: link para referencias
         //$("#referencias").append('<div class="r1f"><div class="pdficon"><a href="#"><img src="/img/pdfi.png" width="16px" height="16px"></a></div><div class="txtref"> <p>' + citation.value + '</p></div></div>');
         $("#referencias").append('<div class="r1f"><div class="pdficon"><img src="/img/pdfi.png" width="16px" height="16px"></div><div class="txtref"> <p>' + citation.value + '</p></div></div>');
+        //$("#referencias").append('<p>' + citation.value + '</p>');
       });
     }
 

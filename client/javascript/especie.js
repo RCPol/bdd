@@ -9,6 +9,8 @@ function readSpecies(id, map){
     $("#familia").append(data["dwc:family"].value);
     $("#nomeDaEspecie").append(data["dwc:scientificName"].value);
     $("#nomeDoAutor").append(data["dwc:scientificNameAuthorship"].value);
+    if (data["dwc:vernacularName"])
+      $("#nomePopular").append(data["dwc:vernacularName"].value);
 
     escreverEstados("#habito", data["rcpol:habit"]);
 

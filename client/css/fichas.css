@@ -95,7 +95,7 @@ article h1 {
 	font-size: 35px;
 	font-weight: normal;
 	line-height: 35px;
-	margin: 0 0 25px 0;
+	margin: 0 0 0 0;
 	color: #F27224;
 }
 
@@ -140,6 +140,12 @@ h2.famesp {
 	color: #470054;
 }
 
+/* Nome popular */
+h2.popname {
+	margin: 0 0 25px 0;
+	font-size: 16px;
+}
+
 /* Características da Planta */
 div.info-planta {
 	display: block;
@@ -155,7 +161,18 @@ div.img-planta {
 	margin: 0 0 0 50px;
 }
 
+div.img-planta-me {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 50px 0 0 50px;
+}
+
 div.img-planta h2 {
+	display: none;
+}
+
+div.img-planta-me h2 {
 	display: none;
 }
 
@@ -167,7 +184,7 @@ div.info-polen {
 	overflow: auto;
 }
 
-span{
+span.tipoDeAberturaDoPolen {
     display:inline-block;
 }
 
@@ -223,29 +240,8 @@ div.rre {
 	margin: 0 0 -12px 0;
 }
 
-div.r1f {
-	display: flex;
-	align-itens: center;
-	margin: 0 0 12px 0;
-}
-
-div.pdficon {
-	order: <integer>;
-	text-align: center;
-	margin: auto 0;
-}
-
-div.pdficon img {
-	margin: 0 17px;
-}
-
-div.txtref {
-	order: <integer>;
-}
-
-div.r1f a:link, a:visited, a:hover, a:active {
-	text-decoration: none;
-	background-color: transparent;
+div.rre p {
+	margin: 0 0 7px 0;
 }
 
 /* Rodapé */
