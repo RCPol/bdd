@@ -12,7 +12,6 @@ function readSpecimen(id, cb){
     var codigo_herbario;
     var collectionCode = specimenDb["dwc:collectionCode"];
     if (!(Array.isArray(collectionCode))) collectionCode = [collectionCode]; // se houver apenas um valor
-    console.log(collectionCode);
     collectionCode.forEach(function(c_code){
       if (c_code.label == "Código da Palinoteca")
         codigo_palinoteca = c_code.value;
@@ -79,10 +78,9 @@ function readSpecimen(id, cb){
       //$("#referencias").append("<h2>Refer&ecirc;ncias relacionadas ao esp&eacute;cime:</h2>");
       if (!(Array.isArray(biblio))) biblio = [biblio];
       biblio.forEach(function(citation){
-        //TODO: link para referencias
-        //$("#referencias").append('<div class="r1f"><div class="pdficon"><a href="#"><img src="/img/pdfi.png" width="16px" height="16px"></a></div><div class="txtref"> <p>' + citation.value + '</p></div></div>');
-        $("#referencias").append('<div class="r1f"><div class="pdficon"><img src="/img/pdfi.png" width="16px" height="16px"></div><div class="txtref"> <p>' + citation.value + '</p></div></div>');
-        //$("#referencias").append('<p>' + citation.value + '</p>');
+        citation.references.forEach(function(referencia){
+         $("#referencias").append('<p>' + referencia + '</p>');
+        });
       });
     }
 
