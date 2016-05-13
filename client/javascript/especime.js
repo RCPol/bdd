@@ -62,6 +62,7 @@ function readSpecimen(id, cb){
     $("#estado").append(specimenDb['dwc:stateProvince'].value);
     $("#municipio").append(specimenDb['dwc:municipality'].value);
     $("#tipoDeFormacaoVegetal").append(specimenDb['rcpol:vegetalFormationType'].value);
+    //latitude e longitude são adicionadas no html direto
 
     //TODO: informações adicionais
 

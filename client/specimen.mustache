@@ -32,8 +32,8 @@
 				map.on("layeradd",function (e) {
 					if(marker == null){
 				    var p = [specimenDb["dwc:decimalLatitude"].value, specimenDb["dwc:decimalLongitude"].value];
-				    $("#latitude").append(p[0]);
-				    $("#longitude").append(p[1]);
+				    $("#latitude").append(p[0].toFixed(6));
+				    $("#longitude").append(p[1].toFixed(6));
 						marker = "Not null";
 						L.marker(p,{opacity:0.9}).addTo(map);
 				    map.setView(p, 17);
