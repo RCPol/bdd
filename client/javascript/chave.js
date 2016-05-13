@@ -44,7 +44,7 @@ function identify(query){
     var species_query = {where: {id: {inq: ids}}};
     if (ids.length == 0)
       species_query = {where: {id: ""}};
-    $.getJSON("/api/Species?filter[fields][id]=true&filter[order]=dwc:scientificName%20ASC", { filter : species_query }, function(species){
+    $.getJSON("/api/Species?filter[fields][id]=true&filter[order][0]=dwc:family%20ASC&filter[order][1]=dwc:scientificName%20ASC", { filter : species_query }, function(species){
       // clean eligible itens
       eligibleSpeciesDB = {};
       /* especies */
