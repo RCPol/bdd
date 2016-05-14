@@ -65,13 +65,117 @@ function readSpecimen(id, cb){
 
     //TODO: informações adicionais
 
-    // Galeria de Imagens
-    var associatedMedia = specimenDb['dwc:associatedMedia'];
-    if (!(Array.isArray(associatedMedia))) associatedMedia = [associatedMedia];
-    associatedMedia.forEach(function(media_object){
-      $("#galeria_fotos").append("<img src='/resized_images/" + media_object.name + ".jpg'>");
+    escreverEstados("#habito", specimenDb["rcpol:habit"]);
+
+    if (specimenDb["dwc:establishmentMean"])
+      $("#origem").append(specimenDb["dwc:establishmentMean"].value);
+
+    if (specimenDb["rcpol:floweringPeriod"])
+      $("#periodoDeFloracao").append(specimenDb["rcpol:floweringPeriod"].months.join(', '));
+
+    // caracteristicas da flor
+    escreverEstados("#sindromeDePolinizacao", specimenDb["rcpol:pollinationSyndrome"]);
+    escreverEstados("#unidadeDeAtracao", specimenDb["rcpol:attractionUnit"]);
+    escreverEstados("#sexualidade", specimenDb["rcpol:flowerSexuality"]);
+    escreverEstados("#tamanhoDaFlor", specimenDb["rcpol:flowerSize"]);
+    escreverEstados("#forma", specimenDb["rcpol:flowerForm"]);
+    escreverEstados("#simetria", specimenDb["rcpol:flowerSymmetry"]);
+    escreverEstados("#corDaFlor", specimenDb["rcpol:flowerColor"]);
+    escreverEstados("#antese", specimenDb["rcpol:flowerOpeningTime"]);
+    escreverEstados("#deiscenciaDaAntera", specimenDb["rcpol:antherDehiscence"]);
+    escreverEstados("#odor", specimenDb["rcpol:odorPresence"]);
+    escreverEstados("#tipoDeRecursoFloral", specimenDb["rcpol:mainFloralResourceCollectedByVisitors"]);
+
+    // imagens da planta
+    if(!(Array.isArray(specimenDb['dwc:associatedMedia']))) specimenDb['dwc:associatedMedia'] = [specimenDb['dwc:associatedMedia']];
+    specimenDb["dwc:associatedMedia"].forEach(function(media){
+      if (media.category != "Pólen"){
+        imagem("#foto_planta", specimenDb["dwc:associatedMedia"], media.category);
+        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+      }
     });
     $(".fotorama").fotorama();
+
+    // Descrição Polínica
+    escreverEstados("#unidadeDeDispersaoDoPolen", specimenDb["rcpol:pollenDispersalUnit"], true);
+
+    if (specimenDb["rcpol:pollenDiameter"])
+      escreverEstados("#tamanhoDoPolen", specimenDb["rcpol:pollenDiameter"], true);
+    else if (specimenDb["rcpol:smallerPollenDiameter"] && specimenDb["rcpol:largerPollenDiameter"])
+      $("#tamanhoDoPolen").append("tamanho do pólen maior: ", specimenDb["rcpol:smallerPollenDiameter"].value, ", tamanho do pólen menor: ", specimenDb["rcpol:largerPollenDiameter"].value);
+
+    if (specimenDb["rcpol:pollenDiameter"]){
+      var d = specimenDb["rcpol:pollenDiameter"];
+      $("#pollenDiameter").append("D = " +d.mean + " ± " + d.sd + " (" + d.min + " - " + d.max + "), " );
+    }
+
+    if (specimenDb["rcpol:smallerPollenDiameter"]){
+      var smalld = specimenDb["rcpol:smallerPollenDiameter"];
+      $("#smallerPollenDiameter").append("Dmenor = " +smalld.mean + " ± " + smalld.sd + " (" + smalld.min + " - " + smalld.max + "), " );
+    }
+
+    if (specimenDb["rcpol:largerPollenDiameter"]){
+      var larged = specimenDb["rcpol:largerPollenDiameter"];
+      $("#largerPollenDiameter").append("Dmaior = " +larged.mean + " ± " + larged.sd + " (" + larged.min + " - " + larged.max + "), " );
+    }
+
+    if (specimenDb["rcpol:polarAxis"]){
+      var p = specimenDb["rcpol:polarAxis"];
+      $("#polarAxis").append("P = " +p.mean + " ± " + p.sd + " (" + p.min + " - " + p.max + "), " );
+    }
+
+    if (specimenDb["rcpol:equatorialAxis"]){
+      var e = specimenDb["rcpol:equatorialAxis"];
+      $("#equatorialAxis").append("E = " + e.mean + " ± " + e.sd + " (" + e.min + " - " + e.max + "), " );
+    }
+
+    escreverEstados("#simetriaDoPolen", specimenDb["rcpol:pollenSymmetry"], true);
+    escreverEstados("#polaridadeDoPolen", specimenDb["rcpol:pollenPolarity"], true);
+    $("#ambitoDoPolen").append("âmbito ");
+    escreverEstados("#ambitoDoPolen", specimenDb["rcpol:pollenAmbit"], true);
+    escreverEstados("#formaDoPolen", specimenDb["rcpol:pollenShape"], true);
+
+    if(specimenDb["rcpol:pollenShapePE"]){
+      var p_e = specimenDb["rcpol:pollenShapePE"];
+      $("#formaDoPolenPE").append("P/E = " + p_e.mean + " ± " + p_e.sd + " (" + p_e.min + " - " + p_e.max + "). " );
+      escreverEstados("#tipoDeAberturaDoPolen", specimenDb["rcpol:pollenAperture"], true); //letra maiuscula
+    } else {
+      escreverEstados("#tipoDeAberturaDoPolen", specimenDb["rcpol:pollenAperture"], true); //letra minuscula
+      $("#tipoDeAberturaDoPolen").addClass("tipoDeAberturaDoPolen-minusculo").removeClass("tipoDeAberturaDoPolen");
+    }
+
+    if(specimenDb["rcpol:colpeFeature"]){
+      if (specimenDb["rcpol:colpeFeature"].value.indexOf("ausente") == -1){
+        $("#caracteristicaDoColpo").append("ectoabertura do tipo colpo ");
+        escreverEstados("#caracteristicaDoColpo", specimenDb["rcpol:colpeFeature"], true);
+      } else
+        $("#caracteristicaDoColpo").append("ectoabertura ausente, ");
+    }
+
+    if (specimenDb["rcpol:poreFeature"]){
+      $("#caracteristicaDoPoro").append("endoabertura ");
+      escreverEstados("#caracteristicaDoPoro", specimenDb["rcpol:poreFeature"]);
+      //$("#caracteristicaDoPoro").append(" (Figuras C-D). ");
+    }
+
+    if (specimenDb["rcpol:espexi"]){
+      var espexi = specimenDb["rcpol:espexi"];
+      $("#espexi").append(". Exina de espessura " + espexi.mean + " ± " + espexi.sd + " (" + espexi.min + " - " + espexi.max + "), " );
+    }
+
+    $("#ornamentacaoDaExina").append("superficie ");
+    escreverEstados("#ornamentacaoDaExina", specimenDb["rcpol:exineOrnamentation"]);
+    //$("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
+    $("#ornamentacaoDaExina").append(".");
+
+    //imagens do polen
+    specimenDb["dwc:associatedMedia"].forEach(function(media){
+      if (media.category == "Pólen"){
+        imagem("#foto_polen", specimenDb["dwc:associatedMedia"], media.category);
+      }
+    });
+    $(".fotorama").fotorama();
+
 
     var biblio = specimenDb["dwc:bibliographicCitation"];
     if(biblio){
@@ -86,4 +190,32 @@ function readSpecimen(id, cb){
 
     cb();
   });
+}
+
+function escreverEstados(seletor, descritor, adicionarVirgula){
+  // adicionar separador ","...
+  if(descritor && descritor.hasOwnProperty("states")){
+    var estados = descritor.states;
+    if (estados.length > 1){
+      $(seletor).append(estados.map(function(estado){ return estado.value; }).join(", "));
+    }
+    else
+      $(seletor).append(estados[0].value);
+    if (adicionarVirgula)
+      $(seletor).append(", ");
+  }
+}
+
+function imagem(nicho, descritor, categoria){
+  if(descritor.length > 0){
+    descritor.forEach(function(img_object){
+      if(img_object.category == categoria){
+        $(nicho).append("<img src='/resized_images/" + img_object.name + ".jpg'>");
+      }
+    });
+  } else { // se não for um array
+    if (descritor.category == categoria){
+      $(nicho).append("<img style='max-width:500px;' src="+ descritor.url +">");
+    }
+  }
 }

@@ -1,9 +1,8 @@
 function readSpecies(id, map){
-
   $.getJSON("/api/Species/"+id, function(data){
     // titulo
     var name = data["dwc:scientificName"].value + " " + data["dwc:scientificNameAuthorship"].value;
-    document.title = name;
+    document.title = "RCPol - "+name;
 
     // nome da espécie
     $("#familia").append(data["dwc:family"].value);
@@ -167,6 +166,7 @@ function escreverEstados(seletor, descritor, adicionarVirgula){
       $(seletor).append(", ");
   }
 }
+
 function imagem(nicho, descritor, categoria){
   if(descritor.length > 0){
     descritor.forEach(function(img_object){
