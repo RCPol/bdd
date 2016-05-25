@@ -34,8 +34,8 @@
 				map.on("layeradd",function (e) {
 					if(marker == null){
 				    var p = [specimenDb["dwc:decimalLatitude"].value, specimenDb["dwc:decimalLongitude"].value];
-				    $("#latitude").append(p[0].toFixed(6));
-				    $("#longitude").append(p[1].toFixed(6));
+				    $("#latitude").append(Number(p[0]).toFixed(6));
+				    $("#longitude").append(Number(p[1]).toFixed(6));
 						marker = "Not null";
 						L.marker(p,{opacity:0.9}).addTo(map);
 				    map.setView(p, 17);
@@ -80,9 +80,11 @@
 
 	<!-- Início das informações do especieme -->
 	<article>
+    <h2 class="famesp" id="familia"></h2>
 
 		<!-- Nome da espécie e onde se encontra o espécime -->
 	  <h1 class="spm">Esp&eacute;cime de <i><span id="nome"></span></i> <span id="autor"></span> depositado na coleção <span id="laboratorio"></span> da <span id="instituicao"></span> - <span id="codigoDaInstituicao"></span></h1>
+    <h2 class="popname" id="nomePopular"></h2>
 
 		<!-- Início: Embrulho Informações e Logo -->
 		<div class="cspm">
@@ -134,7 +136,8 @@
 				<p><b>Herb&aacute;rio:</b> <span id="herbario"></span></p>
 				<p><b>N&uacute;mero de Registro no Herb&aacute;rio:</b> <span id="numeroDeRegistroNoHerbario"></span></p>
 				<p><b>N&uacute;mero de Registro na Palinoteca:</b> <span id="numeroDeRegistroNaPalinoteca"></span></p>
-				<p><b>Pa&iacute;s:</b> <span id="pais"></span></p>
+        <p><b>Data da Coleta:</b> <span id="dataColeta"></span></p>
+        <p><b>Pa&iacute;s:</b> <span id="pais"></span></p>
 				<p><b>Estado:</b> <span id="estado"></span></p>
 				<p><b>Munic&iacute;pio:</b> <span id="municipio"></span></p>
 				<p><b>Tipo de formação vegetal:</b> <span id="tipoDeFormacaoVegetal"></span></p>
