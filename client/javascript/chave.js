@@ -42,18 +42,20 @@ function getImage(id, nicho, model){
   });
 }
 
-function writeSpecies(id, nicho){
-  // adicionar uma espécie (id, imagem, familia, nome científico, nome popular) a alguma lista (ex: especiesDescartadas ou especiesElegiveis)
-  $(nicho).append("<div class='especies' id = " + id + "></div>");
+function writeSpecies(ids, nicho){
+  // adicionar espécies (id, imagem, familia, nome científico, nome popular) a alguma lista (ex: especiesDescartadas ou especiesElegiveis)
+  for (let id of ids){
+    $(nicho).append("<div class='especies' id = " + id + "></div>");
 
-  $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg'>"); // imagem placeholder caso a imagem real não possa ser carregada
-  $(nicho + " > #" + id).append("<div class='nsp'></div>");
-  $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
-  $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
-  if (speciesDb[id].vernacularName != undefined)
-    $(nicho + " > #" + id + " > .nsp").append("<p class='popn'>" + speciesDb[id].vernacularName + "</p>");
-  getImage(id, nicho, "Species");
-  $(nicho + " > #" + id + " img").width(100).height(100);
+    $(nicho + " > #" + id).append("<img id='"+nicho.slice(1,nicho.length)+"_img_"+id+"' src='img/lspm.jpg'>"); // imagem placeholder caso a imagem real não possa ser carregada
+    $(nicho + " > #" + id).append("<div class='nsp'></div>");
+    $(nicho + " > #" + id + " > .nsp").append("<p class='famisp'>" + speciesDb[id].family + "</p>");
+    $(nicho + " > #" + id + " > .nsp").append("<a href='/profile/species/" + id + "' target='_blank' ><p class='nomesp'><i>" + speciesDb[id].scientificName + " </i>" + speciesDb[id].scientificNameAuthorship + "</p></a>");
+    if (speciesDb[id].vernacularName != undefined)
+      $(nicho + " > #" + id + " > .nsp").append("<p class='popn'>" + speciesDb[id].vernacularName + "</p>");
+    getImage(id, nicho, "Species");
+    $(nicho + " > #" + id + " img").width(100).height(100);
+  };
 }
 
 function writeDescriptor(descritor, species_length){
@@ -132,11 +134,14 @@ function buscaEspecies(nothing) {
 
 function setDiscartedSpecies(){
   // escrever espécies descartadas
-  for (var id in speciesDb) {
-    if (eligibleSpeciesDb.indexOf(id) == -1) {
-      writeSpecies(id,"#especiesDescartadas");
+  var discartedSpeciesDb = Object.keys(speciesDb).filter(function(id){
+    if (eligibleSpeciesDb.indexOf(id) == -1){
+      return true;
+    } else {
+      return false;
     }
-  }
+  });
+  writeSpecies(discartedSpeciesDb,"#especiesDescartadas");
 }
 
 function writeSelectedState(query){
@@ -157,9 +162,6 @@ function getSpeciesInfo(species, nicho, callback){
     speciesDb[species.id].scientificNameAuthorship = species['dwc:scientificNameAuthorship'].value;
     if (species['dwc:vernacularName'] != undefined)
       speciesDb[species.id].vernacularName = species['dwc:vernacularName'].value.split("|");
-    callback(species.id,nicho);
-  } else {
-    callback(species.id,nicho);
   }
 }
 
@@ -171,8 +173,16 @@ function getSpecies(data, species_query, callback){
     $("#elegibleCount").html("#" + species.length + " espécies elegiveis");
     species.forEach(function(item){
       eligibleSpeciesDb.push(item.id); // eligibleSpeciesDb será depois comparado com speciesDb para obter as espécies descartadas
-      getSpeciesInfo(item, "#especiesElegiveis", writeSpecies);
+      getSpeciesInfo(item);
     });
+    for (var i = 0; i < species.length + 100; i = i + 100){
+      (function(x){
+        window.setTimeout(function(){
+          console.log(x);
+          writeSpecies(eligibleSpeciesDb.slice(x,x+100), "#especiesElegiveis");
+        }, 1000);
+      })(i);
+    }
     setDiscartedSpecies();
     callback(species);
   });
