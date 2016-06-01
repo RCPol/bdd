@@ -153,6 +153,20 @@ function writeSelectedState(query){
   });
 };
 
+function writeChunks(i, n, nicho){
+  // escrever uma lista de espécies de n em n
+  console.log(i);
+  if (i+n < eligibleSpeciesDb.length){
+    window.setTimeout(function(){
+      writeSpecies(eligibleSpeciesDb.slice(i,i+n), nicho);
+      writeChunks(i+n, n, nicho);
+    }, 1000);
+  } else {
+    writeSpecies(eligibleSpeciesDb.slice(i,i+n), nicho);
+    return;
+  }
+}
+
 function getSpeciesInfo(species, nicho, callback){
   // obter nome científico, familia e nome popular da espécie e salvar em speciesDb
   if(typeof speciesDb[species.id] == 'undefined'){
@@ -175,14 +189,7 @@ function getSpecies(data, species_query, callback){
       eligibleSpeciesDb.push(item.id); // eligibleSpeciesDb será depois comparado com speciesDb para obter as espécies descartadas
       getSpeciesInfo(item);
     });
-    for (var i = 0; i < species.length + 100; i = i + 100){
-      (function(x){
-        window.setTimeout(function(){
-          console.log(x);
-          writeSpecies(eligibleSpeciesDb.slice(x,x+100), "#especiesElegiveis");
-        }, 1000);
-      })(i);
-    }
+    writeChunks(0, 100, "#especiesElegiveis");
     setDiscartedSpecies();
     callback(species);
   });
