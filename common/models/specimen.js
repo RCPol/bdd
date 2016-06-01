@@ -46,6 +46,20 @@ module.exports = function(Specimen) {
               }
               current.label = toString(label[c]);
               current.value = toString(line[c]);
+              // EVENT DATE
+              if(current.term=="eventDate"){
+                // current.category = current.category?current.category:"Outro";
+                var parsedDate = current.value.split("/");
+                if(parsedDate.length==3){
+                    current.day = {value:parsedDate[0].trim()=="00"||parsedDate[0].trim()=="0"?null:parsedDate[0].trim()};
+                    current.month = {value:parsedDate[1].trim()=="00"||parsedDate[1].trim()=="0"?null:parsedDate[1].trim()};
+                    current.year = {value:parsedDate[2].trim()=="0000"||parsedDate[2].trim()=="00"?null:parsedDate[2].trim()};
+                } else{
+                  current.day = {};
+                  current.month = {};
+                  current.year = {};
+                }
+              } else
               // IMAGE
               if(current.term=="associatedMedia"){
                 current.category = current.category?current.category:"Outro";
@@ -83,7 +97,7 @@ module.exports = function(Specimen) {
               }else
               // LATITUDE
               if(current.term=="decimalLatitude"){
-                var converted = convertDMSCoordinatesToDecimal(current.value);
+                var converted = convertDMSCoordinatesToDecimal(current.value.toUpperCase().replace("O","W").replace("L","E"));
                 if(converted!=current.value){
                   current.rawValue = current.value;
                   current.value = converted;

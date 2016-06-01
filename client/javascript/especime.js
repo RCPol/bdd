@@ -3,29 +3,32 @@ function readSpecimen(id, cb){
     specimenDb = specimen;
     var name = specimenDb["dwc:scientificName"].value + " " + specimenDb["dwc:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
-
+    $("#familia").append(specimenDb["dwc:family"].value);
     $("#nome").append(specimenDb["dwc:scientificName"].value);
     $("#autor").append(specimenDb["dwc:scientificNameAuthorship"].value);
-
+    if (specimenDb["dwc:vernacularName"])
+      $("#nomePopular").append(specimenDb["dwc:vernacularName"].value);
     //dados da palinoteca
     var codigo_palinoteca;
     var codigo_herbario;
     var collectionCode = specimenDb["dwc:collectionCode"];
     if (!(Array.isArray(collectionCode))) collectionCode = [collectionCode]; // se houver apenas um valor
     collectionCode.forEach(function(c_code){
-      if (c_code.label == "Código da Palinoteca")
+      if (c_code.label == "Sigla da Palinoteca"){
         codigo_palinoteca = c_code.value;
-      else if (c_code.label == "Código do Herbário")
+      }
+      else if (c_code.label == "Sigla do Herbário")
         codigo_herbario = c_code.value;
     });
 
 
     $.getJSON("/api/Specimens/getCollection?code="+codigo_palinoteca, function(res){
+
       var palinoteca = res.response[0];
       if (palinoteca["rcpol:laboratory"]) $("#laboratorio").append("do " + palinoteca["rcpol:laboratory"].value);
       $("#instituicao").append(palinoteca["rcpol:institutionName"].value);
-      $("#codigoDaInstituicao").append(palinoteca["dwc:institutionCode"].value);
-      $("#colecao").append(codigo_palinoteca);
+      $("#codigoDaInstituicao").append(palinoteca["rcpol:institutionName"].value+" (").append(palinoteca["dwc:institutionCode"].value+")");
+      $("#colecao").append(palinoteca["rcpol:collectionName"].value+" (").append(codigo_palinoteca+")");
       $("#responsavel").append(palinoteca["rcpol:responsable"].value);
       $("#endereco").append(palinoteca["rcpol:address"].value);
       $("#telefone").append(palinoteca["rcpol:telephone"].value);
@@ -33,7 +36,15 @@ function readSpecimen(id, cb){
       $("#homepage").append(palinoteca["rcpol:homepage"].value);
       $("#homepage_link").attr("href", palinoteca["rcpol:homepage"].value);
       $("#link_palinoteca").attr("href", "/profile/palinoteca/"+palinoteca["id"]);
-      $("#logo").attr("src", palinoteca["rcpol:logotipo"].url);
+      if(palinoteca["rcpol:logotipo"].url)
+        $("#logo").attr("src", palinoteca["rcpol:logotipo"].url);
+      // console.log(palinoteca["rcpol:logotipo"].url);
+    });
+
+    $.getJSON("/api/Specimens/getCollection?code="+codigo_herbario, function(res){
+      var herbario = res.response[0];
+      $("#herbario").append(herbario["rcpol:collectionName"].value+" (").append(codigo_herbario+")");
+      // $("#herbario").append(codigo_herbario);
     });
 
     $.getJSON("/api/Species?filter[fields][id]=true&filter[where][dwc:scientificName.value]="+specimenDb["dwc:scientificName"].value, function(especies){
@@ -41,8 +52,6 @@ function readSpecimen(id, cb){
     });
 
     $("#coletor").append(specimenDb['dwc:recordedBy'].value);
-
-    $("#herbario").append(codigo_herbario);
 
     var num_palinoteca, num_herbario;
     var catalogNumber = specimenDb['dwc:catalogNumber'];
@@ -56,7 +65,9 @@ function readSpecimen(id, cb){
 
     $("#numeroDeRegistroNoHerbario").append(num_herbario);
     $("#numeroDeRegistroNaPalinoteca").append(num_palinoteca);
-
+    $("#dataColeta").append(specimenDb['dwc:eventDate'].day.value?specimenDb['dwc:eventDate'].day.value:"??").append("/");
+    $("#dataColeta").append(specimenDb['dwc:eventDate'].month.value?specimenDb['dwc:eventDate'].month.value:"??").append("/");
+    $("#dataColeta").append(specimenDb['dwc:eventDate'].year.value?specimenDb['dwc:eventDate'].year.value:"??");
     $("#pais").append(specimenDb['dwc:country'].value);
     $("#estado").append(specimenDb['dwc:stateProvince'].value);
     $("#municipio").append(specimenDb['dwc:municipality'].value);
