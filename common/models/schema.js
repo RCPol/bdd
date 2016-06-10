@@ -4,149 +4,258 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 module.exports = function(Schema) {
-  Schema.inputFromURL = function(url, redownload, cb) {
-    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-    var name = defineName(url);
-    if(name==null)
-      cb("Invalid XLSX file.",null);
-    var path = __dirname +"/../../uploads/"+name+".xlsx";
-    saveDataset(name,url,path);
-    var downloadQueue = [];
+  Schema.inputFromURL = function(url, language, sheetNumber, redownload, cb) {
+    if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
+      url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+      var name = defineName(url);
+      if(name==null)
+        cb("Invalid XLSX file.",null);
+      var path = __dirname +"/../../uploads/"+name+".xlsx";
+      saveDataset(name,url,path);
+      var downloadQueue = [];
 
-    var w = fs.createWriteStream(path).on("close",function (argument) {
-      var data = xlsx.parse(path)[0].data;
-      var schema = data[0];
-      var class_ = data[1];
-      var term = data[2];
-      var label = data[3];
-      data =  data.slice(4,data.length);
-      var rs = {};
-      rs.count = 0;
-      async.each(data, function iterator(line, callback){
-        var record = {};
-        record.id = line[1];
-        record.order = rs.count;
-        rs.count ++;
-        if(record.id){
-          for(var c = 2; c < term.length; c++){
-            if(line[c]){
-              var field = toString(schema[c])+":"+toString(term[c]);
-              var current = {};
-              current.schema = toString(schema[c]);
-              current.class = toString(class_[c]);
-              current.term = toString(term[c]);
-              current.label = toString(label[c]);
-              current.value = toString(line[c]);
-              // REFERENCE
-              if(current.term=="bibliographicCitation"){
-                current.references = [];
-                current.value.split("|").forEach(function (ref) {
-                  current.references.push(ref.trim());
-                });
-              }
-              // IMAGE
-              if(current.term=="glossaryImage"){
-                current.images = [];
-                current.value.split("|").forEach(function (image) {
-                  current.images.push(image.trim());
-                });
-              }
-              // Check if exist field with the same key
-              if(record[field]){
-                // Check if the field is the is an Array
-                if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
-                    record[field].push(current);
-                } else {
-                  var old = Object.create(record[field]);
-                  record[field] = [];
-                  record[field].push(old);
-                  record[field].push(current);
-                }
-              } else {
-                record[field] = current;
-              }
+      var w = fs.createWriteStream(path).on("close",function (argument) {
+        var data = xlsx.parse(path)[sheetNumber || 0].data;
+        var header = data[0];
+        data =  data.slice(1,data.length);
+        var rs = {};
+        rs.count = 0;
+        async.each(data, function iterator(line, callback){
+          var record = {};
+          var id = null;
+          if(line[0] && line[1] && line[2] && line[0].trim().length>0 && line[1].trim().length>0 && line[2].trim().length>0)
+            id = line[0].trim().concat(":").concat(line[1].trim()).concat(":").concat(line[2].trim());
+          record.order = rs.count;
+          if(id){
+            rs.count++;
+            record.schema = toString(line[0]).trim();
+            record.class = toString(line[1]).trim();
+            record.term = toString(line[2]).trim();
+            if (toString(line[3]).trim().length>0) {
+              record.category = toString(line[3]).trim();
             }
-          }
-          Schema.upsert(record,function (err,instance) {
-            if(err)
-              console.log(err);
-            callback();
-          });
-        }else{
-          // adicionar estados
-          if (line[5] == "Estado"){
-            //record.id= line[3].toLowerCase().split(" ").join("-") + "-" + line[4].toLowerCase().split(" ").join("-");
-            for(var c = 2; c < term.length; c++){
-              if(line[c]){
-                var field = toString(schema[c])+":"+toString(term[c]);
-                var current = {};
-                current.schema = toString(schema[c]);
-                current.class = toString(class_[c]);
-                current.term = toString(term[c]);
-                current.label = toString(label[c]);
-                current.value = toString(line[c]);
-                // REFERENCE
-                if(current.term=="bibliographicCitation"){
-                  current.references = [];
-                  current.value.split("|").forEach(function (ref) {
-                    current.references.push(ref.trim());
-                  });
-                }
-                // IMAGE
-                if(current.term=="glossaryImage"){
-                  current.images = [];
-                  current.value.split("|").forEach(function (image) {
-                    current.images.push(image.trim());
-                  });
-                }
-                // Check if exist field with the same key
-                if(record[field]){
-                  // Check if the field is the is an Array
-                  if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
-                      record[field].push(current);
-                  } else {
-                    var old = Object.create(record[field]);
-                    record[field] = [];
-                    record[field].push(old);
-                    record[field].push(current);
-                  }
-                } else {
-                  record[field] = current;
-                }
-              }
+            if (toString(line[4]).trim().length>0) {
+              record.field = toString(line[4]).trim();
             }
-            if (!line[2]) {
-              line[2] = "";
+            if (toString(line[5]).trim().length>0) {
+              record.state = toString(line[5]).trim();
             }
-            if (!line[3]) {
-              line[3] = "";
+            if (toString(line[6]).trim().length>0) {
+              record.definition = toString(line[6]).trim();
             }
-            if (!line[4]) {
-              line[4] = "";
+            if (toString(line[7]).trim().length>0) {
+              record.references = [];
+              toString(line[7]).trim().split("|").forEach(function (ref) {
+                record.references.push(ref.trim());
+              });
             }
-            record.id = hash.MD5(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
-            console.log(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase()+" "+record.id);
-            record.image = line[10];
-            record.url = "/images/" + record.id + ".jpeg";
+            if (toString(line[8]).trim().length>0) {
+              record.images = [];
+              toString(line[8]).trim().split("|").forEach(function (img) {
+                record.images.push(img.trim());
+              });
+              record.image = record.images[0];
+            }
+            record.url = "/images/" + id + ".jpeg";
             if (record.image != undefined){
               record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
               downloadQueue.push({url:record.image, name:record.id});
             }
+            Schema.findById(id, function(err, instance){
+              if(err){
+                  console.log(err);
+              }
+              if(instance){
+                instance[language] = record;
+                instance.save(function(e,d) {
+                  callback();
+                });
+              } else {
+                var multiLangRecord = {};
+                multiLangRecord.id = id;
+                multiLangRecord[language] = record;
+                Schema.create(multiLangRecord, function(err,ok) {
+                  callback();
+                });
+              }
+            });
+          } else {
+            callback();
           }
-          Schema.upsert(record, function(err, instance){
-            if(err)
-              console.log(err);
-            rs.count++;
-          });
-          callback();
-        }
-      }, function done(){
-        downloadImages(downloadQueue, redownload);
-        cb(null, rs);
+        }, function done(){
+          downloadImages(downloadQueue, redownload);
+          cb(null, rs);
+        });
       });
-    });
-    request(url).pipe(w);
+      request(url).pipe(w);
+    } else {
+      cb("invalid language",language)
+    }
   };
+  // Schema.inputFromURL = function(url, language, sheetNumber, redownload, cb) {
+  //   if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
+  //     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+  //     var name = defineName(url);
+  //     if(name==null)
+  //       cb("Invalid XLSX file.",null);
+  //     var path = __dirname +"/../../uploads/"+name+".xlsx";
+  //     saveDataset(name,url,path);
+  //     var downloadQueue = [];
+  //
+  //     var w = fs.createWriteStream(path).on("close",function (argument) {
+  //       var data = xlsx.parse(path)[sheetNumber || 0].data;
+  //       var schema = data[0];
+  //       var class_ = data[1];
+  //       var term = data[2];
+  //       var label = data[3];
+  //       data =  data.slice(4,data.length);
+  //       var rs = {};
+  //       rs.count = 0;
+  //       async.each(data, function iterator(line, callback){
+  //         var record = {};
+  //         record.id = line[1] && line[1].trim().length>0?line[1].trim():null;
+  //         record.order = rs.count;
+  //         // rs.count ++;
+  //         if(record.id){
+  //           rs.count++;
+  //           // If State is empty
+  //           if (line[4] && line[4].trim().length==0){
+  //             for(var c = 2; c < term.length; c++){
+  //               if(line[c]){
+  //                 var field = toString(schema[c])+":"+toString(term[c]);
+  //                 var current = {};
+  //                 current.schema = toString(schema[c]);
+  //                 current.class = toString(class_[c]);
+  //                 current.term = toString(term[c]);
+  //                 current.label = toString(label[c]);
+  //                 current.value = toString(line[c]);
+  //                 // REFERENCE
+  //                 if(current.class=="Reference"){
+  //                   current.references = [];
+  //                   current.value.split("|").forEach(function (ref) {
+  //                     current.references.push(ref.trim());
+  //                   });
+  //                 }
+  //                 // IMAGE
+  //                 if(current.class=="Image"){
+  //                   current.images = [];
+  //                   current.value.split("|").forEach(function (image) {
+  //                     current.images.push(image.trim());
+  //                   });
+  //                 }
+  //                 // Check if exist field with the same key
+  //                 if(record[field]){
+  //                   // Check if the field is the is an Array
+  //                   if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
+  //                       record[field].push(current);
+  //                   } else {
+  //                     var old = Object.create(record[field]);
+  //                     record[field] = [];
+  //                     record[field].push(old);
+  //                     record[field].push(current);
+  //                   }
+  //                 } else {
+  //                   record[field] = current;
+  //                 }
+  //               }
+  //             }
+  //             Schema.upsert(record,function (err,instance) {
+  //               if(err)
+  //                 console.log(err);
+  //               callback();
+  //             });
+  //           } else {
+  //           // adicionar estados
+  //             for(var c = 2; c < term.length; c++){
+  //               if(line[c]){
+  //                 var field = toString(schema[c])+":"+toString(term[c]);
+  //                 var current = {};
+  //                 current.schema = toString(schema[c]);
+  //                 current.class = toString(class_[c]);
+  //                 current.term = toString(term[c]);
+  //                 current.label = toString(label[c]);
+  //                 current.value = toString(line[c]);
+  //                 // REFERENCE
+  //                 if(current.class=="Reference"){
+  //                   current.references = [];
+  //                   current.value.split("|").forEach(function (ref) {
+  //                     current.references.push(ref.trim());
+  //                   });
+  //                 }
+  //                 // IMAGE
+  //                 if(current.class=="Image"){
+  //                   current.images = [];
+  //                   current.value.split("|").forEach(function (image) {
+  //                     current.images.push(image.trim());
+  //                   });
+  //                 }
+  //                 // Check if exist field with the same key
+  //                 if(record[field]){
+  //                   // Check if the field is the is an Array
+  //                   if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
+  //                       record[field].push(current);
+  //                   } else {
+  //                     var old = Object.create(record[field]);
+  //                     record[field] = [];
+  //                     record[field].push(old);
+  //                     record[field].push(current);
+  //                   }
+  //                 } else {
+  //                   record[field] = current;
+  //                 }
+  //               }
+  //             }
+  //             if (!line[2]) {
+  //               line[2] = "";
+  //             }
+  //             if (!line[3]) {
+  //               line[3] = "";
+  //             }
+  //             if (!line[4]) {
+  //               line[4] = "";
+  //             }
+  //             // record.id = hash.MD5(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
+  //             // console.log(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase()+" "+record.id);
+  //             record.image = line[7];
+  //             record.url = "/images/" + record.id + ".jpeg";
+  //             if (record.image != undefined){
+  //               record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+  //               downloadQueue.push({url:record.image, name:record.id});
+  //             }
+  //           }
+  //           Schema.findById(record.id, function(err, instance){
+  //             if(err){
+  //                 console.log(err);
+  //             }
+  //             if(instance){
+  //               instance[language] = record;
+  //               delete instance[language].id;
+  //               instance.save(function(e,d) {
+  //                 callback();
+  //               });
+  //             } else {
+  //               var multiLangRecord = {};
+  //               multiLangRecord.id = record.id;
+  //               multiLangRecord[language] = record;
+  //               delete multiLangRecord[language].id    ;
+  //               Schema.create(multiLangRecord, function(err,ok) {
+  //                 callback();
+  //               });
+  //             }
+  //           });
+  //         } else {
+  //           callback();
+  //         }
+  //       }, function done(){
+  //         downloadImages(downloadQueue, redownload);
+  //         cb(null, rs);
+  //       });
+  //     });
+  //     request(url).pipe(w);
+  //   } else {
+  //     cb("invalid language",language)
+  //   }
+  // };
   Schema.mainImage = function(id, cb){
     Schema.findById(id, function(err, data){
       if (err) throw new Error(err);
@@ -185,6 +294,8 @@ module.exports = function(Schema) {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
         {arg: 'url', type: 'string', required:true, description: 'link para tabela do glossário'},
+        {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'},
+        {arg: 'sheetNumber', type: 'number', required:false, description: 'Sheet number. Default: 0'},
         {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}

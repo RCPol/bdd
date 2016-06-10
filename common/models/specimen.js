@@ -8,7 +8,8 @@ var qt = require('quickthumb');
 var Thumbnail = require('thumbnail');
 var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
-  Specimen.inputFromURL = function(url,redownload, cb) {
+  Specimen.inputFromURL = function(url,language, redownload, cb) {
+    var Schema = Specimen.app.models.Schema;
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url);
     if(name==null)
@@ -22,151 +23,56 @@ module.exports = function(Specimen) {
       var schema = data[0];
       var class_ = data[1];
       var term = data[2];
-      var category = data[3];
-      var label = data[4];
+      // var category = data[3];
+      // var label = data[4];
       data =  data.slice(5,data.length);
 
       var idIndexes = [1,2,3]; // institutionCode and collectionCode
       var rs = {};
       rs.count = 0;
       async.each(data, function iterator(line, callback){
+        var c = 0;
         var record = {};
         record.id = defineId(line,idIndexes);
         if(record.id){
           rs.count ++;
-          for(var c = 1; c < term.length; c++){
-            if(line[c]){
-              var field = toString(schema[c])+":"+toString(term[c]);
-              var current = {};
-              current.schema = toString(schema[c]);
-              current.term = toString(term[c]);
-              current.class = String(class_[c]).trim();
-              if(toString(category[c])!="-" && toString(category[c])!=""){
-                current.category = toString(category[c]);
-              }
-              current.label = toString(label[c]);
-              current.value = toString(line[c]);
-              // EVENT DATE
-              if(current.term=="eventDate"){
-                // current.category = current.category?current.category:"Outro";
-                var parsedDate = current.value.split("/");
-                if(parsedDate.length==3){
-                    current.day = {value:parsedDate[0].trim()=="00"||parsedDate[0].trim()=="0"?null:parsedDate[0].trim()};
-                    current.month = {value:parsedDate[1].trim()=="00"||parsedDate[1].trim()=="0"?null:parsedDate[1].trim()};
-                    current.year = {value:parsedDate[2].trim()=="0000"||parsedDate[2].trim()=="00"?null:parsedDate[2].trim()};
-                } else{
-                  current.day = {};
-                  current.month = {};
-                  current.year = {};
-                }
-              } else
-              // IMAGE
-              if(current.term=="associatedMedia"){
-                current.category = current.category?current.category:"Outro";
-                current.value.split("|").forEach(function(value){
-                  current.name = current.category + value.replace("https://drive.google.com/open?id=", "");
-                  if(typeof value === "string"){
-                    current.url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-                  }
-                  // save images
-                  var image = {url: current.url, name: current.name};
-                  downloadQueue.push(image);
-                });
-              }else
-              // REFERENCE
-              if(current.term=="bibliographicCitation"){
-                current.category = current.category?current.category:"Outro";
-                current.references = [];
-                current.value.split("|").forEach(function (ref) {
-                  current.references.push(ref.trim());
-                });
-              }else
-              // INTERACTION
-              if(current.class=="Interaction"){
-                current.species = [];
-                current.value.split("|").forEach(function (sp) {
-                  current.species.push(sp.trim());
-                });
-              }else
-              // FLOWERING PERIOD
-              if(current.term=="floweringPeriod"){
-                current.months = [];
-                current.value.split("|").forEach(function (month) {
-                  current.months.push(month.trim());
-                });
-              }else
-              // LATITUDE
-              if(current.term=="decimalLatitude"){
-                var converted = convertDMSCoordinatesToDecimal(current.value.toUpperCase().replace("O","W").replace("L","E"));
-                if(converted!=current.value){
-                  current.rawValue = current.value;
-                  current.value = converted;
-                }
-              }else
-              // LONGITUDE
-              if(current.term=="decimalLongitude"){
-                var converted = convertDMSCoordinatesToDecimal(current.value.toUpperCase().replace("O","W").replace("L","E"));
-                if(converted!=current.value){
-                  current.rawValue = current.value;
-                  current.value = converted;
-                }
-              }else
-              //CAT
-              if(current.class=="CategoricalDescriptor"){
-                current.category = current.category?current.category:"Outro";
-                current.id = hash.MD5(current.schema+":"+current.class+":"+current.term);
-                current.states = [];
-                current.value.split("|").forEach(function (state_) {
-                  var state  = {};
-                  state.value = state_.trim();
-                  console.log(current.category+":"+current.label+":"+state.value);
-                  state.id = hash.MD5(current.category.trim().toLowerCase()+":"+current.label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                  //state.id = hash.MD5(current.schema+":"+current.class+":"+current.term+":"+state.value);
-                  current.states.push(state);
-                });
-              }
-              //NUM
-              else if(current.class=="NumericalDescriptor"){
-                current.category = current.category?current.category:"Outro";
-                current.id = hash.MD5(current.schema+":"+current.class+":"+current.term);
-                if(current.value.toUpperCase().indexOf("VALUE:")>0){
-                  current.value = current.value.toUpperCase().split("VALUE:")[1].trim();
-                }else{
-                  current.value.split(";").forEach(function (item) {
-                    if(item.toUpperCase().indexOf("MIN:")!=-1){
-                      current.min = item.toUpperCase().split("MIN:")[1].trim();
-                    } else if(item.toUpperCase().indexOf("MAX:")!=-1){
-                      current.max = item.toUpperCase().split("MAX:")[1].trim();
-                    } else if(item.toUpperCase().indexOf("MED:")!=-1){
-                      current.mean = item.toUpperCase().split("MED:")[1].trim();
-                    } else if(item.toUpperCase().indexOf("DVPAD:")!=-1){
-                      current.sd = item.toUpperCase().split("DVPAD:")[1].trim();
-                    }
-                  });
-                }
-              }
-              // Check if exist field with the same key
-              if(record[field]){
-                // Check if the field is the is an Array
-                if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
-                    record[field].push(current);
+          async.each(term, function(cell, callbackCell){
+            c++;
+            if(cell){
+              var currentSchema = toString(schema[c]).trim();
+              var currentClass = toString(class_[c]).trim();
+              var currentTerm = toString(term[c]).trim();
+              var collumnId = currentSchema.concat(":").concat(currentClass).concat(":").concat(currentTerm);
+              record[collumnId] = {};
+              record[collumnId][language] = {value:line[c]};
+              Schema.findById(collumnId,function(err,schema) {
+                if(err)
+                  console.log(err);
+                if(schema){
+                  var value = record[schema.id][language].value;
+                  record[schema.id] = schema;
+                  record[schema.id][language].value = value;
+                  // if(schema.class=="CategoricalDescriptor"){
+                  //   Schema.find({where:{language:{state:line[c]}},limit:1}, function(err,state) {
+                  //
+                  //   });
+                  // }
                 } else {
-                  var old = Object.create(record[field]);
-                  record[field] = [];
-                  record[field].push(old);
-                  record[field].push(current);
+
                 }
-              } else {
-                record[field] = current;
-              }
+                callbackCell();
+              });
+            } else {
+              callbackCell();
             }
-          }
-          Specimen.upsert(record,function (err,instance) {
-            if(err)
-              console.log(err);
-            callback();
+          },function done() {
+            Specimen.upsert(record,function (err,instance) {
+              if(err)
+                console.log(err);
+              callback();
+            });
           });
-        }else{
+        } else{
           console.log("can't find id");
           callback();
         }
@@ -177,6 +83,175 @@ module.exports = function(Specimen) {
     });
     request(url).pipe(w);
   };
+  // Specimen.inputFromURL = function(url,language,redownload, cb) {
+  //   url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+  //   var name = defineName(url);
+  //   if(name==null)
+  //   cb("Invalid XLSX file.",null);
+  //   var path = __dirname +"/../../uploads/"+name+".xlsx";
+  //   saveDataset(name,url,path);
+  //   var downloadQueue = [];
+  //
+  //   var w = fs.createWriteStream(path).on("close",function (argument) {
+  //     var data = xlsx.parse(path)[0].data;
+  //     var schema = data[0];
+  //     var class_ = data[1];
+  //     var term = data[2];
+  //     var category = data[3];
+  //     var label = data[4];
+  //     data =  data.slice(5,data.length);
+  //
+  //     var idIndexes = [1,2,3]; // institutionCode and collectionCode
+  //     var rs = {};
+  //     rs.count = 0;
+  //     async.each(data, function iterator(line, callback){
+  //       var record = {};
+  //       record.id = defineId(line,idIndexes);
+  //       if(record.id){
+  //         rs.count ++;
+  //         for(var c = 1; c < term.length; c++){
+  //           if(line[c]){
+  //             var field = toString(schema[c])+":"+toString(term[c]);
+  //             var current = {};
+  //             current.schema = toString(schema[c]);
+  //             current.term = toString(term[c]);
+  //             current.class = String(class_[c]).trim();
+  //             if(toString(category[c])!="-" && toString(category[c])!=""){
+  //               current.category = toString(category[c]);
+  //             }
+  //             current.label = toString(label[c]);
+  //             current.value = toString(line[c]);
+  //             // EVENT DATE
+  //             if(current.term=="eventDate"){
+  //               // current.category = current.category?current.category:"Outro";
+  //               var parsedDate = current.value.split("/");
+  //               if(parsedDate.length==3){
+  //                   current.day = {value:parsedDate[0].trim()=="00"||parsedDate[0].trim()=="0"?null:parsedDate[0].trim()};
+  //                   current.month = {value:parsedDate[1].trim()=="00"||parsedDate[1].trim()=="0"?null:parsedDate[1].trim()};
+  //                   current.year = {value:parsedDate[2].trim()=="0000"||parsedDate[2].trim()=="00"?null:parsedDate[2].trim()};
+  //               } else{
+  //                 current.day = {};
+  //                 current.month = {};
+  //                 current.year = {};
+  //               }
+  //             } else
+  //             // IMAGE
+  //             if(current.term=="associatedMedia"){
+  //               current.category = current.category?current.category:"Outro";
+  //               current.value.split("|").forEach(function(value){
+  //                 current.name = current.category + value.replace("https://drive.google.com/open?id=", "");
+  //                 if(typeof value === "string"){
+  //                   current.url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+  //                 }
+  //                 // save images
+  //                 var image = {url: current.url, name: current.name};
+  //                 downloadQueue.push(image);
+  //               });
+  //             }else
+  //             // REFERENCE
+  //             if(current.term=="bibliographicCitation"){
+  //               current.category = current.category?current.category:"Outro";
+  //               current.references = [];
+  //               current.value.split("|").forEach(function (ref) {
+  //                 current.references.push(ref.trim());
+  //               });
+  //             }else
+  //             // INTERACTION
+  //             if(current.class=="Interaction"){
+  //               current.species = [];
+  //               current.value.split("|").forEach(function (sp) {
+  //                 current.species.push(sp.trim());
+  //               });
+  //             }else
+  //             // FLOWERING PERIOD
+  //             if(current.term=="floweringPeriod"){
+  //               current.months = [];
+  //               current.value.split("|").forEach(function (month) {
+  //                 current.months.push(month.trim());
+  //               });
+  //             }else
+  //             // LATITUDE
+  //             if(current.term=="decimalLatitude"){
+  //               var converted = convertDMSCoordinatesToDecimal(current.value.toUpperCase().replace("O","W").replace("L","E"));
+  //               if(converted!=current.value){
+  //                 current.rawValue = current.value;
+  //                 current.value = converted;
+  //               }
+  //             }else
+  //             // LONGITUDE
+  //             if(current.term=="decimalLongitude"){
+  //               var converted = convertDMSCoordinatesToDecimal(current.value.toUpperCase().replace("O","W").replace("L","E"));
+  //               if(converted!=current.value){
+  //                 current.rawValue = current.value;
+  //                 current.value = converted;
+  //               }
+  //             }else
+  //             //CAT
+  //             if(current.class=="CategoricalDescriptor"){
+  //               current.category = current.category?current.category:"Outro";
+  //               current.id = hash.MD5(current.schema+":"+current.class+":"+current.term);
+  //               current.states = [];
+  //               current.value.split("|").forEach(function (state_) {
+  //                 var state  = {};
+  //                 state.value = state_.trim();
+  //                 console.log(current.category+":"+current.label+":"+state.value);
+  //                 state.id = hash.MD5(current.category.trim().toLowerCase()+":"+current.label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
+  //                 //state.id = hash.MD5(current.schema+":"+current.class+":"+current.term+":"+state.value);
+  //                 current.states.push(state);
+  //               });
+  //             }
+  //             //NUM
+  //             else if(current.class=="NumericalDescriptor"){
+  //               current.category = current.category?current.category:"Outro";
+  //               current.id = hash.MD5(current.schema+":"+current.class+":"+current.term);
+  //               if(current.value.toUpperCase().indexOf("VALUE:")>0){
+  //                 current.value = current.value.toUpperCase().split("VALUE:")[1].trim();
+  //               }else{
+  //                 current.value.split(";").forEach(function (item) {
+  //                   if(item.toUpperCase().indexOf("MIN:")!=-1){
+  //                     current.min = item.toUpperCase().split("MIN:")[1].trim();
+  //                   } else if(item.toUpperCase().indexOf("MAX:")!=-1){
+  //                     current.max = item.toUpperCase().split("MAX:")[1].trim();
+  //                   } else if(item.toUpperCase().indexOf("MED:")!=-1){
+  //                     current.mean = item.toUpperCase().split("MED:")[1].trim();
+  //                   } else if(item.toUpperCase().indexOf("DVPAD:")!=-1){
+  //                     current.sd = item.toUpperCase().split("DVPAD:")[1].trim();
+  //                   }
+  //                 });
+  //               }
+  //             }
+  //             // Check if exist field with the same key
+  //             if(record[field]){
+  //               // Check if the field is the is an Array
+  //               if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
+  //                   record[field].push(current);
+  //               } else {
+  //                 var old = Object.create(record[field]);
+  //                 record[field] = [];
+  //                 record[field].push(old);
+  //                 record[field].push(current);
+  //               }
+  //             } else {
+  //               record[field] = current;
+  //             }
+  //           }
+  //         }
+  //         Specimen.upsert(record,function (err,instance) {
+  //           if(err)
+  //             console.log(err);
+  //           callback();
+  //         });
+  //       }else{
+  //         console.log("can't find id");
+  //         callback();
+  //       }
+  //     }, function done(){
+  //       downloadImages(downloadQueue, redownload);
+  //       cb(null, rs);
+  //     });
+  //   });
+  //   request(url).pipe(w);
+  // };
   Specimen.cleanDB = function(cb) {
     Specimen.destroyAll(function (err,callback) {
       cb(err,callback);
@@ -218,6 +293,7 @@ module.exports = function(Specimen) {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
         {arg: 'url', type: 'string', required:true, description: 'link para tabela de espécimes'},
+        {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'},
         {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
