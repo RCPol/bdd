@@ -8,81 +8,212 @@ var qt = require('quickthumb');
 var Thumbnail = require('thumbnail');
 var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+  function titleCase(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  }
+  var downloadQueue = [];
   Specimen.inputFromURL = function(url,language, redownload, cb) {
-    var Schema = Specimen.app.models.Schema;
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url);
     if(name==null)
     cb("Invalid XLSX file.",null);
     var path = __dirname +"/../../uploads/"+name+".xlsx";
     saveDataset(name,url,path);
-    var downloadQueue = [];
 
     var w = fs.createWriteStream(path).on("close",function (argument) {
       var data = xlsx.parse(path)[0].data;
       var schema = data[0];
       var class_ = data[1];
-      var term = data[2];
+      var terms = data[2];
       // var category = data[3];
-      // var label = data[4];
+      var label = data[4];
       data =  data.slice(5,data.length);
-
-      var idIndexes = [1,2,3]; // institutionCode and collectionCode
       var rs = {};
       rs.count = 0;
       async.each(data, function iterator(line, callback){
-        var c = 0;
-        var record = {};
-        record.id = defineId(line,idIndexes);
-        if(record.id){
-          rs.count ++;
-          async.each(term, function(cell, callbackCell){
-            c++;
-            if(cell){
-              var currentSchema = toString(schema[c]).trim();
-              var currentClass = toString(class_[c]).trim();
-              var currentTerm = toString(term[c]).trim();
-              var collumnId = currentSchema.concat(":").concat(currentClass).concat(":").concat(currentTerm);
-              record[collumnId] = {};
-              record[collumnId][language] = {value:line[c]};
-              Schema.findById(collumnId,function(err,schema) {
-                if(err)
-                  console.log(err);
-                if(schema){
-                  var value = record[schema.id][language].value;
-                  record[schema.id] = schema;
-                  record[schema.id][language].value = value;
-                  // if(schema.class=="CategoricalDescriptor"){
-                  //   Schema.find({where:{language:{state:line[c]}},limit:1}, function(err,state) {
-                  //
-                  //   });
-                  // }
-                } else {
-
-                }
-                callbackCell();
-              });
-            } else {
-              callbackCell();
-            }
-          },function done() {
-            Specimen.upsert(record,function (err,instance) {
-              if(err)
-                console.log(err);
-              callback();
+        rs.count ++;
+        async.parallel([
+          function(callbackSave) {
+            saveRecord(language,"en-US",line, schema, class_, terms, function() {
+              callbackSave();
             });
-          });
-        } else{
-          console.log("can't find id");
+          },
+          function(callbackSave) {
+            saveRecord(language,"pt-BR",line, schema, class_, terms, function() {
+              callbackSave();
+            });
+          },
+          function(callbackSave) {
+            saveRecord(language,"es-ES",line, schema, class_, terms, function() {
+              callbackSave();
+            });
+          }
+        ],function done() {
           callback();
-        }
+        });
       }, function done(){
-        downloadImages(downloadQueue, redownload);
+        // downloadImages(downloadQueue, redownload);
+        console.log("Done.");
         cb(null, rs);
       });
     });
     request(url).pipe(w);
   };
+  function saveRecord(originalLanguage,language,line, schema, class_, terms, callback) {
+    var Schema = Specimen.app.models.Schema;
+    var c = 0;
+    var record = {};
+    record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]);
+    if(record.id){
+      // rs.count ++;
+      async.each(terms, function(term, callbackCell){
+        c++;
+        if(term){
+          var schemaId = Specimen.app.defineSchemaID(language,schema[c],class_[c],terms[c]);
+          record.language = language;
+          record.originalLanguage = originalLanguage;
+          record[schemaId] = {value:toString(line[c])};
+          if(schemaId){
+            Schema.findById(schemaId,function(err,schema) {
+              if(err)
+                console.log(err);
+              if(schema){
+                var value = toString(record[schema.id].value).trim();
+                record[schema.id] = schema;
+                // CATEGORICAL DESCRIPTOR
+                if(schema.class=="CategoricalDescriptor"){
+                  record[schema.id].value = value;
+                  value = titleCase(value);
+                  record[schema.id].states = [];
+                  async.each(value.split("|"), function(stateValue, callbackState) {
+                    stateValue = titleCase(stateValue);
+                    if(language==originalLanguage){
+                      Schema.findOne({where:{language:originalLanguage,class:"State",field:schema.field,state:stateValue.trim()}}, function(err,state) {
+                        if(state){
+                          record[schema.id].states.push(state.toJSON());
+                        }else {
+                          console.log("\tSTATE NOT FOUND: ", "\tLanguage: ",originalLanguage,"\tField: ",schema.field,"\tState: ",stateValue.trim());
+                        }
+                        callbackState();
+                      });
+                    } else {
+                      var schemaIdOriginal = Specimen.app.defineSchemaID(originalLanguage,schema.schema,schema.class,schema.term);
+                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {
+                        if(schemaOriginal){
+                          Schema.findOne({where:{language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue.trim()}}, function(err,state) {
+
+                            if(state){
+                                Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
+                                  if(translatedState){
+                                    record[schema.id].states.push(translatedState.toJSON());
+                                  } else{
+                                    console.log("\tSTATE NOT FOUND: ", "\tLanguage: ",language,"\tField: ",schema.field,"\tState: ",stateValue.trim());
+                                  }
+                                });
+                            } else {
+                              console.log("\tSTATE NOT FOUND: ", "\tLanguage: ",originalLanguage,"\tField: ",schemaOriginal.field,"\tState: ",stateValue.trim());
+                            }
+                            callbackState();
+                          });
+                        } else {
+                          console.log("NOT FOUND: ",schemaIdOriginal);
+                          callbackState();
+                        }
+                      });
+                    }
+                  },function doneState() {
+                    callbackCell();
+                  });
+                // OTHER FIELDS
+                } else {
+                  record[schema.id].value = value;
+                  // EVENT DATE
+                  if(schema.term=="eventDate"){
+                    var parsedDate = record[schema.id].value.split("-");
+                    if(parsedDate.length==3){
+                        record[schema.id].day = {value:parsedDate[2].trim()=="00"||parsedDate[0].trim()=="0"?null:parsedDate[0].trim()};
+                        record[schema.id].month = {value:parsedDate[1].trim()=="00"||parsedDate[1].trim()=="0"?null:parsedDate[1].trim()};
+                        record[schema.id].year = {value:parsedDate[0].trim()=="0000"||parsedDate[2].trim()=="00"?null:parsedDate[2].trim()};
+                    } else {
+                      record[schema.id].day = {};
+                      record[schema.id].month = {};
+                      record[schema.id].year = {};
+                      // console.log("\nVALUE: ",value,"\nERROR: Invalid format. Expected format: yyyy-mm-dd.");
+                    }
+                } else
+                  // IMAGE
+                  if(schema.class=="Image"){
+                    record[schema.id].value.split("|").forEach(function(value){
+                      record[schema.id].name = schema.category + value.replace("https://drive.google.com/open?id=", "");
+                      if(typeof value === "string"){
+                        record[schema.id].url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+                      }
+                      // save images
+                      var image = {url: record[schema.id].url, name: record[schema.id].name};
+                      downloadQueue.push(image);
+                    });
+                  }else
+                  // REFERENCE
+                  if(schema.class=="Reference"){
+                    record[schema.id].references = [];
+                    record[schema.id].value.split("|").forEach(function (ref) {
+                      record[schema.id].references.push(ref.trim());
+                    });
+                  }else
+                  // INTERACTION
+                  if(schema.class=="Interaction"){
+                    record[schema.id].species = [];
+                    record[schema.id].value.split("|").forEach(function (sp) {
+                      record[schema.id].species.push(sp.trim());
+                    });
+                  }else
+                  // FLOWERING PERIOD
+                  if(schema.term=="floweringPeriod"){
+                    record[schema.id].months = [];
+                    record[schema.id].value.split("|").forEach(function (month) {
+                      record[schema.id].months.push(month.trim());
+                    });
+                  }else
+                  // LATITUDE
+                  if(schema.term=="decimalLatitude"){
+                    var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
+                    if(converted!=record[schema.id].value){
+                      record[schema.id].rawValue = record[schema.id].value;
+                      record[schema.id].value = converted;
+                    }
+                  }else
+                  // LONGITUDE
+                  if(schema.term=="decimalLongitude"){
+                    var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
+                    if(converted!=record[schema.id].value){
+                      record[schema.id].rawValue = record[schema.id].value;
+                      record[schema.id].value = converted;
+                    }
+                  }
+                  callbackCell();
+              }
+            } else {
+                callbackCell();
+              }
+            });
+          } else {
+            callbackCell();
+          }
+        } else {
+          callbackCell();
+        }
+      },function done() {
+        Specimen.upsert(record,function (err,instance) {
+          if(err)
+            console.log(err);
+          callback();
+        });
+      });
+    } else {
+      console.log("Cannot define an ID for specimen.");
+      callback();
+    }
+  }
   // Specimen.inputFromURL = function(url,language,redownload, cb) {
   //   url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
   //   var name = defineName(url);

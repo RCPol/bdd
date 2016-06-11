@@ -4,6 +4,9 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 module.exports = function(Schema) {
+  function titleCase(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  }
   Schema.inputFromURL = function(url, language, sheetNumber, redownload, cb) {
     if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
       url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
@@ -22,23 +25,21 @@ module.exports = function(Schema) {
         rs.count = 0;
         async.each(data, function iterator(line, callback){
           var record = {};
-          var id = null;
-          if(line[0] && line[1] && line[2] && line[0].trim().length>0 && line[1].trim().length>0 && line[2].trim().length>0)
-            id = line[0].trim().concat(":").concat(line[1].trim()).concat(":").concat(line[2].trim());
+          record.id = Schema.app.defineSchemaID(language,line[0],line[1],line[2]);
           record.order = rs.count;
-          if(id){
+          if(record.id){
             rs.count++;
             record.schema = toString(line[0]).trim();
             record.class = toString(line[1]).trim();
             record.term = toString(line[2]).trim();
             if (toString(line[3]).trim().length>0) {
-              record.category = toString(line[3]).trim();
+              record.category = titleCase(toString(line[3]).trim());
             }
             if (toString(line[4]).trim().length>0) {
-              record.field = toString(line[4]).trim();
+              record.field = titleCase(toString(line[4]).trim());
             }
             if (toString(line[5]).trim().length>0) {
-              record.state = toString(line[5]).trim();
+              record.state = titleCase(toString(line[5]).trim());
             }
             if (toString(line[6]).trim().length>0) {
               record.definition = toString(line[6]).trim();
@@ -56,28 +57,17 @@ module.exports = function(Schema) {
               });
               record.image = record.images[0];
             }
-            record.url = "/images/" + id + ".jpeg";
+            record.url = "/images/" + record.id + ".jpeg";
             if (record.image != undefined){
               record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
               downloadQueue.push({url:record.image, name:record.id});
             }
-            Schema.findById(id, function(err, instance){
+            record.language = language;
+            Schema.upsert(record, function(err, instance){
               if(err){
                   console.log(err);
               }
-              if(instance){
-                instance[language] = record;
-                instance.save(function(e,d) {
-                  callback();
-                });
-              } else {
-                var multiLangRecord = {};
-                multiLangRecord.id = id;
-                multiLangRecord[language] = record;
-                Schema.create(multiLangRecord, function(err,ok) {
-                  callback();
-                });
-              }
+              callback();
             });
           } else {
             callback();
