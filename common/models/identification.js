@@ -17,15 +17,16 @@ module.exports = function(Identification) {
   Identification.identify = function(param, callback) {
     //examples
     //param = ['schema:term:state'];
-
     //TODO: validate query
+    //param = [ {descriptor: 'rcpol:equatorialAxis', value: 20.00}, 'rcpol:flowerColor:lilás' ];
 
     console.log("received parameters:");
     console.log(param);
 
     composeQuery(param, function(query, queryMongo){
       console.log(JSON.stringify(query));
-      Identification.find({where: query, fields: 'id'}, function (err, items) {
+      console.log(JSON.stringify(queryMongo));
+      Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
         console.log(items.length);
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
@@ -151,7 +152,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
         //Object.keys(species).forEach(function(key, i){
-        if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1 && species[key].term != "pollenShape" && species[key].term != "espexi"){
+        if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1 && species[key].term != "pollenShape" && species[key].term != "espexi" && species[key].term != "floweringPeriod"){
           //TODO: handle pollenShape and espexi
           // we only want "rcpol"'s descriptors
           // we can have multiple states
@@ -180,7 +181,10 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
                 console.log("after",id);
                 Schema.getOrder(id, function(err, state_order){
                   if (err) throw Error(err);
-                  entry.states.push( {value:prefix + state.value, order:state_order, id:state.id} );
+                  var entry_state = {value:prefix + state.value, order:state_order, id:state.id};
+                  if (state.numerical)
+                    entry_state.numerical = state.numerical;
+                  entry.states.push(entry_state );
                   callback3();
                 });
               }, function(err){
@@ -233,19 +237,26 @@ function composeQuery(param, callback){
         {or: [{"states.descritor": "term2", "states.states": "schema:term2:state3"}]}
    ]}
 
-   */
+   if numerical
 
-  var param_fixed = [];
+   db.Identification.find({states: {"$elemMatch": {"term": "equatorialAxis", "states.numerical.min": {"$lt": 20}, "states.numerical.max": {"$gt": 20}}}}).pretty()
+
+   */
+  var categorical_param = [];
+  var numerical_param = [];
   //append "states." to each field
   param.forEach(function(elem){
-    param_fixed.push({
-      "states.term": elem.split(":")[1],
-      "states.states.value": elem
-    });
+    if (!elem.hasOwnProperty("value")) { //categorical descriptors
+      categorical_param.push({
+        "states.term": elem.split(":")[1],
+        "states.states.value": elem
+      });
+    } else { //numerical descriptors
+      numerical_param.push(elem);
+    }
   });
-  param = param_fixed;
 
-  var param_grouped_by_descriptor = _.groupBy(param, function(elem){ return elem["states.term"]; });
+  var param_grouped_by_descriptor = _.groupBy(categorical_param, function(elem){ return elem["states.term"]; });
 
   if (param.length == 0) callback({}, {});
   else {
@@ -255,7 +266,22 @@ function composeQuery(param, callback){
       query.and.push({or: param_grouped_by_descriptor[descriptor]});
       queryMongo.$and.push({$or: param_grouped_by_descriptor[descriptor]});
     });
-
+    console.log(numerical_param);
+    // numerical descriptors:
+    numerical_param.forEach(function(elem){
+      query.and.push(
+        {"states": {"elemMatch":
+                    {"term": elem.descriptor.split(":")[1],
+                     "states.numerical.min": {lt: elem.value},
+                     "states.numerical.max": {gt: elem.value}
+                    }}});
+      queryMongo.$and.push(
+        {"states": {"$elemMatch":
+                    {"term": elem.descriptor.split(":")[1],
+                     "states.numerical.min": {$lt: elem.value},
+                     "states.numerical.max": {$gt: elem.value}
+                    }}});
+    });
     callback(query, queryMongo);
   }
 };
