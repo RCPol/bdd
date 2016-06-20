@@ -18,8 +18,15 @@
 
 	<!-- Campos de busca, scrollbar e botões  -->
 	<script type="text/javascript">
-	  window.onload = function(){
+      $(document).on('keyup', '.numnum', function(event) {
+        var v = this.value;
+        if($.isNumeric(v) === false) {
+          //chop off the last char entered
+          this.value = this.value.slice(0,-1);
+        }
+      });
 
+	  window.onload = function(){
         //Barras de Rolagem das caixas
 		$(".roxinho").mCustomScrollbar({
 			scrollButtons:{ enable: true },
@@ -95,6 +102,7 @@
 		  }
 		});
       }
+
 
       $(document).ready(function(){
         identify([]);

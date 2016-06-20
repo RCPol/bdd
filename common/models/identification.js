@@ -16,9 +16,9 @@ module.exports = function(Identification) {
 
   Identification.identify = function(param, callback) {
     //examples
-    //param = ['schema:term:state'];
+    //param = [{state:'schema:term:state'}];
     //TODO: validate query
-    //param = [ {descriptor: 'rcpol:equatorialAxis', value: 20.00}, 'rcpol:flowerColor:lilás' ];
+    //param = [ {descriptor: 'rcpol:equatorialAxis', value: 20.00}, {state:'rcpol:flowerColor:lilás'} ];
 
     console.log("received parameters:");
     console.log(param);
@@ -27,7 +27,6 @@ module.exports = function(Identification) {
       console.log(JSON.stringify(query));
       console.log(JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
-        console.log(items.length);
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
 
@@ -75,6 +74,8 @@ module.exports = function(Identification) {
           { $unwind: '$states.states'},
           { $project: {
             _id: 0,
+            'schema': '$states.schema',
+            'class': '$states.class',
             'descriptor': '$states.descriptor',
             'category': '$states.category',
             'id': '$states.id',
@@ -83,11 +84,13 @@ module.exports = function(Identification) {
             'state': '$states.states'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor', id: '$id', state: '$state', category:"$category", term:"$term", order:'$order'},
+            _id: { schema: '$schema', class: '$class', descriptor: '$descriptor', id: '$id', state: '$state', category:"$category", term:"$term", order:'$order'},
             sum: {$sum:1}
           }},
           { $project: {
             _id: 0,
+            schema: '$_id.schema',
+            class: '$_id.class',
             descriptor: '$_id.descriptor',
             id: '$_id.id',
             state: '$_id.state',
@@ -97,11 +100,13 @@ module.exports = function(Identification) {
             count: '$sum'
           }},
           { $group: {
-            _id: { descriptor: '$descriptor',category: '$category', id: '$id', term:'$term', order:'$order'},
+            _id: { schema: '$schema', class: '$class', descriptor: '$descriptor',category: '$category', id: '$id', term:'$term', order:'$order'},
             states: {$push: {state: '$state', count: '$count'}}
           }},
           { $project:{
             _id: 0,
+            schema: '$_id.schema',
+            class: '$_id.class',
             category_name: '$_id.category',
             descriptor_name: '$_id.descriptor',
             descriptor_id: '$_id.id',
@@ -132,6 +137,7 @@ module.exports = function(Identification) {
     'identify',
     {
       http: {verb:'get'},
+      //accepts: {arg: 'param', type: 'array'},
       accepts: {arg: 'param', type: 'array'},
       returns: {arg: 'response', type: 'object'}
     }
@@ -151,16 +157,17 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
       identification_item.id = species.id;
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
-        //Object.keys(species).forEach(function(key, i){
-        if (species.hasOwnProperty(key) && key.indexOf("rcpol") != -1 && species[key].term != "pollenShape" && species[key].term != "espexi" && species[key].term != "floweringPeriod"){
+        if (species.hasOwnProperty(key) && species[key] && species[key].term != "pollenShape" && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
           //TODO: handle pollenShape and espexi
-          // we only want "rcpol"'s descriptors
+          // we only want entries with classes CategoricalDescriptor or NumericalDescriptor
           // we can have multiple states
 
           Schema.getOrder(species[key].term, function(err, order){
             if (err) {throw new Error(err);}
 
             var entry = {
+              schema: species[key].schema,
+              class: species[key].class,
               category: species[key].category,
               descriptor: species[key].label,
               id: species[key].id,
@@ -221,7 +228,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
 function composeQuery(param, callback){
   /*
-   param: ["schema:term1:state1", "schema:term1:state2", "schema:term2:state3"]
+   param: [{state:"schema:term1:state1"}, {state:"schema:term1:state2"}, {state:"schema:term2:state3"}]
 
    for mongoDB
 
@@ -248,8 +255,8 @@ function composeQuery(param, callback){
   param.forEach(function(elem){
     if (!elem.hasOwnProperty("value")) { //categorical descriptors
       categorical_param.push({
-        "states.term": elem.split(":")[1],
-        "states.states.value": elem
+        "states.term": elem.state.split(":")[1],
+        "states.states.value": elem.state
       });
     } else { //numerical descriptors
       numerical_param.push(elem);
@@ -266,7 +273,6 @@ function composeQuery(param, callback){
       query.and.push({or: param_grouped_by_descriptor[descriptor]});
       queryMongo.$and.push({$or: param_grouped_by_descriptor[descriptor]});
     });
-    console.log(numerical_param);
     // numerical descriptors:
     numerical_param.forEach(function(elem){
       query.and.push(

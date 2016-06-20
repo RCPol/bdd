@@ -7,7 +7,12 @@ function composeQuery(){
   // chamado pelo botão "identificar", Adiciona à query os estados selecionados
   $(".selecionado").each( function(){
     var name = $(this).attr('name');
-    query.push(name);
+    query.push({state: name});
+  });
+  $(".numnum").each(function(){
+    if ($(this).val()){
+      query.push({descriptor: $(this).attr('name'), value: $(this).val()});
+    }
   });
   identify(query);
 }
@@ -23,7 +28,7 @@ function removeSelected(){
   $("input:checked").each(function(){
     var $this = $(this);
     query = query.filter(function(elem){
-      if(elem == $this.attr('state'))
+      if(elem.state == $this.attr('state') || elem.descriptor == $this.attr('state'))
         return false;
       else
         return true;
@@ -59,39 +64,46 @@ function writeSpecies(ids, nicho){
 }
 
 function writeDescriptor(descritor, species_length){
-  // adicionar um descritor e seus estados associados à lista de descritores
-  var copia_descritor = [];
-  descritor.states.forEach(function(estado){
-    if (estado.count < species_length){
-      // retirar estados com count >= species_length
-      copia_descritor.push(estado);
-    }
-  });
-
-  //TODO: usar ids para consultar Schema
-  // adicionar descritor, se houver algum estado
-  if (copia_descritor.length > 0){
+  if (descritor.class == "NumericalDescriptor"){
     $("#desc_for_"+descritor.category_name).append("<li><section class='toggle'><span>+</span>" + descritor.descriptor_name + "<a target='_blank' href='/profile/glossary/"+descritor.descriptor_term+"'><img src='img/glo.png' class='lala'></a></section></li>");
-    $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
+    $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresn inner'><input name='" + descritor.schema + ":" + descritor.descriptor_term +"' type='text' class='numnum' size='5' maxlength='12' placeholder='00.00'> un </div>");
   }
 
-  // ordenar estados
-  copia_descritor.sort(function(a, b){
-    return parseInt(a.state.order) - parseInt(b.state.order);
-  });
+  if (descritor.class == "CategoricalDescriptor"){
+    // adicionar um descritor e seus estados associados à lista de descritores
+    var copia_descritor = [];
+    descritor.states.forEach(function(estado){
+      if (estado.count < species_length){
+        // retirar estados com count >= species_length
+        copia_descritor.push(estado);
+      }
+    });
 
-  copia_descritor.forEach(function(estado){
-    $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
-      "<div class='vimagens' id='" + estado.state.value.split(":").join("-") + "' name='" + estado.state.value + "'>"
-        + "<p>"+
-        "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ estado.state.id +"'>"+
-        "<a href='/profile/glossary/" + estado.state.id + "' target='_blank'>"+
-        "<img src='/img/glo.png' class='vglos'>"+
-        "</a>  " + estado.state.value.split(":")[2] + " (" + estado.count+ ")" +
-        "</p></div>");
+    //TODO: usar ids para consultar Schema
+    // adicionar descritor, se houver algum estado
+    if (copia_descritor.length > 0){
+      $("#desc_for_"+descritor.category_name).append("<li><section class='toggle'><span>+</span>" + descritor.descriptor_name + "<a target='_blank' href='/profile/glossary/"+descritor.descriptor_term+"'><img src='img/glo.png' class='lala'></a></section></li>");
+      $("#desc_for_"+descritor.category_name + " li").last().append("<div class='valoresi inner'></div>");
+    }
 
-    getImage(estado.state.id, "#desc_for_"+descritor.category_name, "Schemas");
-  });
+    // ordenar estados
+    copia_descritor.sort(function(a, b){
+      return parseInt(a.state.order) - parseInt(b.state.order);
+    });
+
+    copia_descritor.forEach(function(estado){
+      $("#desc_for_"+descritor.category_name + " li").last().find(".valoresi").append(
+        "<div class='vimagens' id='" + estado.state.value.split(":").join("-") + "' name='" + estado.state.value + "'>"
+          + "<p>"+
+          "<img src='/img/lspm.jpg' class='vimg' id='desc_for_"+ descritor.category_name +"_img_"+ estado.state.id +"'>"+
+          "<a href='/profile/glossary/" + estado.state.id + "' target='_blank'>"+
+          "<img src='/img/glo.png' class='vglos'>"+
+          "</a>  " + estado.state.value.split(":")[2] + " (" + estado.count+ ")" +
+          "</p></div>");
+
+      getImage(estado.state.id, "#desc_for_"+descritor.category_name, "Schemas");
+    });
+  }
 }
 
 function buscaDescritores(nothing) {
@@ -147,25 +159,17 @@ function setDiscartedSpecies(){
 function writeSelectedState(query){
   // escrever estado selecionado na lista de descritores selecionados
   query.forEach(function(selected, i){
-    $.getJSON('/api/Schemas/'+selected.split(":")[1], function(schema){
-      $(".descel").append("<input state='" + selected +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.split(":")[2] + "</label><br>");
-    });
+    if (selected.state){ // se for categórico
+      $.getJSON('/api/Schemas/'+selected.state.split(":")[1], function(schema){
+        $(".descel").append("<input state='" + selected.state +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.state.split(":")[2] + "</label><br>");
+      });
+    } else if (selected.value) { // se for numérico
+      $.getJSON('/api/Schemas/'+selected.descriptor.split(":")[1], function(schema){
+        $(".descel").append("<input state='" + selected.descriptor +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.value + "</label><br>");
+      });
+    }
   });
 };
-
-function writeChunks(i, n, nicho){
-  // escrever uma lista de espécies de n em n
-  console.log(i);
-  if (i+n < eligibleSpeciesDb.length){
-    window.setTimeout(function(){
-      writeSpecies(eligibleSpeciesDb.slice(i,i+n), nicho);
-      writeChunks(i+n, n, nicho);
-    }, 1000);
-  } else {
-    writeSpecies(eligibleSpeciesDb.slice(i,i+n), nicho);
-    return;
-  }
-}
 
 function getSpeciesInfo(species, nicho, callback){
   // obter nome científico, familia e nome popular da espécie e salvar em speciesDb
@@ -179,42 +183,42 @@ function getSpeciesInfo(species, nicho, callback){
   }
 }
 
-function getSpecies(data, species_query, callback){
+function getSpecies(data, species_query, limit, offset, callback){
   /* listas de especies */
-  $.getJSON("/api/Species?filter[fields][id]=true&filter[fields][dwc:scientificName]=true&filter[fields][dwc:family]=true&filter[fields][dwc:scientificNameAuthorship]=true&filter[fields][dwc:vernacularName]=true&filter[order][0]=dwc:family%20ASC&filter[order][1]=dwc:scientificName%20ASC", { filter : species_query }, function(species){
-    // limpar espécies elegíveis
-    eligibleSpeciesDb = [];
-    $("#elegibleCount").html("#" + species.length + " espécies elegiveis");
+  $.getJSON("/api/Species?filter[fields][id]=true&filter[fields][dwc:scientificName]=true&filter[fields][dwc:family]=true&filter[fields][dwc:scientificNameAuthorship]=true&filter[fields][dwc:vernacularName]=true&filter[order][0]=dwc:family%20ASC&filter[order][1]=dwc:scientificName%20ASC&filter[limit]="+limit+"&filter[skip]="+offset, { filter : species_query }, function(species){
     species.forEach(function(item){
       eligibleSpeciesDb.push(item.id); // eligibleSpeciesDb será depois comparado com speciesDb para obter as espécies descartadas
       getSpeciesInfo(item);
     });
-    writeChunks(0, 100, "#especiesElegiveis");
-    setDiscartedSpecies();
-    callback(species);
+    writeSpecies(eligibleSpeciesDb.slice(offset, offset+limit), "#especiesElegiveis");
+    if (species.length > 0)
+      getSpecies(data, species_query, limit, offset + limit, callback);
+    else
+      callback();
   });
 }
 
-function getDescriptors(data, species){
+function getDescriptors(data){
   /* listas de descritores */
   // limpar descritores elegíveis
   eligibleDescriptor = [];
   data.response.eligibleStates.forEach(function(descriptor){
     /* apenas escrever descritores não selecionados, com mais de um estado */
+    //TODO: numericos
     var selected = false;
     query.forEach(function(element){
-      if (element.split(":")[1] == descriptor.descriptor_term){
+      if (!element.value && element.state.split(":")[1] == descriptor.descriptor_term){
         selected = true;
       }
     });
 
     if(descriptor.states.length > 1 && !selected){
       eligibleDescriptor.push(descriptor);
-      writeDescriptor(descriptor, species.length);
+      writeDescriptor(descriptor, eligibleSpeciesDb.length);
     }
   });
   $(".btnident").removeAttr('disabled');
-  if(species.length == 1){
+  if(eligibleSpeciesDb.length == 1){
     window.open($("#especiesElegiveis .nsp > a").attr("href"));
   }
 }
@@ -235,8 +239,12 @@ function identify(query){
     var species_query = {where: {id: {inq: ids}}};
     if (ids.length == 0)
       species_query = {where: {id: ""}};
-    getSpecies(data, species_query, function(species){
-      getDescriptors(data, species);
+    // limpar espécies elegíveis
+    eligibleSpeciesDb = [];
+    getSpecies(data, species_query, 100, 0, function(){
+      $("#elegibleCount").html("#" + eligibleSpeciesDb.length + " espécies elegiveis");
+      setDiscartedSpecies();
+      getDescriptors(data);
     });
   });
 }
