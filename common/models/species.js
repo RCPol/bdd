@@ -36,10 +36,30 @@ module.exports = function(Species) {
     }
   );
   Species.fromSpecimensAggregation = function(filter,cb) {
-    selectScientificNames(filter,function (scientificNames) {
-      generateSpecies(scientificNames,function(species) {
-        cb(null,species);
-      });
+    async.parallel([
+      function en(callback) {
+        selectScientificNames("en-US",filter,function (scientificNames) {
+          generateSpecies("en-US",scientificNames,function(species) {
+            callback();
+          });
+        });
+      },
+      function pt(callback) {
+        selectScientificNames("pt-BR",filter,function (scientificNames) {
+          generateSpecies("pt-BR",scientificNames,function(species) {
+            callback();
+          });
+        });
+      },
+      function es(callback) {
+        selectScientificNames("es-ES",filter,function (scientificNames) {
+          generateSpecies("es-ES",scientificNames,function(species) {
+            callback();
+          });
+        });
+      }
+    ],function done() {
+      cb(null,"done");
     });
   };
   Species.remoteMethod(
@@ -52,22 +72,29 @@ module.exports = function(Species) {
       returns: {arg: 'response', type: 'object'}
     }
   );
-  function generateSpecies(sciName,cb) {
+  function generateSpecies(language,sciName,cb) {
     var Specimen = Species.app.models.Specimen;
     var count = 0;
     async.each(sciName, function iterator(name, callback){
-      Specimen.find({where:{"dwc:scientificName.value":name}}, function (err,specimens) {
+      var query = {where:{}};
+      query.where[language+":dwc:Taxon:scientificName.value"] = name;
+      Specimen.find(query, function (err,specimens) {
+
         var species = {};
         species.specimens = [];
-        species["dwc:family"] = specimens[0]["dwc:family"];
-        species["dwc:scientificName"] = specimens[0]["dwc:scientificName"];
-        species["dwc:scientificNameAuthorship"] = specimens[0]["dwc:scientificNameAuthorship"];
+        species[language+":dwc:Taxon:family"] = specimens[0][language+":dwc:Taxon:family"];
+        species[language+":dwc:Taxon:scientificName"] = specimens[0][language+":dwc:Taxon:scientificName"];
+        species[language+":dwc:Taxon:scientificNameAuthorship"] = specimens[0][language+":dwc:Taxon:scientificNameAuthorship"];
         // TODO multiple specimens with different popular names
-        species["dwc:vernacularName"] = specimens[0]["dwc:vernacularName"];
+        species[language+":dwc:Taxon:vernacularName"] = specimens[0][":dwc:Taxon:vernacularName"];
 
-        species["dwc:establishmentMean"] = specimens[0]["dwc:establishmentMean"];
-        species["rcpol:floweringPeriod"] = specimens[0]["rcpol:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
-        species["dwc:associatedMedia"] = specimens[0]["dwc:associatedMedia"];
+        species[language+":dwc:Taxon:establishmentMean"] = specimens[0][language+":dwc:establishmentMean"];
+        species[language+":rcpol:Sample:floweringPeriod"] = specimens[0][language+":rcpol:Sample:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
+        species[language+":rcpol:Image:plantImage"] = specimens[0][language+":rcpol:Image:plantImage"];
+        species[language+":rcpol:Image:flowerImage"] = specimens[0][language+":rcpol:Image:flowerImage"];
+        species[language+":rcpol:Image:beeImage"] = specimens[0][language+":rcpol:Image:beeImage"];
+        species[language+":rcpol:Image:pollenImage"] = specimens[0][language+":rcpol:Image:pollenImage"];
+        species[language+":rcpol:Image:allPollenImage"] = specimens[0][language+":rcpol:Image:allPollenImage"];
         specimens.forEach(function (sp) {
           species.specimens.push({id:sp.id});
           Object.keys(sp).forEach(function(key,index) {
@@ -80,55 +107,22 @@ module.exports = function(Species) {
                 }
               } else if(sp[key].class=="NumericalDescriptor"){
                 if(!species[key]){
-                  //if(sp[key].term=="pollenShapePE"){
-                  //}else{
                     species[key] = sp[key];
                     species[key].states = [];
                   if(species[key].min == undefined){
                     console.log("problema com valor numerico:");
                     console.log(species[key]);
                   }
-                    var min = parseFloat(species[key].min.replace(",","."));
-                    var max = parseFloat(species[key].max.replace(",","."));
-                    var state = {};
-                    state.numerical = {min: min, max: max};
-                    if(min < 10 ||  max < 10){
-                      state.value = "Muito pequeno";
-                      state.id = hash.MD5(sp[key].category.trim().toLowerCase()+":"+sp[key].label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                      species[key].states.push(state);
-                    }
-                    if((min >= 10 && min < 25) ||  (max >= 10 && max < 25)){
-                      state.value = "Pequeno";
-                      state.id = hash.MD5(sp[key].category.trim().toLowerCase()+":"+sp[key].label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                      species[key].states.push(state);
-                    }
-                    if((min >= 25 && min < 50) ||  (max >= 25 && max < 50)){
-                      state.value = "Médio";
-                      state.id = hash.MD5(sp[key].category.trim().toLowerCase()+":"+sp[key].label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                      species[key].states.push(state);
-                    }
-                    if((min >= 50 && min < 100) ||  (max >= 50 && max < 100)){
-                      state.value = "Grande";
-                      state.id = hash.MD5(sp[key].category.trim().toLowerCase()+":"+sp[key].label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                      species[key].states.push(state);
-                    }
-                    if((min >= 100 && min < 200) ||  (max >= 100 && max < 200)){
-                      state.value = "Muito Grande";
-                      state.id = hash.MD5(sp[key].category.trim().toLowerCase()+":"+sp[key].label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                      species[key].states.push(state);
-                    }
-                    if(min >= 200 || max >= 200){
-                      state.value = "Gigante";
-                      state.id = hash.MD5(sp[key].category.trim().toLowerCase()+":"+sp[key].label.trim().toLowerCase()+":"+state.value.trim().toLowerCase());
-                      species[key].states.push(state);
-                    }
-                  //}
+                  var min = parseFloat(species[key].min.replace(",","."));
+                  var max = parseFloat(species[key].max.replace(",","."));
+                  var state = {};
+                  state.numerical = {min: min, max: max};
                 }
               }
             }
           });
         });
-        species.id = hash.MD5(name);
+        species.id = Species.app.defineSpeciesID(language,name);
         Species.upsert(species,function (err,instance) {
           if(err)
             console.log(err);
@@ -140,12 +134,12 @@ module.exports = function(Species) {
       cb(count);
     });
   }
-  function selectScientificNames(filter,cb) {
+  function selectScientificNames(language,filter,cb) {
     var Specimen = Species.app.models.Specimen;
     var sp = Specimen.getDataSource().connector.collection(Specimen.modelName);
-    sp.aggregate({
+    sp.aggregate({'$match':{'language': language}},{
       $group: {
-        _id: { value: '$dwc:scientificName.value'}
+        _id: { value: '$'+language+':dwc:Taxon:scientificName.value'}
       }
     }, function(err, groupByRecords) {
       if(err) {

@@ -54,6 +54,10 @@ module.exports = function(Specimen) {
       }, function done(){
         // downloadImages(downloadQueue, redownload);
         console.log("Done.");
+        for (var key in logs) {
+          console.log(logs[key]);
+        }
+
         cb(null, rs);
       });
     });
@@ -78,40 +82,46 @@ module.exports = function(Specimen) {
               if(err)
                 console.log(err);
               if(schema){
-                var value = toString(record[schema.id].value).trim();
+                var value = toString(record[schema.id].value);
                 record[schema.id] = schema;
                 // CATEGORICAL DESCRIPTOR
                 if(schema.class=="CategoricalDescriptor"){
                   record[schema.id].value = value;
-                  value = titleCase(value);
                   record[schema.id].states = [];
-                  async.each(value.split("|"), function(stateValue, callbackState) {
-                    stateValue = titleCase(stateValue);
+                  async.each(value.split("|"), function(sValue, callbackState) {
+                    var stateValue = titleCase(sValue.trim());
                     if(language==originalLanguage){
-                      Schema.findOne({where:{language:originalLanguage,class:"State",field:schema.field,state:stateValue.trim()}}, function(err,state) {
-                        if(state){
-                          record[schema.id].states.push(state.toJSON());
-                        }else {
-                          console.log("\tSTATE NOT FOUND: ", "\tLanguage: ",originalLanguage,"\tField: ",schema.field,"\tState: ",stateValue.trim());
-                        }
+                      if(stateValue.length>0 && stateValue.charAt(0).toLowerCase()==stateValue.charAt(0))
+                        console.log("BEFORE: ",stateValue);
+                      if(stateValue.length>0){
+                        Schema.findOne({where:{language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
+                          if(state){
+                            record[schema.id].states.push(state.toJSON());
+                          }else {
+                            logs[hash.MD5("STATE NOT FOUND Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
+                          }
+                          callbackState();
+                        });
+                      } else {
+                        logs[hash.MD5("EMPTY STATE Field: "+schema.field)] = "STATE NOT FOUND\tField: "+schema.field;
                         callbackState();
-                      });
+                      }
                     } else {
                       var schemaIdOriginal = Specimen.app.defineSchemaID(originalLanguage,schema.schema,schema.class,schema.term);
                       Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {
                         if(schemaOriginal){
-                          Schema.findOne({where:{language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue.trim()}}, function(err,state) {
+                          Schema.findOne({where:{language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
 
                             if(state){
                                 Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
                                   if(translatedState){
                                     record[schema.id].states.push(translatedState.toJSON());
                                   } else{
-                                    console.log("\tSTATE NOT FOUND: ", "\tLanguage: ",language,"\tField: ",schema.field,"\tState: ",stateValue.trim());
+                                    logs[hash.MD5("STATE NOT FOUND "+"Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
                                   }
                                 });
                             } else {
-                              console.log("\tSTATE NOT FOUND: ", "\tLanguage: ",originalLanguage,"\tField: ",schemaOriginal.field,"\tState: ",stateValue.trim());
+                              logs[hash.MD5("STATE NOT FOUND Field: "+schemaOriginal.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schemaOriginal.field+"\tState: "+stateValue;
                             }
                             callbackState();
                           });
@@ -138,7 +148,7 @@ module.exports = function(Specimen) {
                       record[schema.id].day = {};
                       record[schema.id].month = {};
                       record[schema.id].year = {};
-                      // console.log("\nVALUE: ",value,"\nERROR: Invalid format. Expected format: yyyy-mm-dd.");
+                      logs[hash.MD5("INVALID FORMAT OF DATE Field: "+schema.field+"State: "+record[schema.id].value)] = "INVALID FORMAT OF DATE\tField: "+schema.field+"\tState: "+record[schema.id].value;
                     }
                 } else
                   // IMAGE
@@ -210,10 +220,11 @@ module.exports = function(Specimen) {
         });
       });
     } else {
-      console.log("Cannot define an ID for specimen.");
+      console.log("Cannot define an ID for specimen: ",language,line[1],line[2],line[3]);
       callback();
     }
   }
+
   // Specimen.inputFromURL = function(url,language,redownload, cb) {
   //   url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
   //   var name = defineName(url);
