@@ -8,6 +8,7 @@ var qt = require('quickthumb');
 var Thumbnail = require('thumbnail');
 var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+  var logs = {};
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
