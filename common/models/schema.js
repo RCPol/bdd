@@ -21,14 +21,14 @@ module.exports = function(Schema) {
         var data = xlsx.parse(path)[sheetNumber || 0].data;
         var header = data[0];
         data =  data.slice(1,data.length);
-        var rs = {};
-        rs.count = 0;
+        var response = {};
+        response.count = 0;
         async.each(data, function iterator(line, callback){
           var record = {};
           record.id = Schema.app.defineSchemaID(language,line[0],line[1],line[2]);
-          record.order = rs.count;
+          record.order = response.count;
           if(record.id){
-            rs.count++;
+            response.count++;
             record.schema = toString(line[0]).trim();
             record.class = toString(line[1]).trim();
             record.term = toString(line[2]).trim();
@@ -70,16 +70,18 @@ module.exports = function(Schema) {
               callback();
             });
           } else {
+            console.error("record id could not be generated: ".concat(line[0], " ", line[1], " ", line[2]));
             callback();
           }
         }, function done(){
-          downloadImages(downloadQueue, redownload);
-          cb(null, rs);
+          //downloadImages(downloadQueue, redownload);
+          console.log("Done.");
+          cb(null, response);
         });
       });
       request(url).pipe(w);
     } else {
-      cb("invalid language",language)
+      cb("invalid language",language);
     }
   };
   // Schema.inputFromURL = function(url, language, sheetNumber, redownload, cb) {

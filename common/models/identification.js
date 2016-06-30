@@ -150,11 +150,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
     var list_of_items = [];
     async.eachSeries(all_species, function(species, callback1){
-
-    //all_species.forEach(function(species){
       var identification_item = {};
-
-      identification_item.id = species.id;
+      identification_item.id = species._id;
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
         if (species.hasOwnProperty(key) && species[key] && species[key].term != "pollenShape" && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
@@ -162,49 +159,38 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           // we only want entries with classes CategoricalDescriptor or NumericalDescriptor
           // we can have multiple states
 
-          Schema.getOrder(species[key].term, function(err, order){
-            if (err) {throw new Error(err);}
+          var entry = {
+            language: species[key].language,
+            id: species[key].id,
+            order: species[key].order,
+            schema: species[key].schema,
+            class: species[key].class,
+            term: species[key].term,
+            category: species[key].category,
+            descriptor: species[key].field,
+            states: []
+          };
 
-            var entry = {
-              schema: species[key].schema,
-              class: species[key].class,
-              category: species[key].category,
-              descriptor: species[key].label,
-              id: species[key].id,
-              term: species[key].term,
-              order: order,
-              states: []
-            };
-
-            var prefix = species[key].schema + ":" + species[key].term + ":";
-            if(species[key].states){
-              console.log(species[key].states);
-              async.eachSeries(species[key].states, function(state, callback3){
-              //species[key].states.forEach(function(state){
-                //entry.states.push( prefix + state.value );
-                var id = species[key].label.toLowerCase().split(" ").join("-") + "-" + state.value.toLowerCase().split(" ").join("-");
-                // console.log("before",id);
-                id = state.id;
-                console.log("after",id);
-                Schema.getOrder(id, function(err, state_order){
-                  if (err) throw Error(err);
-                  var entry_state = {value:prefix + state.value, order:state_order, id:state.id};
-                  if (state.numerical)
-                    entry_state.numerical = state.numerical;
-                  entry.states.push(entry_state );
-                  callback3();
-                });
-              }, function(err){
-                if (err) throw new Error(err);
-                identification_item["states"].push(entry);
-                callback2();
-              });
-            } else {
+          var prefix = species[key].schema + ":" + species[key].term + ":";
+          if(species[key].states){
+            console.log(species[key].states);
+            async.eachSeries(species[key].states, function(state, callback3){
+              var id = state.id;
+              var entry_state = {value:prefix + state.value, order:state.order, id:state.id};
+              if (state.numerical)
+                entry_state.numerical = state.numerical;
+              entry.states.push(entry_state );
+              callback3();
+            }, function(err){
+              if (err) throw new Error(err);
               identification_item["states"].push(entry);
               callback2();
-            }
+            });
+          } else {
+            identification_item["states"].push(entry);
+            callback2();
+          }
 
-          });
         } else callback2();
       }, function(err){
         if (err) throw new Error(err);

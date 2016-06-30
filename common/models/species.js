@@ -88,7 +88,7 @@ module.exports = function(Species) {
         // TODO multiple specimens with different popular names
         species[language+":dwc:Taxon:vernacularName"] = specimens[0][":dwc:Taxon:vernacularName"];
 
-        species[language+":dwc:Taxon:establishmentMean"] = specimens[0][language+":dwc:establishmentMean"];
+        species[language+":dwc:Taxon:establishmentMean"] = specimens[0][language+":dwc:Occurrence:establishmentMean"];
         species[language+":rcpol:Sample:floweringPeriod"] = specimens[0][language+":rcpol:Sample:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
         species[language+":rcpol:Image:plantImage"] = specimens[0][language+":rcpol:Image:plantImage"];
         species[language+":rcpol:Image:flowerImage"] = specimens[0][language+":rcpol:Image:flowerImage"];
@@ -107,16 +107,17 @@ module.exports = function(Species) {
                 }
               } else if(sp[key].class=="NumericalDescriptor"){
                 if(!species[key]){
-                    species[key] = sp[key];
-                    species[key].states = [];
-                  if(species[key].min == undefined){
+                  var values = sp[key].value.split(";");
+                  if(values.length != 4){
                     console.log("problema com valor numerico:");
+                    console.log(key);
                     console.log(species[key]);
                   }
-                  var min = parseFloat(species[key].min.replace(",","."));
-                  var max = parseFloat(species[key].max.replace(",","."));
-                  var state = {};
-                  state.numerical = {min: min, max: max};
+                  species[key] = sp[key];
+                  species[key].state = {min: values[0].trim().slice(4), max: values[1].trim().slice(4)};
+                  var min = parseFloat(species[key].state.min.replace(",","."));
+                  var max = parseFloat(species[key].state.max.replace(",","."));
+                  species[key].state.numerical = {min: min, max: max};
                 }
               }
             }

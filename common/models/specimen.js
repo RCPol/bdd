@@ -29,10 +29,10 @@ module.exports = function(Specimen) {
       // var category = data[3];
       var label = data[4];
       data =  data.slice(5,data.length);
-      var rs = {};
-      rs.count = 0;
+      var response = {};
+      response.count = 0;
       async.each(data, function iterator(line, callback){
-        rs.count ++;
+        response.count ++;
         async.parallel([
           function(callbackSave) {
             saveRecord(language,"en-US",line, schema, class_, terms, function() {
@@ -59,7 +59,7 @@ module.exports = function(Specimen) {
           console.log(logs[key]);
         }
 
-        cb(null, rs);
+        cb(null, response);
       });
     });
     request(url).pipe(w);
@@ -70,10 +70,9 @@ module.exports = function(Specimen) {
     var record = {};
     record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]);
     if(record.id){
-      // rs.count ++;
       async.each(terms, function(term, callbackCell){
         c++;
-        if(term){
+        if(term && toString(line[c]) != ""){
           var schemaId = Specimen.app.defineSchemaID(language,schema[c],class_[c],terms[c]);
           record.language = language;
           record.originalLanguage = originalLanguage;
