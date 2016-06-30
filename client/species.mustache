@@ -24,7 +24,19 @@
 
 	<!-- Início: Códigos para o Mapa e Tabela -->
 	<script type="text/javascript">
+		var id = "{{id}}";
+		function setLanguage(language){
+			localStorage.language = language;
+			window.location = "/profile/species/"+localStorage.language+":"+id.split(":")[1];
+		}
 	  $(document).ready(function(){
+			if (typeof(Storage) !== "undefined") {
+					localStorage.language = localStorage.language?localStorage.language:"pt-BR";
+					if(id.split(":")[0]!=localStorage.language)
+						window.location = "/profile/species/"+localStorage.language+":"+id.split(":")[1];
+			} else {
+					alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
+			}
 		//readSpecies("{{id}}");
 	  //});
 
@@ -66,7 +78,7 @@
               window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
             });
 			//Final do Código da Tabela-Grid
-        readSpecies("{{id}}", map);
+        readSpecies(id, map);
 		});
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
@@ -82,7 +94,12 @@
 			<ul>
 				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
 				<li> <!-- inserir link para a ferramenta --> <a href="/">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
-                <li> <!-- inserir link para o glossário --> <a href="/profile/glossary">Gloss&aacute;rio</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary">Gloss&aacute;rio</a></li>
+				<li>
+					<img onclick="setLanguage('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
+					<img onclick="setLanguage('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
+					<img onclick="setLanguage('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+				</li>
 			</ul>
 		</nav>
 		<!-- Menu: fim -->
@@ -100,32 +117,32 @@
 	<article>
 
 	  <!-- Nome da espécie -->
-      <h2 class="famesp" id="familia"></h2>
-	  <h1> <i> <span id="nomeDaEspecie"></span> </i><span id="nomeDoAutor"></span></h1>
+      <h2 class="famesp" id="dwc-Taxon-family-value"></h2>
+	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
 
       <!--Nome popular-->
-	  <h2 class="popname" id="nomePopular"></h2>
+	  <h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
 
 		<!-- Início: Características da Planta -->
 	  <div class="info-planta">
             <h2>Caracter&iacute;sticas da Planta:</h2>
-		    <p><b>H&aacute;bito:</b> <span id="habito"></span> </p>
-			<p><b>Origem:</b> <span id="origem"></span></p>
-			<p><b>Per&iacute;odo de Flora&ccedil;&atilde;o:</b> <span id="periodoDeFloracao"></span></p>
+		    <p><b><span id="rcpol-CategoricalDescriptor-habit-label"></span></b> <span id="rcpol-CategoricalDescriptor-habit-value"></span> </p>
+			<p><b><span id="dwc-Occurrence-establishmentMean-label"></span></b> <span id="dwc-Occurrence-establishmentMean-value"></span></p>
+			<p><b><span id="rcpol-Sample-floweringPeriod-label"></span></b> <span id="rcpol-Sample-floweringPeriod-value"></span></p>
 
 			<h2>Caracter&iacute;sticas da Flor:</h2>
 
-			<p><b>S&iacute;ndrome de poliniza&ccedil;&atilde;o:</b> <span id="sindromeDePolinizacao"></span></p>
-			<p><b>Unidade de atra&ccedil;&atilde;o:</b> <span id="unidadeDeAtracao"></span></p>
-			<p><b>Sexualidade:</b> <span id="sexualidade"></span></p>
-			<p><b>Tamanho da flor:</b> <span id="tamanhoDaFlor"></span></p>
-			<p><b>Forma:</b> <span id="forma"></span></p>
-			<p><b>Simetria:</b> <span id="simetria"></span></p>
-			<p><b>Cor da flor:</b> <span id="corDaFlor"></span></p>
-			<p><b>Antese:</b> <span id="antese"></span></p>
-			<p><b>Deisc&ecirc;ncia da antera:</b> <span id="deiscenciaDaAntera"></span></p>
-			<p><b>Odor:</b> <span id="odor"></span></p>
-			<p><b>Tipo de recurso floral:</b> <span id="tipoDeRecursoFloral"></span> </p>
+			<p><b><span id="rcpol-CategoricalDescriptor-pollinationSyndrome-label"/></b> <span id="rcpol-CategoricalDescriptor-pollinationSyndrome-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-attractionUnit-label"/></b> <span id="rcpol-CategoricalDescriptor-attractionUnit-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-flowerSexuality-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSexuality-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-flowerSize-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSize-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-flowerForm-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerForm-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-flowerSymmetry-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSymmetry-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-flowerColor-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerColor-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-flowerOpeningTime-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerOpeningTime-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-antherDehiscence-label"/></b> <span id="rcpol-CategoricalDescriptor-antherDehiscence-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-odorPresence-label"/></b> <span id="rcpol-CategoricalDescriptor-odorPresence-value"/></p>
+			<p><b><span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-label"/></b> <span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-value"/></p>
 
 		</div>
 		<!-- Final: Características da Planta -->
@@ -147,7 +164,26 @@
 
 			<h2>Descri&ccedil;&atilde;o pol&iacute;nica:</h2>
 
-            <p><span id="unidadeDeDispersaoDoPolen"></span><span id="tamanhoDoPolen"></span><span id="pollenDiameter"><span id="largerPollenDiameter"></span><span id="smallerPollenDiameter"></span></span><span id="polarAxis"></span><span id="equatorialAxis"></span><span id="simetriaDoPolen"></span><span id="polaridadeDoPolen"></span><span id="ambitoDoPolen"></span><span id="formaDoPolen"></span><span id="formaDoPolenPE"></span><span id="tipoDeAberturaDoPolen" class="tipoDeAberturaDoPolen"></span><span id="caracteristicaDoColpo"></span><span id="caracteristicaDoPoro"></span><span id="espexi"></span><span id="ornamentacaoDaExina"></span></p>
+            <p>
+							<p><b><span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-value"></span>
+							<span id="tamanhoDoPolen"></span>
+							<span id="pollenDiameter">
+								<span id="largerPollenDiameter"></span>
+								<span id="smallerPollenDiameter"></span>
+							</span>
+							<span id="polarAxis"></span>
+							<span id="equatorialAxis"></span>
+							<p><b><span id="rcpol-CategoricalDescriptor-pollenSymmetry-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenSymmetry-value"></span>
+							<p><b><span id="rcpol-CategoricalDescriptor-pollenPolarity-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenPolarity-value"></span>
+							<p><b><span id="rcpol-CategoricalDescriptor-pollenAmbit-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenAmbit-value"></span>
+							<span id="formaDoPolen"></span>
+							<span id="formaDoPolenPE"></span>
+							<span id="tipoDeAberturaDoPolen" class="tipoDeAberturaDoPolen"></span>
+							<span id="caracteristicaDoColpo"></span>
+							<span id="caracteristicaDoPoro"></span>
+							<span id="espexi"></span>
+							<p><b><span id="rcpol-CategoricalDescriptor-exineOrnamentation-label"/></b> <span id="rcpol:CategoricalDescriptor-exineOrnamentation-value"></span>
+						</p>
 
 		</div>
 		<!-- Final: Descrição Polínica -->

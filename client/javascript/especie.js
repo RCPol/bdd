@@ -1,125 +1,133 @@
 function readSpecies(id, map){
+  var lang = localStorage.language?localStorage.language:"pt-BR";
   $.getJSON("/api/Species/"+id, function(data){
+    console.log(data);
     // titulo
-    var name = data["dwc:scientificName"].value + " " + data["dwc:scientificNameAuthorship"].value;
+    var name = data[lang+":dwc:Taxon:scientificName"].value + " " + data[lang+":dwc:Taxon:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
 
-    // nome da espécie
-    $("#familia").append(data["dwc:family"].value);
-    $("#nomeDaEspecie").append(data["dwc:scientificName"].value);
-    $("#nomeDoAutor").append(data["dwc:scientificNameAuthorship"].value);
-    if (data["dwc:vernacularName"])
-      $("#nomePopular").append(data["dwc:vernacularName"].value);
+    Object.keys(data).forEach(function(key) {
+      var parsedId = key.split(":");
+      if(parsedId.length==4 && parsedId[2]!="NumericalDescriptor"){
+        var schema = parsedId[1];
+        var class_ = parsedId[2];
+        var term = parsedId[3];
+        var base = schema+"-"+class_+"-"+term;
 
-    escreverEstados("#habito", data["rcpol:habit"]);
-
-    if (data["dwc:establishmentMean"])
-      $("#origem").append(data["dwc:establishmentMean"].value);
-
-    if (data["rcpol:floweringPeriod"])
-      $("#periodoDeFloracao").append(data["rcpol:floweringPeriod"].months.join(', '));
-
-    // caracteristicas da flor
-    escreverEstados("#sindromeDePolinizacao", data["rcpol:pollinationSyndrome"]);
-    escreverEstados("#unidadeDeAtracao", data["rcpol:attractionUnit"]);
-    escreverEstados("#sexualidade", data["rcpol:flowerSexuality"]);
-    escreverEstados("#tamanhoDaFlor", data["rcpol:flowerSize"]);
-    escreverEstados("#forma", data["rcpol:flowerForm"]);
-    escreverEstados("#simetria", data["rcpol:flowerSymmetry"]);
-    escreverEstados("#corDaFlor", data["rcpol:flowerColor"]);
-    escreverEstados("#antese", data["rcpol:flowerOpeningTime"]);
-    escreverEstados("#deiscenciaDaAntera", data["rcpol:antherDehiscence"]);
-    escreverEstados("#odor", data["rcpol:odorPresence"]);
-    escreverEstados("#tipoDeRecursoFloral", data["rcpol:mainFloralResourceCollectedByVisitors"]);
-
-    // imagens da planta
-    if(!(Array.isArray(data['dwc:associatedMedia']))) data['dwc:associatedMedia'] = [data['dwc:associatedMedia']];
-    data["dwc:associatedMedia"].forEach(function(media){
-      if (media.category != "Pólen"){
-        imagem("#foto_planta", data["dwc:associatedMedia"], media.category);
-        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+        if(data[key].value && !data[key].states && !data[key].months){
+          $("#"+base+"-value").append(data[key].value);
+        }
+        if(data[key].field){
+          $("#"+base+"-label").append(data[key].field+": ");
+        }
+        if(data[key].states){
+          data[key].states.forEach(function(state) {
+            $("#"+base+"-value").append(state.state).append(", ");
+          });
+          var aux = $("#"+base+"-value").html() || "";
+          if(aux.length>0){
+            $("#"+base+"-value").html(
+              aux.substring(0,aux.length-2)
+            );
+          }
+        }
+        if(data[key].months){
+          data[key].months.forEach(function(month) {
+            $("#"+base+"-value").append(month).append(", ");
+          });
+          var aux = $("#"+base+"-value").html() || "";
+          if(aux.length>0){
+            $("#"+base+"-value").html(
+              aux.substring(0,aux.length-2)
+            );
+          }
+        }
       }
     });
+    // TODO: Error?
+    // if (data[lang+":dwc:Occurrence:establishmentMean"])
+    //   $("#origem").append(data[lang+":dwc:Occurrence:establishmentMean"].value);
+
+    // TODO: imagens da planta
+    // if(!(Array.isArray(data[lang+':dwc:Image:associatedMedia']))) data[lang+':dwc:Image:associatedMedia'] = [data[lang+':dwc:Image:associatedMedia']];
+    // data[lang+":dwc:Image:associatedMedia"].forEach(function(media){
+    //   if (media.category != "Pólen"){
+    //     imagem("#foto_planta", data[lang+":dwc:Image:associatedMedia"], media.category);
+    //     $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+    //   }
+    // });
     $(".fotorama").fotorama();
+    //
+    // TODO: Tratamento de valores númericos nas descrição polínica e cometários/detalhes extra
+    // if (data[lang+":rcpol:CategoricalDescriptor:pollenDiameter"])
+    //   escreverEstados("#tamanhoDoPolen", data[lang+":rcpol:State:pollenDiameter"], true);
+    // else if (data[lang+:"rcpol:State:smallerPollenDiameter"] && data[lang+":rcpol:State:largerPollenDiameter"])
+    //   $("#tamanhoDoPolen").append("tamanho do pólen maior: ", data[lang+":rcpol:State:smallerPollenDiameter"].value, ", tamanho do pólen menor: ", data["rcpol:largerPollenDiameter"].value);
+    //
+    // if (data[lang+":rcpol:NumericalDescriptor:pollenDiameter"]){
+    //   var d = data[lang+":rcpol:NumericalDescriptor:pollenDiameter"];
+    //   $("#pollenDiameter").append("D = " +d.mean + " ± " + d.sd + " (" + d.min + " - " + d.max + "), " );
+    // }
+    //
+    // if (data[lang+":rcpol:NumericalDescriptor:smallerPollenDiameter"]){
+    //   var smalld = data[lang+":rcpol:NumericalDescriptor:smallerPollenDiameter"];
+    //   $("#smallerPollenDiameter").append("Dmenor = " +smalld.mean + " ± " + smalld.sd + " (" + smalld.min + " - " + smalld.max + "), " );
+    // }
+    //
+    // if (data["rcpol:largerPollenDiameter"]){
+    //   var larged = data["rcpol:largerPollenDiameter"];
+    //   $("#largerPollenDiameter").append("Dmaior = " +larged.mean + " ± " + larged.sd + " (" + larged.min + " - " + larged.max + "), " );
+    // }
+    //
+    // if (data["rcpol:polarAxis"]){
+    //   var p = data["rcpol:polarAxis"];
+    //   $("#polarAxis").append("P = " +p.mean + " ± " + p.sd + " (" + p.min + " - " + p.max + "), " );
+    // }
+    //
+    // if (data["rcpol:equatorialAxis"]){
+    //   var e = data["rcpol:equatorialAxis"];
+    //   $("#equatorialAxis").append("E = " + e.mean + " ± " + e.sd + " (" + e.min + " - " + e.max + "), " );
+    // }
+    // escreverEstados("#formaDoPolen", data[lang+":rcpol:pollenShape"], true);
+    // if(data["rcpol:pollenShapePE"]){
+    //   var p_e = data[lang+":rcpol:pollenShapePE"];
+    //   $("#formaDoPolenPE").append("P/E = " + p_e.mean + " ± " + p_e.sd + " (" + p_e.min + " - " + p_e.max + "). " );
+    //   escreverEstados("#tipoDeAberturaDoPolen", data[lang+":rcpol:pollenAperture"], true); //letra maiuscula
+    // } else {
+    //   escreverEstados("#tipoDeAberturaDoPolen", data[lang+":rcpol:pollenAperture"], true); //letra minuscula
+    //   $("#tipoDeAberturaDoPolen").addClass("tipoDeAberturaDoPolen-minusculo").removeClass("tipoDeAberturaDoPolen");
+    // }
+    //
+    // if(data["rcpol:colpeFeature"]){
+    //   if (data["rcpol:colpeFeature"].value.indexOf("ausente") == -1){
+    //     $("#caracteristicaDoColpo").append("ectoabertura do tipo colpo ");
+    //     escreverEstados("#caracteristicaDoColpo", data[lang+":rcpol:colpeFeature"], true);
+    //   } else
+    //     $("#caracteristicaDoColpo").append("ectoabertura ausente, ");
+    // }
+    //
+    // if (data["rcpol:poreFeature"]){
+    //   $("#caracteristicaDoPoro").append("endoabertura ");
+    //   escreverEstados("#caracteristicaDoPoro", data[lang+":rcpol:poreFeature"]);
+    //   //$("#caracteristicaDoPoro").append(" (Figuras C-D). ");
+    // }
+    //
+    // if (data[lang+":rcpol:espexi"]){
+    //   var espexi = data[lang+":rcpol:espexi"];
+    //   $("#espexi").append(". Exina de espessura " + espexi.mean + " ± " + espexi.sd + " (" + espexi.min + " - " + espexi.max + "), " );
+    // }
+    //
+    // $("#ornamentacaoDaExina").append("superficie ");
+    // escreverEstados("#ornamentacaoDaExina", data[lang+":rcpol:exineOrnamentation"]);
+    // //$("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
+    // $("#ornamentacaoDaExina").append(".");
 
-    // Descrição Polínica
-    escreverEstados("#unidadeDeDispersaoDoPolen", data["rcpol:pollenDispersalUnit"], true);
-
-    if (data["rcpol:pollenDiameter"])
-      escreverEstados("#tamanhoDoPolen", data["rcpol:pollenDiameter"], true);
-    else if (data["rcpol:smallerPollenDiameter"] && data["rcpol:largerPollenDiameter"])
-      $("#tamanhoDoPolen").append("tamanho do pólen maior: ", data["rcpol:smallerPollenDiameter"].value, ", tamanho do pólen menor: ", data["rcpol:largerPollenDiameter"].value);
-
-    if (data["rcpol:pollenDiameter"]){
-      var d = data["rcpol:pollenDiameter"];
-      $("#pollenDiameter").append("D = " +d.mean + " ± " + d.sd + " (" + d.min + " - " + d.max + "), " );
-    }
-
-    if (data["rcpol:smallerPollenDiameter"]){
-      var smalld = data["rcpol:smallerPollenDiameter"];
-      $("#smallerPollenDiameter").append("Dmenor = " +smalld.mean + " ± " + smalld.sd + " (" + smalld.min + " - " + smalld.max + "), " );
-    }
-
-    if (data["rcpol:largerPollenDiameter"]){
-      var larged = data["rcpol:largerPollenDiameter"];
-      $("#largerPollenDiameter").append("Dmaior = " +larged.mean + " ± " + larged.sd + " (" + larged.min + " - " + larged.max + "), " );
-    }
-
-    if (data["rcpol:polarAxis"]){
-      var p = data["rcpol:polarAxis"];
-      $("#polarAxis").append("P = " +p.mean + " ± " + p.sd + " (" + p.min + " - " + p.max + "), " );
-    }
-
-    if (data["rcpol:equatorialAxis"]){
-      var e = data["rcpol:equatorialAxis"];
-      $("#equatorialAxis").append("E = " + e.mean + " ± " + e.sd + " (" + e.min + " - " + e.max + "), " );
-    }
-
-    escreverEstados("#simetriaDoPolen", data["rcpol:pollenSymmetry"], true);
-    escreverEstados("#polaridadeDoPolen", data["rcpol:pollenPolarity"], true);
-    $("#ambitoDoPolen").append("âmbito ");
-    escreverEstados("#ambitoDoPolen", data["rcpol:pollenAmbit"], true);
-    escreverEstados("#formaDoPolen", data["rcpol:pollenShape"], true);
-
-    if(data["rcpol:pollenShapePE"]){
-      var p_e = data["rcpol:pollenShapePE"];
-      $("#formaDoPolenPE").append("P/E = " + p_e.mean + " ± " + p_e.sd + " (" + p_e.min + " - " + p_e.max + "). " );
-      escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra maiuscula
-    } else {
-      escreverEstados("#tipoDeAberturaDoPolen", data["rcpol:pollenAperture"], true); //letra minuscula
-      $("#tipoDeAberturaDoPolen").addClass("tipoDeAberturaDoPolen-minusculo").removeClass("tipoDeAberturaDoPolen");
-    }
-
-    if(data["rcpol:colpeFeature"]){
-      if (data["rcpol:colpeFeature"].value.indexOf("ausente") == -1){
-        $("#caracteristicaDoColpo").append("ectoabertura do tipo colpo ");
-        escreverEstados("#caracteristicaDoColpo", data["rcpol:colpeFeature"], true);
-      } else
-        $("#caracteristicaDoColpo").append("ectoabertura ausente, ");
-    }
-
-    if (data["rcpol:poreFeature"]){
-      $("#caracteristicaDoPoro").append("endoabertura ");
-      escreverEstados("#caracteristicaDoPoro", data["rcpol:poreFeature"]);
-      //$("#caracteristicaDoPoro").append(" (Figuras C-D). ");
-    }
-
-    if (data["rcpol:espexi"]){
-      var espexi = data["rcpol:espexi"];
-      $("#espexi").append(". Exina de espessura " + espexi.mean + " ± " + espexi.sd + " (" + espexi.min + " - " + espexi.max + "), " );
-    }
-
-    $("#ornamentacaoDaExina").append("superficie ");
-    escreverEstados("#ornamentacaoDaExina", data["rcpol:exineOrnamentation"]);
-    //$("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
-    $("#ornamentacaoDaExina").append(".");
-
-    //imagens do polen
-    data["dwc:associatedMedia"].forEach(function(media){
-      if (media.category == "Pólen"){
-        imagem("#foto_polen", data["dwc:associatedMedia"], media.category);
-      }
-    });
+    // TODO: imagens do polen
+    // data["dwc:associatedMedia"].forEach(function(media){
+    //   if (media.category == "Pólen"){
+    //     imagem("#foto_polen", data[lang+":dwc:associatedMedia"], media.category);
+    //   }
+    // });
     $(".fotorama").fotorama();
 
     // mapa
@@ -127,7 +135,7 @@ function readSpecies(id, map){
 
     //especimes
     var specimen_ids = data.specimens.map(function(elem){return elem.id;});
-    var specimen_query = "filter[fields][dwc:decimalLatitude]=true&filter[fields][dwc:decimalLongitude]=true&filter[fields][dwc:collectionCode]=true&filter[fields][dwc:recordedBy]=true&filter[fields][dwc:municipality]=true&filter[fields][dwc:stateProvince]=true&filter[fields][id]=true&filter[where][id][inq]=" + specimen_ids[0];
+    var specimen_query = "filter[fields]["+lang+":dwc:Location:decimalLatitude]=true&filter[fields]["+lang+":dwc:Location:decimalLongitude]=true&filter[fields]["+lang+":dwc:RecordLevel:collectionCode]=true&filter[fields]["+lang+":dwc:Occurrence:recordedBy]=true&filter[fields]["+lang+":dwc:Location:municipality]=true&filter[fields]["+lang+":dwc:Location:stateProvince]=true&filter[fields][id]=true&filter[where][id][inq]=" + specimen_ids[0];
     specimen_ids.forEach(function(id){
       specimen_query += "&filter[where][id][inq]=" + id;
     });
@@ -135,38 +143,23 @@ function readSpecies(id, map){
     $.getJSON("/api/Specimens?" + specimen_query, function(specimens){
       specimens.forEach(function(specimen, id){
         // mapa
-        var p = [specimen["dwc:decimalLatitude"].value, specimen["dwc:decimalLongitude"].value];
+        var p = [specimen[lang+":dwc:Location:decimalLatitude"].value, specimen[lang+":dwc:Location:decimalLongitude"].value];
                 console.log(p);
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
 
         // especimes
         var palinoteca = "";
-        if (!(Array.isArray(specimen["dwc:collectionCode"]))) specimen["dwc:collectionCode"] = [specimen["dwc:collectionCode"]];
-        specimen["dwc:collectionCode"].forEach(function(c_code){
+        if (!(Array.isArray(specimen[lang+":dwc:RecordLevel:collectionCode"]))) specimen[lang+":dwc:RecordLevel:collectionCode"] = [specimen[lang+":dwc:RecordLevel:collectionCode"]];
+        specimen[lang+":dwc:RecordLevel:collectionCode"].forEach(function(c_code){
           if(c_code.label == "Código da Palinoteca")
             palinoteca = c_code.value;
         });
-        w2ui['grid'].add({recid: id, species: name, palinoteca: palinoteca, tipo: specimen["dwc:recordedBy"].value, cidade: specimen["dwc:municipality"].value + " - " + specimen["dwc:stateProvince"].value, specimen_id: specimen.id});
+        w2ui['grid'].add({recid: id, species: name, palinoteca: palinoteca, tipo: specimen[lang+":dwc:Occurrence:recordedBy"].value, cidade: specimen[lang+":dwc:Location:municipality"].value + " - " + specimen[lang+":dwc:Location:stateProvince"].value, specimen_id: specimen.id});
       });
     });
 
   });
 };
-
-function escreverEstados(seletor, descritor, adicionarVirgula){
-  // adicionar separador ","...
-  if(descritor && descritor.hasOwnProperty("states")){
-    var estados = descritor.states;
-    if (estados.length > 1){
-      $(seletor).append(estados.map(function(estado){ return estado.value; }).join(", "));
-    }
-    else
-      $(seletor).append(estados[0].value);
-    if (adicionarVirgula)
-      $(seletor).append(", ");
-  }
-}
-
 function imagem(nicho, descritor, categoria){
   if(descritor.length > 0){
     descritor.forEach(function(img_object){
@@ -180,3 +173,18 @@ function imagem(nicho, descritor, categoria){
     }
   }
 }
+
+// function escreverEstados(seletor, descritor, adicionarVirgula){
+//   // adicionar separador ","...
+//   if(descritor && descritor.hasOwnProperty("states")){
+//     var estados = descritor.states;
+//     if (estados.length > 1){
+//
+//       $(seletor).append(estados.map(function(estado){ return estado.state; }).join(", "));
+//     }
+//     else
+//       $(seletor).append(estados[0].state);
+//     if (adicionarVirgula)
+//       $(seletor).append(", ");
+//   }
+// }
