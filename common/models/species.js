@@ -108,16 +108,17 @@ module.exports = function(Species) {
               } else if(sp[key].class=="NumericalDescriptor"){
                 if(!species[key]){
                   var values = sp[key].value.split(";");
+                  species[key] = sp[key];
                   if(values.length != 4){
                     console.log("problema com valor numerico:");
                     console.log(key);
                     console.log(species[key]);
+                  } else {
+                    species[key].state = {min: values[0].trim().slice(4), max: values[1].trim().slice(4)};
+                    var min = parseFloat(species[key].state.min.replace(",","."));
+                    var max = parseFloat(species[key].state.max.replace(",","."));
+                    species[key].state.numerical = {min: min, max: max};
                   }
-                  species[key] = sp[key];
-                  species[key].state = {min: values[0].trim().slice(4), max: values[1].trim().slice(4)};
-                  var min = parseFloat(species[key].state.min.replace(",","."));
-                  var max = parseFloat(species[key].state.max.replace(",","."));
-                  species[key].state.numerical = {min: min, max: max};
                 }
               }
             }

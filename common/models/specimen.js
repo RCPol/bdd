@@ -91,8 +91,7 @@ module.exports = function(Specimen) {
                   async.each(value.split("|"), function(sValue, callbackState) {
                     var stateValue = titleCase(sValue.trim());
                     if(language==originalLanguage){
-                      if(stateValue.length>0 && stateValue.charAt(0).toLowerCase()==stateValue.charAt(0))
-                        console.log("BEFORE: ",stateValue);
+                    //  SAME LANGUAGE
                       if(stateValue.length>0){
                         Schema.findOne({where:{language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
                           if(state){
@@ -107,23 +106,24 @@ module.exports = function(Specimen) {
                         callbackState();
                       }
                     } else {
+                    // DIFFERENT LANGUAGES
                       var schemaIdOriginal = Specimen.app.defineSchemaID(originalLanguage,schema.schema,schema.class,schema.term);
                       Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {
                         if(schemaOriginal){
                           Schema.findOne({where:{language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
-
                             if(state){
-                                Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
-                                  if(translatedState){
-                                    record[schema.id].states.push(translatedState.toJSON());
-                                  } else{
-                                    logs[hash.MD5("STATE NOT FOUND "+"Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
-                                  }
-                                });
+                              Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
+                                if(translatedState){
+                                  record[schema.id].states.push(translatedState.toJSON());
+                                } else{
+                                  logs[hash.MD5("STATE NOT FOUND "+"Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
+                                }
+                                callbackState();
+                              });
                             } else {
                               logs[hash.MD5("STATE NOT FOUND Field: "+schemaOriginal.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schemaOriginal.field+"\tState: "+stateValue;
+                              callbackState();
                             }
-                            callbackState();
                           });
                         } else {
                           console.log("NOT FOUND: ",schemaIdOriginal);
