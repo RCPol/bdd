@@ -151,7 +151,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
     var list_of_items = [];
     async.eachSeries(all_species, function(species, callback1){
       var identification_item = {};
-      identification_item.id = species._id;
+      identification_item.id = species.id;
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
         if (species.hasOwnProperty(key) && species[key] && species[key].term != "pollenShape" && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
@@ -171,12 +171,9 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             states: []
           };
 
-          var prefix = species[key].schema + ":" + species[key].term + ":";
           if(species[key].states){
-            console.log(species[key].states);
             async.eachSeries(species[key].states, function(state, callback3){
-              var id = state.id;
-              var entry_state = {value:prefix + state.value, order:state.order, id:state.id};
+              var entry_state = {value:state.state, order:state.order, id:state.id};
               if (state.numerical)
                 entry_state.numerical = state.numerical;
               entry.states.push(entry_state );
