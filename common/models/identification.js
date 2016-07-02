@@ -1,7 +1,5 @@
-//var hash = require('object-hash');
 var _ = require('underscore');
 var async = require('async');
-//var mad = require('mongo-aggregation-debugger')(); //FOR DEBUGGING THE AGGREGATION
 
 module.exports = function(Identification) {
   Identification.populate = function(filter, callback){
@@ -15,58 +13,20 @@ module.exports = function(Identification) {
   };
 
   Identification.identify = function(param, callback) {
-    //examples
-    //param = [{state:'schema:term:state'}];
     //TODO: validate query
-    //param = [ {descriptor: 'rcpol:equatorialAxis', value: 20.00}, {state:'rcpol:flowerColor:lilás'} ];
+    //examples
+    //{language:pt-BR, states:[{states.states.id:pt-BR:rcpol:State:flowerColorPurple}], numerical: []}
+    //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":"5.0"}]}
+
 
     console.log("received parameters:");
     console.log(param);
 
     composeQuery(param, function(query, queryMongo){
-      console.log(JSON.stringify(query));
       console.log(JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
-
-        //FOR DEBUGGING THE AGGREGATION
-         /*Identification.find(function(err, id_items){
-
-           mad.log(id_items, [
-            { $unwind: '$states'},
-            { $unwind: '$states.states'},
-            { $project: {
-              _id: 0,
-              'descriptor': '$states.descriptor',
-              'id': '$states.id',
-              'state': '$states.states'
-            }},
-            { $group: {
-              _id: { descriptor: '$descriptor', id: '$id', state: '$state'},
-              sum: {$sum:1}
-            }},
-            { $project: {
-              _id: 0,
-              descriptor: '$_id.descriptor',
-              id: '$_id.id',
-              state: '$_id.state',
-              count: '$sum'
-            }},
-            { $group: {
-              _id: { descriptor: '$descriptor', id: '$id'},
-              states: {$push: {state: '$state', count: '$count'}}
-            }},
-            { $project:{
-              _id: 0,
-              descriptor: '$_id.descriptor',
-              id: '$_id.id',
-              states: '$states'
-            }}
-          ], function(err){
-            if(err) throw new Error(err);
-          });
-        });*/
 
         IdentificationCollection.aggregate([
           { $match: queryMongo},
@@ -137,8 +97,7 @@ module.exports = function(Identification) {
     'identify',
     {
       http: {verb:'get'},
-      //accepts: {arg: 'param', type: 'array'},
-      accepts: {arg: 'param', type: 'array'},
+      accepts: {arg: 'param', type: 'object'},
       returns: {arg: 'response', type: 'object'}
     }
   );
@@ -210,45 +169,14 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 };
 
 function composeQuery(param, callback){
-  /*
-   param: [{state:"schema:term1:state1"}, {state:"schema:term1:state2"}, {state:"schema:term2:state3"}]
+  var categorical_param = param.states;
+  var numerical_param = param.numerical;
+  var lang = param.language;;
 
-   for mongoDB
+  var param_grouped_by_descriptor = _.groupBy(categorical_param, function(elem){ return elem["states.states.id"]; });
 
-   query: {$and :[
-        {$or: [{"states.descritor": "term1", "states.states": "schema:term1:state1"}, {"states.descritor": "term1", "states.states": "schema:term1:state2"}]},
-        {$or: [{"states.descritor": "term2", "states.states": "schema:term2:state3"}]}
-   ]}
+  if (categorical_param.length == 0 && numerical_param.length == 0) callback({"states.language": lang}, {"states.language": lang});
 
-   for loopback
-
-   query: {and :[
-        {or: [{"states.descritor": "term1", "states.states": "schema:term1:state1"}, {"states.descritor": "term1", "states.states": "schema:term1:state2"}]},
-        {or: [{"states.descritor": "term2", "states.states": "schema:term2:state3"}]}
-   ]}
-
-   if numerical
-
-   db.Identification.find({states: {"$elemMatch": {"term": "equatorialAxis", "states.numerical.min": {"$lt": 20}, "states.numerical.max": {"$gt": 20}}}}).pretty()
-
-   */
-  var categorical_param = [];
-  var numerical_param = [];
-  //append "states." to each field
-  param.forEach(function(elem){
-    if (!elem.hasOwnProperty("value")) { //categorical descriptors
-      categorical_param.push({
-        "states.term": elem.state.split(":")[1],
-        "states.states.value": elem.state
-      });
-    } else { //numerical descriptors
-      numerical_param.push(elem);
-    }
-  });
-
-  var param_grouped_by_descriptor = _.groupBy(categorical_param, function(elem){ return elem["states.term"]; });
-
-  if (param.length == 0) callback({}, {});
   else {
     var query = {and: []};
     var queryMongo = {$and: []};
@@ -260,13 +188,13 @@ function composeQuery(param, callback){
     numerical_param.forEach(function(elem){
       query.and.push(
         {"states": {"elemMatch":
-                    {"term": elem.descriptor.split(":")[1],
+                    {"id": elem.descriptor_id,
                      "states.numerical.min": {lt: elem.value},
                      "states.numerical.max": {gt: elem.value}
                     }}});
       queryMongo.$and.push(
         {"states": {"$elemMatch":
-                    {"term": elem.descriptor.split(":")[1],
+                    {"id": elem.descriptor_id,
                      "states.numerical.min": {$lt: elem.value},
                      "states.numerical.max": {$gt: elem.value}
                     }}});
