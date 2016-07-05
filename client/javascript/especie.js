@@ -5,27 +5,28 @@ function readSpecies(id, map){
     // titulo
     var name = data[lang+":dwc:Taxon:scientificName"].value + " " + data[lang+":dwc:Taxon:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
-
     Object.keys(data).forEach(function(key) {
       var parsedId = key.split(":");
-      if(parsedId.length==4 && parsedId[2]!="NumericalDescriptor"){
-        var schema = parsedId[1];
-        var class_ = parsedId[2];
-        var term = parsedId[3];
-        var base = schema+"-"+class_+"-"+term;
-
+      var schema = parsedId.length==4?parsedId[1]:"";
+      var class_ = parsedId.length==4?parsedId[2]:"";
+      var term = parsedId.length==4?parsedId[3]:"";
+      var base = schema+"-"+class_+"-"+term;
+      if(parsedId.length==4 && class_!="NumericalDescriptor"){
         if(data[key].value && !data[key].states && !data[key].months){
-          $("#"+base+"-value").append(data[key].value);
-        }
-        if(data[key].field){
           $("#"+base+"-label").append(data[key].field+": ");
+          $("#"+base+"-value").append(data[key].value);
         }
         if(data[key].states){
           data[key].states.forEach(function(state) {
             $("#"+base+"-value").append(state.state).append(", ");
+            if(data[key].term == "exineOrnamentation"){
+              console.log("#"+base+"-value");
+              console.log(state.state);
+            }
           });
           var aux = $("#"+base+"-value").html() || "";
           if(aux.length>0){
+            $("#"+base+"-label").append(data[key].field+": ");
             $("#"+base+"-value").html(
               aux.substring(0,aux.length-2)
             );
@@ -37,27 +38,50 @@ function readSpecies(id, map){
           });
           var aux = $("#"+base+"-value").html() || "";
           if(aux.length>0){
+            $("#"+base+"-label").append(data[key].field+": ");
             $("#"+base+"-value").html(
               aux.substring(0,aux.length-2)
             );
           }
         }
+      } else if(class_=="NumericalDescriptor"){
+        if(data[key].field && data[key].state && data[key].state.numerical && data[key].state.numerical.min && data[key].state.numerical.max){
+          if(data[key].term == "pollenShapePE"){
+            var pos = data[key].field.toLowerCase().indexOf("p/e");
+            var before = data[key].field.substring(0,pos);
+            var after = data[key].field.substring(pos+3,data[key].field.length);
+            var aux = before+"P/E"+after;
+            $("#"+base+"-label").append(aux+": ");
+          } else
+            $("#"+base+"-label").append(data[key].field+": ");
+          $("#"+base+"-value").append("Min: "+data[key].state.numerical.min+" / Max: "+data[key].state.numerical.max +
+          (data[key].state.numerical.med?" / Avg: "+data[key].state.numerical.avg:"")+
+          (data[key].state.numerical.sd?" / SD: "+data[key].state.numerical.sd:"")
+          );
+        }
       }
     });
-    // TODO: Error?
-    // if (data[lang+":dwc:Occurrence:establishmentMean"])
-    //   $("#origem").append(data[lang+":dwc:Occurrence:establishmentMean"].value);
-
-    // TODO: imagens da planta
-    // if(!(Array.isArray(data[lang+':dwc:Image:associatedMedia']))) data[lang+':dwc:Image:associatedMedia'] = [data[lang+':dwc:Image:associatedMedia']];
-    // data[lang+":dwc:Image:associatedMedia"].forEach(function(media){
-    //   if (media.category != "Pólen"){
-    //     imagem("#foto_planta", data[lang+":dwc:Image:associatedMedia"], media.category);
-    //     $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
-    //   }
-    // });
+    // IMAGES
+    data[lang+':rcpol:Image:plantImage'] = !(Array.isArray(data[lang+':rcpol:Image:plantImage']))?[data[lang+':rcpol:Image:plantImage']]:data[lang+':rcpol:Image:plantImage'];
+    data[lang+":rcpol:Image:plantImage"].forEach(function(media){
+        imagem("#foto_planta", data[lang+":rcpol:Image:plantImage"]);
+        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+    });
+    data[lang+':rcpol:Image:flowerImage'] = !(Array.isArray(data[lang+':rcpol:Image:flowerImage']))?[data[lang+':rcpol:Image:flowerImage']]:data[lang+':rcpol:Image:flowerImage'];
+    data[lang+":rcpol:Image:flowerImage"].forEach(function(media){
+        imagem("#foto_planta", data[lang+":rcpol:Image:flowerImage"]);
+        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+    });
+    data[lang+':rcpol:Image:pollenImage'] = !(Array.isArray(data[lang+':rcpol:Image:pollenImage']))?[data[lang+':rcpol:Image:pollenImage']]:data[lang+':rcpol:Image:pollenImage'];
+    data[lang+":rcpol:Image:pollenImage"].forEach(function(media){
+        imagem("#foto_polen", data[lang+":rcpol:Image:pollenImage"]);
+    });
+    data[lang+':rcpol:Image:allPollenImage'] = !(Array.isArray(data[lang+':rcpol:Image:allPollenImage']))?[data[lang+':rcpol:Image:allPollenImage']]:data[lang+':rcpol:Image:allPollenImage'];
+    data[lang+":rcpol:Image:allPollenImage"].forEach(function(media){
+        imagem("#foto_polen", data[lang+":rcpol:Image:allPollenImage"]);
+    });
     $(".fotorama").fotorama();
-    //
+
     // TODO: Tratamento de valores númericos nas descrição polínica e cometários/detalhes extra
     // if (data[lang+":rcpol:CategoricalDescriptor:pollenDiameter"])
     //   escreverEstados("#tamanhoDoPolen", data[lang+":rcpol:State:pollenDiameter"], true);
@@ -122,14 +146,6 @@ function readSpecies(id, map){
     // //$("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
     // $("#ornamentacaoDaExina").append(".");
 
-    // TODO: imagens do polen
-    // data["dwc:associatedMedia"].forEach(function(media){
-    //   if (media.category == "Pólen"){
-    //     imagem("#foto_polen", data[lang+":dwc:associatedMedia"], media.category);
-    //   }
-    // });
-    $(".fotorama").fotorama();
-
     // mapa
     map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
 
@@ -160,18 +176,14 @@ function readSpecies(id, map){
 
   });
 };
-function imagem(nicho, descritor, categoria){
-  if(descritor.length > 0){
+function imagem(nicho, descritor){
     descritor.forEach(function(img_object){
-      if(img_object.category == categoria){
-        $(nicho).append("<img src='/resized_images/" + img_object.name + ".jpg'>");
-      }
+      if(img_object)
+        $(nicho).append(img_object.name
+          ?"<img src='/resized_images/" +img_object.name + ".jpg'>"
+          :"<img style='max-width:500px;' src="+ img_object.url +">");
+      // }
     });
-  } else { // se não for um array
-    if (descritor.category == categoria){
-      $(nicho).append("<img style='max-width:500px;' src="+ descritor.url +">");
-    }
-  }
 }
 
 // function escreverEstados(seletor, descritor, adicionarVirgula){

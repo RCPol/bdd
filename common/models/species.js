@@ -88,7 +88,7 @@ module.exports = function(Species) {
         // TODO multiple specimens with different popular names
         species[language+":dwc:Taxon:vernacularName"] = specimens[0][":dwc:Taxon:vernacularName"];
 
-        species[language+":dwc:Taxon:establishmentMean"] = specimens[0][language+":dwc:Occurrence:establishmentMean"];
+        species[language+":dwc:Occurrence:establishmentMean"] = specimens[0][language+":dwc:Occurrence:establishmentMean"];
         species[language+":rcpol:Sample:floweringPeriod"] = specimens[0][language+":rcpol:Sample:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
         species[language+":rcpol:Image:plantImage"] = specimens[0][language+":rcpol:Image:plantImage"];
         species[language+":rcpol:Image:flowerImage"] = specimens[0][language+":rcpol:Image:flowerImage"];
