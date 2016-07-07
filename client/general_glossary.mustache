@@ -16,8 +16,36 @@
     <script type="text/javascript" src="/javascript/glossary.js"></script>
 
 	<script type="text/javascript">
-		window.onload = function(){
 
+	var language = "pt-BR";
+	function setLanguage(language){
+		localStorage.language = language;
+		window.location = "/profile/glossary/"+language;
+	}
+		window.onload = function(){
+			if(localStorage && localStorage.language)
+				language = localStorage.language;
+			$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){
+				data.forEach(function(label) {
+					$("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
+				});
+			});
+			$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22ProfilesLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){
+				data.forEach(function(label) {
+					if(label.term == "profilesDepositedInCollection"){
+						$("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field.toLowerCase());
+					} else {
+							$("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
+					}
+				});
+			});
+			if (typeof(Storage) !== "undefined") {
+					localStorage.language = localStorage.language?localStorage.language:"pt-BR";
+					if(language!=localStorage.language)
+						window.location = "/profile/glossary/"+language;
+			} else {
+					alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
+			}
 			//Limpa texto da busca dos descritores
 			var btpglossario = document.getElementById("buscaglossario");
 
@@ -29,7 +57,7 @@
 				});
 			}
 
-          $.getJSON("/api/Schemas?filter[fields][id]=true&filter[fields][rcpol:type]=true&filter[order]=order%20asc", function(schemas){
+          $.getJSON("/api/Schemas?filter[fields][id]=true&filter[fields][rcpol:type]=true&filter[order]=order%20asc&filter[where][language]="+language, function(schemas){
             schemas.forEach(function(schema){
               writeSchema(schema);
             })
@@ -50,6 +78,11 @@
 			<ul>
 				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
 				<li> <!-- inserir link para a ferramenta --> <a href="/">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+				<li>
+					<img onclick="setLanguage('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
+					<img onclick="setLanguage('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
+					<img onclick="setLanguage('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+				</li>
 			</ul>
 		</nav>
 		<!-- Menu: fim -->

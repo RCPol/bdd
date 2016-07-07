@@ -74,7 +74,7 @@ module.exports = function(Schema) {
             callback();
           }
         }, function done(){
-          //downloadImages(downloadQueue, redownload);
+          downloadImages(downloadQueue, redownload);
           console.log("Done.");
           cb(null, response);
         });
