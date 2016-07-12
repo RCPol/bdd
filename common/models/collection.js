@@ -138,7 +138,6 @@ module.exports = function(Collection) {
         rs.count ++;
         async.parallel([
           function(callbackSave) {
-
             var helper = new CollectionHelper();
             helper.defineSchema(data[0])
                   .defineClass(data[1])
@@ -149,7 +148,7 @@ module.exports = function(Collection) {
                   .defineId("en-US",line[1],line[2])
                   .mapping().on("done",function() {
                     helper.saveRecord()
-                          .on("success",function() {                            
+                          .on("success",function() {
                             callbackSave();
                           })
                           .on("error",function(err) {

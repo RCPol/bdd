@@ -13,56 +13,56 @@ function readSpecimen(id, cb){
       var class_ = parsedId.length==4?parsedId[2]:"";
       var term = parsedId.length==4?parsedId[3]:"";
       var base = schema+"-"+class_+"-"+term;
-      if(parsedId.length==4 && class_!="NumericalDescriptor"){
-        if(data[key].value && !data[key].states && !data[key].months){
-          $("#"+base+"-label").append(data[key].field+": ");
-          $("#"+base+"-value").append(data[key].value);
-        }
-        if(data[key].states){
-          data[key].states.forEach(function(state) {
-            $("#"+base+"-value").append(state.state).append(", ");
-            if(data[key].term == "exineOrnamentation"){
-              console.log("#"+base+"-value");
-              console.log(state.state);
-            }
-          });
-          var aux = $("#"+base+"-value").html() || "";
-          if(aux.length>0){
-            $("#"+base+"-label").append(data[key].field+": ");
-            $("#"+base+"-value").html(
-              aux.substring(0,aux.length-2)
-            );
-          }
-        }
-        if(data[key].months){
-          data[key].months.forEach(function(month) {
-            $("#"+base+"-value").append(month).append(", ");
-          });
-          var aux = $("#"+base+"-value").html() || "";
-          if(aux.length>0){
-            $("#"+base+"-label").append(data[key].field+": ");
-            $("#"+base+"-value").html(
-              aux.substring(0,aux.length-2)
-            );
-          }
-        }
-      } else if(class_=="NumericalDescriptor"){
-        if(data[key].field && data[key].state && data[key].state.numerical && data[key].state.numerical.min && data[key].state.numerical.max){
-          if(data[key].term == "pollenShapePE"){
-            var pos = data[key].field.toLowerCase().indexOf("p/e");
-            var before = data[key].field.substring(0,pos);
-            var after = data[key].field.substring(pos+3,data[key].field.length);
-            var aux = before+"P/E"+after;
-            $("#"+base+"-label").append(aux+": ");
-          } else
-            $("#"+base+"-label").append(data[key].field+": ");
-          $("#"+base+"-value").append("Min: "+data[key].state.numerical.min+" / Max: "+data[key].state.numerical.max +
-          (data[key].state.numerical.med?" / Avg: "+data[key].state.numerical.avg:"")+
-          (data[key].state.numerical.sd?" / SD: "+data[key].state.numerical.sd:"")
-          );
-        }
-      }
-    });
+    //   if(parsedId.length==4 && class_!="NumericalDescriptor"){
+    //     if(data[key].value && !data[key].states && !data[key].months){
+    //       $("#"+base+"-label").append(data[key].field+": ");
+    //       $("#"+base+"-value").append(data[key].value);
+    //     }
+    //     if(data[key].states){
+    //       data[key].states.forEach(function(state) {
+    //         $("#"+base+"-value").append(state.state).append(", ");
+    //         if(data[key].term == "exineOrnamentation"){
+    //           console.log("#"+base+"-value");
+    //           console.log(state.state);
+    //         }
+    //       });
+    //       var aux = $("#"+base+"-value").html() || "";
+    //       if(aux.length>0){
+    //         $("#"+base+"-label").append(data[key].field+": ");
+    //         $("#"+base+"-value").html(
+    //           aux.substring(0,aux.length-2)
+    //         );
+    //       }
+    //     }
+    //     if(data[key].months){
+    //       data[key].months.forEach(function(month) {
+    //         $("#"+base+"-value").append(month).append(", ");
+    //       });
+    //       var aux = $("#"+base+"-value").html() || "";
+    //       if(aux.length>0){
+    //         $("#"+base+"-label").append(data[key].field+": ");
+    //         $("#"+base+"-value").html(
+    //           aux.substring(0,aux.length-2)
+    //         );
+    //       }
+    //     }
+    //   } else if(class_=="NumericalDescriptor"){
+    //     if(data[key].field && data[key].state && data[key].state.numerical && data[key].state.numerical.min && data[key].state.numerical.max){
+    //       if(data[key].term == "pollenShapePE"){
+    //         var pos = data[key].field.toLowerCase().indexOf("p/e");
+    //         var before = data[key].field.substring(0,pos);
+    //         var after = data[key].field.substring(pos+3,data[key].field.length);
+    //         var aux = before+"P/E"+after;
+    //         $("#"+base+"-label").append(aux+": ");
+    //       } else
+    //         $("#"+base+"-label").append(data[key].field+": ");
+    //       $("#"+base+"-value").append("Min: "+data[key].state.numerical.min+" / Max: "+data[key].state.numerical.max +
+    //       (data[key].state.numerical.med?" / Avg: "+data[key].state.numerical.avg:"")+
+    //       (data[key].state.numerical.sd?" / SD: "+data[key].state.numerical.sd:"")
+    //       );
+    //     }
+    //   }
+    // });
 
     // IMAGES
     data[lang+':rcpol:Image:plantImage'] = !(Array.isArray(data[lang+':rcpol:Image:plantImage']))?[data[lang+':rcpol:Image:plantImage']]:data[lang+':rcpol:Image:plantImage'];
