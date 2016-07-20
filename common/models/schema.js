@@ -286,6 +286,7 @@ module.exports = function(Schema) {
   function downloadImage(queue){
     var i = 0;
     var end = queue.length;
+    var erro = "";
     async.whilst(function(){
       return i < end;
     }, function(callback){
@@ -304,7 +305,15 @@ module.exports = function(Schema) {
             if (err) throw new Error(err);
             console.log(response.statusCode);
             fs.writeFile("client/images/"+name+".jpeg", body, 'binary', function(err){
-              if (err) throw new Error(err);
+              try{
+                if(err){
+                  erro = "Não foi possivel requisitar a imagem: " + url;
+                  console.log('Ops, um erro ocorreu!');
+                  console.log("URL: ",url);
+                }
+              }catch(err){
+                  if (err) throw new Error(err);
+              }
               i++;
               callback();
             });
@@ -313,6 +322,7 @@ module.exports = function(Schema) {
       });
     }, function(err){
       if (err) throw new Error(err);
+      console.log(erro);
       console.log("done.");
     });
   }

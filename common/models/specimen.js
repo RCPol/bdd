@@ -14,7 +14,7 @@ module.exports = function(Specimen) {
   }
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
-  Specimen.inputFromURL = function(url,language, redownload, cb) {
+  Specimen.inputFromURL = function(url,language, cb) {
     //substitui a url da imagem
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url); //define o nome da url
@@ -442,13 +442,12 @@ module.exports = function(Specimen) {
           }
         }
       });
-      downloadImage(downloadQueue);
-
+      var erro = downloadImage(downloadQueue);
       if(err){
         console.log(err);
         cb(err, "");
       }
-      cb("", "done");
+      cb(null, "done.");
     });
 
   };
@@ -600,7 +599,9 @@ module.exports = function(Specimen) {
   function isNumeric (str){
     return validator.isFloat(str);
   };
+
   function downloadImage(queue){
+    var erro;
     var i = 0;
     var end = queue.length;
     async.whilst(function(){
@@ -622,31 +623,44 @@ module.exports = function(Specimen) {
             if (err) throw new Error(err);
             console.log(response.statusCode);
             fs.writeFile("client/images/"+name+".jpg", body, 'binary', function(err){
-              if(err) {
-                console.log("URL: ",url);
-                throw new Error(err);
-              }
-              // salvar imagem
-              qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/resized_images/" + name + ".jpg", width:1500}, function(err, filename){
-                if (err) throw new Error(err);
-                i++;
-                // se é flor, salvar thumbnail tambem
-                if (term == 'flowerImage'){
-                  qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/thumbnails/" + name + ".jpg", width:100, height:100}, function(err, filename){
-                    if (err) throw new Error(err);
-                    console.log("converted to thumbnail");
+              try {
+                if(err) {
+                  console.log("URL: ",url);
+                  throw new Error(err);
+                }
+                // salvar imagem
+                qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/resized_images/" + name + ".jpg", width:1500}, function(err, filename){
+                  if(err){
+                    erro = "Não foi possivel ler a imagem: " + url;
+                    console.log('Ops, um erro ocorreu!');
+                    console.log("URL: ",url);
+                    console.log("Não foi possível ler a imagem");
+                  }
+                  i++;
+                  // se é flor, salvar thumbnail tambem
+                  if (term == 'flowerImage'){
+                    qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/thumbnails/" + name + ".jpg", width:100, height:100}, function(err, filename){
+                      if (err) throw new Error(err);
+                      console.log("converted to thumbnail");
+                      callback();
+                    });
+                  } else
                     callback();
-                  });
-                } else
-                  callback();
-              });
+                });
+              } catch(err) {
+                if (err) {
+                  throw new Error(err);
+                }
+              }
             });
           });
         }
       });
     }, function(err){
       if(err) throw new Error(err);
+      console.log(erro);
       console.log("done.");
     });
+    return erro;
   };
 };
