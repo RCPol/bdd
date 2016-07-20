@@ -7,23 +7,26 @@ module.exports = function(Schema) {
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
-  Schema.inputFromURL = function(url, language, sheetNumber, redownload, cb) {
+  Schema.inputFromURL = function(url, language, sheetNumber, cb) {
     if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
+      //definição da url
       url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-      var name = defineName(url);
+      var name = defineName(url); //nome da url
       if(name==null)
         cb("Invalid XLSX file.",null);
-      var path = __dirname +"/../../uploads/"+name+".xlsx";
-      saveDataset(name,url,path);
-      var downloadQueue = [];
+      var path = __dirname +"/../../uploads/"+name+".xlsx"; //diretorio da planilha
+      saveDataset(name,url,path); //salva dados com a url, nome e diretorio da planilha
+      //var downloadQueue = []; //vetor de imagens
 
+      //Passa o diretorio da planilha a ser lida
       var w = fs.createWriteStream(path).on("close",function (argument) {
-        var data = xlsx.parse(path)[sheetNumber || 0].data;
-        var header = data[0];
-        data =  data.slice(1,data.length);
-        var response = {};
+        var data = xlsx.parse(path)[sheetNumber || 0].data; //recebe os dados de uma planilha
+        var header = data[0]; //primeira linha da planilha
+        data =  data.slice(1,data.length); //slice = retorna a quantidade de dados
+        var response = {}; //array de resposta
         response.count = 0;
         async.each(data, function iterator(line, callback){
+          //line é o campo da tabela
           var record = {};
           record.id = Schema.app.defineSchemaID(language,line[0],line[1],line[2]);
           record.order = response.count;
@@ -50,19 +53,21 @@ module.exports = function(Schema) {
                 record.references.push(ref.trim());
               });
             }
+            //ler o campo das imagens
             if (toString(line[8]).trim().length>0) {
               record.images = [];
               toString(line[8]).trim().split("|").forEach(function (img) {
-                record.images.push(img.trim());
+                record.images.push(img.trim()); //coloca as imagens no vetor
               });
-              record.image = record.images[0];
+              record.image = record.images[0]; // so pega a primeira imagem
             }
-            record.url = "/images/" + record.id + ".jpeg";
-            if (record.image != undefined){
+            record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
+            if (record.image != undefined){ //se a imagem tiver definida
               record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-              downloadQueue.push({url:record.image, name:record.id});
+              //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
             }
             record.language = language;
+            //save record in database
             Schema.upsert(record, function(err, instance){
               if(err){
                   console.log(err);
@@ -74,7 +79,7 @@ module.exports = function(Schema) {
             callback();
           }
         }, function done(){
-          downloadImages(downloadQueue, redownload);
+          //downloadImages(downloadQueue, redownload); //download das imagens
           console.log("Done.");
           cb(null, response);
         });
@@ -248,6 +253,84 @@ module.exports = function(Schema) {
   //     cb("invalid language",language)
   //   }
   // };
+
+  //Método by Raquel
+  Schema.downloadImages = function (cb) {
+    //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
+    //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
+    //Onde a imagem vai ser salva na pasta do cliente
+    var downloadQueue = [];
+
+    Schema.find({
+      image:{$exists:true}
+    }, function(err, results) {
+      console.log(results);
+      console.log(results.length);
+      results.forEach(function (result) {
+        if(result.image != null){
+          console.log(result.image);
+          console.log(result.id);
+          downloadQueue.push({url: result.image, name: result.id});
+        }
+      });
+      downloadImage(downloadQueue);
+      if(err){
+        console.log(err);
+        cb(err, "");
+      }
+      cb("", "done");
+    });
+
+  };
+
+  function downloadImage(queue){
+    var i = 0;
+    var end = queue.length;
+    async.whilst(function(){
+      return i < end;
+    }, function(callback){
+      console.log(i + " of " + end);
+      var url = queue[i].url;
+      var name = queue[i].name;
+      var file = __dirname + "/../../client/images/" + name + ".jpeg";
+      fs.exists(file, function(exists){
+        if (exists) {
+          console.log("image alreadly exists");
+          i++;
+          callback();
+        } else {
+          console.log("making request to " + url);
+          request(url, {encoding: 'binary'}, function(err, response, body){
+            if (err) throw new Error(err);
+            console.log(response.statusCode);
+            fs.writeFile("client/images/"+name+".jpeg", body, 'binary', function(err){
+              if (err) throw new Error(err);
+              i++;
+              callback();
+            });
+          });
+        }
+      });
+    }, function(err){
+      if (err) throw new Error(err);
+      console.log("done.");
+    });
+  }
+
+  Schema.remoteMethod(
+    'downloadImages',
+    {
+      http: {path: '/downloadImages', verb: 'get'},
+      accepts: [
+       // {arg:'download'}
+       // {arg: 'download', type: 'boolean', required:true, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: true}
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+
+  //Define a imagem principal para o glossário
   Schema.mainImage = function(id, cb){
     Schema.findById(id, function(err, data){
       if (err) throw new Error(err);
@@ -288,7 +371,7 @@ module.exports = function(Schema) {
         {arg: 'url', type: 'string', required:true, description: 'link para tabela do glossário'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'},
         {arg: 'sheetNumber', type: 'number', required:false, description: 'Sheet number. Default: 0'},
-        {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
+      //  {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
     }
@@ -314,6 +397,7 @@ module.exports = function(Schema) {
     else return null;
     return name;
   }
+
   function saveDataset(name,url,path) {
     var Dataset = Schema.app.models.Dataset;
     var dataset = {};
@@ -325,37 +409,4 @@ module.exports = function(Schema) {
       console.log("Dataset saved: "+instance.id);
     });
   }
-  function downloadImages(queue, redownload){
-    var i = 0;
-    var end = queue.length;
-    async.whilst(function(){
-      return i < end;
-    }, function(callback){
-      console.log(i + " of " + end);
-      var url = queue[i].url;
-      var name = queue[i].name;
-      var file = __dirname + "/../../client/images/" + name + ".jpeg";
-      fs.exists(file, function(exists){
-        if (exists & !(redownload)) {
-          console.log("image alreadly exists");
-          i++;
-          callback();
-        } else {
-          console.log("making request to " + url);
-          request(url, {encoding: 'binary'}, function(err, response, body){
-            if (err) throw new Error(err);
-            console.log(response.statusCode);
-            fs.writeFile("client/images/"+name+".jpeg", body, 'binary', function(err){
-              if (err) throw new Error(err);
-              i++;
-              callback();
-            });
-          });
-        }
-      });
-    }, function(err){
-        if (err) throw new Error(err);
-        console.log("done.");
-      });
-    }
 };

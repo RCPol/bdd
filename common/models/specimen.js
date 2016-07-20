@@ -12,48 +12,60 @@ module.exports = function(Specimen) {
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
-  var downloadQueue = [];
+ // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
+  //função que recebe a planilha
   Specimen.inputFromURL = function(url,language, redownload, cb) {
+    //substitui a url da imagem
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-    var name = defineName(url);
+    var name = defineName(url); //define o nome da url
     if(name==null)
     cb("Invalid XLSX file.",null);
-    var path = __dirname +"/../../uploads/"+name+".xlsx";
-    saveDataset(name,url,path);
-
+    var path = __dirname +"/../../uploads/"+name+".xlsx"; //define o caminho do arquivo
+    saveDataset(name,url,path); //salva os dados
+    //ler o arquivo da planilha
     var w = fs.createWriteStream(path).on("close",function (argument) {
-      var data = xlsx.parse(path)[0].data;
-      var schema = data[0];
-      var class_ = data[1];
-      var terms = data[2];
+      var data = xlsx.parse(path)[0].data; //recebe os dados
+      var schema = data[0]; //define o schema
+      var class_ = data[1]; //define a classe
+      var terms = data[2]; //define o termo
       // var category = data[3];
-      var label = data[4];
-      data =  data.slice(5,data.length);
-      var response = {};
+      var label = data[4]; //define o rotulo
+      data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha
+      var response = {}; //resposta de execução
       response.count = 0;
-      async.each(data, function iterator(line, callback){
+      async.each(data, function iterator(line, callback){ //para cada linha lida salve os dados
         response.count ++;
-        async.parallel([
+        async.series([
           function(callbackSave) {
+            console.log("start en-US");
+            //para salvar em  inglês
             saveRecord(language,"en-US",line, schema, class_, terms, function() {
+              console.log("finish en-US");
               callbackSave();
             });
           },
           function(callbackSave) {
+            console.log("start pt-BR");
+            //para salvar em português
             saveRecord(language,"pt-BR",line, schema, class_, terms, function() {
+              console.log("finish pt-BR");
               callbackSave();
             });
           },
           function(callbackSave) {
+            console.log("start es-ES");
+            //para salvar em espanhol
             saveRecord(language,"es-ES",line, schema, class_, terms, function() {
+              console.log("finish es-ES");
               callbackSave();
             });
           }
         ],function done() {
-          callback();
+          callback(); //retorno da função
         });
       }, function done(){
-        downloadImages(downloadQueue, redownload);
+        //executa o download das imagens
+       // downloadImages(downloadQueue, redownload);
         console.log("Done.");
         for (var key in logs) {
           console.log(logs[key]);
@@ -65,24 +77,26 @@ module.exports = function(Specimen) {
     request(url).pipe(w);
   };
   function saveRecord(originalLanguage,language,line, schema, class_, terms, callback) {
-    var Schema = Specimen.app.models.Schema;
+    var Schema = Specimen.app.models.Schema; //usando o schema
     var c = 0;
-    var record = {};
-    record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]);
-    if(record.id){
+    var record = {}; //dados as serem gravados no banco
+    record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]); //definição do id do specimen
+    if(record.id){   //se o id existir execute
+      //para termo da planilha
       async.each(terms, function(term, callbackCell){
         c++;
+        //se existe o termo e a linha existe da amostra
         if(term && toString(line[c]) != ""){
-          var schemaId = Specimen.app.defineSchemaID(language,schema[c],class_[c],terms[c]);
-          record.language = language;
-          record.originalLanguage = originalLanguage;
-          record[schemaId] = {value:toString(line[c])};
-          if(schemaId){
-            Schema.findById(schemaId,function(err,schema) {
-              if(err)
+          var schemaId = Specimen.app.defineSchemaID(language,schema[c],class_[c],terms[c]); //define o id do esquema
+          record.language = language; //recebe a linguagem
+          record.originalLanguage = originalLanguage;  //linguagem original
+          record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
+          if(schemaId){ //se existe id definido no esquema
+            Schema.findById(schemaId,function(err,schema) { //busca o id que está no schema
+              if(err) //se existe erro na busca
                 console.log(err);
-              if(schema){
-                var value = toString(record[schema.id].value);
+              if(schema){ //se existe schema
+                var value = toString(record[schema.id].value); //pega o valor do schema
                 record[schema.id] = schema;
                 // CATEGORICAL DESCRIPTOR
                 if(schema["class"]=="CategoricalDescriptor"){
@@ -152,17 +166,18 @@ module.exports = function(Specimen) {
                   }
                 } else
                   // IMAGE
-                  if(schema["class"]=="Image"){
+                  //encontra class image no schema
+                  if(schema["class"]=="Image"){ //se encontrar a classe da imagem
                     record[schema.id].value.split("|").forEach(function(value){
                       record[schema.id].name = schema.category + value.replace("https://drive.google.com/open?id=", "");
                       if(typeof value === "string"){
                         record[schema.id].url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
                       }
                       // save images
-                      var image = {url: record[schema.id].url, term:schema.term ,name: record[schema.id].name};
-                      if(language==originalLanguage){
-                        downloadQueue.push(image);
-                      }
+                     // var image = {url: record[schema.id].url, term:schema.term ,name: record[schema.id].name};
+                      //if(language==originalLanguage){
+                       // downloadQueue.push(image); //recebe as imagens
+                     // }
                     });
                   }else
                   // REFERENCE
@@ -396,6 +411,61 @@ module.exports = function(Specimen) {
   //   });
   //   request(url).pipe(w);
   // };
+
+
+//Método by Raquel
+ Specimen.downloadImages = function (cb) {
+   //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
+   //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
+   //Onde a imagem vai ser salva na pasta do cliente
+   var downloadQueue = [];
+   var instance;
+   var imgUrl;
+  Specimen.find({},
+    function(err, results) {
+     // console.log(results);
+     // console.log(results.typeOf);
+      results.forEach(function (result) {
+        for (var key in result) {
+         // console.log("Agora esse é resultado unico");
+          instance = new Object(result[key]);
+          if (result.originalLanguage == instance.language) {
+            if (instance.class == "Image") {
+                instance.value.split("|").forEach(function(value){
+                  if(typeof value === "string"){
+                    imgUrl = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+                  }
+                  var image = {url: imgUrl, term: instance.term, name: instance.name};
+                  downloadQueue.push(image);
+                });
+            }
+          }
+        }
+      });
+      downloadImage(downloadQueue);
+
+      if(err){
+        console.log(err);
+        cb(err, "");
+      }
+      cb("", "done");
+    });
+
+  };
+
+
+  Specimen.remoteMethod(
+    'downloadImages',
+    {
+      http: {path: '/downloadImages', verb: 'get'},
+      accepts: [
+        // {arg:'download'}
+        // {arg: 'download', type: 'boolean', required:true, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: true}
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
   Specimen.cleanDB = function(cb) {
     Specimen.destroyAll(function (err,callback) {
       cb(err,callback);
@@ -437,8 +507,8 @@ module.exports = function(Specimen) {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
         {arg: 'url', type: 'string', required:true, description: 'link para tabela de espécimes'},
-        {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'},
-        {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
+        {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'}
+       // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
     }
@@ -530,7 +600,7 @@ module.exports = function(Specimen) {
   function isNumeric (str){
     return validator.isFloat(str);
   };
-  function downloadImages(queue, redownload){
+  function downloadImage(queue){
     var i = 0;
     var end = queue.length;
     async.whilst(function(){
@@ -542,7 +612,7 @@ module.exports = function(Specimen) {
       var term = queue[i].term;
       var file = __dirname + "/../../client/resized_images/"+name+".jpg";
       fs.exists(file, function(exists){
-        if (exists & !redownload) {
+        if (exists) {
           console.log("image alreadly exists");
           i++;
           callback();
