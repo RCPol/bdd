@@ -5,6 +5,7 @@
 
 	<!-- Google fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+	<script src="javascript/md5.min.js"></script>
 
     <!-- Css Documento -->
 	<link rel="stylesheet" href="/css/chave.css">
@@ -15,6 +16,8 @@
     <!-- JQuery Rolagem -->
 	<link rel="stylesheet" href="/javascript/jquery.mCustomScrollbar.css">
 	<script src="/javascript/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript" src="/javascript/chave.js"></script>
 
 	<!-- Campos de busca, scrollbar e botões  -->
 	<script type="text/javascript">
@@ -102,14 +105,17 @@
 		  }
 		});
       }
-
+			var identification;
 
       $(document).ready(function(){
-        identify([]);
+				identification = new Identification();
+				// identification.identify();
+				identification.startup();
+        // identify([]);
       });
 	</script>
 
-    <script type="text/javascript" src="/javascript/chave.js"></script>
+
 
 	<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
 </head>
@@ -159,7 +165,7 @@
 				<div class="divaeh">
                     <button type="button" class="open expocu">Ver todos</button>
 					<button type="button" class="close expocu">Ocultar todos</button>
-                    <button type="button" class="btnident" onclick="composeQuery()">Identificar &#9654;</button>
+                    <button type="button" class="btnident" onclick="identification.identify()">Identificar &#9654;</button>
 				</div>
             </div>
 
@@ -167,10 +173,10 @@
 				<!-- Início: Div descritores superiores -->
 				<div class="agregadordescritores">
 
-                  <ul class="accordion">
-                    <li><a id="category_Planta" class="toggle" href="javascript:void(0);"><span>+</span> Planta </a><ul id="desc_for_Planta" class="descritor inner"></ul></li>
+                  <ul id="category" class="accordion">
+                    <!-- <li><a id="category_Planta" class="toggle" href="javascript:void(0);"><span>+</span> Planta </a><ul id="desc_for_Planta" class="descritor inner"></ul></li>
                     <li><a id="category_Flor" class="toggle" href="javascript:void(0);"><span>+</span> Flor </a><ul id="desc_for_Flor" class="descritor inner"></ul></li>
-                    <li><a id="category_Pólen" class="toggle" href="javascript:void(0);"><span>+</span> Pólen </a><ul id="desc_for_Pólen" class="descritor inner"></ul></li>
+                    <li><a id="category_Pólen" class="toggle" href="javascript:void(0);"><span>+</span> Pólen </a><ul id="desc_for_Pólen" class="descritor inner"></ul></li> -->
                   </ul>
 
 				</div>
@@ -186,7 +192,7 @@
 
               <!-- Botões de Expandir/Ocultar -->
 				<div class="divaeh">
-					<button type="button" class="expocu" onclick="resetQuery()">Remover todos</button>
+					<button type="button" class="expocu" onclick="identification.removeAll()">Remover todos</button>
 					<button type="button" class="expocu" onclick="removeSelected()">Remover Selecionados</button>
 				</div>
 

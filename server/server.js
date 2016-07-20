@@ -4,6 +4,7 @@ var path = require('path');
 var mustache = require('mustache');
 var fs = require('fs');
 var hash = require('object-hash');
+var async = require('async');
 
 var app = module.exports = loopback();
 
@@ -65,9 +66,75 @@ app.get('/profile/species/:id', function(req, res) {
 });
 
 app.get('/profile/specimen/:id', function(req, res) {
-  var template = fs.readFileSync('./client/specimen.mustache', 'utf8');
-  var params = {id: req.params.id};
-  res.send(mustache.render(template, params));
+  var Specimen = app.models.Specimen;
+  var params = {};
+  params.id =req.params.id;
+  params.language = req.params.id.split(":")[0];
+  params.value = {};
+  async.parallel([
+    function(callback) {
+      siteLabel(params,callback);
+    },
+    function (callback) {
+      profilesLabel(params,callback);
+    },
+    function(callback) {
+      var parsedId = params.id.split(":");
+      collection([parsedId[0],parsedId[1],parsedId[2]].join(":"),params,callback);
+    },
+    function specimen(callback) {
+      Specimen.findById(params.id,function(err,specimen) {
+        Object.keys(specimen.toJSON()).forEach(function(key) {
+          var parsedId = key.split(":");
+          if(parsedId.length){
+            var domIdLabel = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":label";
+            var domIdValue = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":value";
+            if(specimen[key].field)
+              params.label[domIdLabel] = specimen[key].field+": ";
+            if(specimen[key].value && !specimen[key].states && !specimen[key].months){
+              // NORMAL VALUE
+              params.value[domIdValue] = specimen[key].value;
+              // COORDINATES
+              if(parsedId[3]=="decimalLatitude" || parsedId[3]=="decimalLongitude")
+                params.value[domIdValue] = specimen[key].value.toFixed(6)
+              // IMAGE
+              if(parsedId[2]=="Image"){
+                params.value[domIdValue] = [];
+                specimen[key].value.split("|").forEach(function(image){
+                 params.value[domIdValue].push({value:image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=")});
+                });
+              }
+              // REFERENCES
+              if(parsedId[2]=="Reference"){
+                params.value[domIdValue] = [];
+                specimen[key].value.split("|").forEach(function(referencia){
+                 params.value[domIdValue].push({value:referencia});
+                });
+              }
+            } else if(specimen[key].states){
+              params.value[domIdValue] = "";
+              specimen[key].states.forEach(function(state) {
+                params.value[domIdValue] += state.state+", ";
+              });
+              params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+            } else if(specimen[key].months){
+              params.value[domIdValue] = "";
+              specimen[key].months.forEach(function(month) {
+                params.value[domIdValue] += month+", ";
+              });
+              params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+            } else if(specimen[key]["class"] == "NumericalDescriptor"){
+              params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+            }
+          }
+        });
+        callback();
+      });
+    }
+  ],function done() {
+    var template = fs.readFileSync('./client/specimen.mustache', 'utf8');
+    res.send(mustache.render(template, params));
+  });
 });
 
 app.get('/quality/check', function(req, res) {
@@ -77,11 +144,76 @@ app.get('/quality/check', function(req, res) {
 });
 
 app.get('/profile/palinoteca/:id', function(req, res) {
-  var template = fs.readFileSync('./client/palinoteca.mustache', 'utf8');
-  var params = {id: req.params.id};
-  res.send(mustache.render(template, params));
+  var params = {};
+  params.id =req.params.id;
+  params.language = req.params.id.split(":")[0];
+  params.value = {};
+  async.parallel([
+    function(callback) {
+      siteLabel(params,callback);
+    },
+    function (callback) {
+      profilesLabel(params,callback);
+    },
+    function(callback) {
+      collection(params.id,params,callback);
+    }
+  ],function done() {
+    var template = fs.readFileSync('./client/palinoteca.mustache', 'utf8');
+    res.send(mustache.render(template, params));
+  });
 });
 
+function collection(id, params, callback) {
+  params.value = params.value?params.value:{};
+  var Collection = app.models.Collection;
+  Collection.findById(id,function(err,collection) {
+    Object.keys(collection.toJSON()).forEach(function(key) {
+      var parsedId = key.split(":");
+      if(parsedId.length){
+        var domIdLabel = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":label";
+        var domIdValue = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":value";
+        if(collection[key].field && collection[key].value)
+          params.label[domIdLabel] = collection[key].field;
+        if(collection[key].value){
+          params.value[domIdValue] = collection[key].value;
+          if(parsedId[2]=="Image"){
+            if(collection[key].value && collection[key].value.length>0)
+              params.value[domIdValue] = collection[key].value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+            else
+              params.value[domIdValue] = "/img/lspm.jpg";
+          }
+        }
+      }
+    });
+    callback();
+  });
+}
+
+function siteLabel(params,callback) {
+  params.label = params.label?params.label:{};
+  var Schema = app.models.Schema;
+  Schema.find({where:{"class":"SiteLabel",language:params.language}},function(err,siteLabel) {
+    siteLabel.forEach(function(item) {
+      var parsedId = item.id.split(":");
+      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]
+      params.label[domId] = item.field;
+    });
+    callback();
+  });
+}
+function profilesLabel(params,callback) {
+  params.label = params.label?params.label:{};
+  var Schema = app.models.Schema;
+  Schema.find({where:{"class":"ProfilesLabel",language:params.language}},function(err,profilesLabel) {
+    profilesLabel.forEach(function(item) {
+      var parsedId = item.id.split(":");
+      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]
+      params.label[domId] = item.field;
+    });
+    callback();
+  });
+}
 app.get('/profile/glossary/:id', function(req, res) {
   var template = fs.readFileSync('./client/glossary.mustache', 'utf8');
   var params = {id: req.params.id};

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/fichas.css">
+
+	<!-- Arquivos Leaflet Map -->
+	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" /> -->
+	<!-- <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script> -->
+
+	<!-- Arquivos Grid Tabela de Amostras -->
+	<!-- <link rel="stylesheet" type="text/css" href="http://w2ui.com/src/w2ui-1.4.min.css" /> -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://w2ui.com/src/w2ui-1.4.min.js"></script>
+
+	<!-- Arquivos Galeria - Fotorama -->
+	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
+
+	<script type="text/javascript" src="/javascript/simple-excel.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <!-- Javascript Documento -->
+    <script type="text/javascript" src="/javascript/especie.js"></script>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+                <li> <!-- inserir link para o glossário --> <a href="/profile/glossary">Gloss&aacute;rio</a></li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<!-- Início das informações da espécie -->
+	<article>
+
+		<html>
+<head>
+This form allows you to upload a file to the server.<br>
+<!-- <form action="/api/files/upload" method="POST" enctype="multipart/form-data"><br> -->
+Select a File: <input type="file" id="fileInput" /><br/>
+        <input type="button" id="fileExport" />
+<!-- </form> -->
+
+
+	</article>
+	<!-- Final das informações da espécie -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+<script type="text/javascript">
+			// var csvParser = new SimpleExcel.Parser.XLSX();
+			var fileInput = document.getElementById('fileInput');
+			// parse when file loaded, then print the result to console
+			fileInput.addEventListener('change', function (e) {
+					var file = e.target.files[0];
+					var reader = new FileReader();
+
+    reader.onload = function(e){
+        var data = e.target.result();
+        var workbook = XLSX.read(data, {type : 'binary'});
+
+			        workbook.SheetNames.forEach(function(sheetName){
+			            // Here is your object
+			            var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+			            var json_object = JSON.stringify(XL_row_object);
+			            console.log(json_object);
+
+			        })
+
+			    };
+
+			    reader.onerror = function(ex){
+			        console.log(ex);
+			    };
+
+			    reader.readAsBinaryString(file);
+			});
+</script>
+</html>

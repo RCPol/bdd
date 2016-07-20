@@ -18,6 +18,9 @@ module.exports = function(Identification) {
     //{language:pt-BR, states:[{states.states.id:pt-BR:rcpol:State:flowerColorPurple}], numerical: []}
     //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":"5.0"}]}
 
+    param.language = typeof param.language != "undefined"?param.language:"pt-BR";
+    param.states = typeof param.states != "undefined"?param.states:[];
+    param.numerical = typeof param.numerical != "undefined"?param.numerical:[];
 
     console.log("received parameters:");
     console.log(param);

@@ -9,5 +9,11 @@
     "database": "bdd",
     "name": "BDD",
     "connector": "mongodb"
+  },
+  "files-storage": {
+    "name": "files-storage",
+    "connector": "loopback-component-storage",
+    "root": "./storage",
+    "maxFileSize": "524288000"
   }
 }
