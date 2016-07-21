@@ -32,55 +32,134 @@ module.exports = function(Identification) {
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
 
         IdentificationCollection.aggregate([
-          { $match: queryMongo},
+          { $match: queryMongo}, // utilizar a query para filtar apenas as espécies que queremos
+           // cada espécie tem uma lista de descritores, cada um com uma lista de estados. Montar uma lista unindo todos estes descritores
+          /* exemplo:
+           {
+             id: especie1
+             states: [
+               {descritor:descritor1.
+                estados:[estado1]
+               },
+               {descritor:descritor2.
+                estados:[estado2, estado3]
+               }
+             ]
+           }
+           {
+             id: especie2
+             states: [
+               {descritor:descritor1.
+                estados:[estado1, estado4]
+               },
+               {descritor:descritor2.
+                estados:[estado2]
+               }
+             ]
+           }
+           __________________
+           $unwind: '$states'
+           __________________
+
+           [
+            {id:especie1,
+             descritor:descritor1.
+             estados:[estado1]
+            },
+            {id:especie1,
+             descritor:descritor2.
+             estados:[estado2, estado3]
+            }
+            {id:especie2,
+             descritor:descritor1.
+             estados:[estado1, estado4]
+            },
+            {id:especie2,
+             descritor:descritor2.
+             estados:[estado2]
+            }
+           ]
+           __________________
+           $unwind: '$states.states'
+           __________________
+
+           [
+               {id: especie1,
+                descritor:descritor1.
+                estados:estado1
+               },
+               {id:especie1,
+                descritor:descritor2.
+                estados:estado2
+               },
+               {id:especie1,
+                descritor:descritor2.
+                estados:estado3
+               },
+               {id:especie2
+                descritor:descritor1.
+                estados:estado1
+               },
+               {id:especie2,
+                descritor:descritor1.
+                estados:estado4
+               },
+               {id:especie2,
+                descritor:descritor2.
+                estados:estado2
+               }
+           ]
+
+           */
           { $unwind: '$states'},
           { $unwind: '$states.states'},
+          /*
+           para cada elemento da lista, extrair apenas o id do estado
+           ________
+           $project
+           ________
+
+           [
+               {
+                id:estado1
+               },
+               {
+                id:estado2
+               },
+               {
+                id:estado3
+               },
+               {
+                id:estado1
+               },
+               {
+                id:estado4
+               },
+               {
+                id:estado2
+               }
+           ]
+
+           e então contar o número de espécies de cada estado
+
+           [
+              {estado: estado1, count:2},
+              {estado: estado2, count:2},
+              {estado: estado3, count:1},
+              {estado: estado4, count:1},
+           ]
+           */
           { $project: {
             _id: 0,
-            'schema': '$states.schema',
-            'class': '$states.class',
-            'descriptor': '$states.descriptor',
-            'category': '$states.category',
-            'id': '$states.id',
-            'term': '$states.term',
-            'order': '$states.order',
-            'state': '$states.states'
+            'state': '$states.states.id'
           }},
           { $group: {
-            _id: { schema: '$schema', class: '$class', descriptor: '$descriptor', id: '$id', state: '$state', category:"$category", term:"$term", order:'$order'},
-            sum: {$sum:1}
-          }},
-          { $project: {
-            _id: 0,
-            schema: '$_id.schema',
-            class: '$_id.class',
-            descriptor: '$_id.descriptor',
-            id: '$_id.id',
-            state: '$_id.state',
-            category: '$_id.category',
-            term: '$_id.term',
-            order: '$_id.order',
-            count: '$sum'
-          }},
-          { $group: {
-            _id: { schema: '$schema', class: '$class', descriptor: '$descriptor',category: '$category', id: '$id', term:'$term', order:'$order'},
-            states: {$push: {state: '$state', count: '$count'}}
-          }},
-          { $project:{
-            _id: 0,
-            schema: '$_id.schema',
-            class: '$_id.class',
-            category_name: '$_id.category',
-            descriptor_name: '$_id.descriptor',
-            descriptor_id: '$_id.id',
-            descriptor_term: '$_id.term',
-            order: '$_id.order',
-            states: '$states'
+            _id: '$state',
+            count: {$sum:1}
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
-          var ordered_states = _.sortBy(states, 'order');
-          var results = {eligibleItems: items, eligibleStates: ordered_states};
+          var results = {eligibleStates: states, eligibleSpecies: items};
           callback(null, results);
         });
       });
