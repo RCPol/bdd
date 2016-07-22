@@ -216,9 +216,9 @@ Identification.prototype.identify = function() {
   // self.clean().writeSelectedStates();
   console.log(query);
   $.get("/api/Identification/identify", {param: query}, function(data){
-    console.log(data);
+    console.log("Identify response",data);
     Object.keys(self.eligibleSpecies).forEach(function(localEligibleSpeciesId) {
-      var isEligible = data.response.eligibleItems.find(function(remoteEligibleSpecies) {
+      var isEligible = data.response.eligibleSpecies.find(function(remoteEligibleSpecies) {        
         return localEligibleSpeciesId == remoteEligibleSpecies.id;
       });
       if(!isEligible){
