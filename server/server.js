@@ -214,9 +214,15 @@ function profilesLabel(params,callback) {
     callback();
   });
 }
-app.get('/profile/glossary/:id', function(req, res) {
+app.get('/profile/glossary/individual/:id', function(req, res) {
   var template = fs.readFileSync('./client/glossary.mustache', 'utf8');
   var params = {id: req.params.id};
+  res.send(mustache.render(template, params));
+});
+
+app.get('/profile/glossary/:lang*?', function(req, res){
+  var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
+  var params = {lang: req.params.lang};
   res.send(mustache.render(template, params));
 });
 
