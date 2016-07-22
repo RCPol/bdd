@@ -1,15 +1,19 @@
 function Identification() {
+  this.language = "en-US";
+}
+Identification.prototype.startup = function() {
+  $("#category").html("");
+  $("#descritoresSelecionados").html("");
+  $("#especiesElegiveis").html("");
+  $("#especiesDescartadas").html("");
   this.species = {};
   this.descriptors = {};
   this.eligibleSpecies = {};
   this.eligibleCategories = {};
   this.eligibleDescriptors = {};
   this.eligibleStates = {};
-  this.language = "en-US";
   this.selectedStates = {};
   this.definedNumericals = {};
-}
-Identification.prototype.startup = function() {
   console.time("load species");
   console.time("load descriptors");
   var self = this;
@@ -18,7 +22,9 @@ Identification.prototype.startup = function() {
       self.eligibleSpecies[id] = true;
     });
     self.printSpecies();
+
   }).createDescriptors(function() {
+    console.log("teste desc");
     Object.keys(self.descriptors).forEach(function(idCategory) {
       self.eligibleCategories[idCategory] = true;
       Object.keys(self.descriptors[idCategory]).forEach(function(idDescriptor) {
@@ -70,7 +76,7 @@ Identification.prototype.createSpecies = function(callback) {
       self.species[sp.id].scientificNameAuthorship = sp[self.language+":dwc:Taxon:scientificNameAuthorship"].value;
       self.species[sp.id].vernacularName = sp[self.language+":dwc:Taxon:vernacularName"]?sp[self.language+":dwc:Taxon:vernacularName"].value:"";
       self.species[sp.id].html = $("<div class='especies' id = " + self.species[sp.id].htmlId + "></div>");
-      self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='/thumbnails/"+(sp[self.language+":rcpol:Image:plantImage"]?sp[self.language+":rcpol:Image:plantImage"].name:"?")+".jpg' onerror='imageError(this)'/>");
+      // self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='/thumbnails/"+(sp[self.language+":rcpol:Image:plantImage"]?sp[self.language+":rcpol:Image:plantImage"].name:"?")+".jpg' onerror='imageError(this)'/>");
       // self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='"+(sp[self.language+":rcpol:Image:plantImage"]?sp[self.language+":rcpol:Image:plantImage"].value.split("|")[0].replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="):"?")+"' onerror='imageError(this)'/>");
       self.species[sp.id].html.append("<div class='nsp'></div>");
       self.species[sp.id].html.find(".nsp").append("<p class='famisp'>" + self.species[sp.id].family + "</p>");
@@ -85,6 +91,8 @@ Identification.prototype.createDescriptors = function(callback) {
   var self = this;
   $.getJSON("/api/Schemas?filter[where][language]="+self.language+"&filter[where][class]=State"/*, { filter : query }*/, function(states){
     states.forEach(function(state) {
+      if(!state.category)
+        console.log(state);
       var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
       // CATEGORY
       if(typeof self.descriptors[state.category] == "undefined"){
@@ -109,24 +117,6 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].id = state.id;
         self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
       }
-      // if (selected.state){ // se for categórico
-      //   $.getJSON('/api/Schemas/'+selected.state.split(":")[1], function(schema){
-      //     $(".descel").append("<input state='" + selected.state +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.state.split(":")[2] + "</label><br>");
-      //   });
-      // } else if (selected.value) { // se for numérico
-      //   $.getJSON('/api/Schemas/'+selected.descriptor.split(":")[1], function(schema){
-      //     $(".descel").append("<input state='" + selected.descriptor +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.value + "</label><br>");
-      //   });
-      // }
-
-
-      // self.descriptors[state.category][state.field][state.state].image = state.image.split("|")[0];
-      // self.states[state.id].html = $("<div class='especies' id = " + self.species[sp.id].htmlId + "></div>");
-      // self.states[state.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='/thumbnails/"+(sp[self.language+":rcpol:Image:plantImage"]?sp[self.language+":rcpol:Image:plantImage"].name:"?")+".jpg' onerror='imageError(this)'/>"); //src='img/lspm.jpg'>" imagem placeholder caso a imagem real não possa ser carregada
-      // self.states[state.id].html.append("<div class='nsp'></div>");
-      // self.states[state.id].html.find(".nsp").append("<p class='famisp'>" + self.species[sp.id].family + "</p>");
-      // self.states[state.id].html.find(".nsp").append("<a href='/profile/species/" + sp.id + "' target='_blank' ><p class='nomesp'><i>" + self.species[sp.id].scientificName+ " </i>" + self.species[sp.id].scientificNameAuthorship + "</p></a>");
-      // self.states[state.id].html.find(".nsp").append("<p class='popn'>" + self.species[sp.id].vernacularName + "</p>");
     });
     callback();
   });
@@ -143,6 +133,7 @@ Identification.prototype.printSpecies = function() {
 }
 Identification.prototype.printDescriptors = function() {
   var self = this;
+  console.log("teste",self.descriptors);
   Object.keys(self.descriptors).forEach(function(idCategory) {
     // IS CATEGORY ELIGIBLE?
     if(self.eligibleCategories[idCategory]){
@@ -217,8 +208,9 @@ Identification.prototype.identify = function() {
   console.time("Identify");
   var self = this;
   var query = {language:self.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}
-  self.printDescriptors();    
+  self.printDescriptors();
   $.get("/api/Identification/identify", {param: query}, function(data){
+    console.log("Identify:",data);
     self.eligibleSpecies = {};
     data.response.eligibleSpecies.forEach(function(remoteEligibleSpecies) {
       self.eligibleSpecies[remoteEligibleSpecies.id] = true;

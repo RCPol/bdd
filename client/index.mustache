@@ -21,6 +21,12 @@
 
 	<!-- Campos de busca, scrollbar e botões  -->
 	<script type="text/javascript">
+	var language = "pt-BR";
+	function setLanguage(language){
+		localStorage.language = language;
+		identification.language = language;
+		identification.startup();
+	}
       $(document).on('keyup', '.numnum', function(event) {
         var v = this.value;
         if($.isNumeric(v) === false) {
@@ -104,10 +110,16 @@
 			var identification;
 
       $(document).ready(function(){
+				if(localStorage && localStorage.language)
+					language = localStorage.language;
+				if (typeof(Storage) !== "undefined") {
+						localStorage.language = localStorage.language?localStorage.language:"pt-BR";
+				} else {
+						alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
+				}
 				identification = new Identification();
-				// identification.identify();
+				identification.language = language;
 				identification.startup();
-        // identify([]);
       });
 	</script>
 
@@ -124,7 +136,12 @@
 		<nav>
 			<ul>
 			  <li> <!-- inserir link para o portal --> <a href="#">Home</a></li>
-              <li> <!-- inserir link para o portal --> <a href="/profile/glossary">Gloss&aacute;rio</a></li>
+        <li> <!-- inserir link para o portal --> <a href="/profile/glossary">Gloss&aacute;rio</a></li>
+				<li>
+					<img onclick="setLanguage('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
+					<img onclick="setLanguage('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
+					<img onclick="setLanguage('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+				</li>
 			</ul>
 		</nav>
 		<!-- Menu: fim -->
