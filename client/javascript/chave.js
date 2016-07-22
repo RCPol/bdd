@@ -51,6 +51,13 @@ Identification.prototype.removeAll = function() {
   self.identify();
   return this;
 }
+Identification.prototype.unselectState = function(id) {
+  var self = this;
+  // self.eligibleStates[id] = {count:null}
+  delete self.selectedStates[id];
+  self.identify();
+  return this;
+}
 Identification.prototype.createSpecies = function(callback) {
   var self = this;
   $.getJSON("/api/Species?filter[where][language]="+self.language+"&filter[fields]["+self.language+":rcpol:Image:plantImage]=true&filter[fields][id]=true&filter[fields]["+self.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.language+":dwc:Taxon:family]=true&filter[fields]["+self.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.language+":dwc:Taxon:family%20ASC&filter[order][1]="+self.language+":dwc:Taxon:scientificName%20ASC"/*, { filter : query }*/, function(species){
@@ -100,7 +107,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
         self.descriptors[state.category][state.field][state.state].value = state.state;
         self.descriptors[state.category][state.field][state.state].id = state.id;
-        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"/></p></div>');
+        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
       }
       // if (selected.state){ // se for categórico
       //   $.getJSON('/api/Schemas/'+selected.state.split(":")[1], function(schema){
@@ -167,7 +174,7 @@ Identification.prototype.printDescriptors = function() {
             // IS SELECTED STATE?
             if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id]){
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#descritoresSelecionados"));
-              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("")
+              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='javascript:identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='http://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Button-Close-icon.png'/></a>")
             }
           }
         }
@@ -209,24 +216,16 @@ function imageError(img) {
 Identification.prototype.identify = function() {
   console.time("Identify");
   var self = this;
-
   var query = {language:self.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}
-  self.printDescriptors();
-  // self.clean().writeSelectedStates();
-  console.log(query);
+  self.printDescriptors();    
   $.get("/api/Identification/identify", {param: query}, function(data){
-    console.log("Identify response",data);
-    Object.keys(self.eligibleSpecies).forEach(function(localEligibleSpeciesId) {
-      var isEligible = data.response.eligibleSpecies.find(function(remoteEligibleSpecies) {
-        return localEligibleSpeciesId == remoteEligibleSpecies.id;
-      });
-      if(!isEligible){
-        delete self.eligibleSpecies[localEligibleSpeciesId];
-      }
+    self.eligibleSpecies = {};
+    data.response.eligibleSpecies.forEach(function(remoteEligibleSpecies) {
+      self.eligibleSpecies[remoteEligibleSpecies.id] = true;
     });
     self.printSpecies();
     self.eligibleStates = {};
-    data.response.eligibleStates.map(function(remoteEligibleState) {
+    data.response.eligibleStates.forEach(function(remoteEligibleState) {
         self.eligibleStates[remoteEligibleState._id] = {count: remoteEligibleState.count}
     });
     self.printDescriptors();
