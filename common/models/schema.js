@@ -392,8 +392,8 @@ function convertThumbnail(local,thumbnail,callback) {
     Schema.findById(id, function(err, data){
       if (err) throw new Error(err);
       // check if url exists
-      if(data && data.url){
-        var url = data.url;
+      if(data && data.images){
+        var url = data.images[0].resized;
         cb(err, url);
       } else {
         cb("", "");
