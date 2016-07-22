@@ -2,7 +2,9 @@ function Identification() {
   this.species = {};
   this.descriptors = {};
   this.eligibleSpecies = {};
+  this.eligibleCategories = {};
   this.eligibleDescriptors = {};
+  this.eligibleStates = {};
   this.language = "en-US";
   this.selectedStates = {};
   this.definedNumericals = {};
@@ -17,10 +19,17 @@ Identification.prototype.startup = function() {
     });
     self.printSpecies();
   }).createDescriptors(function() {
-    Object.keys(self.descriptors).forEach(function(id) {
-      self.eligibleDescriptors[id] = true;
+    Object.keys(self.descriptors).forEach(function(idCategory) {
+      self.eligibleCategories[idCategory] = true;
+      Object.keys(self.descriptors[idCategory]).forEach(function(idDescriptor) {
+        self.eligibleDescriptors[idCategory+":"+idDescriptor] = true;
+        Object.keys(self.descriptors[idCategory][idDescriptor]).forEach(function(idState) {
+          self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id] = {count:null};
+        });
+      });
     });
     self.printDescriptors();
+    self.identify();
   });
 }
 Identification.prototype.selectState = function(id) {
@@ -39,6 +48,7 @@ Identification.prototype.removeAll = function() {
     self.eligibleSpecies[id] = true;
   });
   self.printSpecies();
+  self.identify();
   return this;
 }
 Identification.prototype.createSpecies = function(callback) {
@@ -69,8 +79,6 @@ Identification.prototype.createDescriptors = function(callback) {
   $.getJSON("/api/Schemas?filter[where][language]="+self.language+"&filter[where][class]=State"/*, { filter : query }*/, function(states){
     states.forEach(function(state) {
       var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
-      if(stateImg=="img/lspm.jpg")
-      console.log("NO IMAGE: ",state);
       // CATEGORY
       if(typeof self.descriptors[state.category] == "undefined"){
         self.descriptors[state.category] = self.descriptors[state.category]?self.descriptors[state.category]:{};
@@ -92,7 +100,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
         self.descriptors[state.category][state.field][state.state].value = state.state;
         self.descriptors[state.category][state.field][state.state].id = state.id;
-        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' </p></div>');
+        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"/></p></div>');
       }
       // if (selected.state){ // se for categórico
       //   $.getJSON('/api/Schemas/'+selected.state.split(":")[1], function(schema){
@@ -119,6 +127,7 @@ Identification.prototype.createDescriptors = function(callback) {
 }
 Identification.prototype.printSpecies = function() {
   var self = this;
+  $("#speciesCount").html(Object.keys(self.eligibleSpecies).length);
   Object.keys(self.species).forEach(function(id) {
       self.species[id].html.detach().appendTo(self.eligibleSpecies[id]?"#especiesElegiveis":"#especiesDescartadas");// species is eligible
   });
@@ -128,38 +137,50 @@ Identification.prototype.printSpecies = function() {
 Identification.prototype.printDescriptors = function() {
   var self = this;
   Object.keys(self.descriptors).forEach(function(idCategory) {
-    self.descriptors[idCategory].html.appendTo($("#category"));
+    // IS CATEGORY ELIGIBLE?
+    if(self.eligibleCategories[idCategory]){
+      self.descriptors[idCategory].html.appendTo($("#category"));
+    }
+    var descriptorCount = 0;
     Object.keys(self.descriptors[idCategory]).forEach(function(idDescriptor) {
       if(self.descriptors[idCategory][idDescriptor].value){
-        self.descriptors[idCategory][idDescriptor].html.appendTo($("#"+self.descriptors[idCategory].htmlId).next("#descriptors"));
+        // IS DESCRIPTOR ELIGIBLE?
+        if(self.eligibleDescriptors[idCategory+":"+idDescriptor]){
+          descriptorCount++;
+          self.descriptors[idCategory][idDescriptor].html.appendTo($("#"+self.descriptors[idCategory].htmlId).next("#descriptors"));
+        }
       }
+      var stateCount = 0;
       Object.keys(self.descriptors[idCategory][idDescriptor]).forEach(function(idState) {
         if(typeof self.descriptors[idCategory][idDescriptor][idState].value != "undefined"){
           if(self.descriptors[idCategory][idDescriptor][idState].value){
+            // IS STATE ELIGIBLE?
+            if(self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id] && (self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count==null || self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count<Object.keys(self.eligibleSpecies).length)){
+              stateCount++;
+              self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#"+self.descriptors[idCategory][idDescriptor].htmlId));
+              if(self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count!=null){
+                $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("("+self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count+")")
+              }
+            } else {
+              self.descriptors[idCategory][idDescriptor][idState].html.detach();
+            }
+            // IS SELECTED STATE?
             if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id]){
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#descritoresSelecionados"));
-            } else{
-              self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#"+self.descriptors[idCategory][idDescriptor].htmlId));
+              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("")
             }
           }
         }
       });
+      // REMOVE UNELIGIBLE DESCRIPTOR
+      if(self.descriptors[idCategory][idDescriptor].value&&stateCount==0){
+        descriptorCount--;
+        self.descriptors[idCategory][idDescriptor].html.detach();
+      }
     });
-
-
-    // if(typeof self.eligibleDescriptors[idCategory] != "undefined"){ // category is eligible
-    //   console.log(self.eligibleDescriptors[idCategory].value.toUpperCase());
-    //   Object.keys(self.descriptors[idCategory]).forEach(function(idDescriptor) {
-    //     if(typeof self.eligibleDescriptors[idCategory][idDescriptor] != "undefined"){ // descriptor is eligible
-    //       console.log(" - "+self.eligibleDescriptors[idCategory][idDescriptor].value);
-    //       Object.keys(self.descriptors[idCategory][idDescriptor]).forEach(function(idState) {
-    //         if(typeof self.eligibleDescriptors[idCategory][idDescriptor][idState] != "undefined"){// state is eligible
-    //           console.log("     :"+self.eligibleDescriptors[idCategory][idDescriptor][idState].value);
-    //         }
-    //       });
-    //     }
-    // });
-    // }
+    // REMOVE UNELIGIBLE CATEGORY
+    if(self.descriptors[idCategory].value&&descriptorCount==0)
+      self.descriptors[idCategory].html.detach();
   });
   console.timeEnd("load descriptors");
 }
@@ -179,32 +200,7 @@ Identification.prototype.definedNumerical = function(id,value) {
   this.definedNumericals.push({id:id,value:value});
   return this;
 }
-// Identification.prototype.clean = function() {
-//   // limpar tudo
-//   $(".btnident").attr('disabled', 'disabled');
-//   $("#especiesElegiveis").empty();
-//   $("#especiesElegiveis").append('<p style="margin-bottom:10px" id="elegibleCount"></p>');
-//   $(".descritor").empty();
-//   $("#especiesDescartadas").empty();
-//   $("#descritoresSelecionados").empty();
-//   return this;
-// }
-// Identification.prototype.writeStates = function() {
-//   var self = this;
-//   console.log("TODO: writeSelectedState");
-//   // self.selectedStates.forEach(function(selected, i){
-//   //   if (selected.state){ // se for categórico
-//   //     $.getJSON('/api/Schemas/'+selected.state.split(":")[1], function(schema){
-//   //       $(".descel").append("<input state='" + selected.state +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.state.split(":")[2] + "</label><br>");
-//   //     });
-//   //   } else if (selected.value) { // se for numérico
-//   //     $.getJSON('/api/Schemas/'+selected.descriptor.split(":")[1], function(schema){
-//   //       $(".descel").append("<input state='" + selected.descriptor +"' type='checkbox' id='idcheckbox" + i + "'><label for='idcheckbox" + i + "'>" + schema["rcpol:descriptor"].value + ": " + selected.value + "</label><br>");
-//   //     });
-//   //   }
-//   // });
-//   return this;
-// }
+
 function imageError(img) {
   img.src = "img/lspm.jpg";
   img.onerror= "";
@@ -227,26 +223,13 @@ Identification.prototype.identify = function() {
       if(!isEligible){
         delete self.eligibleSpecies[localEligibleSpeciesId];
       }
-      self.printSpecies();
+    });
+    self.printSpecies();
+    self.eligibleStates = {};
+    data.response.eligibleStates.map(function(remoteEligibleState) {
+        self.eligibleStates[remoteEligibleState._id] = {count: remoteEligibleState.count}
     });
     self.printDescriptors();
-
-  //   data.response.eligibleItems.forEach(function(species) {
-  //       self.eligibleSpecies[species.id] = {htmlId:md5(species.id)}
-  //   });
-  //   self.eligibleStates = data.response.eligibleStates;
-  //   self.writeSpeciesDivs().writeSpeciesData().writeStates();
-  //   // var ids = data.response.eligibleItems.map(function(item) {return item.id;});
-  //   // var species_query = {where: {id: {inq: ids}}};
-  //   // if (ids.length == 0)
-  //     // species_query = {where: {id: ""}};
-  //   // limpar espécies elegíveis
-  //   // eligibleSpeciesDb = [];
-  //   // getSpecies(data, species_query, 100, 0, function(){
-  //   //   $("#elegibleCount").html("#" + eligibleSpeciesDb.length + " espécies elegiveis");
-  //   //   setDiscartedSpecies();
-  //   //   getDescriptors(data);
-  //   // });
   });
   return this;
 };

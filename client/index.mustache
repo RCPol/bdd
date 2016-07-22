@@ -28,19 +28,16 @@
           this.value = this.value.slice(0,-1);
         }
       });
-
 	  window.onload = function(){
         //Barras de Rolagem das caixas
 		$(".roxinho").mCustomScrollbar({
 			scrollButtons:{ enable: true },
 			theme: "dark",
 		});
-
 		$(".roxinhodesc").mCustomScrollbar({
 			scrollButtons:{ enable: true },
 			theme: "dark",
 		});
-
 		//Limpa texto da busca dos descritores
 		var btpdescritores = document.getElementById("buscadescritores");
 
@@ -62,7 +59,6 @@
 				}
 			});
 		}
-
         //Toggle Descritores
         $(".accordion").on("click", ".toggle", function(e){
 
@@ -217,10 +213,12 @@
 			</form>
 			<div class="tfclear"></div>
 			<!-- Final: Busca Espécies -->
-
 			<!-- Início: Espécies disponíveis -->
 			<div class="roxinho">
-              <div id="especiesElegiveis"></div>
+				<div  style="float:right;text-align:right;margin-right:40px; color:#F27224" >
+					#<span id="speciesCount">0</span> species
+				</div>
+        <div id="especiesElegiveis"></div>
 			</div>
 			<!-- Final: Espécies disponíveis -->
 
