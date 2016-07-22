@@ -68,6 +68,9 @@ Identification.prototype.createDescriptors = function(callback) {
   var self = this;
   $.getJSON("/api/Schemas?filter[where][language]="+self.language+"&filter[where][class]=State"/*, { filter : query }*/, function(states){
     states.forEach(function(state) {
+      var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
+      if(stateImg=="img/lspm.jpg")
+      console.log("NO IMAGE: ",state);
       // CATEGORY
       if(typeof self.descriptors[state.category] == "undefined"){
         self.descriptors[state.category] = self.descriptors[state.category]?self.descriptors[state.category]:{};
@@ -89,7 +92,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
         self.descriptors[state.category][state.field][state.state].value = state.state;
         self.descriptors[state.category][state.field][state.state].id = state.id;
-        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="/images/19ec1de76b8f8798054c5bdc3a74abb6.jpeg" class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' </p></div>');
+        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' </p></div>');
       }
       // if (selected.state){ // se for categórico
       //   $.getJSON('/api/Schemas/'+selected.state.split(":")[1], function(schema){
@@ -218,7 +221,7 @@ Identification.prototype.identify = function() {
   $.get("/api/Identification/identify", {param: query}, function(data){
     console.log("Identify response",data);
     Object.keys(self.eligibleSpecies).forEach(function(localEligibleSpeciesId) {
-      var isEligible = data.response.eligibleSpecies.find(function(remoteEligibleSpecies) {        
+      var isEligible = data.response.eligibleSpecies.find(function(remoteEligibleSpecies) {
         return localEligibleSpeciesId == remoteEligibleSpecies.id;
       });
       if(!isEligible){
