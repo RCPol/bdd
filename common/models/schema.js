@@ -3,6 +3,8 @@ var hash = require('object-hash');
 var request = require('request');
 var async = require('async');
 var fs = require('fs');
+var qt = require('quickthumb');
+
 module.exports = function(Schema) {
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -56,16 +58,24 @@ module.exports = function(Schema) {
             //ler o campo das imagens
             if (toString(line[8]).trim().length>0) {
               record.images = [];
-              toString(line[8]).trim().split("|").forEach(function (img) {
-                record.images.push(img.trim()); //coloca as imagens no vetor
+              toString(line[8]).trim().split("|").forEach(function (img,i) {
+                var imageId = record.id.split(":").slice(1).join(":")+":"+i;
+                var image = {
+                  id: imageId,
+                  original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
+                  local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                  resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                  thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                }
+                record.images.push(image); //coloca as imagens no vetor
               });
-              record.image = record.images[0]; // so pega a primeira imagem
+              // record.image = record.images[0]; // so pega a primeira imagem
             }
-            record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
-            if (record.image != undefined){ //se a imagem tiver definida
-              record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+            // record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
+            // if (record.image != undefined){ //se a imagem tiver definida
+              // record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
               //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
-            }
+            // }
             record.language = language;
             //save record in database
             Schema.upsert(record, function(err, instance){
@@ -260,29 +270,23 @@ module.exports = function(Schema) {
     //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
     //Onde a imagem vai ser salva na pasta do cliente
     var downloadQueue = [];
-
-    Schema.find({
-      image:{$exists:true}
-    }, function(err, results) {
-      console.log(results);
+    Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
       console.log(results.length);
-      results.forEach(function (result) {
-        if(result.image != null){
-          console.log(result.image);
-          console.log(result.id);
-          downloadQueue.push({url: result.image, name: result.id});
-        }
+      var queue =  [];
+      results.forEach(function(rec) {
+        rec.images.forEach(function(img) {
+          queue.push(img);
+        });
       });
-      downloadImage(downloadQueue);
+      downloadImage(queue);
       if(err){
         console.log(err);
         cb(err, "");
       }
-      cb("", "done");
+      cb(null, "Downloading...");
     });
 
   };
-
   function downloadImage(queue){
     var i = 0;
     var end = queue.length;
@@ -290,32 +294,51 @@ module.exports = function(Schema) {
     async.whilst(function(){
       return i < end;
     }, function(callback){
-      console.log(i + " of " + end);
-      var url = queue[i].url;
-      var name = queue[i].name;
-      var file = __dirname + "/../../client/images/" + name + ".jpeg";
+      var local = queue[i].local;
+      var original = queue[i].original;
+      var resized = queue[i].resized;
+      var thumbnail = queue[i].thumbnail;
+      var file = __dirname + "/../../client"+local;
+      console.log(i + " of "+end+" images");
       fs.exists(file, function(exists){
+        // check if exist localy
         if (exists) {
           console.log("image alreadly exists");
           i++;
           callback();
         } else {
-          console.log("making request to " + url);
-          request(url, {encoding: 'binary'}, function(err, response, body){
+          console.log("making request to " + original);
+          // download image
+          request(original, {encoding: 'binary'}, function(err, response, body){
             if (err) throw new Error(err);
-            console.log(response.statusCode);
-            fs.writeFile("client/images/"+name+".jpeg", body, 'binary', function(err){
+            // write local file
+            fs.writeFile("client"+local, body, 'binary', function(err){
               try{
                 if(err){
-                  erro = "Não foi possivel requisitar a imagem: " + url;
+                  console.log("******** ORIGINAL: "+local);
                   console.log('Ops, um erro ocorreu!');
-                  console.log("URL: ",url);
+                  console.log("URL: ",original);
+                  console.log("********");
+                  i++;
+                  callback();
+                } else {
+                  async.parallel([
+                    function resizedConverting(callback) {
+                      // write resized
+                      convertResized(local,resized,callback);
+                    },
+                    function thumbnailConverting(callback) {
+                      // write thumbnail
+                      convertThumbnail(local,thumbnail,callback);
+                    },
+                  ],function done() {
+                    i++;
+                    callback();
+                  });
                 }
               }catch(err){
                   if (err) throw new Error(err);
               }
-              i++;
-              callback();
             });
           });
         }
@@ -327,6 +350,30 @@ module.exports = function(Schema) {
     });
   }
 
+function convertResized(local,resized,callback) {
+  qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+resized, width:1500}, function(err, filename){
+    if(err){
+      console.log("******** RESIZED ERROR: "+local+" >> Trying again...");
+      // try again
+      convertResized(local,resized,callback);
+    } else {
+      console.log("Converting to resized: OK");
+      callback();
+    }
+  });
+}
+function convertThumbnail(local,thumbnail,callback) {
+  qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+thumbnail, width:100, height:100}, function(err, filename){
+    if(err){
+      console.log("******** THUMBNAIL ERROR: "+local+" >> Trying again...");
+      // try again
+      convertThumbnail(local,thumbnail,callback);
+    } else {
+      console.log("Converting to thumbnail: OK");
+      callback();
+    }
+  });
+}
   Schema.remoteMethod(
     'downloadImages',
     {
