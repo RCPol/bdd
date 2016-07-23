@@ -4,7 +4,6 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 var qt = require('quickthumb');
-var exif = require('exif').ExifImage;
 
 module.exports = function(Schema) {
   function titleCase(string) {
