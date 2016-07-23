@@ -4,6 +4,7 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 var qt = require('quickthumb');
+var exif = require('exif').ExifImage;
 
 module.exports = function(Schema) {
   function titleCase(string) {
@@ -287,6 +288,8 @@ module.exports = function(Schema) {
     });
 
   };
+
+
   function downloadImage(queue){
     var i = 0;
     var end = queue.length;
@@ -294,11 +297,11 @@ module.exports = function(Schema) {
     async.whilst(function(){
       return i < end;
     }, function(callback){
-      var local = queue[i].local;
-      var original = queue[i].original;
-      var resized = queue[i].resized;
-      var thumbnail = queue[i].thumbnail;
-      var file = __dirname + "/../../client"+local;
+      var local = queue[i].local; //local da imagem salva
+      var original = queue[i].original; //url original da imagem
+      var resized = queue[i].resized; //local da imagem salva
+      var thumbnail = queue[i].thumbnail; //local da imagem salva
+      var file = __dirname + "/../../client"+local; //arquivo da imagem salva
       console.log(i + " of "+end+" images");
       fs.exists(file, function(exists){
         // check if exist localy
@@ -306,49 +309,85 @@ module.exports = function(Schema) {
           console.log("image alreadly exists");
           i++;
           callback();
+
         } else {
+
           console.log("making request to " + original);
-          // download image
-          request(original, {encoding: 'binary'}, function(err, response, body){
-            if (err) throw new Error(err);
-            // write local file
-            fs.writeFile("client"+local, body, 'binary', function(err){
-              try{
-                if(err){
-                  console.log("******** ORIGINAL: "+local);
-                  console.log('Ops, um erro ocorreu!');
-                  console.log("URL: ",original);
-                  console.log("********");
-                  i++;
-                  callback();
-                } else {
-                  async.parallel([
-                    function resizedConverting(callback) {
-                      // write resized
-                      convertResized(local,resized,callback);
-                    },
-                    function thumbnailConverting(callback) {
-                      // write thumbnail
-                      convertThumbnail(local,thumbnail,callback);
-                    },
-                  ],function done() {
-                    i++;
-                    callback();
-                  });
+
+          requestFile(original,local, function test (){
+                var count = 0;  
+                var readChunk = require('read-chunk'); // npm install read-chunk 
+                var imageType = require('image-type');
+                var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
+
+                console.log(imageType(buffer));
+                //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
+                if (imageType(buffer)==null){
+                        console.log("Arquivo inválido");
+                        while (count < 3){
+                            requestFile(original,local,callback);
+                            count++;
+                        }
+                }else{
+                    console.log("Arquivo válido"); 
+                    async.parallel([
+                      function resizedConverting(callback) {
+                          // write resized
+                          convertResized(local,resized,callback);
+                      },
+                      function thumbnailConverting(callback) {
+                          // write thumbnail
+                          convertThumbnail(local,thumbnail,callback);
+                      },
+                      ],function done() {
+                           i++;
+                           callback();
+                            
+                      }); 
+                             
                 }
-              }catch(err){
-                  if (err) throw new Error(err);
-              }
-            });
-          });
+
+        });
+
         }
+
       });
+
     }, function(err){
       if (err) throw new Error(err);
       console.log(erro);
       console.log("done.");
     });
   }
+
+//faz requisição de arquivo para download
+function requestFile(original,local,callback){
+  request(original, {encoding: 'binary'}, function(err, response, body){
+            if (err) throw new Error(err);
+            // write local file
+            fs.writeFile("client"+local, body, 'binary', function(err){
+              try{
+                    console.log("Escrevendo o arquivo...");
+                    if(err){
+                      console.log("******** ORIGINAL: "+local);
+                      console.log('Ops, um erro ocorreu!');
+                      console.log("URL: ",original);
+                      console.log("********");
+                      callback();
+                      i++;
+
+                    }else{
+                      callback();
+                    }
+                    
+              }catch(err){
+                  if(err) throw new Error(err);
+              } 
+        });
+        
+  });
+
+}
 
 function convertResized(local,resized,callback) {
   qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+resized, width:1500}, function(err, filename){
@@ -366,6 +405,7 @@ function convertThumbnail(local,thumbnail,callback) {
   qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+thumbnail, width:100, height:100}, function(err, filename){
     if(err){
       console.log("******** THUMBNAIL ERROR: "+local+" >> Trying again...");
+      console.log(err);
       // try again
       convertThumbnail(local,thumbnail,callback);
     } else {
@@ -392,8 +432,8 @@ function convertThumbnail(local,thumbnail,callback) {
     Schema.findById(id, function(err, data){
       if (err) throw new Error(err);
       // check if url exists
-      if(data && data.images){
-        var url = data.images[0].resized;
+      if(data && data.url){
+        var url = data.url;
         cb(err, url);
       } else {
         cb("", "");
