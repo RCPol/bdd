@@ -22,18 +22,18 @@ body {
 ::-webkit-scrollbar {
     width: 10px;
 }
- 
+
 /* Fundo */
 ::-webkit-scrollbar-track {
 	background-color: #F27224;
 }
- 
+
 /* Indicador */
 ::-webkit-scrollbar-thumb {
 	background-color: rgba(81,10,84,0.4);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-	background-color: rgba(81,10,84,0.2); 
+	background-color: rgba(81,10,84,0.2);
 }
 
 /* Links */
@@ -106,7 +106,7 @@ div.qbranco {
 
 /* Título */
 div.qbranco h1 {
-	font-size: 21px;
+	font-size: 20px;
 	line-height: 21px;
 	font-weight: normal;
 	margin: 5px 0 16px 13px;
@@ -142,7 +142,7 @@ div.cdireita {
 /* Busca */
 .formbusca {
 	float:right;
-	width: 300px;
+	width: 250px;
 	padding-right: 25px;
 	text-align: right;
 }
@@ -451,7 +451,7 @@ ul li a.toggle span {
 }
 
 .descel input[type=checkbox] + label:before {
-	content: "\00a0";  
+	content: "\00a0";
 	display: inline-block;
 	vertical-align: 1px;
 	width: 8px;

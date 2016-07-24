@@ -216,8 +216,20 @@ function profilesLabel(params,callback) {
 }
 app.get('/profile/glossary/individual/:id', function(req, res) {
   var template = fs.readFileSync('./client/glossary.mustache', 'utf8');
-  var params = {id: req.params.id};
-  res.send(mustache.render(template, params));
+  var Schema = app.models.Schema;
+  Schema.findById(req.params.id,function(err,schema) {
+    if(typeof schema.images != "undefined" && schema.images.length>0){
+      schema.image = schema.images[0].resized;
+    } else {
+      schema.image = "/img/lspm.jpg"
+    }
+    if(schema.class == "State"){
+      schema.subtitle = schema.category+" : "+schema.field;
+    } else{
+      schema.subtitle = schema.category;
+    }      
+    res.send(mustache.render(template, schema));
+  });
 });
 
 app.get('/profile/glossary/:lang*?', function(req, res){
