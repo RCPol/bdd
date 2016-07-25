@@ -86,14 +86,14 @@
 		  $('.inner').addClass('show');
 		  $('li .inner').slideUp(350);
 		  $('li .inner').slideToggle(350);
-		  $('.accordion').find('span').html('&minus;');
+		  $('.accordion').find('span .toggle').html('&minus;');
 		});
 
 		//Botão Ocultar todos
 		$('.close').click(function(){
 		  $('.inner').removeClass('show');
 		  $('li .inner').slideUp(350);
-		  $('.accordion').find('span').html('+');
+		  $('.accordion').find('span .toggle').html('+');
 		});
 
 		//Ao clicar adiciona a classe selecionado à div vimagens
@@ -109,7 +109,7 @@
       $(document).ready(function(){
 				identification = new Identification();
 				identification.startup();
-      });			
+      });
 	</script>
 	<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
 </head>
