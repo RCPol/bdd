@@ -62,24 +62,24 @@ function readSpecies(id, map){
       }
     });
     // IMAGES
-    data[lang+':rcpol:Image:plantImage'] = !(Array.isArray(data[lang+':rcpol:Image:plantImage']))?[data[lang+':rcpol:Image:plantImage']]:data[lang+':rcpol:Image:plantImage'];
-    data[lang+":rcpol:Image:plantImage"].forEach(function(media){
-        imagem("#foto_planta", data[lang+":rcpol:Image:plantImage"]);
-        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
-    });
-    data[lang+':rcpol:Image:flowerImage'] = !(Array.isArray(data[lang+':rcpol:Image:flowerImage']))?[data[lang+':rcpol:Image:flowerImage']]:data[lang+':rcpol:Image:flowerImage'];
-    data[lang+":rcpol:Image:flowerImage"].forEach(function(media){
-        imagem("#foto_planta", data[lang+":rcpol:Image:flowerImage"]);
-        $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
-    });
-    data[lang+':rcpol:Image:pollenImage'] = !(Array.isArray(data[lang+':rcpol:Image:pollenImage']))?[data[lang+':rcpol:Image:pollenImage']]:data[lang+':rcpol:Image:pollenImage'];
-    data[lang+":rcpol:Image:pollenImage"].forEach(function(media){
-        imagem("#foto_polen", data[lang+":rcpol:Image:pollenImage"]);
-    });
-    data[lang+':rcpol:Image:allPollenImage'] = !(Array.isArray(data[lang+':rcpol:Image:allPollenImage']))?[data[lang+':rcpol:Image:allPollenImage']]:data[lang+':rcpol:Image:allPollenImage'];
-    data[lang+":rcpol:Image:allPollenImage"].forEach(function(media){
-        imagem("#foto_polen", data[lang+":rcpol:Image:allPollenImage"]);
-    });
+    if(data[lang+':rcpol:Image:plantImage'] && data[lang+':rcpol:Image:plantImage'].images && data[lang+':rcpol:Image:plantImage'].images.length>0)
+      data[lang+":rcpol:Image:plantImage"].images.forEach(function(media){
+          $("#foto_planta").append("<img src='" +media.resized+"'/>");
+          $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+      });
+    if(data[lang+':rcpol:Image:flowerImage'] && data[lang+':rcpol:Image:flowerImage'].images && data[lang+':rcpol:Image:flowerImage'].images.length>0)
+      data[lang+":rcpol:Image:flowerImage"].images.forEach(function(media){
+          $("#foto_planta").append("<img src='" +media.resized+"'/>");
+          $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+      });
+    if(data[lang+':rcpol:Image:pollenImage'] && data[lang+':rcpol:Image:pollenImage'].images && data[lang+':rcpol:Image:pollenImage'].images.length>0)
+      data[lang+":rcpol:Image:pollenImage"].images.forEach(function(media){
+          $("#foto_polen").append("<img src='" +media.resized+"'/>");
+      });
+    if(data[lang+':rcpol:Image:allPollenImage'] && data[lang+':rcpol:Image:allPollenImage'].images && data[lang+':rcpol:Image:allPollenImage'].images.length>0)
+      data[lang+":rcpol:Image:allPollenImage"].images.forEach(function(media){
+          $("#foto_polen").append("<img src='" +media.resized+"'/>");
+      });
     $(".fotorama").fotorama();
 
     // TODO: Tratamento de valores númericos nas descrição polínica e cometários/detalhes extra
@@ -176,15 +176,7 @@ function readSpecies(id, map){
 
   });
 };
-function imagem(nicho, descritor){
-    descritor.forEach(function(img_object){
-      if(img_object)
-        $(nicho).append(img_object.name
-          ?"<img src='/resized_images/" +img_object.name + ".jpg'>"
-          :"<img style='max-width:500px;' src="+ img_object.url +">");
-      // }
-    });
-}
+
 
 // function escreverEstados(seletor, descritor, adicionarVirgula){
 //   // adicionar separador ","...

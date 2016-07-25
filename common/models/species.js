@@ -113,7 +113,7 @@ module.exports = function(Species) {
                   if(values.length != 4){
                     console.log("problema com valor numerico:");
                     console.log(key);
-                    console.log(species[key]);
+                    // console.log(species[key]);
                   } else {
                     var min = parseFloat(values[0].trim().slice(4).replace(",","."));
                     var max = parseFloat(values[1].trim().slice(4).replace(",","."));
@@ -121,6 +121,12 @@ module.exports = function(Species) {
                     var sd = parseFloat(values[2].trim().slice(4).replace(",","."));
                     species[key].numerical = {min: min, max: max, avg:avg, sd:sd};
                   }
+                }
+              } else if(sp[key].class=="Image"){
+                if(species[key]){
+                  species[key].images.concat(sp[key].images);
+                }else{
+                  species[key] = sp[key];
                 }
               }
             }
