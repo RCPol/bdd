@@ -5,7 +5,7 @@ var mustache = require('mustache');
 var fs = require('fs');
 var hash = require('object-hash');
 var async = require('async');
-
+require('compression');
 var app = module.exports = loopback();
 
 app.start = function() {
@@ -45,7 +45,7 @@ app.start = function() {
     }
   });
 };
-app.use(loopback.compress());
+// app.use(loopback.compress());
 app.use(loopback.static(path.resolve(__dirname, '../client')));
 
 // Aqui (para a chave) vai ter que ser diferente porque a quantidade de parâmetros é variável. Vai ter que usar os parametros do tipo ?parmA=X&paramB=Y
@@ -96,7 +96,7 @@ app.get('/profile/specimen/:id', function(req, res) {
               params.value[domIdValue] = specimen[key].value;
               // COORDINATES
               if(parsedId[3]=="decimalLatitude" || parsedId[3]=="decimalLongitude")
-                params.value[domIdValue] = specimen[key].value.toFixed(6)
+                params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
               // IMAGE
               if(parsedId[2]=="Image"){
                 params.value[domIdValue] = [];
@@ -227,7 +227,7 @@ app.get('/profile/glossary/individual/:id', function(req, res) {
       schema.subtitle = schema.category+" : "+schema.field;
     } else{
       schema.subtitle = schema.category;
-    }      
+    }
     res.send(mustache.render(template, schema));
   });
 });
