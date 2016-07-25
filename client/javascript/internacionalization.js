@@ -1,7 +1,8 @@
  function Internacionalization() {
   this.language = "pt-BR";
-  if(localStorage && localStorage.language) this.language = localStorage.language;
-  else alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
+  if(localStorage){
+    this.language = localStorage.language?localStorage.language:this.language;
+  } else alert("O seu navegador de Internet pode não suportar alguns dos recursos utilizados por este sistema.\n Para uma melhor experiência, por favor, atualize o seu navegador ou utilize outro de sua preferência.");
 }
 Internacionalization.prototype.setLanguage = function(language){
   var self = this;
