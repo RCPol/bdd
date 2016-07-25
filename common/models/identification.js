@@ -16,7 +16,7 @@ module.exports = function(Identification) {
     //TODO: validate query
     //examples
     //{language:pt-BR, states:[{states.states.id:pt-BR:rcpol:State:flowerColorPurple}], numerical: []}
-    //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":"5.0"}]}
+    //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":{"min":30, "max":40}}]}
 
     param.language = typeof param.language != "undefined"?param.language:"pt-BR";
     param.states = typeof param.states != "undefined"?param.states:[];
@@ -208,15 +208,13 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             class: species[key].class,
             term: species[key].term,
             category: species[key].category,
-            descriptor: species[key].field,
-            states: []
+            descriptor: species[key].field
           };
 
           if(species[key].states){
+            entry.states = [];
             async.eachSeries(species[key].states, function(state, callback3){
               var entry_state = {value:state.state, order:state.order, id:state.id};
-              if (state.numerical)
-                entry_state.numerical = state.numerical;
               entry.states.push(entry_state );
               callback3();
             }, function(err){
@@ -224,6 +222,10 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
               identification_item["states"].push(entry);
               callback2();
             });
+          } else if (species[key].numerical){
+            entry.numerical = species[key].numerical;
+            identification_item["states"].push(entry);
+            callback2();
           } else {
             identification_item["states"].push(entry);
             callback2();
@@ -271,14 +273,14 @@ function composeQuery(param, callback){
       query.and.push(
         {"states": {"elemMatch":
                     {"id": elem.descriptor_id,
-                     "states.numerical.min": {lt: elem.value},
-                     "states.numerical.max": {gt: elem.value}
+                     "numerical.min": {lte: Number(elem.value.min)},
+                     "numerical.max": {gte: Number(elem.value.max)}
                     }}});
       queryMongo.$and.push(
         {"states": {"$elemMatch":
                     {"id": elem.descriptor_id,
-                     "states.numerical.min": {$lt: elem.value},
-                     "states.numerical.max": {$gt: elem.value}
+                     "numerical.min": {$lte: Number(elem.value.min)},
+                     "numerical.max": {$gte: Number(elem.value.max)}
                     }}});
     });
     callback(query, queryMongo);
