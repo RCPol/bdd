@@ -269,7 +269,7 @@ module.exports = function(Schema) {
     //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
     //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
     //Onde a imagem vai ser salva na pasta do cliente
-    var downloadQueue = [];
+  
     Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
       console.log(results.length);
       var queue =  [];
