@@ -148,8 +148,9 @@ module.exports = function(Specimen) {
                   },function doneState() {
                     callbackCell();
                   });
-                // OTHER FIELDS
+                  // END OF CATEGORICAL DESCRIPTOR
                 } else {
+                // OTHER FIELDS
                 record[schema.id].value = value;
                 // EVENT DATE
                 if(schema.term=="eventDate"){
@@ -614,6 +615,7 @@ module.exports = function(Specimen) {
       var file = __dirname + "/../../client/resized_images/"+name+".jpg";
       fs.exists(file, function(exists){
         if (exists) {
+
           console.log("image alreadly exists");
           i++;
           callback();
