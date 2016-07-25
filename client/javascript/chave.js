@@ -125,7 +125,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field] = self.descriptors[state.category][state.field]?self.descriptors[state.category][state.field]:{};
         self.descriptors[state.category][state.field].htmlId = "descriptor_"+(state.category+state.field).htmlId();
         self.descriptors[state.category][state.field].value = state.field;
-        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.descriptors[state.category][state.field].value+"'><img src='img/glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'></div></li>");
+        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.descriptors[state.category][state.field].value+"'><img alt='"+self.descriptors[state.category][state.field].value+"' src='img/glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'></div></li>");
         // self.descriptors[state.category][state.field].html.find("li").append("<div class='valoresn inner'><input name='" + self.descriptors[state.category][state.field].htmlId +"' type='text' class='numnum' size='5' maxlength='12' placeholder='00.00'> un </div>");
       }
       // STATE
