@@ -115,10 +115,11 @@ module.exports = function(Species) {
                     console.log(key);
                     console.log(species[key]);
                   } else {
-                    species[key].state = {min: values[0].trim().slice(4), max: values[1].trim().slice(4)};
-                    var min = parseFloat(species[key].state.min.replace(",","."));
-                    var max = parseFloat(species[key].state.max.replace(",","."));
-                    species[key].state.numerical = {min: min, max: max};
+                    var min = parseFloat(values[0].trim().slice(4).replace(",","."));
+                    var max = parseFloat(values[1].trim().slice(4).replace(",","."));
+                    var avg = parseFloat(values[2].trim().slice(4).replace(",","."));
+                    var sd = parseFloat(values[2].trim().slice(4).replace(",","."));
+                    species[key].numerical = {min: min, max: max, avg:avg, sd:sd};
                   }
                 }
               }
