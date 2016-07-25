@@ -22,20 +22,26 @@ function readGlossary(id){
       description = data.definition;
 
     $("#" + id.split(":").join("-")).find("h2").html(name);
+
     if ((data["class"] == "CategoricalDescriptor" || data["class"] == "NumericalDescriptor") && data.state)
-      $("#" + id.split(":").join("-")).find("h3").html(data.category + ": " + data.field);
-    else if (data["class"] == "CategoricalDescriptor" || data["class"] == "NumericalDescriptor")
       $("#" + id.split(":").join("-")).find("h3").html(data.category);
+    else if (data["class"] == "State")
+      $("#" + id.split(":").join("-")).find("h3").html(data.category + ": " + data.field);
     $("#" + id.split(":").join("-") + " > #description").html(description);
 
-    var url = "/api/Schemas/mainImage?id="+id;
-    $.getJSON(url, function(image){
-      if (image.response != ""){
-        $("#" + id.split(":").join("-") + " > #image").attr("src", image.response);
-      }else{
-        $("#" + id.split(":").join("-") +" >  #image").hide();
-      }
-    });
+    if (data.images && data.images.length > 0)
+      $("#" + id.split(":").join("-") + " > #image").attr("src", data.images[0].resized);
+    else
+      $("#" + id.split(":").join("-") +" >  #image").hide();
+
+    // var url = "/api/Schemas/mainImage?id="+id;
+    // $.getJSON(url, function(image){
+    //   if (image.response != ""){
+    //     $("#" + id.split(":").join("-") + " > #image").attr("src", image.response);
+    //   }else{
+    //     $("#" + id.split(":").join("-") +" >  #image").hide();
+    //   }
+    // });
   });
 }
 
