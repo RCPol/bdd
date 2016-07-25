@@ -148,9 +148,8 @@ module.exports = function(Specimen) {
                   },function doneState() {
                     callbackCell();
                   });
-                  // END OF CATEGORICAL DESCRIPTOR
-                } else {
                 // OTHER FIELDS
+                } else {
                 record[schema.id].value = value;
                 // EVENT DATE
                 if(schema.term=="eventDate"){
@@ -169,17 +168,36 @@ module.exports = function(Specimen) {
                   // IMAGE
                   //encontra class image no schema
                   if(schema["class"]=="Image"){ //se encontrar a classe da imagem
-                    record[schema.id].value.split("|").forEach(function(value){
-                      record[schema.id].name = schema.category + value.replace("https://drive.google.com/open?id=", "");
-                      if(typeof value === "string"){
-                        record[schema.id].url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-                      }
-                      // save images
-                     // var image = {url: record[schema.id].url, term:schema.term ,name: record[schema.id].name};
-                      //if(language==originalLanguage){
-                       // downloadQueue.push(image); //recebe as imagens
-                     // }
+                    //recebe um vetor de images
+                    record[schema.id].images = [];
+                    record[schema.id].value.split("|").forEach(function(img,i){
+                        var imageId = schema.id + ":" + i;
+                        var image = {
+                          id: imageId,
+                          name: schema.category + img.replace("https://drive.google.com/open?id=", ""),
+                          original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
+                          local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                          resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                          thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                        }
+                        record[schemaId].images.push(image);
                     });
+
+                    //Função antiga
+                    // record[schema.id].value.split("|").forEach(function(value){
+                    //   recebe o nome da imagem
+                    //   record[schema.id].name = schema.category + value.replace("https://drive.google.com/open?id=", "");
+                    //   recebe o valor da imagem
+                    //   if(typeof value === "string"){
+                    //     record[schema.id].url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+                    //   }
+                    //    save images
+                    //   var image = {url: record[schema.id].url, term:schema.term ,name: record[schema.id].name};
+                    //   if(language==originalLanguage){
+                    //     downloadQueue.push(image); //recebe as imagens
+                    //   }
+                    // });
+
                   }else
                   // REFERENCE
                   if(schema["class"]=="Reference"){
@@ -419,41 +437,183 @@ module.exports = function(Specimen) {
    //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
    //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
    //Onde a imagem vai ser salva na pasta do cliente
-   var downloadQueue = [];
-   var instance;
-   var imgUrl;
-  Specimen.find({},
-    function(err, results) {
-     // console.log(results);
-     // console.log(results.typeOf);
-      results.forEach(function (result) {
-        for (var key in result) {
-         // console.log("Agora esse é resultado unico");
-          instance = new Object(result[key]);
-          if (result.originalLanguage == instance.language) {
-            if (instance.class == "Image") {
-                instance.value.split("|").forEach(function(value){
-                  if(typeof value === "string"){
-                    imgUrl = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-                  }
-                  var image = {url: imgUrl, term: instance.term, name: instance.name};
-                  downloadQueue.push(image);
-                });
-            }
+   var queue = [];
+
+   Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
+   {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
+   fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
+   "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){
+      //console.log(results);
+        results.forEach(function (result){
+        //console.log(result["pt-BR:rcpol:Image:plantImage"]);
+          
+          if(result["pt-BR:rcpol:Image:allPollenImage"]){
+              result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
+               // console.log(img);
+                queue.push(img);
+              });
           }
-        }
-      });
-      var erro = downloadImage(downloadQueue);
+          if(result["pt-BR:rcpol:Image:flowerImage"]){
+              result["pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
+              //  console.log(img);
+                queue.push(img);
+              });
+          }
+          if(result["pt-BR:rcpol:Image:plantImage"]){
+              result["pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
+              //  console.log(img);
+                queue.push(img);
+              });
+          }
+          if(result["pt-BR:rcpol:Image:beeImage"]){
+              result["pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
+               // console.log(img);
+                queue.push(img);
+              });
+          }
+          if(result["pt-BR:rcpol:Image:pollenImage"]){
+              result["pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
+              //  console.log(img);
+                queue.push(img);
+              });
+          }
+        });
+
+      downloadImage(queue);
       if(err){
         console.log(err);
         cb(err, "");
       }
-      cb(null, "done.");
-    });
+      cb(null, "Downloading...");        
+     
+   });
 
   };
 
+ function downloadImage(queue){
+    var i = 0;
+    var end = queue.length;
+    var erro = "";
+    async.whilst(function(){
+      return i < end;
+    }, function(callback){
+      var local = queue[i].local; //local da imagem salva
+      var original = queue[i].original; //url original da imagem
+      var resized = queue[i].resized; //local da imagem salva
+      var thumbnail = queue[i].thumbnail; //local da imagem salva
+      var file = __dirname + "/../../client"+local; //arquivo da imagem salva
+      console.log(i + " of "+end+" images");
+      fs.exists(file, function(exists){
+        // check if exist localy
+        if (exists) {
+          console.log("image alreadly exists");
+          i++;
+          callback();
 
+        } else {
+
+          console.log("making request to " + original);
+
+          requestFile(original,local, function test (){
+                var count = 0;  
+                var readChunk = require('read-chunk'); // npm install read-chunk 
+                var imageType = require('image-type');
+                var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
+
+                console.log(imageType(buffer));
+                //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
+                if (imageType(buffer)==null){
+                        console.log("Arquivo inválido");
+                        while (count < 3){
+                            requestFile(original,local,callback);
+                            count++;
+                        }
+                }else{
+                    console.log("Arquivo válido"); 
+                    async.parallel([
+                      function resizedConverting(callback) {
+                          // write resized
+                          convertResized(local,resized,callback);
+                      },
+                      function thumbnailConverting(callback) {
+                          // write thumbnail
+                          convertThumbnail(local,thumbnail,callback);
+                      },
+                      ],function done() {
+                           i++;
+                           callback();
+                            
+                      }); 
+                             
+                }
+
+        });
+
+        }
+
+      });
+
+    }, function(err){
+      if (err) throw new Error(err);
+      console.log(erro);
+      console.log("done.");
+    });
+  }
+
+//faz requisição de arquivo para download
+function requestFile(original,local,callback){
+  request(original, {encoding: 'binary'}, function(err, response, body){
+            if (err) throw new Error(err);
+            // write local file
+            fs.writeFile("client"+local, body, 'binary', function(err){
+              try{
+                    console.log("Escrevendo o arquivo...");
+                    if(err){
+                      console.log("******** ORIGINAL: "+local);
+                      console.log('Ops, um erro ocorreu!');
+                      console.log("URL: ",original);
+                      console.log("********");
+                      callback();
+                      i++;
+
+                    }else{
+                      callback();
+                    }
+                    
+              }catch(err){
+                  if(err) throw new Error(err);
+              } 
+        });
+        
+  });
+
+}
+
+function convertResized(local,resized,callback) {
+  qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+resized, width:1500}, function(err, filename){
+    if(err){
+      console.log("******** RESIZED ERROR: "+local+" >> Trying again...");
+      // try again
+      convertResized(local,resized,callback);
+    } else {
+      console.log("Converting to resized: OK");
+      callback();
+    }
+  });
+}
+function convertThumbnail(local,thumbnail,callback) {
+  qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+thumbnail, width:100, height:100}, function(err, filename){
+    if(err){
+      console.log("******** THUMBNAIL ERROR: "+local+" >> Trying again...");
+      console.log(err);
+      // try again
+      convertThumbnail(local,thumbnail,callback);
+    } else {
+      console.log("Converting to thumbnail: OK");
+      callback();
+    }
+  });
+}
   Specimen.remoteMethod(
     'downloadImages',
     {
@@ -601,68 +761,67 @@ module.exports = function(Specimen) {
     return validator.isFloat(str);
   };
 
-  function downloadImage(queue){
-    var erro;
-    var i = 0;
-    var end = queue.length;
-    async.whilst(function(){
-      return i < end;
-    }, function(callback){
-      console.log(i + " of " + end);
-      var url = queue[i].url;
-      var name = queue[i].name;
-      var term = queue[i].term;
-      var file = __dirname + "/../../client/resized_images/"+name+".jpg";
-      fs.exists(file, function(exists){
-        if (exists) {
-
-          console.log("image alreadly exists");
-          i++;
-          callback();
-        } else {
-          console.log("making request to "+url);
-          request(url, {encoding: 'binary'} ,function(err, response, body){
-            if (err) throw new Error(err);
-            console.log(response.statusCode);
-            fs.writeFile("client/images/"+name+".jpg", body, 'binary', function(err){
-              try {
-                if(err) {
-                  console.log("URL: ",url);
-                  throw new Error(err);
-                }
-                // salvar imagem
-                qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/resized_images/" + name + ".jpg", width:1500}, function(err, filename){
-                  if(err){
-                    erro = "Não foi possivel ler a imagem: " + url;
-                    console.log('Ops, um erro ocorreu!');
-                    console.log("URL: ",url);
-                    console.log("Não foi possível ler a imagem");
-                  }
-                  i++;
-                  // se é flor, salvar thumbnail tambem
-                  if (term == 'flowerImage'){
-                    qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/thumbnails/" + name + ".jpg", width:100, height:100}, function(err, filename){
-                      if (err) throw new Error(err);
-                      console.log("converted to thumbnail");
-                      callback();
-                    });
-                  } else
-                    callback();
-                });
-              } catch(err) {
-                if (err) {
-                  throw new Error(err);
-                }
-              }
-            });
-          });
-        }
-      });
-    }, function(err){
-      if(err) throw new Error(err);
-      console.log(erro);
-      console.log("done.");
-    });
-    return erro;
-  };
+  // function downloadImage(queue){
+  //   var erro;
+  //   var i = 0;
+  //   var end = queue.length;
+  //   async.whilst(function(){
+  //     return i < end;
+  //   }, function(callback){
+  //     console.log(i + " of " + end);
+  //     var url = queue[i].url;
+  //     var name = queue[i].name;
+  //     var term = queue[i].term;
+  //     var file = __dirname + "/../../client/resized_images/"+name+".jpg";
+  //     fs.exists(file, function(exists){
+  //       if (exists) {
+  //         console.log("image alreadly exists");
+  //         i++;
+  //         callback();
+  //       } else {
+  //         console.log("making request to "+url);
+  //         request(url, {encoding: 'binary'} ,function(err, response, body){
+  //           if (err) throw new Error(err);
+  //           console.log(response.statusCode);
+  //           fs.writeFile("client/images/"+name+".jpg", body, 'binary', function(err){
+  //             try {
+  //               if(err) {
+  //                 console.log("URL: ",url);
+  //                 throw new Error(err);
+  //               }
+  //               // salvar imagem
+  //               qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/resized_images/" + name + ".jpg", width:1500}, function(err, filename){
+  //                 if(err){
+  //                   erro = "Não foi possivel ler a imagem: " + url;
+  //                   console.log('Ops, um erro ocorreu!');
+  //                   console.log("URL: ",url);
+  //                   console.log("Não foi possível ler a imagem");
+  //                 }
+  //                 i++;
+  //                 // se é flor, salvar thumbnail tambem
+  //                 if (term == 'flowerImage'){
+  //                   qt.convert({src:__dirname + "/../../client/images/"+name+".jpg", dst: __dirname + "/../../client/thumbnails/" + name + ".jpg", width:100, height:100}, function(err, filename){
+  //                     if (err) throw new Error(err);
+  //                     console.log("converted to thumbnail");
+  //                     callback();
+  //                   });
+  //                 } else
+  //                   callback();
+  //               });
+  //             } catch(err) {
+  //               if (err) {
+  //                 throw new Error(err);
+  //               }
+  //             }
+  //           });
+  //         });
+  //       }
+  //     });
+  //   }, function(err){
+  //     if(err) throw new Error(err);
+  //     console.log(erro);
+  //     console.log("done.");
+  //   });
+  //   return erro;
+  // };
 };
