@@ -109,20 +109,7 @@
       $(document).ready(function(){
 				identification = new Identification();
 				identification.startup();
-      });
-			$( document ).tooltip({
-      items: "img",
-      content: function(callback) {
-        var element = $( this );
-        if ( element.is( ".vglos" ) ) {
-					var id = element.attr( "alt" );
-					console.log("id",id);
-					$.get("/profile/glossary/individual/"+id,function(data) {
-						callback(data);
-					});
-        }
-      }
-    });
+      });			
 	</script>
 	<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
 </head>
