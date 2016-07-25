@@ -99,7 +99,7 @@ Identification.prototype.createSpecies = function(callback) {
       self.species[sp.id].scientificNameAuthorship = sp[self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship"].value;
       self.species[sp.id].vernacularName = sp[self.internacionalization.language+":dwc:Taxon:vernacularName"]?sp[self.internacionalization.language+":dwc:Taxon:vernacularName"].value:"";
       self.species[sp.id].html = $("<div class='especies' id = " + self.species[sp.id].htmlId + "></div>");
-      // self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='/thumbnails/"+(sp[self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.internacionalization.language+":rcpol:Image:plantImage"].name:"?")+".jpg' onerror='imageError(this)'/>");
+      self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='"+(sp[self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.internacionalization.language+":rcpol:Image:plantImage"].images[0].thumbnail:"img/lspm.jpg")+"' onerror='imageError(this)'/>");
       // self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='"+(sp[self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.internacionalization.language+":rcpol:Image:plantImage"].value.split("|")[0].replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="):"?")+"' onerror='imageError(this)'/>");
       self.species[sp.id].html.append("<div class='nsp'></div>");
       self.species[sp.id].html.find(".nsp").append("<p class='famisp'>" + self.species[sp.id].family + "</p>");

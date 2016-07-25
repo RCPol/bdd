@@ -37,26 +37,26 @@ module.exports = function(Specimen) {
         response.count ++;
         async.series([
           function(callbackSave) {
-            console.log("start en-US");
+            // console.log("start en-US");
             //para salvar em  inglês
             saveRecord(language,"en-US",line, schema, class_, terms, function() {
-              console.log("finish en-US");
+              // console.log("finish en-US");
               callbackSave();
             });
           },
           function(callbackSave) {
-            console.log("start pt-BR");
+            // console.log("start pt-BR");
             //para salvar em português
             saveRecord(language,"pt-BR",line, schema, class_, terms, function() {
-              console.log("finish pt-BR");
+              // console.log("finish pt-BR");
               callbackSave();
             });
           },
           function(callbackSave) {
-            console.log("start es-ES");
+            // console.log("start es-ES");
             //para salvar em espanhol
             saveRecord(language,"es-ES",line, schema, class_, terms, function() {
-              console.log("finish es-ES");
+              // console.log("finish es-ES");
               callbackSave();
             });
           }
@@ -171,10 +171,10 @@ module.exports = function(Specimen) {
                     //recebe um vetor de images
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
-                        var imageId = schema.id + ":" + i;
+                        var imageId = schema.id.split(":").slice(1).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
                         var image = {
                           id: imageId,
-                          name: schema.category + img.replace("https://drive.google.com/open?id=", ""),
+                          // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
                           original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
                           local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                           resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
@@ -446,7 +446,7 @@ module.exports = function(Specimen) {
       //console.log(results);
         results.forEach(function (result){
         //console.log(result["pt-BR:rcpol:Image:plantImage"]);
-          
+
           if(result["pt-BR:rcpol:Image:allPollenImage"]){
               result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
                // console.log(img);
@@ -484,8 +484,8 @@ module.exports = function(Specimen) {
         console.log(err);
         cb(err, "");
       }
-      cb(null, "Downloading...");        
-     
+      cb(null, "Downloading...");
+
    });
 
   };
@@ -515,8 +515,8 @@ module.exports = function(Specimen) {
           console.log("making request to " + original);
 
           requestFile(original,local, function test (){
-                var count = 0;  
-                var readChunk = require('read-chunk'); // npm install read-chunk 
+                var count = 0;
+                var readChunk = require('read-chunk'); // npm install read-chunk
                 var imageType = require('image-type');
                 var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
 
@@ -529,7 +529,7 @@ module.exports = function(Specimen) {
                             count++;
                         }
                 }else{
-                    console.log("Arquivo válido"); 
+                    console.log("Arquivo válido");
                     async.parallel([
                       function resizedConverting(callback) {
                           // write resized
@@ -542,9 +542,9 @@ module.exports = function(Specimen) {
                       ],function done() {
                            i++;
                            callback();
-                            
-                      }); 
-                             
+
+                      });
+
                 }
 
         });
@@ -579,12 +579,12 @@ function requestFile(original,local,callback){
                     }else{
                       callback();
                     }
-                    
+
               }catch(err){
                   if(err) throw new Error(err);
-              } 
+              }
         });
-        
+
   });
 
 }
