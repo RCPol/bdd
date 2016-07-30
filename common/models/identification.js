@@ -159,6 +159,7 @@ module.exports = function(Identification) {
           }}
         ], function (error, states) {
           if (err) throw new Error(err);
+          states = states.filter(function(state){return state.count < items.length;});
           var results = {eligibleStates: states, eligibleSpecies: items};
           callback(null, results);
         });
