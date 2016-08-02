@@ -15,11 +15,14 @@
 .project
 .strong-pm
 coverage
-node_modules
 npm-debug.log
 
 deployment-config.json
 
 uploads/*
+storage/*
+client/images/*
+client/resized/*
+client/thumbnails/*
 
 *.xlsx
