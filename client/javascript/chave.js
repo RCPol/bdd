@@ -29,7 +29,7 @@ Identification.prototype.startup = function() {
   this.eligibleDescriptors = {};
   this.eligibleStates = {};
   this.selectedStates = {};
-  this.definedNumericals = {};
+  this.definedNumericals = [];
   console.time("load species");
   console.time("load descriptors");
   var self = this;
@@ -69,7 +69,8 @@ Identification.prototype.selectState = function(id) {
 }
 Identification.prototype.removeAll = function() {
   var self = this;
-  self.selectedStates = {}
+  self.selectedStates = {};
+  self.definedNumericals = [];
   self.printDescriptors();
   Object.keys(self.species).forEach(function(id) {
     self.eligibleSpecies[id] = true;
@@ -110,7 +111,7 @@ Identification.prototype.createSpecies = function(callback) {
 }
 Identification.prototype.createDescriptors = function(callback) {
   var self = this;
-  $.getJSON("/api/Schemas?filter[where][language]="+self.internacionalization.language+"&filter[where][class]=State"/*, { filter : query }*/, function(states){
+  $.getJSON("/api/Schemas?filter[where][language]="+self.internacionalization.language+"&filter[where][or][0][class]=State&filter[where][or][1][class]=NumericalDescriptor"/*, { filter : query }*/, function(states){
     states.forEach(function(state) {
       var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
       // CATEGORY
@@ -135,6 +136,15 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].value = state.state;
         self.descriptors[state.category][state.field][state.state].id = state.id;
         self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img alt="'+self.descriptors[state.category][state.field][state.state].id+'" src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
+      }
+      // NUMERICAL
+      if (state.class=="NumericalDescriptor"){
+        self.descriptors[state.category][state.field] = {};
+        self.descriptors[state.category][state.field].class = state.class;
+        self.descriptors[state.category][state.field].htmlId = "descriptor_"+(state.category+state.field).htmlId();
+        self.descriptors[state.category][state.field].value = state.field;
+        self.descriptors[state.category][state.field].id = state.id;
+        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.descriptors[state.category][state.field].value+"'><img src='img/glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'> <div class='numerico' id='"+state.id+"'>min: <input id='min' size='5'> max:<input id='max' size='5'></div> </div></li>");
       }
     });
     callback();
@@ -165,6 +175,12 @@ Identification.prototype.printDescriptors = function() {
           descriptorCount++;
           self.descriptors[idCategory][idDescriptor].html.appendTo($("#"+self.descriptors[idCategory].htmlId).next("#descriptors"));
         }
+        // IS DEFINED NUMERICAL?
+        var numerical = self.definedNumericals.find(function(numerical){return numerical.descriptor_id == self.descriptors[idCategory][idDescriptor].id;});
+        if(numerical){
+          self.descriptors[idCategory][idDescriptor].html.detach();
+          $("#descritoresSelecionados").append(self.descriptors[idCategory][idDescriptor].value + "- min: " + numerical.value.min + ", max: " + numerical.value.max );
+        }
       }
       var stateCount = 0;
       Object.keys(self.descriptors[idCategory][idDescriptor]).forEach(function(idState) {
@@ -175,21 +191,21 @@ Identification.prototype.printDescriptors = function() {
               stateCount++;
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#"+self.descriptors[idCategory][idDescriptor].htmlId));
               if(self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count!=null){
-                $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("("+self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count+")")
+                $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("("+self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count+")");
               }
             } else {
               self.descriptors[idCategory][idDescriptor][idState].html.detach();
             }
             // IS SELECTED STATE?
-            if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id]){
+            if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id] ){
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#descritoresSelecionados"));
-              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='javascript:identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='http://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Button-Close-icon.png'/></a>")
+              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='javascript:identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='http://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Button-Close-icon.png'/></a>");
             }
           }
         }
       });
       // REMOVE UNELIGIBLE DESCRIPTOR
-      if(self.descriptors[idCategory][idDescriptor].value&&stateCount==0){
+      if(self.descriptors[idCategory][idDescriptor].value&&stateCount==0 && (self.descriptors[idCategory][idDescriptor].class != "NumericalDescriptor" || Object.keys(self.eligibleSpecies).length <= 1)){
         descriptorCount--;
         self.descriptors[idCategory][idDescriptor].html.detach();
       }
@@ -208,8 +224,8 @@ String.prototype.htmlId = function() {
 //   this.selectedStates.push({id:state});
 //   return this;
 // }
-Identification.prototype.definedNumerical = function(id,value) {
-  this.definedNumericals.push({id:id,value:value});
+Identification.prototype.definedNumerical = function(id,min,max) {
+  this.definedNumericals.push({descriptor_id:id,value:{min: min, max: max}});
   return this;
 }
 
@@ -218,10 +234,26 @@ function imageError(img) {
   img.onerror= "";
   return true;
 }
+
+Identification.prototype.setNumerical = function(){
+  var self = this;
+  $(".numerico").each(function(){
+    var id = $(this).attr('id');
+    var min = $(this).find("#min").val();
+    var max = $(this).find("#max").val();
+    $(this).find("#min").val("");
+    $(this).find("#max").val("");
+    if (min && max){
+      self.definedNumerical(id, min, max);
+    }
+  });
+}
+
 Identification.prototype.identify = function() {
   console.time("Identify");
   var self = this;
-  var query = {language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}
+  self.setNumerical();
+  var query = {language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item};}), numerical:self.definedNumericals};
   self.printDescriptors();
   $.get("/api/Identification/identify", {param: query}, function(data){
     self.eligibleSpecies = {};
@@ -231,7 +263,7 @@ Identification.prototype.identify = function() {
     self.printSpecies();
     self.eligibleStates = {};
     data.response.eligibleStates.forEach(function(remoteEligibleState) {
-        self.eligibleStates[remoteEligibleState._id] = {count: remoteEligibleState.count}
+      self.eligibleStates[remoteEligibleState._id] = {count: remoteEligibleState.count};
     });
     self.printDescriptors();
   });
