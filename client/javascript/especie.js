@@ -99,8 +99,10 @@ function readSpecies(id, map){
         //   if(c_code.label == "Código da Palinoteca")
         //     palinoteca = c_code.value;
         // });
+        console.log("/api/Collections/"+lang+"%3A"+specimen[lang+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[lang+":dwc:RecordLevel:collectionCode"].value);
         $.getJSON("/api/Collections/"+lang+"%3A"+specimen[lang+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[lang+":dwc:RecordLevel:collectionCode"].value,
             function(collection){
+              console.log("Collecrion",collection);
               w2ui['grid'].add(
                 {
                 recid: specimen[lang+":dwc:RecordLevel:catalogNumber"].value,
