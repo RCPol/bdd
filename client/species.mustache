@@ -8,7 +8,7 @@
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<script src="/javascript/leaflet.js"></script>
 
 	<!-- Arquivos Grid Tabela de Amostras -->
 	<link rel="stylesheet" type="text/css" href="http://w2ui.com/src/w2ui-1.4.min.css" />
@@ -73,10 +73,10 @@
 				},
 				columns: [
 					{ field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-					{ field: 'species', caption: 'Nome da Espécie', size: '20%', sortable: true, resizable: true },
-					{ field: 'palinoteca', caption: 'Palinoteca', size: '30%', sortable: true, resizable: true },
-					{ field: 'tipo', caption: 'Nome do Coletor', size: '25%', resizable: true },
-				    { field: 'cidade', caption: 'Cidade', size: '25%', resizable: true },
+					{ field: 'scientificName', caption: 'Nome da Espécie', size: '20%', sortable: true, resizable: true },
+					{ field: 'collectionName', caption: 'Palinoteca', size: '30%', sortable: true, resizable: true },
+					{ field: 'recordedBy', caption: 'Nome do Coletor', size: '25%', resizable: true },
+				    { field: 'municipality', caption: 'Cidade', size: '25%', resizable: true },
                     { field: 'specimen_id', caption: 'Specimen_id', size: '20px', resizable: true, hidden: true }
 				],
 				searches: [
