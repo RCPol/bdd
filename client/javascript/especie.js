@@ -93,23 +93,25 @@ function readSpecies(id, map){
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
 
         // especimes
-        var palinoteca = "";
-        if (!(Array.isArray(specimen[lang+":dwc:RecordLevel:collectionCode"]))) specimen[lang+":dwc:RecordLevel:collectionCode"] = [specimen[lang+":dwc:RecordLevel:collectionCode"]];
-        specimen[lang+":dwc:RecordLevel:collectionCode"].forEach(function(c_code){
-          if(c_code.label == "Código da Palinoteca")
-            palinoteca = c_code.value;
+        // var palinoteca = "";
+        // if (!(Array.isArray(specimen[lang+":dwc:RecordLevel:collectionCode"]))) specimen[lang+":dwc:RecordLevel:collectionCode"] = [specimen[lang+":dwc:RecordLevel:collectionCode"]];
+        // specimen[lang+":dwc:RecordLevel:collectionCode"].forEach(function(c_code){
+        //   if(c_code.label == "Código da Palinoteca")
+        //     palinoteca = c_code.value;
+        // });
+        $.getJSON("/api/Collections/"+lang+"%3A"+specimen[lang+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[lang+":dwc:RecordLevel:collectionCode"].value,
+            function(collection){
+              w2ui['grid'].add(
+                {
+                recid: specimen[lang+":dwc:RecordLevel:catalogNumber"].value,
+                scientificName: "<i>"+name+"</i>",
+                collectionName: ((collection["pt-BR:rcpol:Collection:collectionName"]?collection["pt-BR:rcpol:Collection:collectionName"].value:"")+" - "+(specimen[lang+":dwc:RecordLevel:institutionCode"]?specimen[lang+":dwc:RecordLevel:institutionCode"].value:"")),
+                recordedBy: specimen[lang+":dwc:Occurrence:recordedBy"].value,
+                municipality: specimen[lang+":dwc:Location:municipality"].value + " - " + specimen[lang+":dwc:Location:stateProvince"].value,
+                specimen_id: specimen.id}
+              );
+            });
         });
-        $.getJSON("/api/Collections/"+lang+"%3A"+specimen[lang+":dwc:RecordLevel:institutionCode"].value+"%3A"+(specimen[lang+":dwc:RecordLevel:collectionCode"]&&specimen[lang+":dwc:RecordLevel:collectionCode"][0]?specimen[lang+":dwc:RecordLevel:collectionCode"][0].value:""), function(collection){
-          w2ui['grid'].add({
-            recid: specimen[lang+":dwc:RecordLevel:catalogNumber"].value,
-            scientificName: "<i>"+name+"</i>",
-            collectionName: collection["pt-BR:rcpol:Collection:collectionName"].value+" - "+specimen[lang+":dwc:RecordLevel:institutionCode"].value,
-            recordedBy: specimen[lang+":dwc:Occurrence:recordedBy"].value,
-            municipality: specimen[lang+":dwc:Location:municipality"].value + " - " + specimen[lang+":dwc:Location:stateProvince"].value,
-            specimen_id: specimen.id});
-        });
-        });
-
     });
 
   });
