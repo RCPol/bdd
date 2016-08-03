@@ -17,7 +17,26 @@
 	$(document).ready(function(){
 		internacionalization = new Internacionalization();
 		translate();
+		loadSpecies();
 	});
+	function loadSpecies() {
+		var content = `<img class="graf_int" src="friesio_.png" width="450px">
+		<p><img src="colors/1.png"><i>Delonix regia</i> (Bojer ex Hook.) Raf. Recurso: pólen e néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Myracrodruon urundeuva"><img src="colors/2.png"><i>Myracrodruon urundeuva</i> Allemão Recurso: pólen e néctar</a></p>
+		<p><img src="colors/3.png"><i>Basiloxylon brasiliensis</i> (Allemão) K. Schum. Recurso: pólen e néctar</p>
+		<p><img src="colors/4.png"><i>Ligustrum lucidum</i> W.T. Aiton Recurso: pólen e néctar</p>
+		<p><img src="colors/5.png"><i>Caesalpinia pulcherrima</i> (L.) Sw. Recurso: néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Poincianella pluviosa"><img src="colors/6.png"><i>Poincianella pluviosa</i> (DC.) L.P.Queiroz. Recurso: néctar</a></p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Triumfetta rhomboidea"><img src="colors/4.png"><i>Triumfetta rhomboidea</i> Jacq. Recurso: pólen e néctar</a></p>
+		<p><img src="colors/8.png"><i>Syagrus romanzoffiana</i> (Cham.) Glassman Recurso: pólen</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Eugenia brasiliensis"><img src="colors/9.png"><i>Eugenia brasiliensis</i> Lam. Recurso: pólen</a></p>
+		<p><img src="colors/10.png"><i><span id="rcpol-InteractionLabel-others">Outras</span></i></p>
+		<p><img src="colors/12.png"><i>Archontophoenix alexandrae</i> (F. Muell.) H. Wendl. & Drude Recurso: pólen</p>
+		<p><img src="colors/13.png"><i>Anadenanthera macrocarpa</i> (Benth.) Brenan Recurso: néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Ixora chinensis"><img src="colors/14.png"><i>Ixora chinensis</i> Lam. Recurso: néctar</a></p>`
+
+		$("#content").html(content);
+	}
 	function translate(lang) {
 		if (typeof lang != "undefined")
 				internacionalization.setLanguage(lang);
@@ -60,23 +79,7 @@
 		<!-- Título da Página -->
 		<h1 class="pal"><span id="rcpol-InteractionLabel-plantVisitedBy">Espécies de plantas visitadas por</span> <i>Frieseomelitta varia</i> (Lepeletier, 1836)</h1>
 
-		<div class="graf">
-
-		<img class="graf_int" src="friesio_.png" width="450px">
-
-		<p><a href="http://200.144.182.24:3030/profile/species/4773fd52018a2a7694c7358268f7796b"><img src="colors/1.png"><i>Delonix regia</i> (Bojer ex Hook.) Raf. Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/19e567c34f78251f076d4f14896da15d"><img src="colors/2.png"><i>Myracrodruon urundeuva</i> Allemão Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/11047a1e87201b0dee6634aa127155c1"><img src="colors/3.png"><i>Basiloxylon brasiliensis</i> (Allemão) K. Schum. Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/7eff7bdd97ab68e8951333f5cbab8f98"><img src="colors/4.png"><i>Ligustrum lucidum</i> W.T. Aiton Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/dcbfbe56b6662a257951822cbdd31cac"><img src="colors/5.png"><i>Caesalpinia pulcherrima</i> (L.) Sw. Recurso: néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/928bc230ee6eefed1078a907aa5ae0ba"><img src="colors/6.png"><i>Poincianella pluviosa</i> (DC.) L.P.Queiroz. Recurso: néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/a49e3aca2cc3a4353c1385f6d4184665"><img src="colors/4.png"><i>Triumfetta rhomboidea</i> Jacq. Recurso: pólen e néctar</a></p>
-		<p><img src="colors/8.png"><i>Syagrus romanzoffiana</i> (Cham.) Glassman Recurso: pólen</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/c10b58ea5d438ff166a185d21ef13d95"><img src="colors/9.png"><i>Eugenia brasiliensis</i> Lam. Recurso: pólen</a></p>
-		<p><img src="colors/10.png"><i><span id="rcpol-InteractionLabel-others">Outras</span></i></p>
-		<p><img src="colors/12.png"><i>Archontophoenix alexandrae</i> (F. Muell.) H. Wendl. & Drude Recurso: pólen</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/7d555d18dc364846bf4e0332fd42bd97"><img src="colors/13.png"><i>Anadenanthera macrocarpa</i> (Benth.) Brenan Recurso: néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/61cf2a43940cabcaca1c3ebcf77fc61c"><img src="colors/14.png"><i>Ixora chinensis</i> Lam. Recurso: néctar</a></p>
+		<div id="content" class="graf">
 
 		</div>
 

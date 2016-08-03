@@ -17,7 +17,26 @@
 	$(document).ready(function(){
 		internacionalization = new Internacionalization();
 		translate();
+		loadSpecies();
 	});
+	function loadSpecies() {
+		var content = `<img class="graf_int" src="centris_.png" width="450px">
+		<p><a href="/profile/species/`+internacionalization.language+`:Malpighia emarginata"><img src="colors/1.png"><i>Malpighia emarginata</i> DC. Recurso: óleo + pólen</a></p>
+		<p><img src="colors/2.png"><span id="rcpol-InteractionLabel-others">Outras</span></p>
+		<p><img src="colors/3.png"><i>Heteropterys</i> sp. Recurso: óleo + pólen</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Crotalaria pallida"><img src="colors/4.png"><i>Crotalaria pallida</i> Recurso: néctar</a></p>
+		<p><img src="colors/5.png"><i>Banisteriopsis</i> sp. Recurso: óleo + pólen</p>
+		<p><img src="colors/6.png"><i>Erythrina sect. cristae-galli</i> Krukoff Recurso: pólen + néctar</p>
+		<p><img src="colors/7.png"><i>Cedrela fissilis</i> Recurso: néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Machaerium hirtum"><img src="colors/8.png"><i>Machaerium hirtum</i> Recurso: néctar</a></p>
+		<p><img src="colors/9.png"><i>Machaerium</i> sp. Recurso: néctar</p>
+		<p><img src="colors/10.png"><i>Cassia fistula</i> Recurso: pólen</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Crotalaria brachystachya"><img src="colors/11.png"><i>Crotalaria brachystachya</i> Recurso: néctar</a></p>
+		<p><img src="colors/12.png"><i>Malphigiaceae</i> sp1 Recurso: óleo + pólen</p>
+		<p><img src="colors/13.png"><i>Alysicarpus vaginalis</i> (L.) DC Recurso: néctar</p>
+		<p><img src="colors/14.png"><i>Delonix regia</i> (Bojer ex Hook.) Raf. Recurso: pólen e néctar</p>`
+		$("#content").html(content);
+	}
 	function translate(lang) {
 		if (typeof lang != "undefined")
 				internacionalization.setLanguage(lang);
@@ -60,24 +79,7 @@
 		<!-- Título da Página -->
 		<h1 class="pal"><span id="rcpol-InteractionLabel-plantVisitedBy">Espécies de plantas visitadas por</span> <i>Centris (Heterocentris) analis</i> (Fabricius, 1804)</h1>
 
-		<div class="graf">
-
-		<img class="graf_int" src="centris_.png" width="450px">
-
-		<p><a href="http://200.144.182.24:3030/profile/species/7ee46ddf3183cf751bbcd08b3029e1b1"><img src="colors/1.png"><i>Malpighia emarginata</i> DC. Recurso: óleo + pólen</a></p>
-		<p><img src="colors/2.png"><span id="rcpol-InteractionLabel-others">Outras</span></p>
-		<p><img src="colors/3.png"><i>Heteropterys</i> sp. Recurso: óleo + pólen</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/2aa85de58dd092d2fefd7962a8ce0c63"><img src="colors/4.png"><i>Crotalaria pallida</i> Recurso: néctar</a></p>
-		<p><img src="colors/5.png"><i>Banisteriopsis</i> sp. Recurso: óleo + pólen</p>
-		<p><img src="colors/6.png"><i>Erythrina sect. cristae-galli</i> Krukoff Recurso: pólen + néctar</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/595e816d7a02c53e27d436c7ed543e38"><img src="colors/7.png"><i>Cedrela fissilis</i> Recurso: néctar</a></p>
-		<p><img src="colors/8.png"><i>Machaerium hirtum</i> Recurso: néctar</p>
-		<p><img src="colors/9.png"><i>Machaerium</i> sp. Recurso: néctar</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/fb0d884148376c876c4b47eb1c397886"><img src="colors/10.png"><i>Cassia fistula</i> Recurso: pólen</a></p>
-		<p><img src="colors/11.png"><i>Crotalaria brachystachya</i> Recurso: néctar</p>
-		<p><img src="colors/12.png"><i>Malphigiaceae</i> sp1 Recurso: óleo + pólen</p>
-		<p><img src="colors/13.png"><i>Alysicarpus vaginalis</i> (L.) DC Recurso: néctar</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/4773fd52018a2a7694c7358268f7796b"><img src="colors/14.png"><i>Delonix regia</i> (Bojer ex Hook.) Raf. Recurso: pólen e néctar</a></p>
+		<div id="content" class="graf">
 
 		</div>
 

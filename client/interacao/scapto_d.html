@@ -17,7 +17,28 @@
 	$(document).ready(function(){
 		internacionalization = new Internacionalization();
 		translate();
+		loadSpecies();
 	});
+	function loadSpecies() {
+		var content = `<img class="graf_int" src="centris_.png" width="450px">
+
+		<p><img src="colors/1.png"><i>Basiloxylon brasiliensis</i> (Allemão) K. Schum. Recurso: pólen e néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Poincianella pluviosa"><img src="colors/1.png"><i>Poincianella pluviosa</i> (DC.) L.P.Queiroz. Recurso: néctar</a></p>
+		<p><img src="colors/1.png"><i>Cassia grandis</i> L. f. Recurso: pólen</p>
+		<p><img src="colors/1.png"><i>Mimosa</i> sp.1</p>
+		<p><img src="colors/1.png"><i>Mimosa</i> sp.2</p>
+		<p><img src="colors/1.png"><i>Ricinus communis</i> L. Recurso: pólen e néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Eucalyptus moluccana"><img src="colors/1.png"><i>Eucalyptus moluccana</i> Roxb. Recurso: pólen e néctar</a></p>
+		<p><img src="colors/1.png"><i>Centrolobium tomentosum</i> Recurso: néctar</p>
+		<p><img src="colors/1.png"><i>Byrsonima intermedia</i> Recurso: óleo + pólen</p>
+		<p><img src="colors/1.png"><i>Serjania lethalis</i> A. St.-Hil. Recurso: néctar</p>
+		<p><img src="colors/1.png"><span id="rcpol-InteractionLabel-others">Outras</span></p>
+		<p><img src="colors/1.png"><i>Caesalpinia pulcherrima</i> (L.) Sw. Recurso: néctar</p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Leucaena leucocephala"><img src="colors/1.png"><i>Leucaena leucocephala</i> (Lam.) de Wit Recurso: pólen e néctar</a></p>
+		<p><a href="/profile/species/`+internacionalization.language+`:Eugenia brasiliensis"><img src="colors/1.png"><i>Eugenia brasiliensis</i> Lam. Recurso: pólen</a></p>`
+
+		$("#content").html(content);
+	}
 	function translate(lang) {
 		if (typeof lang != "undefined")
 				internacionalization.setLanguage(lang);
@@ -60,25 +81,7 @@
 		<!-- Título da Página -->
 		<h1 class="pal"><span id="rcpol-InteractionLabel-plantVisitedBy">Espécies de plantas visitadas por</span> <i>Scaptotrigona depilis</i> (Moure, 1942)</h1>
 
-		<div class="graf">
-
-		<img class="graf_int" src="centris_.png" width="450px">
-
-		<p><a href="http://200.144.182.24:3030/profile/species/11047a1e87201b0dee6634aa127155c1"><img src="colors/1.png"><i>Basiloxylon brasiliensis</i> (Allemão) K. Schum. Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/928bc230ee6eefed1078a907aa5ae0ba"><img src="colors/1.png"><i>Poincianella pluviosa</i> (DC.) L.P.Queiroz. Recurso: néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/a53767960e28f68248678a4b76094e4b"><img src="colors/1.png"><i>Cassia grandis</i> L. f. Recurso: pólen</a></p>
-		<p><img src="colors/1.png"><i>Mimosa</i> sp.1</p>
-		<p><img src="colors/1.png"><i>Mimosa</i> sp.2</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/9df27c184d8a0902c9285317b612a17e"><img src="colors/1.png"><i>Ricinus communis</i> L. Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/e8f3498267ae7fbb848157013eba8be9"><img src="colors/1.png"><i>Eucalyptus moluccana</i> Roxb. Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/33eb4c3394146afde7cc4984b7fd2096"><img src="colors/1.png"><i>Centrolobium tomentosum</i> Recurso: néctar</a></p>
-		<p><img src="colors/1.png"><i>Byrsonima intermedia</i> Recurso: óleo + pólen</p>
-		<p><a href="http://200.144.182.24:3030/profile/species/03d2e1d25d805f51bd65ea02012e14a7"><img src="colors/1.png"><i>Serjania lethalis</i> A. St.-Hil. Recurso: néctar</a></p>
-		<p><img src="colors/1.png"><span id="rcpol-InteractionLabel-others">Outras</span></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/dcbfbe56b6662a257951822cbdd31cac"><img src="colors/1.png"><i>Caesalpinia pulcherrima</i> (L.) Sw. Recurso: néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/6f1d0ff3a07f635615b0bf876cdbb561"><img src="colors/1.png"><i>Leucaena leucocephala</i> (Lam.) de Wit Recurso: pólen e néctar</a></p>
-		<p><a href="http://200.144.182.24:3030/profile/species/c10b58ea5d438ff166a185d21ef13d95"><img src="colors/1.png"><i>Eugenia brasiliensis</i> Lam. Recurso: pólen</a></p>
-
+		<div id="content" class="graf">
 		</div>
 
 
