@@ -493,7 +493,9 @@ module.exports = function(Specimen) {
  function downloadImage(queue){
     var i = 0;
     var end = queue.length;
-    var erro = "";
+    var erro = [];
+    var count = 0;
+    var countErr = 0;
     async.whilst(function(){
       return i < end;
     }, function(callback){
@@ -502,20 +504,30 @@ module.exports = function(Specimen) {
       var resized = queue[i].resized; //local da imagem salva
       var thumbnail = queue[i].thumbnail; //local da imagem salva
       var file = __dirname + "/../../client"+local; //arquivo da imagem salva
+      var file2 = __dirname + "/../../client"+thumbnail;
       console.log(i + " of "+end+" images");
       fs.exists(file, function(exists){
         // check if exist localy
         if (exists) {
-          console.log("image alreadly exists");
-          i++;
-          callback();
-
+          fs.exists(file2, function(exists){
+            if(exists){
+              console.log("image alreadly exists");
+              i++;
+              callback();              
+            }else{
+              fs.unlink(file);
+              callback();
+            }
+          });
         } else {
-
           console.log("making request to " + original);
-
-          requestFile(original,local, function test (){
-                var count = 0;
+          async.series([
+            function fileRequest(callback){
+              if(count < 3){
+                requestFile(original,local,callback);
+              }
+            },
+            function test(callback){
                 var readChunk = require('read-chunk'); // npm install read-chunk
                 var imageType = require('image-type');
                 var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
@@ -523,11 +535,16 @@ module.exports = function(Specimen) {
                 console.log(imageType(buffer));
                 //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
                 if (imageType(buffer)==null){
-                        console.log("Arquivo inválido");
-                        while (count < 3){
-                            requestFile(original,local,callback);
-                            count++;
-                        }
+                        console.log("Arquivo inválido");                
+                        count++; 
+                        if(count == 3){
+                          erro[countErr] = "Ocorreu um erro na URL: " + original;
+                          countErr++;
+                          count = 0;
+                          i++;
+                        } 
+                        callback();   
+                      
                 }else{
                     console.log("Arquivo válido");
                     async.parallel([
@@ -541,13 +558,14 @@ module.exports = function(Specimen) {
                       },
                       ],function done() {
                            i++;
+                           count = 0;
                            callback();
-
                       });
-
                 }
-
-        });
+          },
+          ],function done(){
+            callback();
+          });
 
         }
 
@@ -555,7 +573,9 @@ module.exports = function(Specimen) {
 
     }, function(err){
       if (err) throw new Error(err);
-      console.log(erro);
+      for(var t=0;t < countErr;t++){
+        console.log(erro[t]);
+      }
       console.log("done.");
     });
   }
