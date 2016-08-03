@@ -86,11 +86,10 @@ function readSpecies(id, map){
     });
 
     $.getJSON("/api/Specimens?" + specimen_query, function(specimens){
-      specimens.forEach(function(specimen, id){
-        console.log("SPECIMEN",specimen);
+      specimens.forEach(function(specimen, id){        
         // mapa
         var p = [specimen[lang+":dwc:Location:decimalLatitude"].value, specimen[lang+":dwc:Location:decimalLongitude"].value];
-        var marker = L.marker(p, {opacity:0.9}).addTo(map);        
+        var marker = L.marker(p, {opacity:0.9}).addTo(map);
         $.getJSON("/api/Collections/"+lang+"%3A"+specimen[lang+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[lang+":dwc:RecordLevel:collectionCode"].value,
             function(collection){
               w2ui['grid'].add(
