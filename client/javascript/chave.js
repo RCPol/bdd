@@ -29,7 +29,7 @@ Identification.prototype.startup = function() {
   this.eligibleDescriptors = {};
   this.eligibleStates = {};
   this.selectedStates = {};
-  this.definedNumericals = [];
+  this.definedNumericals = {};
   console.time("load species");
   console.time("load descriptors");
   var self = this;
@@ -38,7 +38,6 @@ Identification.prototype.startup = function() {
       self.eligibleSpecies[id] = true;
     });
     self.printSpecies();
-
   }).createDescriptors(function() {
     Object.keys(self.descriptors).forEach(function(idCategory) {
       self.eligibleCategories[idCategory] = true;
@@ -70,7 +69,7 @@ Identification.prototype.selectState = function(id) {
 Identification.prototype.removeAll = function() {
   var self = this;
   self.selectedStates = {};
-  self.definedNumericals = [];
+  self.definedNumericals = {};
   self.printDescriptors();
   Object.keys(self.species).forEach(function(id) {
     self.eligibleSpecies[id] = true;
@@ -122,7 +121,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category].html = $('<li><a id="'+self.descriptors[state.category].htmlId+'" class="toggle" href="javascript:void(0);"><span>+</span> '+self.descriptors[state.category].value+' </a><ul id="descriptors" class="descritor inner"></ul></li>');
       }
       // DESCRIPTOR
-      if(typeof self.descriptors[state.category][state.field] == "undefined"){
+      if(state.class!="NumericalDescriptor" && typeof self.descriptors[state.category][state.field] == "undefined"){
         self.descriptors[state.category][state.field] = self.descriptors[state.category][state.field]?self.descriptors[state.category][state.field]:{};
         self.descriptors[state.category][state.field].htmlId = "descriptor_"+(state.category+state.field).htmlId();
         self.descriptors[state.category][state.field].value = state.field;
@@ -130,7 +129,7 @@ Identification.prototype.createDescriptors = function(callback) {
         // self.descriptors[state.category][state.field].html.find("li").append("<div class='valoresn inner'><input name='" + self.descriptors[state.category][state.field].htmlId +"' type='text' class='numnum' size='5' maxlength='12' placeholder='00.00'> un </div>");
       }
       // STATE
-      if(typeof self.descriptors[state.category][state.field][state.state] == "undefined"){
+      if(state.class!="NumericalDescriptor" && typeof self.descriptors[state.category][state.field][state.state] == "undefined"){
         self.descriptors[state.category][state.field][state.state] = self.descriptors[state.category][state.field][state.state]?self.descriptors[state.category][state.field][state.state]:{};
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
         self.descriptors[state.category][state.field][state.state].value = state.state;
@@ -176,8 +175,8 @@ Identification.prototype.printDescriptors = function() {
           self.descriptors[idCategory][idDescriptor].html.appendTo($("#"+self.descriptors[idCategory].htmlId).next("#descriptors"));
         }
         // IS DEFINED NUMERICAL?
-        var numerical = self.definedNumericals.find(function(numerical){return numerical.descriptor_id == self.descriptors[idCategory][idDescriptor].id;});
-        if(numerical){
+        //var numerical = self.definedNumericals.find(function(numerical){return numerical.descriptor_id == self.descriptors[idCategory][idDescriptor].id;});
+        if(typeof self.definedNumericals[self.descriptors[idCategory][idDescriptor].id] != "undefined"){
           self.descriptors[idCategory][idDescriptor].html.detach();
           $("#descritoresSelecionados").append(self.descriptors[idCategory][idDescriptor].value + "- min: " + numerical.value.min + ", max: " + numerical.value.max );
         }
@@ -224,8 +223,8 @@ String.prototype.htmlId = function() {
 //   this.selectedStates.push({id:state});
 //   return this;
 // }
-Identification.prototype.definedNumerical = function(id,min,max) {
-  this.definedNumericals.push({descriptor_id:id,value:{min: min, max: max}});
+Identification.prototype.defineNumerical = function(id,min,max) {
+  this.definedNumericals[id] = {descriptor_id:id,value:{min: min, max: max}};
   return this;
 }
 
@@ -244,16 +243,15 @@ Identification.prototype.setNumerical = function(){
     $(this).find("#min").val("");
     $(this).find("#max").val("");
     if (min && max){
-      self.definedNumerical(id, min, max);
+      self.defineNumerical(id, min, max);
     }
   });
 }
-
 Identification.prototype.identify = function() {
   console.time("Identify");
   var self = this;
   self.setNumerical();
-  var query = {language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item};}), numerical:self.definedNumericals};
+  var query = {language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item};}), numerical:Object.keys(self.definedNumericals).map(function(key){return self.definedNumericals[key];})};
   self.printDescriptors();
   $.get("/api/Identification/identify", {param: query}, function(data){
     self.eligibleSpecies = {};
