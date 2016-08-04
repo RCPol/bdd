@@ -5,8 +5,10 @@ var async = require('async');
 var validator = require('validator');
 var fs = require('fs');
 var qt = require('quickthumb');
-var Thumbnail = require('thumbnail');
-var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
+var EventEmitter = require('events').EventEmitter;
+var util = require('util');
+// var Thumbnail = require('thumbnail');
+// var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
   var logs = {};
   function titleCase(string) {
@@ -433,207 +435,409 @@ module.exports = function(Specimen) {
 
 
 //Método by Raquel
- Specimen.downloadImages = function (cb) {
-   //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
-   //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
-   //Onde a imagem vai ser salva na pasta do cliente
-   var queue = [];
+ // Specimen.downloadImages = function (cb) {
+ //   //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
+ //   //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
+ //   //Onde a imagem vai ser salva na pasta do cliente
+ //   var queue = [];
+ //
+ //   Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
+ //   {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
+ //   fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
+ //   "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){
+ //      //console.log(results);
+ //        results.forEach(function (result){
+ //        //console.log(result["pt-BR:rcpol:Image:plantImage"]);
+ //
+ //          if(result["pt-BR:rcpol:Image:allPollenImage"]){
+ //              result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
+ //               // console.log(img);
+ //                queue.push(img);
+ //              });
+ //          }
+ //          if(result["pt-BR:rcpol:Image:flowerImage"]){
+ //              result["pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
+ //              //  console.log(img);
+ //                queue.push(img);
+ //              });
+ //          }
+ //          if(result["pt-BR:rcpol:Image:plantImage"]){
+ //              result["pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
+ //              //  console.log(img);
+ //                queue.push(img);
+ //              });
+ //          }
+ //          if(result["pt-BR:rcpol:Image:beeImage"]){
+ //              result["pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
+ //               // console.log(img);
+ //                queue.push(img);
+ //              });
+ //          }
+ //          if(result["pt-BR:rcpol:Image:pollenImage"]){
+ //              result["pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
+ //              //  console.log(img);
+ //                queue.push(img);
+ //              });
+ //          }
+ //        });
+ //
+ //      downloadImage(queue);
+ //      if(err){
+ //        console.log(err);
+ //        cb(err, "");
+ //      }
+ //      cb(null, "Downloading...");
+ //
+ //   });
+ //
+ //  };
 
-   Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
-   {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
-   fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
-   "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){
-      //console.log(results);
-        results.forEach(function (result){
-        //console.log(result["pt-BR:rcpol:Image:plantImage"]);
-
-          if(result["pt-BR:rcpol:Image:allPollenImage"]){
-              result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
-               // console.log(img);
-                queue.push(img);
-              });
-          }
-          if(result["pt-BR:rcpol:Image:flowerImage"]){
-              result["pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
-              //  console.log(img);
-                queue.push(img);
-              });
-          }
-          if(result["pt-BR:rcpol:Image:plantImage"]){
-              result["pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
-              //  console.log(img);
-                queue.push(img);
-              });
-          }
-          if(result["pt-BR:rcpol:Image:beeImage"]){
-              result["pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
-               // console.log(img);
-                queue.push(img);
-              });
-          }
-          if(result["pt-BR:rcpol:Image:pollenImage"]){
-              result["pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
-              //  console.log(img);
-                queue.push(img);
-              });
-          }
-        });
-
-      downloadImage(queue);
-      if(err){
-        console.log(err);
-        cb(err, "");
-      }
-      cb(null, "Downloading...");
-
-   });
+  Specimen.downloadImages = function (cb) {
+    //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
+    //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
+    //Onde a imagem vai ser salva na pasta do cliente
+    var startTime = new Date();
+    Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
+    {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
+    fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
+    "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){
+    // Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
+      var queue = {};
+      results.forEach(function (result){
+        if(result["pt-BR:rcpol:Image:allPollenImage"]){
+            result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
+             queue[img.original] = img;
+            });
+        }
+        if(result["pt-BR:rcpol:Image:flowerImage"]){
+            result["pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
+              queue[img.original] = img;
+            });
+        }
+        if(result["pt-BR:rcpol:Image:plantImage"]){
+            result["pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
+              queue[img.original] = img;
+            });
+        }
+        if(result["pt-BR:rcpol:Image:beeImage"]){
+            result["pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
+             queue[img.original] = img;
+            });
+        }
+        if(result["pt-BR:rcpol:Image:pollenImage"]){
+            result["pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
+              queue[img.original] = img;
+            });
+        }
+      });
+      var downloader = new ImageDownloader(queue);
+      downloader.download().on("done",
+        function() {
+          console.log("Terminou #"+downloader.count+" em "+(new Date().getTime() - startTime.getTime()));
+          downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");
+          cb(null, downloader.log);
+        }
+      );
+    });
 
   };
-
- function downloadImage(queue){
-    var i = 0;
-    var end = queue.length;
-    var erro = [];
-    var count = 0;
-    var countErr = 0;
-    async.whilst(function(){
-      return i < end;
-    }, function(callback){
-      var local = queue[i].local; //local da imagem salva
-      var original = queue[i].original; //url original da imagem
-      var resized = queue[i].resized; //local da imagem salva
-      var thumbnail = queue[i].thumbnail; //local da imagem salva
-      var file = __dirname + "/../../client"+local; //arquivo da imagem salva
-      var file2 = __dirname + "/../../client"+thumbnail;
-      console.log(i + " of "+end+" images");
-      fs.exists(file, function(exists){
-        // check if exist localy
-        if (exists) {
-          fs.exists(file2, function(exists){
-            if(exists){
-              console.log("image alreadly exists");
-              i++;
-              callback();              
-            }else{
-              fs.unlink(file);
-              callback();
-            }
-          });
-        } else {
-          console.log("making request to " + original);
-          async.series([
-            function fileRequest(callback){
-              if(count < 3){
-                requestFile(original,local,callback);
-              }
-            },
-            function test(callback){
-                var readChunk = require('read-chunk'); // npm install read-chunk
-                var imageType = require('image-type');
-                var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
-
-                console.log(imageType(buffer));
-                //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
-                if (imageType(buffer)==null){
-                        console.log("Arquivo inválido");                
-                        count++; 
-                        if(count == 3){
-                          erro[countErr] = "Ocorreu um erro na URL: " + original;
-                          countErr++;
-                          count = 0;
-                          i++;
-                        } 
-                        callback();   
-                      
-                }else{
-                    console.log("Arquivo válido");
-                    async.parallel([
-                      function resizedConverting(callback) {
-                          // write resized
-                          convertResized(local,resized,callback);
-                      },
-                      function thumbnailConverting(callback) {
-                          // write thumbnail
-                          convertThumbnail(local,thumbnail,callback);
-                      },
-                      ],function done() {
-                           i++;
-                           count = 0;
-                           callback();
-                      });
-                }
-          },
-          ],function done(){
-            callback();
-          });
-
-        }
-
-      });
-
-    }, function(err){
-      if (err) throw new Error(err);
-      for(var t=0;t < countErr;t++){
-        console.log(erro[t]);
-      }
-      console.log("done.");
-    });
+  function ImageDownloader(queue) {
+    EventEmitter.call(this);
+    this.log = [];
+    this.count = 0;
+    this.queue = queue;
+    this.requestErrorCount = 0;
   }
-
-//faz requisição de arquivo para download
-function requestFile(original,local,callback){
-  request(original, {encoding: 'binary'}, function(err, response, body){
-            if (err) throw new Error(err);
-            // write local file
-            fs.writeFile("client"+local, body, 'binary', function(err){
-              try{
-                    console.log("Escrevendo o arquivo...");
-                    if(err){
-                      console.log("******** ORIGINAL: "+local);
-                      console.log('Ops, um erro ocorreu!');
-                      console.log("URL: ",original);
-                      console.log("********");
-                      callback();
-                      i++;
-
-                    }else{
-                      callback();
-                    }
-
-              }catch(err){
-                  if(err) throw new Error(err);
-              }
-        });
-
-  });
-
-}
-
-function convertResized(local,resized,callback) {
-  qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+resized, width:1500}, function(err, filename){
-    if(err){
-      console.log("******** RESIZED ERROR: "+local+" >> Trying again...");
-      // try again
-      convertResized(local,resized,callback);
-    } else {
-      console.log("Converting to resized: OK");
-      callback();
+  util.inherits(ImageDownloader, EventEmitter);
+  ImageDownloader.prototype.download = function(cb) {
+    var self = this;
+    if (Object.keys(self.queue).length-1 == self.count){ // testa se terminou
+      self.log.unshift("Total de imagens: "+self.count)
+      self.emit("done")
+      return false;
     }
-  });
-}
-function convertThumbnail(local,thumbnail,callback) {
-  qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+thumbnail, width:100, height:100}, function(err, filename){
-    if(err){
-      console.log("******** THUMBNAIL ERROR: "+local+" >> Trying again...");
-      console.log(err);
-      // try again
-      convertThumbnail(local,thumbnail,callback);
-    } else {
-      console.log("Converting to thumbnail: OK");
-      callback();
-    }
-  });
-}
+    var image = new Image(self.queue[Object.keys(self.queue)[self.count]]); // Pega a chave do objeto na posição [count]
+    image.checkIfExist();
+    image.on("exists",
+        function() {
+          console.log("Existe "+image.local);
+          self.count++;
+          self.download();
+        }
+    ).on("doesNotExist",
+        image.requestFromURL
+    ).on("endDownload",
+        function() {
+          image.writeLocalFile();
+          self.count++
+          self.download();
+        }
+    ).on("localFileWrote",
+      function() {
+        image.convertResized();
+        image.convertThumbnail();
+        self.log = self.log.concat(image.log)
+      }
+    );
+    return this;
+  };
+  function Image(img) {
+    EventEmitter.call(this);
+    this.log = [];
+    this.count = 0;
+    this.img = img;
+    this.requestErrorCount = 0;
+    this.writeLocalErrorCount = 0;
+    this.writeResizedErrorCount = 0;
+    this.writeThumbnailErrorCount = 0;
+    this.original = img.original;
+    this.local = img.local;
+    this.resized = img.resized;
+    this.thumbnail = img.thumbnail;
+    this.localPath = __dirname + "/../../client"+this.local;
+    this.thumbnailPath = __dirname + "/../../client"+this.thumbnail;
+    this.resizedPath = __dirname + "/../../client"+this.resized;
+  }
+  util.inherits(Image, EventEmitter);
+  Image.prototype.checkIfExist = function() {
+    var self = this;
+    fs.exists(self.localPath, function(exists){
+      if(exists)
+        return self.emit("exists")
+      return self.emit("doesNotExist");
+    });
+    return this;
+  };
+  Image.prototype.requestFromURL = function() {
+    var self = this;
+    request(self.original, {encoding: 'binary'}, function(err, response, body){
+      if (err){
+        if (self.requestErrorCount==3) {
+          console.log("Error to download "+self.original);
+          self.requestErrorCount == 0;
+          self.log.push("Error no download de "+self.original);
+          return self.emit("endDownload");
+        } else {
+          self.requestErrorCount++;
+          self.requestFromURL();
+        }
+      } else {
+        self.downloadedContent = body;
+        return self.emit("endDownload");
+      }
+    });
+    return this;
+  }
+  Image.prototype.writeLocalFile = function() {
+    var self = this;
+    fs.writeFile("client"+self.local, self.downloadedContent, 'binary', function(err){
+        if(err){
+          if(self.writeLocalErrorCount==3){
+            console.log("******** Local: "+self.local);
+            console.log('Ops, um erro ocorreu!');
+            console.log("URL: ",self.original);
+            console.log("********");
+            self.log.push("Write Local File: "+self.local+"   URL: "+self.original);
+            self.writeLocalErrorCount = 0;
+          } else {
+            self.writeLocalErrorCount++
+            self.writeLocalFile();
+          }
+        } else {
+          self.emit("localFileWrote");
+        }
+    });
+    return this;
+  }
+  Image.prototype.convertResized = function() {
+    var self = this;
+    qt.convert({src:self.localPath, dst: self.resizedPath, width:1500}, function(err, filename){
+      if(err){
+        if(self.writeResizedErrorCount==3){
+          console.log("******** RESIZED: "+self.resized);
+          console.log('Ops, um erro ocorreu!');
+          console.log("******** Local: "+self.local);
+          console.log("URL: ",self.original);
+          console.log("********");
+          self.log.push("Write Resized File: "+self.resized+"   Local: "+self.local+"   URL: "+self.original);
+          self.writeResizedErrorCount = 0;
+        } else {
+          self.writeResizedErrorCount++
+          self.convertResized();
+        }
+      } else {
+        self.emit("resizedFileWrote");
+      }
+    });
+    return this;
+  }
+  Image.prototype.convertThumbnail = function() {
+    var self = this;
+    qt.convert({src:self.localPath, dst: self.thumbnailPath, width:100, height:100}, function(err, filename){
+      if(err){
+        if(self.writeThumbnailErrorCount==3){
+          console.log("******** THUMBNAIL: "+self.thumbnail);
+          console.log('Ops, um erro ocorreu!');
+          console.log("******** Local: "+self.local);
+          console.log("URL: ",self.original);
+          console.log("********");
+          self.log.push("Write Thumbnail File: "+self.thumbnail+"   Local: "+self.local+"   URL: "+self.original);
+          self.writeThumbnailErrorCount = 0;
+        } else {
+          self.writeThumbnailErrorCount++
+          self.convertThumbnail();
+        }
+      } else {
+        self.emit("thumbnailFileWrote");
+      }
+    });
+    return this;
+  }
+//
+//  function downloadImage(queue){
+//     var i = 0;
+//     var end = queue.length;
+//     var erro = [];
+//     var count = 0;
+//     var countErr = 0;
+//     async.whilst(function(){
+//       return i < end;
+//     }, function(callback){
+//       var local = queue[i].local; //local da imagem salva
+//       var original = queue[i].original; //url original da imagem
+//       var resized = queue[i].resized; //local da imagem salva
+//       var thumbnail = queue[i].thumbnail; //local da imagem salva
+//       var file = __dirname + "/../../client"+local; //arquivo da imagem salva
+//       var file2 = __dirname + "/../../client"+thumbnail;
+//       console.log(i + " of "+end+" images");
+//       fs.exists(file, function(exists){
+//         // check if exist localy
+//         if (exists) {
+//           fs.exists(file2, function(exists){
+//             if(exists){
+//               console.log("image alreadly exists");
+//               i++;
+//               callback();
+//             }else{
+//               fs.unlink(file);
+//               callback();
+//             }
+//           });
+//         } else {
+//           console.log("making request to " + original);
+//           async.series([
+//             function fileRequest(callback){
+//               if(count < 3){
+//                 requestFile(original,local,callback);
+//               }
+//             },
+//             function test(callback){
+//                 var readChunk = require('read-chunk'); // npm install read-chunk
+//                 var imageType = require('image-type');
+//                 var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
+//
+//                 console.log(imageType(buffer));
+//                 //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
+//                 if (imageType(buffer)==null){
+//                         console.log("Arquivo inválido");
+//                         count++;
+//                         if(count == 3){
+//                           erro[countErr] = "Ocorreu um erro na URL: " + original;
+//                           countErr++;
+//                           count = 0;
+//                           i++;
+//                         }
+//                         callback();
+//
+//                 }else{
+//                     console.log("Arquivo válido");
+//                     async.parallel([
+//                       function resizedConverting(callback) {
+//                           // write resized
+//                           convertResized(local,resized,callback);
+//                       },
+//                       function thumbnailConverting(callback) {
+//                           // write thumbnail
+//                           convertThumbnail(local,thumbnail,callback);
+//                       },
+//                       ],function done() {
+//                            i++;
+//                            count = 0;
+//                            callback();
+//                       });
+//                 }
+//           },
+//           ],function done(){
+//             callback();
+//           });
+//
+//         }
+//
+//       });
+//
+//     }, function(err){
+//       if (err) throw new Error(err);
+//       for(var t=0;t < countErr;t++){
+//         console.log(erro[t]);
+//       }
+//       console.log("done.");
+//     });
+//   }
+//
+// //faz requisição de arquivo para download
+// function requestFile(original,local,callback){
+//   request(original, {encoding: 'binary'}, function(err, response, body){
+//             if (err) throw new Error(err);
+//             // write local file
+//             fs.writeFile("client"+local, body, 'binary', function(err){
+//               try{
+//                     console.log("Escrevendo o arquivo...");
+//                     if(err){
+//                       console.log("******** ORIGINAL: "+local);
+//                       console.log('Ops, um erro ocorreu!');
+//                       console.log("URL: ",original);
+//                       console.log("********");
+//                       callback();
+//                       i++;
+//
+//                     }else{
+//                       callback();
+//                     }
+//
+//               }catch(err){
+//                   if(err) throw new Error(err);
+//               }
+//         });
+//
+//   });
+//
+// }
+//
+// function convertResized(local,resized,callback) {
+//   qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+resized, width:1500}, function(err, filename){
+//     if(err){
+//       console.log("******** RESIZED ERROR: "+local+" >> Trying again...");
+//       // try again
+//       convertResized(local,resized,callback);
+//     } else {
+//       console.log("Converting to resized: OK");
+//       callback();
+//     }
+//   });
+// }
+// function convertThumbnail(local,thumbnail,callback) {
+//   qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+thumbnail, width:100, height:100}, function(err, filename){
+//     if(err){
+//       console.log("******** THUMBNAIL ERROR: "+local+" >> Trying again...");
+//       console.log(err);
+//       // try again
+//       convertThumbnail(local,thumbnail,callback);
+//     } else {
+//       console.log("Converting to thumbnail: OK");
+//       callback();
+//     }
+//   });
+// }
   Specimen.remoteMethod(
     'downloadImages',
     {
