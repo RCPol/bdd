@@ -2,6 +2,10 @@
 <html lang="pt-br">
 <head>
 	<meta charset="UTF-8">
+	<!-- POLYMER e CUSTUM COMPONENTS -->
+	<script src="/bower_components/webcomponentsjs/webcomponents.js"></script>
+	<link rel="import" href="/elements/autocomplete-species.html"></script>
+	<link rel="import" href="/elements/autocomplete-descriptors.html"></script>
 
 	<!-- Google fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
@@ -9,11 +13,12 @@
 
     <!-- Css Documento -->
 	<link rel="stylesheet" href="/css/chave.css">
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 
 	<!-- JQuery -->
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+
 
     <!-- JQuery Rolagem -->
 	<link rel="stylesheet" href="/javascript/jquery.mCustomScrollbar.css">
@@ -22,16 +27,31 @@
 <script type="text/javascript" src="/javascript/chave.js"></script>
 <script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
+<style>
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+a.ui-button:active,
+.ui-button:active,
+.ui-button.ui-state-active:hover {
+	border: 0px solid #dddddd;
+	/*text-shadow: 1px 1px #A8A080;*/
+	background-color: #FBE0D2;
+	/*font-weight: bold;*/
+	color: black;
+}
+}
+</style>
 	<!-- Campos de busca, scrollbar e botões  -->
 	<script type="text/javascript">
 
-      $(document).on('keyup', '.numnum', function(event) {
-        var v = this.value;
-        if($.isNumeric(v) === false) {
-          //chop off the last char entered
-          this.value = this.value.slice(0,-1);
-        }
-      });
+    $(document).on('keyup', '.numnum', function(event) {
+      var v = this.value;
+      if($.isNumeric(v) === false) {
+        //chop off the last char entered
+        this.value = this.value.slice(0,-1);
+      }
+    });
 	  window.onload = function(){
         //Barras de Rolagem das caixas
 		$(".roxinho").mCustomScrollbar({
@@ -42,29 +62,9 @@
 			scrollButtons:{ enable: true },
 			theme: "dark",
 		});
-		//Limpa texto da busca dos descritores
-		var btpdescritores = document.getElementById("buscadescritores");
 
-		if(btpdescritores.addEventListener){
-			btpdescritores.addEventListener("click", function() {
-				if (btpdescritores.value == 'Pesquisar'){
-					btpdescritores.value = '';
-				}
-			});
-		}
-
-		//Limpa texto da busca das espécies
-		var submitbutton2 = document.getElementById("buscaespecies");
-
-		if(submitbutton2.addEventListener){
-			submitbutton2.addEventListener("click", function() {
-				if (submitbutton2.value == 'Pesquisar'){
-					submitbutton2.value = '';
-				}
-			});
-		}
-        //Toggle Descritores
-        $(".accordion").on("click", ".toggle", function(e){
+		        //Toggle Descritores
+    $(".accordion").on("click", ".toggle", function(e){
 
 		  var $this = $(this);
 
@@ -104,10 +104,9 @@
 			$(this).addClass('selecionado');
 		  }
 		});
-      }
-			var identification;
-      $(document).ready(function(){
-				identification = new Identification();
+    }
+			var identification = new Identification();
+			$(document).ready(function(){
 				identification.startup();
       });
 	</script>
@@ -143,7 +142,6 @@
 
 	<!-- Início do quadrado branco de fundo -->
 	<div class="qbranco">
-
 		<!-- Início: Caixa da esquerda -->
 		<div class="cesquerda">
 
@@ -151,8 +149,8 @@
 			<h1 id="rcpol-KeyLabel-keyDescriptores">Descritores</h1>
 
 			<!-- Início: Busca Descritores -->
-			<form class="formbusca" onreset="buscaDescritores(true);" onsubmit="buscaDescritores(false); return false;">
-				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset" value="Limpar">
+			<form class="formbusca">
+				<autocomplete-descriptors source="identification.descriptors"></autocomplete-descriptors>
 			</form>
 
 			<div class="tfclear"></div>
@@ -164,7 +162,7 @@
 				<div class="divaeh">
                     <button type="button" class="open expocu" id="rcpol-KeyLabel-keySeeAll">Ver todos</button>
 					<button type="button" class="close expocu" id="rcpol-KeyLabel-keyHideAll">Ocultar todos</button>
-                    <button type="button" class="btnident" onclick="identification.identify()"><span id="rcpol-KeyLabel-keyIdentify">Identificar</span> &#9654;</button>
+                    <!-- <button type="button" class="btnident" onclick="identification.identify()"><span id="rcpol-KeyLabel-keyIdentify">Identificar</span> &#9654;</button> -->
 				</div>
             </div>
 
@@ -211,8 +209,8 @@
 			<h1 id="rcpol-KeyLabel-keySpecies">Espécies</h1>
 
 			<!-- Início: Busca Espécies -->
-			<form class="formbusca" onreset="buscaEspecies(true);" onsubmit="buscaEspecies(false); return false;">
-				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset" value="Limpar">
+			<form class="formbusca" >
+				<autocomplete-species source="identification.species"></autocomplete-species>
 			</form>
 			<div class="tfclear"></div>
 			<!-- Final: Busca Espécies -->

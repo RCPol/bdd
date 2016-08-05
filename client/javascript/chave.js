@@ -1,6 +1,14 @@
 function Identification() {
   this.internacionalization = new Internacionalization();
   this.internacionalization.siteTranslator().keyTranslator();
+  this.species = {};
+  this.descriptors = {};
+  this.eligibleSpecies = {};
+  this.eligibleCategories = {};
+  this.eligibleDescriptors = {};
+  this.eligibleStates = {};
+  this.selectedStates = {};
+  this.definedNumericals = {};
   this.tooltipConfig();
 }
 Identification.prototype.tooltipConfig = function() {
@@ -80,8 +88,8 @@ Identification.prototype.removeAll = function() {
 }
 Identification.prototype.unselectState = function(id) {
   var self = this;
-  // self.eligibleStates[id] = {count:null}
-  delete self.selectedStates[id];
+  self.eligibleStates[id] = {count:null}
+  // delete self.selectedStates[id];
   self.identify();
   return this;
 }
@@ -98,11 +106,11 @@ Identification.prototype.createSpecies = function(callback) {
       self.species[sp.id].vernacularName = sp[self.internacionalization.language+":dwc:Taxon:vernacularName"]?sp[self.internacionalization.language+":dwc:Taxon:vernacularName"].value:"";
       self.species[sp.id].html = $("<div class='especies' id = " + self.species[sp.id].htmlId + "></div>");
       self.species[sp.id].thumbnail = sp[self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.internacionalization.language+":rcpol:Image:plantImage"].images[0].thumbnail:sp[self.internacionalization.language+":rcpol:Image:flowerImage"]?sp[self.internacionalization.language+":rcpol:Image:flowerImage"].images[0].thumbnail:sp[self.internacionalization.language+":rcpol:Image:allPollenImage"]?sp[self.internacionalization.language+":rcpol:Image:allPollenImage"].images[0].thumbnail:"img/lspm.jpg"
-      self.species[sp.id].html.append("<img id='_img_"+self.species[sp.id].htmlId+"' src='"+self.species[sp.id].thumbnail+"' onerror='imageError(this)'/>");
+      self.species[sp.id].html.append("<a href='/profile/species/" + sp.id + "' target='_blank' ><img id='_img_"+self.species[sp.id].htmlId+"' src='"+self.species[sp.id].thumbnail+"' onerror='imageError(this)'/></a>");
       self.species[sp.id].html.append("<div class='nsp'></div>");
-      self.species[sp.id].html.find(".nsp").append("<p class='famisp'>" + self.species[sp.id].family + "</p>");
+      self.species[sp.id].html.find(".nsp").append("<a href='/profile/species/" + sp.id + "' target='_blank' ><p class='famisp'>" + self.species[sp.id].family + "</p></a>");
       self.species[sp.id].html.find(".nsp").append("<a href='/profile/species/" + sp.id + "' target='_blank' ><p class='nomesp'><i>" + self.species[sp.id].scientificName+ " </i>" + self.species[sp.id].scientificNameAuthorship + "</p></a>");
-      self.species[sp.id].html.find(".nsp").append("<p class='popn'>" + self.species[sp.id].vernacularName + "</p>");
+      self.species[sp.id].html.find(".nsp").append("<a href='/profile/species/" + sp.id + "' target='_blank' ><p class='popn'>" + self.species[sp.id].vernacularName + "</p></a>");
     });
     callback();
   });
@@ -134,7 +142,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
         self.descriptors[state.category][state.field][state.state].value = state.state;
         self.descriptors[state.category][state.field][state.state].id = state.id;
-        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\')" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img alt="'+self.descriptors[state.category][state.field][state.state].id+'" src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
+        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\').identify();" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img alt="'+self.descriptors[state.category][state.field][state.state].id+'" src="/img/glo.png" class="vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
       }
     });
     callback();
@@ -170,12 +178,16 @@ Identification.prototype.printDescriptors = function() {
       Object.keys(self.descriptors[idCategory][idDescriptor]).forEach(function(idState) {
         if(typeof self.descriptors[idCategory][idDescriptor][idState].value != "undefined"){
           if(self.descriptors[idCategory][idDescriptor][idState].value){
+            // default
+            $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("(0)")
             // IS STATE ELIGIBLE?
             if(self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id] && (self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count==null || self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count<Object.keys(self.eligibleSpecies).length)){
               stateCount++;
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#"+self.descriptors[idCategory][idDescriptor].htmlId));
               if(self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count!=null){
                 $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("("+self.eligibleStates[self.descriptors[idCategory][idDescriptor][idState].id].count+")")
+              } else {
+                $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("(0)")
               }
             } else {
               self.descriptors[idCategory][idDescriptor][idState].html.detach();
@@ -183,7 +195,7 @@ Identification.prototype.printDescriptors = function() {
             // IS SELECTED STATE?
             if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id]){
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#descritoresSelecionados"));
-              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='javascript:identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='http://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Button-Close-icon.png'/></a>")
+              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='#' onclick='identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='http://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Button-Close-icon.png'/></a>")
             }
           }
         }
