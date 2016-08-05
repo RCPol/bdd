@@ -1,0 +1,21 @@
+{
+  "name": "bdd",
+  "description": "bdd",
+  "main": "server/server.js",
+  "authors": [
+    "Allan Koch Veiga <allan.kv@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/RCPol/bdd",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "client/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.6.1",
+    "jquery-ui": "^1.12.0"
+  }
+}

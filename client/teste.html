@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="elements/autocomplete-species.html">
+
+    <title></title>
+    <script type="text/javascript">
+    var availableTags = {values:[
+        "ActionScript",
+        "AppleScript",
+        "Asp",
+        "BASIC",
+        "C",
+        "C++",
+        "Clojure",
+        "COBOL",
+        "ColdFusion",
+        "Erlang",
+        "Fortran",
+        "Groovy",
+        "Haskell",
+        "Java",
+        "JavaScript",
+        "Lisp",
+        "Perl",
+        "PHP",
+        "Python",
+        "Ruby",
+        "Scala",
+        "Scheme"
+      ]};
+      // $(document).ready(function() {
+        // var source = {values:availableTags};
+        // document.querySelector('autocomplete-species').source = source;
+        // $("autocomplete-species").attr("source",JSON.stringify(source));
+        // $("autocomplete-species").attr("source",source);
+
+      // });
+    </script>
+  </head>
+  <body>
+    <!-- <autocomplete-species source='{"values":["teste1","abcd"]}'></autocomplete-species> -->
+    <autocomplete-species source="availableTags"></autocomplete-species>
+  </body>
+</html>
