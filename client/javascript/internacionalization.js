@@ -15,11 +15,11 @@ Internacionalization.prototype.siteTranslator = function(){
   $.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+self.language+"%22%7D%7D", function(data){
     data.forEach(function(label) {
       if(label.term=="siteSearch"){
-        $(".formbusca > :text").val(label.field)
+        $(".formbusca > :text").attr("placeholder",label.field)
       } else
-      if(label.term=="siteClean"){
-        $(".formbusca > :reset").val(label.field)
-      } else
+      // if(label.term=="siteClean"){
+      //   $(".formbusca > :reset").val(label.field)
+      // } else
         $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
     });
   });

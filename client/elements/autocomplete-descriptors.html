@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 <dom-module id="autocomplete-descriptors">
   <style>
-    .fbcampo {
+    :host {
     	margin: 0;
     	padding: 5px 10px;
     	font-family: 'Roboto Condensed', sans-serif;
@@ -20,13 +20,14 @@
 <script>
   Polymer({
     is: "autocomplete-descriptors",
+    extends: 'input',
     properties:{
         source: String
     },
     ready: function(){
       var self = this;
-      var field = Polymer.dom(this.root).querySelector('#searchDescriptors');
-      $(field).autocomplete({
+      // var field = Polymer.dom(this.root).querySelector('#searchDescriptors');
+      $(self).autocomplete({
         source: [],
         search: function(event, ui) {
           var data = [];
@@ -49,7 +50,7 @@
               });
             });
           }
-          if(typeof $(field).autocomplete != "undefined") $(field).autocomplete("option",{source:data})          
+          if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})          
         }
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
         var rs = $("<div>").append(item.html.clone().css("margin","0").css("height","150px")).css("display","inline-block").css("height","100%");
