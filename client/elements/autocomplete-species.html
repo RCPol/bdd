@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 <dom-module id="autocomplete-species">
   <style>
-    .fbcampo {
+    :host {
     	margin: 0;
     	padding: 5px 10px;
     	font-family: 'Roboto Condensed', sans-serif;
@@ -12,21 +12,22 @@
     }
   </style>
   <template>
-    <input type="text" id="searchSpecies" class="fbcampo" size="21" maxlength="120" placeholder="Pesquisar">
+    <!-- <input type="text" id="searchSpecies" class="fbcampo" size="21" maxlength="120" placeholder="Pesquisar"> -->
   </template>
 </dom-module>
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script>
   Polymer({
-    is: "autocomplete-species",
+    is: "autocomplete-species",  
+    extends: 'input',  
     properties:{
         source: String
     },
     ready: function(){
-      var self = this;
-      var field = Polymer.dom(this.root).querySelector('#searchSpecies');
-      $(field).autocomplete({
+      var self = this;      
+      // var field = Polymer.dom(this.root).querySelector('#searchSpecies');
+      $(self).autocomplete({
         source: [],
         search: function(event, ui) {
           var data = [];
@@ -36,9 +37,9 @@
               return {value:currentSource[key].scientificName,label:currentSource[key].scientificName+currentSource[key].vernacularName+currentSource[key].family,html:currentSource[key].html};
             });
           }
-          if(typeof $(field).autocomplete != "undefined") $(field).autocomplete("option",{source:data})
+          if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})
           else {
-            console.log("Error",field);
+            console.log("Error",self);
           }
         }
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
@@ -53,5 +54,4 @@
       };
     }
   });
-
 </script>
