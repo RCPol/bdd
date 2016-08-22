@@ -266,6 +266,7 @@ module.exports = function(Schema) {
   //   }
   // };
 
+  var logs = {};
   //Método by Raquel
   Schema.downloadImages = function (cb) {
     //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
@@ -283,7 +284,8 @@ module.exports = function(Schema) {
       downloader.download().on("done",
         function() {
           console.log("Terminou #"+downloader.count+" em "+(new Date().getTime() - startTime.getTime()));
-          downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");
+          downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");                    
+          console.log(downloader.log);
           cb(null, downloader.log);
         }
       );
