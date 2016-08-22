@@ -1,3 +1,5 @@
+var readChunk = require('read-chunk'); 
+var imageType = require('image-type');  
 var xlsx = require('node-xlsx');
 var hash = require('object-hash');
 var request = require('request');
@@ -299,7 +301,7 @@ module.exports = function(Schema) {
     this.requestErrorCount = 0;
   }
   util.inherits(ImageDownloader, EventEmitter);
-  ImageDownloader.prototype.download = function(queue,cb) {    
+  ImageDownloader.prototype.download = function(queue) {    
     var self = this;
     if (queue.length == 0){ // testa se terminou
       self.log.unshift("Total de imagens: "+self.count)
@@ -318,23 +320,23 @@ module.exports = function(Schema) {
           if(exists){      
             console.log("Existe thumbnail "+image.thumbnailPath);              
             image.checkIfExist(image.resizedPath,function(exists) {
-              if(exists) console.log("Existe resized "+image.resizedPath);
+              if(exists) console.log("Existe resized "+image.thumbnailPath);
               else image.emit("localFileWrote");
             });
           } else {
             image.emit("localFileWrote");
           }
         });
-        self.download(queue,cb);
+        self.download(queue);
       })
     .on("doesNotExist",image.requestFromURL)
     .on("endDownload", function() {
           image.writeLocalFile();
           self.count++
-          self.download(queue,cb);
+          self.download(queue);
       })
     .on("localFileWrote",
-      function() {
+      function() {        
         image.convertResized();
         image.convertThumbnail();
         self.log = self.log.concat(image.log)
@@ -387,7 +389,7 @@ module.exports = function(Schema) {
     });
     return this;
   }
-  Image.prototype.writeLocalFile = function() {
+  Image.prototype.writeLocalFile = function() {    
     var self = this;
     fs.writeFile("client"+self.local, self.downloadedContent, 'binary', function(err){
         if(err){
@@ -403,7 +405,23 @@ module.exports = function(Schema) {
             self.writeLocalFile();
           }
         } else {
-          self.emit("localFileWrote");
+          var buffer = readChunk.sync("client"+self.local, 0, 120);  
+          //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
+          if (imageType(buffer)==null){
+            if(self.writeLocalErrorCount==10){              
+              console.log("******** Local: "+self.local);
+              console.log('Ops, um erro ocorreu!');
+              console.log("URL: ",self.original);
+              console.log("********");
+              self.log.push("Write Local File: "+self.local+"   URL: "+self.original);
+              self.writeLocalErrorCount = 0;
+            } else {
+              self.writeLocalErrorCount++
+              self.writeLocalFile();
+            }
+          }else{            
+            self.emit("localFileWrote");
+          }  
         }
     });
     return this;
