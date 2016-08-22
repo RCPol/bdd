@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="/bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="/bower_components/paper-datatable/paper-datatable.html">
+
+    <title></title>
+    <script type="text/javascript">
+      var data = [{title:"tese"},{title:"teste"}];
+    </script>
+  </head>
+  <body>
+    <paper-datatable data="{{data}}" selectable multi-selection>
+    <!-- <paper-datatable-column header="Title" property="title" sortable editable>
+        <template>
+            <paper-input value="{{value}}">
+        </template>
+    </paper-datatable-column> -->
+</paper-datatable>
+  </body>
+</html>

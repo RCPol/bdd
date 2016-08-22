@@ -22,10 +22,9 @@ a:link, a:visited {
 	text-decoration: none;
 	color: #510A5E;
 }
-
 a:hover, a:active {
-	background-color: #F27224;
-	color: black;
+	background-color: #F8C88A;
+	color: #111111;
 }
 
 div.contem {
@@ -74,6 +73,7 @@ nav ul li a {
 
 nav ul li a:hover {
 	background-color: #F27224;
+	color:#111111
 }
 
 /* Logotipo */

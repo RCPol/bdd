@@ -2,252 +2,245 @@
 <html lang="pt-br">
 <head>
 	<meta charset="UTF-8">
+	<!-- POLYMER e CUSTUM COMPONENTS -->
+	<script src="/bower_components/webcomponentsjs/webcomponents.js"></script>
+	<link rel="import" href="/elements/autocomplete-species.html"></script>
+	<link rel="import" href="/elements/autocomplete-descriptors.html"></script>
 
 	<!-- Google fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 	<script src="javascript/md5.min.js"></script>
 
-    <!-- Css Documento -->
+	<!-- Css Documento -->
 	<link rel="stylesheet" href="/css/chave.css">
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 
 	<!-- JQuery -->
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 
-    <!-- JQuery Rolagem -->
+
+	<!-- JQuery Rolagem -->
 	<link rel="stylesheet" href="/javascript/jquery.mCustomScrollbar.css">
 	<script src="/javascript/jquery.mCustomScrollbar.concat.min.js"></script>
 
-<script type="text/javascript" src="/javascript/chave.js"></script>
-<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/chave.js"></script>
+	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
-	<!-- Campos de busca, scrollbar e botões  -->
-	<script type="text/javascript">
+	<style>
+		.ui-state-active,
+		.ui-widget-content .ui-state-active,
+		.ui-widget-header .ui-state-active,
+		a.ui-button:active,
+		.ui-button:active,
+		.ui-button.ui-state-active:hover {
+			border: 0px solid #dddddd;
+			/*text-shadow: 1px 1px #A8A080;*/
+			background-color: #FBE0D2;
+			/*font-weight: bold;*/
+			color: black;
+		}
+	}
+</style>
+<!-- Campos de busca, scrollbar e botões  -->
+<script type="text/javascript">
 
-      $(document).on('keyup', '.numnum', function(event) {
-        var v = this.value;
-        if($.isNumeric(v) === false) {
-          //chop off the last char entered
-          this.value = this.value.slice(0,-1);
-        }
-      });
-	  window.onload = function(){
+	$(document).on('keyup', '.numnum', function(event) {
+		var v = this.value;
+		if($.isNumeric(v) === false) {
+        //chop off the last char entered
+        this.value = this.value.slice(0,-1);
+    }
+});
+	window.onload = function(){
         //Barras de Rolagem das caixas
-		$(".roxinho").mCustomScrollbar({
-			scrollButtons:{ enable: true },
-			theme: "dark",
-		});
-		$(".roxinhodesc").mCustomScrollbar({
-			scrollButtons:{ enable: true },
-			theme: "dark",
-		});
-		//Limpa texto da busca dos descritores
-		var btpdescritores = document.getElementById("buscadescritores");
+        $(".roxinho").mCustomScrollbar({
+        	scrollButtons:{ enable: true },
+        	theme: "dark",
+        });
+        $(".roxinhodesc").mCustomScrollbar({
+        	scrollButtons:{ enable: true },
+        	theme: "dark",
+        });
 
-		if(btpdescritores.addEventListener){
-			btpdescritores.addEventListener("click", function() {
-				if (btpdescritores.value == 'Pesquisar'){
-					btpdescritores.value = '';
-				}
-			});
-		}
-
-		//Limpa texto da busca das espécies
-		var submitbutton2 = document.getElementById("buscaespecies");
-
-		if(submitbutton2.addEventListener){
-			submitbutton2.addEventListener("click", function() {
-				if (submitbutton2.value == 'Pesquisar'){
-					submitbutton2.value = '';
-				}
-			});
-		}
-        //Toggle Descritores
-        $(".accordion").on("click", ".toggle", function(e){
-
-		  var $this = $(this);
-
-		  if ($this.next().hasClass('show')) {
-			$this.next().removeClass('show');
-			$this.next().slideUp(350);
-			$this.children('span').html('+');
-		  } else {
-			$this.parent().parent().find('li .inner').removeClass('show');
-			$this.parent().parent().find('li .inner').slideUp(350);
-			$this.next().toggleClass('show');
-			$this.next().slideToggle(350);
-			$this.children('span').html('&minus;');
-		  }
-		});
-
+		        //Toggle Descritores
+		        $(".accordion").on("click", ".toggle", function(e){
+		        	var $this = $(this);
+		        	if ($this.next().hasClass('show')) {
+		        		$this.next().removeClass('show');
+		        		$this.next().slideUp(350);
+		        		$this.children('span').html('+');
+		        	} else {
+		        		$this.parent().parent().find('li .inner').removeClass('show');
+		        		$this.parent().parent().find('li .inner').slideUp(350);
+		        		$this.next().toggleClass('show');
+		        		$this.next().slideToggle(350);
+		        		$this.children('span').html('&minus;');
+		        	}
+		        });
 		//Botão Mostrar todos
 		$('.open').click(function(){
-		  $('.inner').addClass('show');
-		  $('li .inner').slideUp(350);
-		  $('li .inner').slideToggle(350);
-		  $('.accordion').find('span .toggle').html('&minus;');
+			$('.inner').addClass('show');
+			$('li .inner').slideUp(350);
+			$('li .inner').slideToggle(350);
+			$('.accordion').find('span .toggle').html('&minus;');
 		});
-
 		//Botão Ocultar todos
 		$('.close').click(function(){
-		  $('.inner').removeClass('show');
-		  $('li .inner').slideUp(350);
-		  $('.accordion').find('span .toggle').html('+');
+			$('.inner').removeClass('show');
+			$('li .inner').slideUp(350);
+			$('.accordion').find('span .toggle').html('+');
 		});
-
 		//Ao clicar adiciona a classe selecionado à div vimagens
-        $(".accordion").on("click", ".vimagens", function(){
-		  if ($(this).hasClass('selecionado')) {
-			$(this).removeClass('selecionado');
-		  } else {
-			$(this).addClass('selecionado');
-		  }
+		$(".accordion").on("click", ".vimagens", function(){
+			if ($(this).hasClass('selecionado')) {
+				$(this).removeClass('selecionado');
+			} else {
+				$(this).addClass('selecionado');
+			}
 		});
-      }
-			var identification;
-      $(document).ready(function(){
-				identification = new Identification();
-				identification.startup();
-      });
-	</script>
-	<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
+	}
+	var identification = new Identification();
+	$(document).ready(function(){
+		identification.startup();
+	});
+</script>
+<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
 </head>
 <body>
-<div class="contem">
-	<!-- Início Header: Menu e Logotipo -->
-	<header>
+	<div class="contem">
+		<!-- Início Header: Menu e Logotipo -->
+		<header>
 
-		<!-- Menu: início -->
-		<nav>
-			<ul>
-			  <li> <!-- inserir link para o portal --> <a href="#" id="rcpol-SiteLabel-siteHome">Home</a></li>
-        <li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
-				<li>
-					<img onclick="identification.translate('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
-					<img onclick="identification.translate('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
-					<img onclick="identification.translate('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
-				</li>
-			</ul>
-		</nav>
-		<!-- Menu: fim -->
+			<!-- Menu: início -->
+			<nav>
+				<ul>
+					<li> <!-- inserir link para o portal --> <a href="#" id="rcpol-SiteLabel-siteHome">Home</a></li>
+					<li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
+					<li>
+						<img onclick="identification.translate('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
+						<img onclick="identification.translate('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
+						<img onclick="identification.translate('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+					</li>
+				</ul>
+			</nav>
+			<!-- Menu: fim -->
 
-		<!-- logotipo -->
-		<div class="logo">
-			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
-		</div>
-		<!-- logotipo -->
+			<!-- logotipo -->
+			<div class="logo">
+				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+			</div>
+			<!-- logotipo -->
 
-	</header>
-	<!-- Fim Header: Menu e Logotipo -->
+		</header>
+		<!-- Fim Header: Menu e Logotipo -->
 
-	<!-- Início do quadrado branco de fundo -->
-	<div class="qbranco">
+		<!-- Início do quadrado branco de fundo -->
+		<div class="qbranco">
+			<!-- Início: Caixa da esquerda -->
+			<div class="cesquerda">
 
-		<!-- Início: Caixa da esquerda -->
-		<div class="cesquerda">
+				<!-- Título -->
+				<h1 id="rcpol-KeyLabel-keyDescriptores">Descritores</h1>
 
-			<!-- Título -->
-			<h1 id="rcpol-KeyLabel-keyDescriptores">Descritores</h1>
+				<!-- Início: Busca Descritores -->
+				<form class="formbusca">
+					<input type="text" is="autocomplete-descriptors" source="identification.descriptors" placeholder="Pesquisar"></input>					
+				</form>
 
-			<!-- Início: Busca Descritores -->
-			<form class="formbusca" onreset="buscaDescritores(true);" onsubmit="buscaDescritores(false); return false;">
-				<input type="text" id="buscadescritores" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset" value="Limpar">
-			</form>
+				<div class="tfclear"></div>
+				<!-- Final: Busca Descritores -->
 
-			<div class="tfclear"></div>
-			<!-- Final: Busca Descritores -->
-
-			<!-- Início: Descritores disponíveis -->
-			<div class="roxinhobtn">
-				<!-- Botões de Expandir/Ocultar -->
-				<div class="divaeh">
-                    <button type="button" class="open expocu" id="rcpol-KeyLabel-keySeeAll">Ver todos</button>
-					<button type="button" class="close expocu" id="rcpol-KeyLabel-keyHideAll">Ocultar todos</button>
-                    <button type="button" class="btnident" onclick="identification.identify()"><span id="rcpol-KeyLabel-keyIdentify">Identificar</span> &#9654;</button>
+				<!-- Início: Descritores disponíveis -->
+				<div class="roxinhobtn">
+					<!-- Botões de Expandir/Ocultar -->
+					<div class="divaeh">
+						<button type="button" class="open expocu" id="rcpol-KeyLabel-keySeeAll">Ver todos</button>
+						<button type="button" class="close expocu" id="rcpol-KeyLabel-keyHideAll">Ocultar todos</button>
+						<!-- <button type="button" class="btnident" onclick="identification.identify()"><span id="rcpol-KeyLabel-keyIdentify">Identificar</span> &#9654;</button> -->
+					</div>
 				</div>
-            </div>
 
-            <div class="roxinhodesc">
-				<!-- Início: Div descritores superiores -->
-				<div class="agregadordescritores">
+				<div class="roxinhodesc">
+					<!-- Início: Div descritores superiores -->
+					<div class="agregadordescritores">
 
-                  <ul id="category" class="accordion">
+						<ul id="category" class="accordion">
                     <!-- <li><a id="category_Planta" class="toggle" href="javascript:void(0);"><span>+</span> Planta </a><ul id="desc_for_Planta" class="descritor inner"></ul></li>
                     <li><a id="category_Flor" class="toggle" href="javascript:void(0);"><span>+</span> Flor </a><ul id="desc_for_Flor" class="descritor inner"></ul></li>
                     <li><a id="category_Pólen" class="toggle" href="javascript:void(0);"><span>+</span> Pólen </a><ul id="desc_for_Pólen" class="descritor inner"></ul></li> -->
-                  </ul>
+                </ul>
 
-				</div>
-				<!-- Final: Div Descritor superior -->
-			</div>
-			<!-- Final: Descritores disponíveis -->
+            </div>
+            <!-- Final: Div Descritor superior -->
+        </div>
+        <!-- Final: Descritores disponíveis -->
 
-			<!-- Título -->
-			<h2 id="rcpol-KeyLabel-keySelectedDescriptores">Descritores selecionados</h2>
+        <!-- Título -->
+        <h2 id="rcpol-KeyLabel-keySelectedDescriptores">Descritores selecionados</h2>
 
-			<!-- Início: Descritores selecionados -->
-			<div class="roxinho">
+        <!-- Início: Descritores selecionados -->
+        <div class="roxinho">
 
-              <!-- Botões de Expandir/Ocultar -->
-				<div class="divaeh">
-					<button type="button" class="expocu" onclick="identification.removeAll()" id="rcpol-KeyLabel-keyRemoveAll">Remover todos</button>
-					<!-- <button type="button" class="expocu" onclick="removeSelected()">Remover Selecionados</button> -->
-				</div>
+        	<!-- Botões de Expandir/Ocultar -->
+        	<div class="divaeh">
+        		<button type="button" class="expocu" onclick="identification.removeAll()" id="rcpol-KeyLabel-keyRemoveAll">Remover todos</button>
+        		<!-- <button type="button" class="expocu" onclick="removeSelected()">Remover Selecionados</button> -->
+        	</div>
 
-                <div id="descritoresSelecionados" class="descel">
-                </div>
+        	<div id="descritoresSelecionados" class="descel">
+        	</div>
 
-			</div>
-			<!-- Final: Descritores selecionados -->
+        </div>
+        <!-- Final: Descritores selecionados -->
 
-		</div>
-		<!-- Final: Caixa da esquerda -->
+    </div>
+    <!-- Final: Caixa da esquerda -->
 
-		<!-- Início: Caixa da direita -->
-		<div class="cdireita">
+    <!-- Início: Caixa da direita -->
+    <div class="cdireita">
 
-			<!-- Título -->
-			<h1 id="rcpol-KeyLabel-keySpecies">Espécies</h1>
+    	<!-- Título -->
+    	<h1 id="rcpol-KeyLabel-keySpecies">Espécies</h1>
 
-			<!-- Início: Busca Espécies -->
-			<form class="formbusca" onreset="buscaEspecies(true);" onsubmit="buscaEspecies(false); return false;">
-				<input type="text" id="buscaespecies" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao"><input class="fbbotao" type="reset" value="Limpar">
-			</form>
-			<div class="tfclear"></div>
-			<!-- Final: Busca Espécies -->
-			<!-- Início: Espécies disponíveis -->
-			<div class="roxinho">
-				<div  style="float:right;text-align:right;margin-right:40px; color:#F27224" >
-					#<span id="speciesCount">...</span></span>
-				</div>
-        <div id="especiesElegiveis"></div>
-			</div>
-			<!-- Final: Espécies disponíveis -->
+    	<!-- Início: Busca Espécies -->
+    	<form class="formbusca" >
+    	<input type="text" is="autocomplete-species" source="identification.species" placeholder="Pesquisar"></input>
+    	</form>
+    	<div class="tfclear"></div>
+    	<!-- Final: Busca Espécies -->
+    	<!-- Início: Espécies disponíveis -->
+    	<div class="roxinho">
+    		<div  style="float:right;text-align:right;margin-right:40px; color:#F27224" >
+    			#<span id="speciesCount">...</span></span>
+    		</div>
+    		<div id="especiesElegiveis"></div>
+    	</div>
+    	<!-- Final: Espécies disponíveis -->
 
-			<!-- Título -->
-			<h2 id="rcpol-KeyLabel-keyDisregardedSpecies">Espécies descartadas</h2>
+    	<!-- Título -->
+    	<h2 id="rcpol-KeyLabel-keyDisregardedSpecies">Espécies descartadas</h2>
 
-			<!-- Início: Espécies descartadas -->
-			<div class="roxinho">
+    	<!-- Início: Espécies descartadas -->
+    	<div class="roxinho">
 
-              <div id="especiesDescartadas">
-              </div>
+    		<div id="especiesDescartadas">
+    		</div>
 
-			</div>
-			<!-- Final: Espécies descartadas -->
+    	</div>
+    	<!-- Final: Espécies descartadas -->
 
-		</div>
-		<!-- Final: Caixa da direita -->
+    </div>
+    <!-- Final: Caixa da direita -->
 
-	</div>
-	<!-- Final do quadrado branco de fundo -->
+</div>
+<!-- Final do quadrado branco de fundo -->
 
-	<!-- Início do Rodapé -->
-	<footer>
-		<p id="rcpol-SiteLabel-siteCopyright">Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
-	</footer>
-	<!-- Final do Rodapé -->
+<!-- Início do Rodapé -->
+<footer>
+	<p id="rcpol-SiteLabel-siteCopyright">Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+</footer>
+<!-- Final do Rodapé -->
 
 </div>
 </body>

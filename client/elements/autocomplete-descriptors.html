@@ -1,0 +1,77 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+<dom-module id="autocomplete-descriptors">
+  <style>
+    :host {
+    	margin: 0;
+    	padding: 5px 10px;
+    	font-family: 'Roboto Condensed', sans-serif;
+    	font-size: 14px;
+    	color: #F27224;
+    	border:1px solid #FFAD60;
+    }
+  </style>
+  <template>
+    <input type="text" id="searchDescriptors" class="fbcampo" size="21" maxlength="120" placeholder="Pesquisar">
+  </template>
+</dom-module>
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script>
+  Polymer({
+    is: "autocomplete-descriptors",
+    extends: 'input',
+    properties:{
+        source: String
+    },
+    ready: function(){
+      var self = this;
+      // var field = Polymer.dom(this.root).querySelector('#searchDescriptors');
+      $(self).autocomplete({
+        source: [],
+        search: function(event, ui) {
+          var data = [];
+          if (eval(self.source)) {
+            var currentSource = eval(self.source);
+            Object.keys(currentSource).forEach(function (categoryKey) {
+              Object.keys(currentSource[categoryKey]).forEach(function (descriptorKey) {
+                Object.keys(currentSource[categoryKey][descriptorKey]).forEach(function (stateKey) {
+                  if(typeof currentSource[categoryKey][descriptorKey][stateKey].value != "undefined" && typeof currentSource[categoryKey][descriptorKey][stateKey].html != "undefined"){
+                    console.log(currentSource[categoryKey][descriptorKey][stateKey]);
+                    var item = {};
+                    item.value = currentSource[categoryKey][descriptorKey][stateKey].value
+                    item.category = categoryKey;
+                    item.descriptor = descriptorKey;
+                    item.label = currentSource[categoryKey][descriptorKey][stateKey].value+categoryKey+descriptorKey
+                    item.html = currentSource[categoryKey][descriptorKey][stateKey].html;
+                    data.push(item);
+                  }
+                });
+              });
+            });
+          }
+          if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})          
+        }
+      }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+        var rs = $("<div>").append(item.html.clone().css("margin","0").css("height","150px")).css("display","inline-block").css("height","100%");
+        rs.prepend('<p style="line-height:105%;letter-spacing: 1px;font-size:small;height:100%;vertical-align:top;top:0px;"><b>'+item.category+'</b>:<br>'+item.descriptor+"</p>")
+        rs.css("margin-left","6px");
+        rs.css("margin-right","6px");
+        rs.css("padding-left","6px");
+        rs.css("padding-right","6px");
+        // rs.css("background-color","#FBE0D2")
+
+        rs.css("width","120px")
+        // rs.css("height","150%")
+        // rs.children().css("width","250px")
+        // rs.children().css("height","100%")
+
+        // rs.children().css("background-color","#FBE0D2")
+        rs.css("background-color","#F9C6A7")
+        ul.css("background-color","#F9C6A7")
+        return rs.appendTo( ul );
+      };
+    }
+  });
+
+</script>

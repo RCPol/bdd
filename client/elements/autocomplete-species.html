@@ -1,0 +1,57 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+<dom-module id="autocomplete-species">
+  <style>
+    :host {
+    	margin: 0;
+    	padding: 5px 10px;
+    	font-family: 'Roboto Condensed', sans-serif;
+    	font-size: 14px;
+    	color: #F27224;
+    	border:1px solid #FFAD60;
+    }
+  </style>
+  <template>
+    <!-- <input type="text" id="searchSpecies" class="fbcampo" size="21" maxlength="120" placeholder="Pesquisar"> -->
+  </template>
+</dom-module>
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script>
+  Polymer({
+    is: "autocomplete-species",  
+    extends: 'input',  
+    properties:{
+        source: String
+    },
+    ready: function(){
+      var self = this;      
+      // var field = Polymer.dom(this.root).querySelector('#searchSpecies');
+      $(self).autocomplete({
+        source: [],
+        search: function(event, ui) {
+          var data = [];
+          if (eval(self.source)) {
+            var currentSource = eval(self.source);
+            data = Object.keys(currentSource).map(function (key) {
+              return {value:currentSource[key].scientificName,label:currentSource[key].scientificName+currentSource[key].vernacularName+currentSource[key].family,html:currentSource[key].html};
+            });
+          }
+          if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})
+          else {
+            console.log("Error",self);
+          }
+        }
+      }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+        var rs = item.html.clone();
+        rs.css("padding","6px");
+        rs.css("background-color","#FBE0D2")
+        rs.children().css("padding","6")
+        rs.children().css("margin","0")
+        rs.children().find(".nomesp").css("width","212px")
+        rs.children().css("background-color","#F9C6A7")
+        return rs.appendTo( ul );
+      };
+    }
+  });
+</script>
