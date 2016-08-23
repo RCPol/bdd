@@ -569,29 +569,33 @@ module.exports = function(Specimen) {
             console.log("Existe thumbnail "+image.thumbnailPath);              
             image.checkIfExist(image.resizedPath,function(exists) {
               if(exists) {
-                console.log("Existe resized "+image.thumbnailPath);                
+                console.log("Existe resized "+image.thumbnailPath); 
+                callback();                 
               }
               else image.emit("localFileWrote");
             });
           } else {
             image.emit("localFileWrote");
           }
-        });
-        callback();        
+        });            
       })
     .on("doesNotExist",image.requestFromURL)
     .on("endDownload", function() {
           image.writeLocalFile();
-          self.count++;
-          callback();          
+          self.count++;            
       })
     .on("localFileWrote",
       function() {        
-        image.convertResized();
-        image.convertThumbnail();            
+        image.convertResized().on("resizedFileWrote",function() {
+          image.convertThumbnail().on("thumbnailFileWrote",function() {
+            callback();
+          });          
+        });        
         // self.log = self.log.concat(image.log)
-      }
-    );
+      })
+    .on("writeError",function() {
+      callback();
+    });
     return this;
   };
   function Image(img) {    
@@ -665,6 +669,7 @@ module.exports = function(Specimen) {
               console.log("********");
               self.log.push("Write Local File: "+self.local+"   URL: "+self.original);
               self.writeLocalErrorCount = 0;
+              self.emit("writeError");
             } else {
               self.writeLocalErrorCount++
               self.writeLocalFile();
@@ -688,6 +693,7 @@ module.exports = function(Specimen) {
           console.log("********");
           self.log.push("Write Resized File: "+self.resized+"   Local: "+self.local+"   URL: "+self.original);
           self.writeResizedErrorCount = 0;
+          self.emit("writeError");
         } else {
           self.writeResizedErrorCount++
           self.convertResized();
@@ -700,7 +706,7 @@ module.exports = function(Specimen) {
   }
   Image.prototype.convertThumbnail = function() {
     var self = this;
-    qt.convert({src:self.localPath, dst: self.thumbnailPath, width:100, height:100}, function(err, filename){
+    qt.convert({src:self.resizedPath, dst: self.thumbnailPath, width:100, height:100}, function(err, filename){
       if(err){
         if(self.writeThumbnailErrorCount==3){
           console.log("******** THUMBNAIL: "+self.thumbnail);
@@ -710,6 +716,7 @@ module.exports = function(Specimen) {
           console.log("********");
           self.log.push("Write Thumbnail File: "+self.thumbnail+"   Local: "+self.local+"   URL: "+self.original);
           self.writeThumbnailErrorCount = 0;
+          self.emit("writeError");
         } else {
           self.writeThumbnailErrorCount++
           self.convertThumbnail();
