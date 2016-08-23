@@ -276,21 +276,23 @@ module.exports = function(Schema) {
     //Onde a imagem vai ser salva na pasta do cliente
     var startTime = new Date();
     Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
-      var queue = [];
+      var downloader = new ImageDownloader();
+      var queue = async.queue(downloader.download,10);
+
       results.forEach(function(rec) {
         rec.images.forEach(function(img) {
           queue.push(img);
         });
       });
-      var downloader = new ImageDownloader();
-      downloader.download(queue).on("done",
-        function() {
-          console.log("Terminou #"+downloader.count+" em "+(new Date().getTime() - startTime.getTime()));
-          downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");                    
-          console.log(downloader.log);
-          cb(null, downloader.log);
-        }
-      );
+      // var downloader = new ImageDownloader();
+      // downloader.download(queue).on("done",
+      //   function() {
+      //     console.log("Terminou #"+downloader.count+" em "+(new Date().getTime() - startTime.getTime()));
+      //     downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");                    
+      //     console.log(downloader.log);
+      //     cb(null, downloader.log);
+      //   }
+      // );
     });
 
   };
@@ -301,14 +303,9 @@ module.exports = function(Schema) {
     this.requestErrorCount = 0;
   }
   util.inherits(ImageDownloader, EventEmitter);
-  ImageDownloader.prototype.download = function(queue) {    
-    var self = this;
-    if (queue.length == 0){ // testa se terminou
-      self.log.unshift("Total de imagens: "+self.count)
-      self.emit("done")
-      return false;
-    }
-    var image = new Image(queue.pop());     
+  ImageDownloader.prototype.download = function(img,callback) {    
+    var self = this;    
+    var image = new Image(img);     
     image.checkIfExist(image.localPath,function(exists) {      
       if(exists) image.emit("exists"); 
       else image.emit("doesNotExist");
@@ -327,19 +324,19 @@ module.exports = function(Schema) {
             image.emit("localFileWrote");
           }
         });
-        self.download(queue);
+        callback();
       })
     .on("doesNotExist",image.requestFromURL)
     .on("endDownload", function() {
           image.writeLocalFile();
           self.count++
-          self.download(queue);
+          callback();
       })
     .on("localFileWrote",
       function() {        
         image.convertResized();
         image.convertThumbnail();
-        self.log = self.log.concat(image.log)
+        // self.log = self.log.concat(image.log)
       }
     );
     return this;
