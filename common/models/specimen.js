@@ -502,9 +502,14 @@ module.exports = function(Specimen) {
     Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
     {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
     fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
-    "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){
-    // Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
-      var queue = [];
+    "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){    
+      
+      
+      var queue = async.queue(function(img,callback) {
+        var downloader = new ImageDownloader();        
+        downloader.download(img,callback);
+      },10);
+
       results.forEach(function (result){
         if(result["pt-BR:rcpol:Image:allPollenImage"]){
             result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
@@ -531,18 +536,16 @@ module.exports = function(Specimen) {
               queue.push(img);
             });
         }
-      });
-      var downloader = new ImageDownloader();
-      downloader.download(queue).on("done",
-        function() {
-          console.log("Terminou #"+downloader.count+" em "+(new Date().getTime() - startTime.getTime()));
-          downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");
-          console.log(downloader.log);
-          cb(null, downloader.log);
-        }
-      );
+      });      
+      // downloader.download(queue).on("done",
+      //   function() {
+      //     console.log("Terminou #"+downloader.count+" em "+(new Date().getTime() - startTime.getTime()));
+      //     downloader.log.unshift("Tempo total: "+((new Date().getTime() - startTime.getTime())/1000)+"s");
+      //     console.log(downloader.log);
+      //     cb(null, downloader.log);
+      //   }
+      // );
     });
-
   };
   function ImageDownloader() {
     EventEmitter.call(this);
@@ -551,14 +554,9 @@ module.exports = function(Specimen) {
     this.requestErrorCount = 0;
   }
   util.inherits(ImageDownloader, EventEmitter);
-  ImageDownloader.prototype.download = function(queue) {    
-    var self = this;
-    if (queue.length == 0){ // testa se terminou
-      self.log.unshift("Total de imagens: "+self.count)
-      self.emit("done")
-      return false;
-    }
-    var image = new Image(queue.pop());     
+  ImageDownloader.prototype.download = function(img,callback) {    
+    var self = this;    
+    var image = new Image(img);     
     image.checkIfExist(image.localPath,function(exists) {      
       if(exists) image.emit("exists"); 
       else image.emit("doesNotExist");
@@ -570,26 +568,28 @@ module.exports = function(Specimen) {
           if(exists){      
             console.log("Existe thumbnail "+image.thumbnailPath);              
             image.checkIfExist(image.resizedPath,function(exists) {
-              if(exists) console.log("Existe resized "+image.thumbnailPath);
+              if(exists) {
+                console.log("Existe resized "+image.thumbnailPath);                
+              }
               else image.emit("localFileWrote");
             });
           } else {
             image.emit("localFileWrote");
           }
         });
-        self.download(queue);
+        callback();        
       })
     .on("doesNotExist",image.requestFromURL)
     .on("endDownload", function() {
           image.writeLocalFile();
-          self.count++
-          self.download(queue);
+          self.count++;
+          callback();          
       })
     .on("localFileWrote",
       function() {        
         image.convertResized();
-        image.convertThumbnail();
-        self.log = self.log.concat(image.log)
+        image.convertThumbnail();            
+        // self.log = self.log.concat(image.log)
       }
     );
     return this;
@@ -692,7 +692,7 @@ module.exports = function(Specimen) {
           self.writeResizedErrorCount++
           self.convertResized();
         }
-      } else {
+      } else {        
         self.emit("resizedFileWrote");
       }
     });
@@ -714,7 +714,7 @@ module.exports = function(Specimen) {
           self.writeThumbnailErrorCount++
           self.convertThumbnail();
         }
-      } else {
+      } else {        
         self.emit("thumbnailFileWrote");
       }
     });
