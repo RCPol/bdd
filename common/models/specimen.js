@@ -504,8 +504,11 @@ module.exports = function(Specimen) {
     fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
     "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){    
       
-      var downloader = new ImageDownloader();
-      var queue = async.queue(downloader.download,10);
+      
+      var queue = async.queue(function(img,callback) {
+        var downloader = new ImageDownloader();        
+        downloader.download(img,callback);
+      },10);
 
       results.forEach(function (result){
         if(result["pt-BR:rcpol:Image:allPollenImage"]){
@@ -543,7 +546,6 @@ module.exports = function(Specimen) {
       //   }
       // );
     });
-
   };
   function ImageDownloader() {
     EventEmitter.call(this);
@@ -566,25 +568,27 @@ module.exports = function(Specimen) {
           if(exists){      
             console.log("Existe thumbnail "+image.thumbnailPath);              
             image.checkIfExist(image.resizedPath,function(exists) {
-              if(exists) console.log("Existe resized "+image.thumbnailPath);
+              if(exists) {
+                console.log("Existe resized "+image.thumbnailPath);                
+              }
               else image.emit("localFileWrote");
             });
           } else {
             image.emit("localFileWrote");
           }
         });
-        callback();
+        callback();        
       })
     .on("doesNotExist",image.requestFromURL)
     .on("endDownload", function() {
           image.writeLocalFile();
-          self.count++
-          callback();
+          self.count++;
+          callback();          
       })
     .on("localFileWrote",
       function() {        
         image.convertResized();
-        image.convertThumbnail();
+        image.convertThumbnail();            
         // self.log = self.log.concat(image.log)
       }
     );
@@ -688,7 +692,7 @@ module.exports = function(Specimen) {
           self.writeResizedErrorCount++
           self.convertResized();
         }
-      } else {
+      } else {        
         self.emit("resizedFileWrote");
       }
     });
@@ -710,7 +714,7 @@ module.exports = function(Specimen) {
           self.writeThumbnailErrorCount++
           self.convertThumbnail();
         }
-      } else {
+      } else {        
         self.emit("thumbnailFileWrote");
       }
     });

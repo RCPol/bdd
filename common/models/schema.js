@@ -276,8 +276,10 @@ module.exports = function(Schema) {
     //Onde a imagem vai ser salva na pasta do cliente
     var startTime = new Date();
     Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
-      var downloader = new ImageDownloader();
-      var queue = async.queue(downloader.download,10);
+      var queue = async.queue(function(img,callback) {
+        var downloader = new ImageDownloader();        
+        downloader.download(img,callback);
+      },10);
 
       results.forEach(function(rec) {
         rec.images.forEach(function(img) {
@@ -317,25 +319,27 @@ module.exports = function(Schema) {
           if(exists){      
             console.log("Existe thumbnail "+image.thumbnailPath);              
             image.checkIfExist(image.resizedPath,function(exists) {
-              if(exists) console.log("Existe resized "+image.thumbnailPath);
+              if(exists) {
+                console.log("Existe resized "+image.thumbnailPath);                
+              }
               else image.emit("localFileWrote");
             });
           } else {
             image.emit("localFileWrote");
           }
         });
-        callback();
+        callback();        
       })
     .on("doesNotExist",image.requestFromURL)
     .on("endDownload", function() {
           image.writeLocalFile();
-          self.count++
-          callback();
+          self.count++;
+          callback();          
       })
     .on("localFileWrote",
       function() {        
         image.convertResized();
-        image.convertThumbnail();
+        image.convertThumbnail();            
         // self.log = self.log.concat(image.log)
       }
     );
@@ -439,7 +443,7 @@ module.exports = function(Schema) {
           self.writeResizedErrorCount++
           self.convertResized();
         }
-      } else {
+      } else {        
         self.emit("resizedFileWrote");
       }
     });
@@ -461,7 +465,7 @@ module.exports = function(Schema) {
           self.writeThumbnailErrorCount++
           self.convertThumbnail();
         }
-      } else {
+      } else {        
         self.emit("thumbnailFileWrote");
       }
     });
