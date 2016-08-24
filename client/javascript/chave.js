@@ -16,11 +16,22 @@ Identification.prototype.tooltipConfig = function() {
     items: "img",
     content: function(callback) {
       var element = $( this );
-      if ( element.is( ".vglos" ) ) {
+      if ( element.is( ".vglos" )) {
         var id = element.attr( "alt" );
         $.get("/profile/glossary/individual/"+id,function(data) {
           callback(data);
         });
+      } else if (element.is( ".lala" ) ) {
+        console.log("ALT: ",element.attr( "alt" ));
+        var parsedAlt = element.attr( "alt" ).split("|");
+        console.log("PARSED ALT: ",parsedAlt);
+        var category = parsedAlt[1];        
+        var descriptor = parsedAlt[0];
+        $.get("/api/Schemas/findOne?filter[where][category]="+category+"&filter[where][field]="+descriptor,function(rs) {          
+          $.get("/profile/glossary/individual/"+rs.id,function(data) {
+            callback(data);
+          });
+        });        
       }
     }
   });
@@ -118,7 +129,7 @@ Identification.prototype.createSpecies = function(callback) {
 }
 Identification.prototype.createDescriptors = function(callback) {
   var self = this;
-  $.getJSON("/api/Schemas?filter[where][language]="+self.internacionalization.language+"&filter[where][class]=State"/*, { filter : query }*/, function(states){
+  $.getJSON("/api/Schemas?filter[where][language]="+self.internacionalization.language+"&filter[where][class]=State&filter[order]=order"/*, { filter : query }*/, function(states){
     states.forEach(function(state) {
       var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
       // CATEGORY
@@ -133,7 +144,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field] = self.descriptors[state.category][state.field]?self.descriptors[state.category][state.field]:{};
         self.descriptors[state.category][state.field].htmlId = "descriptor_"+(state.category+state.field).htmlId();
         self.descriptors[state.category][state.field].value = state.field;
-        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.descriptors[state.category][state.field].value+"'><img alt='"+self.descriptors[state.category][state.field].value+"' src='img/glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'></div></li>");
+        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.descriptors[state.category][state.field].value+"'><img alt='"+self.descriptors[state.category][state.field].value+"|"+self.descriptors[state.category].value+"' src='img/glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'></div></li>");
         // self.descriptors[state.category][state.field].html.find("li").append("<div class='valoresn inner'><input name='" + self.descriptors[state.category][state.field].htmlId +"' type='text' class='numnum' size='5' maxlength='12' placeholder='00.00'> un </div>");
       }
       // STATE

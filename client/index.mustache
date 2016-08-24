@@ -3,9 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<!-- POLYMER e CUSTUM COMPONENTS -->
-	<script src="/bower_components/webcomponentsjs/webcomponents.js"></script>
-	<link rel="import" href="/elements/autocomplete-species.html"></script>
-	<link rel="import" href="/elements/autocomplete-descriptors.html"></script>
+	<script src="/bower_components/webcomponentsjs/webcomponents.js"></script>	
+	<link rel="import" href="bower_components/google-analytics/google-analytics.html">
+
+	<link rel="import" href="/elements/autocomplete-species.html"></script>	
+	<link rel="import" href="/elements/autocomplete-descriptors.html"></script>	
 
 	<!-- Google fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
@@ -105,12 +107,16 @@
 		identification.startup();
 	});
 </script>
+
+
+
 <title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
 </head>
-<body>
+<body>	
+	<google-analytics code="UA-83157202-1"></google-analytics>	
 	<div class="contem">
 		<!-- Início Header: Menu e Logotipo -->
-		<header>
+		<header>		
 
 			<!-- Menu: início -->
 			<nav>
@@ -121,6 +127,9 @@
 						<img onclick="identification.translate('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
 						<img onclick="identification.translate('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
 						<img onclick="identification.translate('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+					</li>
+					<li>
+						counter here					
 					</li>
 				</ul>
 			</nav>
@@ -205,7 +214,7 @@
 
     	<!-- Início: Busca Espécies -->
     	<form class="formbusca" >
-    	<input type="text" is="autocomplete-species" source="identification.species" placeholder="Pesquisar"></input>
+    		<input type="text" is="autocomplete-species" source="identification.species" placeholder="Pesquisar"></input>
     	</form>
     	<div class="tfclear"></div>
     	<!-- Final: Busca Espécies -->

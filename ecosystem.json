@@ -3,8 +3,8 @@
     {    
     "name"        : "bdd",
     "script"      : ".",    
-    "watch"       : false,    
-    "ignore_watch": ["uploads/*","client/images/*","client/thumbnails/*","client/resized/*"],
+    "watch"       : true,    
+    // "ignore_watch": ["uploads/*","client/images/*","client/thumbnails/*","client/resized/*"],
     "merge_logs"  : true,
     "no_daemon"   : true,
     "cwd"         : "/var/www/bdd",    

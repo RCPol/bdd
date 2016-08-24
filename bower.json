@@ -17,6 +17,7 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.6.1",
     "jquery-ui": "^1.12.0",
-    "paper-datatable": "^0.9.8"
+    "paper-datatable": "^0.9.8",
+    "google-analytics": "^0.2.0"
   }
 }

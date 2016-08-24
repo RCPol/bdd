@@ -1,7 +1,37 @@
 var _ = require('underscore');
 var async = require('async');
+var google = require('googleapis');
+var key = require('rcpol-google-key.json');
+const VIEW_ID = 'ga:128522305';
 
 module.exports = function(Identification) {
+  Identification.accessCount = function(cb) {
+    var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'], null);
+    jwtClient.authorize(function(err, tokens) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      var analytics = google.analytics('v3');
+      analytics.data.ga.get({
+            'auth': jwtClient,
+            'ids': VIEW_ID,
+            'metrics': 'ga:pageviews',
+            'dimensions': 'ga:pagePath',
+            'start-date': '30daysAgo',
+            'end-date': '2016-08-25',
+            'sort': '-ga:pageviews',
+            'max-results': 10,        
+          }, function (err, response) {
+            if (err) {
+              console.log(err);
+              // return;
+            }
+            cb(err,response.rows[0][1]);
+            console.log(JSON.stringify(response, null, 4));
+          }); 
+    });
+  } 
   Identification.populate = function(filter, callback){
     Identification.getApp(function(err, app){
       if (err) throw new Error(err);
@@ -165,7 +195,14 @@ module.exports = function(Identification) {
       });
     });
   };
-
+  
+  Identification.remoteMethod(
+    'accessCount',
+    {
+      http: {verb: 'get'},      
+      returns: {arg: 'response', type: 'number'}
+    }
+  );
   Identification.remoteMethod(
     'populate',
     {
