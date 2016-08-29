@@ -35,29 +35,7 @@
       }
       $(self).autocomplete({
         source: [],
-        search: function(event, ui) {
-          var data = [];
-          if (eval(self.source)) {
-            var currentSource = eval(self.source);
-            Object.keys(currentSource).forEach(function (categoryKey) {
-              Object.keys(currentSource[categoryKey]).forEach(function (descriptorKey) {
-                Object.keys(currentSource[categoryKey][descriptorKey]).forEach(function (stateKey) {
-                  if(typeof currentSource[categoryKey][descriptorKey][stateKey].value != "undefined" && typeof currentSource[categoryKey][descriptorKey][stateKey].html != "undefined"){                    
-                    var item = {};
-                    item.value = currentSource[categoryKey][descriptorKey][stateKey].value
-                    item.category = categoryKey;
-                    item.descriptor = descriptorKey;
-                    item.label = currentSource[categoryKey][descriptorKey][stateKey].value+categoryKey+descriptorKey
-                    item.html = currentSource[categoryKey][descriptorKey][stateKey].html;                    
-                    data.push(item);
-                  }
-                });
-              });
-            });
-          }
-          console.log(data.length)
-          if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})          
-        }
+        search: self.search
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
         var rs = $("<div>").append(item.html.clone().css("margin","0").css("height","150px")).css("display","inline-block").css("height","100%");
         rs.prepend('<p style="line-height:105%;letter-spacing: 1px;font-size:small;height:100%;vertical-align:top;top:0px;"><b>'+item.category+'</b>:<br>'+item.descriptor+"</p>")
@@ -77,6 +55,30 @@
         ul.css("background-color","#F9C6A7")
         return rs.appendTo( ul );
       };
+    },
+    search: function(event, ui) {
+      var self = this;
+      var data = [];
+      if (eval(self.source)) {
+        var currentSource = eval(self.source);
+        Object.keys(currentSource).forEach(function (categoryKey) {
+          Object.keys(currentSource[categoryKey]).forEach(function (descriptorKey) {
+            Object.keys(currentSource[categoryKey][descriptorKey]).forEach(function (stateKey) {
+              if(typeof currentSource[categoryKey][descriptorKey][stateKey].value != "undefined" && typeof currentSource[categoryKey][descriptorKey][stateKey].html != "undefined"){                    
+                var item = {};
+                item.value = currentSource[categoryKey][descriptorKey][stateKey].value
+                item.category = categoryKey;
+                item.descriptor = descriptorKey;
+                item.label = currentSource[categoryKey][descriptorKey][stateKey].value+categoryKey+descriptorKey
+                item.html = currentSource[categoryKey][descriptorKey][stateKey].html;                    
+                data.push(item);
+              }
+            });
+          });
+        });
+      }
+      console.log(data.length)
+      if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})          
     }
   });
 

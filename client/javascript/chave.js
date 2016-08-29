@@ -15,13 +15,15 @@ Identification.prototype.tooltipConfig = function() {
   $( document ).tooltip({
     items: "img",
     content: function(callback) {
+      // callback("teste");
       var element = $( this );
       if ( element.is( ".vglos" )) {
         var id = element.attr( "alt" );
-        $.get("/profile/glossary/individual/"+id,function(data) {
+        $.get("/profile/glossary/individual/"+id,function(data) {         
           callback(data);
         });
-      } else if (element.is( ".lala" ) ) {
+      } 
+      else if (element.is( ".lala" ) ) {
         console.log("ALT: ",element.attr( "alt" ));
         var parsedAlt = element.attr( "alt" ).split("|");
         console.log("PARSED ALT: ",parsedAlt);

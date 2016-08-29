@@ -29,19 +29,7 @@
       // var field = Polymer.dom(this.root).querySelector('#searchSpecies');
       $(self).autocomplete({
         source: [],
-        search: function(event, ui) {
-          var data = [];
-          if (eval(self.source)) {
-            var currentSource = eval(self.source);
-            data = Object.keys(currentSource).map(function (key) {
-              return {value:currentSource[key].scientificName,label:currentSource[key].scientificName+currentSource[key].vernacularName+currentSource[key].family,html:currentSource[key].html};
-            });
-          }
-          if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})
-          else {
-            console.log("Error",self);
-          }
-        }
+        search: self.search,
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
         var rs = item.html.clone();
         rs.css("padding","6px");
@@ -52,6 +40,20 @@
         rs.children().css("background-color","#F9C6A7")
         return rs.appendTo( ul );
       };
-    }
+    },
+    search: function(event, ui) {
+        var self = this;
+        var data = [];
+        if (eval(self.source)) {
+          var currentSource = eval(self.source);
+          data = Object.keys(currentSource).map(function (key) {
+            return {value:currentSource[key].scientificName,label:currentSource[key].scientificName+currentSource[key].vernacularName+currentSource[key].family,html:currentSource[key].html};
+          });
+        }
+        if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})
+        else {
+          console.log("Error",self);
+        }
+      }
   });
 </script>
