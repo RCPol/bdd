@@ -279,7 +279,7 @@ module.exports = function(Schema) {
       var queue = async.queue(function(img,callback) {
         var downloader = new ImageDownloader();        
         downloader.download(img,callback);
-      },10);
+      },5);
 
       results.forEach(function(rec) {
         rec.images.forEach(function(img) {

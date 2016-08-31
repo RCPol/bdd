@@ -504,11 +504,14 @@ module.exports = function(Specimen) {
     fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
     "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){    
       
-      
+      var i = 0;
+      console.time("download");
       var queue = async.queue(function(img,callback) {
-        var downloader = new ImageDownloader();        
+        console.log("PROCESSED: ",i++);
+        console.timeEnd("download");
+        var downloader = new ImageDownloader(); 
         downloader.download(img,callback);
-      },10);
+      },5);
 
       results.forEach(function (result){
         if(result["pt-BR:rcpol:Image:allPollenImage"]){
