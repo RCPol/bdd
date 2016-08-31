@@ -22,7 +22,7 @@
     <!-- Javascript Documento -->
     <script type="text/javascript" src="/javascript/especie.js"></script>
 
-	<!-- Início: Códigos para o Mapa e Tabela -->
+    <!-- Início: Códigos para o Mapa e Tabela -->
 	<script type="text/javascript">
 		var id = "{{id}}";
 		var language = "pt-BR";
@@ -136,7 +136,10 @@
       <!--Nome popular-->
 	  <h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
 
-		<!-- Início: Características da Planta -->
+		<!-- Início: Textos -->
+	  <div class="infos-txt">
+
+	  <!-- Início: Características da Planta -->
 	  <div class="info-planta">
       <h2> <span id="rcpol-ProfilesLabel-profilesPlantFeatures">Caracter&iacute;sticas da Planta</span>:</h2>
 		    	<p><b><span id="rcpol-CategoricalDescriptor-habit-label"></span></b> <span id="rcpol-CategoricalDescriptor-habit-value"></span> </p>
@@ -169,18 +172,6 @@
 		</div>
 		<!-- Final: Características da Planta -->
 
-		<!-- Início: Slideshow com as imagens da planta -->
-		<div class="img-planta-ae">
-
-			<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPlantFlowerFruit">Imagens da Planta, Flor e Frutos</span>:</h2>
-
-			<div id="foto_planta" class="fotorama" data-allowfullscreen="native" data-width="425" data-height="365">
-              <!-- <img src="/img/lspm.jpg">-->
-			</div>
-
-		</div>
-		<!-- Final: Slideshow com as imagens da planta -->
-
 		<!-- Início: Descrição Polínica -->
 		<div class="info-polen">
 			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription">Descri&ccedil;&atilde;o pol&iacute;nica</span>:</h2>
@@ -207,6 +198,25 @@
 		</div>
 		<!-- Final: Descrição Polínica -->
 
+</div>
+		<!-- Final: Textos -->
+
+		<!-- Início: Imagens -->
+		<div class="infos-img">
+
+		<!-- Início: Slideshow com as imagens da planta -->
+		<div class="img-planta-ae">
+
+			<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPlantFlowerFruit">Imagens da Planta, Flor e Frutos</span>:</h2>
+
+			<div id="foto_planta" class="fotorama" data-allowfullscreen="native" data-width="425" data-height="365">
+              <!-- <img src="/img/lspm.jpg">-->
+			</div>
+
+		</div>
+		<!-- Final: Slideshow com as imagens da planta -->
+
+
 		<!-- Início: Fotos do Grão de Pólen -->
 		<div class="img-polen">
 
@@ -218,6 +228,9 @@
 
 		</div>
 		<!-- Final: Fotos do Grão de Pólen -->
+
+</div>
+		<!-- Final: Imagens -->
 
 		<!-- Início: Mapa de distribuição -->
 		<div class="mapa">
@@ -248,9 +261,9 @@
 		<a href="/ficha_visitantes_especie.html">
 		  <div class="visitantes">
 
-			<h2>
-			  <span id="rcpol-ProfilesLabel-profilesKnowFlowerVisitors">Conheça os visitantes florais dessa espécie</span> <br><br> <i>(Em construção | En construcción | Under cunstruction)</i>
-			</h2> 
+			<h2 id="rcpol-ProfilesLabel-profilesKnowFlowerVisitors">
+			  Conheça os visitantes florais dessa espécie
+			</h2>
 
 		  </div>
 		</a>
