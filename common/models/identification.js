@@ -266,7 +266,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
       identification_item.id = species.id;
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
-        if (species.hasOwnProperty(key) && species[key] && species[key].term != "pollenShape" && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
+        if (species.hasOwnProperty(key) && species[key] && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
           //TODO: handle pollenShape and espexi
           // we only want entries with classes CategoricalDescriptor or NumericalDescriptor
           // we can have multiple states
