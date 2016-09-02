@@ -5,8 +5,7 @@ var key = require('rcpol-google-key.json');
 const VIEW_ID = 'ga:128522305';
 
 module.exports = function(Identification) {
-  Identification.accessCount = function(cb) {
-    console.log("ACCESS COUNT: ");
+  Identification.accessCount = function(cb) {    
     var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'], null);    
     jwtClient.authorize(function(err, tokens) {
       if (err) {
