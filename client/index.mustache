@@ -103,7 +103,13 @@
 		});
 	}
 	var identification = new Identification();
-	$(document).ready(function(){		
+	$(document).ready(function(){
+		$.get("/api/Identification/accessCount",function(rs) {
+		$('#count').html("#"+rs.response+" acessos");
+		});
+		$.get("/api/Identification/activeUsers",function(rs) {
+			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");
+		});
 		identification.startup();
 		var msg  = $( "#msg" ).dialog({
 				title:"Comunicado Importante!",
@@ -119,14 +125,7 @@
 		} else {
 			msg.dialog('open');
 		} 		
-	});
-	$.get("/api/Identification/accessCount",function(rs) {
-		$('#count').html("#"+rs.response+" acessos");
-	});
-	$.get("/api/Identification/activeUsers",function(rs) {
-		$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");
-	});
-	
+	});		
 </script>
 
 
