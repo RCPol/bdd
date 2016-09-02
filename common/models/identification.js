@@ -32,7 +32,7 @@ module.exports = function(Identification) {
               console.log("Access count: ",err);
               cb('','');            
             } else {
-              console.log("Count",JSON.stringify(response, null, 4));
+              // console.log("Count",JSON.stringify(response, null, 4));
               cb(err,response.rows[0][1]);          
             }          
         }); 
