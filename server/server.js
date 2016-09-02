@@ -93,15 +93,15 @@ app.get('/profile/specimen/:id', function(req, res) {
               params.label[domIdLabel] = specimen[key].field+": ";
             if(specimen[key].value && !specimen[key].states && !specimen[key].months){
               // NORMAL VALUE
-              params.value[domIdValue] = specimen[key].value;
+              params.value[domIdValue] = specimen[key].value;              
               // COORDINATES
               if(parsedId[3]=="decimalLatitude" || parsedId[3]=="decimalLongitude")
                 params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
               // IMAGE
               if(parsedId[2]=="Image"){
                 params.value[domIdValue] = [];
-                specimen[key].value.split("|").forEach(function(image){
-                 params.value[domIdValue].push({value:image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=")});
+                specimen[key].images.forEach(function(image){
+                 params.value[domIdValue].push({value:image.resized});
                 });
               }
               // REFERENCES
@@ -112,11 +112,88 @@ app.get('/profile/specimen/:id', function(req, res) {
                 });
               }
             } else if(specimen[key].states){
+              // NORMAL CATEGORICAL DESCRIPTOR
               params.value[domIdValue] = "";
               specimen[key].states.forEach(function(state) {
                 params.value[domIdValue] += state.state+", ";
               });
               params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+
+              // POLLEN SIZE
+              if(specimen[key].term=="pollenSize"){
+                if(specimen[key].states.length==1){
+                  params.value[domIdValue] = specimen[key].states[0].state;
+                } else {            
+                  var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
+                  var lowestIndex = Infinity;
+                  var highestIndex = -1;                        
+                  var lowestValue = "?";
+                  var highestValue = "?";                        
+                  specimen[key].states.forEach(function(state) {              
+                      var position  = order.indexOf(state.term);
+                      if(position < lowestIndex) {
+                        lowestIndex = position;
+                        lowestValue = state.state;
+                      }
+                      if(position > highestIndex) {
+                        highestIndex = position;
+                        highestValue = state.state;
+                      }
+                  });
+                  var sep = specimen.language=='en-US'?' to ':' a ';
+                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                } 
+              }
+              // POLLEN SHAPE
+              if(specimen[key].term=="pollenShape"){
+                if(specimen[key].states.length==1){
+                  params.value[domIdValue] = specimen[key].states[0].state;
+                } else {            
+                  var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
+                  var lowestIndex = Infinity;
+                  var highestIndex = -1;                        
+                  var lowestValue = "?";
+                  var highestValue = "?";                        
+                  specimen[key].states.forEach(function(state) {              
+                      var position  = order.indexOf(state.term);
+                      if(position < lowestIndex) {
+                        lowestIndex = position;
+                        lowestValue = state.state;
+                      }
+                      if(position > highestIndex) {
+                        highestIndex = position;
+                        highestValue = state.state;
+                      }
+                  });
+                  var sep = specimen.language=='en-US'?' to ':' a ';
+                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                } 
+              }
+              // FLOWER SIZE
+              if(specimen[key].term=="flowerSize"){
+                if(specimen[key].states.length==1){
+                  params.value[domIdValue] = specimen[key].states[0].state;
+                } else {            
+                  var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];
+                  var lowestIndex = Infinity;
+                  var highestIndex = -1;                        
+                  var lowestValue = "?";
+                  var highestValue = "?";                        
+                  specimen[key].states.forEach(function(state) {              
+                      var position  = order.indexOf(state.term);
+                      if(position < lowestIndex) {
+                        lowestIndex = position;
+                        lowestValue = state.state;
+                      }
+                      if(position > highestIndex) {
+                        highestIndex = position;
+                        highestValue = state.state;
+                      }
+                  });
+                  var sep = specimen.language=='en-US'?' to ':' a ';
+                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                } 
+              }
             } else if(specimen[key].months){
               params.value[domIdValue] = "";
               specimen[key].months.forEach(function(month) {

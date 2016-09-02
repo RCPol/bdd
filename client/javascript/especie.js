@@ -10,7 +10,85 @@ function readSpecies(id, map){
       var class_ = parsedId.length==4?parsedId[2]:"";
       var term = parsedId.length==4?parsedId[3]:"";
       var base = schema+"-"+class_+"-"+term;
-      if(parsedId.length==4 && class_!="NumericalDescriptor"){
+      if(term=="pollenSize"){       
+        if(data[key].states){
+          $("#"+base+"-label").append(data[key].field+": ");
+          if(data[key].states.length==1){
+            $("#"+base+"-value").append(data[key].states[0].state);
+          } else {            
+            var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
+            var lowestIndex = Infinity;
+            var highestIndex = -1;                        
+            var lowestValue = "?";
+            var highestValue = "?";                        
+            data[key].states.forEach(function(state) {              
+                var position  = order.indexOf(state.term);
+                if(position < lowestIndex) {
+                  lowestIndex = position;
+                  lowestValue = state.state;
+                }
+                if(position > highestIndex) {
+                  highestIndex = position;
+                  highestValue = state.state;
+                }
+            });
+            var sep = data.language=='en-US'?' to ':' a ';
+            $("#"+base+"-value").append(lowestValue+sep+highestValue);
+          }            
+        }
+      } else if(term=="pollenShape"){        
+        if(data[key].states){
+          $("#"+base+"-label").append(data[key].field+": ");
+          if(data[key].states.length==1){
+            $("#"+base+"-value").append(data[key].states[0].state);
+          } else {            
+            var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
+            var lowestIndex = Infinity;
+            var highestIndex = -1;                        
+            var lowestValue = "?";
+            var highestValue = "?";                        
+            data[key].states.forEach(function(state) {              
+                var position  = order.indexOf(state.term);
+                if(position < lowestIndex) {
+                  lowestIndex = position;
+                  lowestValue = state.state;
+                }
+                if(position > highestIndex) {
+                  highestIndex = position;
+                  highestValue = state.state;
+                }
+            });
+            var sep = data.language=='en-US'?' to ':' a ';
+            $("#"+base+"-value").append(lowestValue+sep+highestValue);
+          }            
+        }
+      } else if(term=="flowerSize"){        
+        if(data[key].states){
+          $("#"+base+"-label").append(data[key].field+": ");
+          if(data[key].states.length==1){
+            $("#"+base+"-value").append(data[key].states[0].state);
+          } else {
+            var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];            
+            var lowestIndex = Infinity;
+            var highestIndex = -1;                        
+            var lowestValue = "?";
+            var highestValue = "?";                        
+            data[key].states.forEach(function(state) {              
+                var position  = order.indexOf(state.term);
+                if(position < lowestIndex) {
+                  lowestIndex = position;
+                  lowestValue = state.state;
+                }
+                if(position > highestIndex) {
+                  highestIndex = position;
+                  highestValue = state.state;
+                }
+            });
+            var sep = data.language=='en-US'?' to ':' a ';
+            $("#"+base+"-value").append(lowestValue+sep+highestValue);           
+          }            
+        }
+      } else if(parsedId.length==4 && class_!="NumericalDescriptor"){        
         if(data[key].value && !data[key].states && !data[key].months){
           $("#"+base+"-label").append(data[key].field+": ");
           $("#"+base+"-value").append(data[key].value);
@@ -107,82 +185,3 @@ function readSpecies(id, map){
 
   });
 };
-
-// function escreverEstados(seletor, descritor, adicionarVirgula){
-//   // adicionar separador ","...
-//   if(descritor && descritor.hasOwnProperty("states")){
-//     var estados = descritor.states;
-//     if (estados.length > 1){
-//
-//       $(seletor).append(estados.map(function(estado){ return estado.state; }).join(", "));
-//     }
-//     else
-//       $(seletor).append(estados[0].state);
-//     if (adicionarVirgula)
-//       $(seletor).append(", ");
-//   }
-// }
-
-// TODO: Tratamento de valores númericos nas descrição polínica e cometários/detalhes extra
-// if (data[lang+":rcpol:CategoricalDescriptor:pollenDiameter"])
-//   escreverEstados("#tamanhoDoPolen", data[lang+":rcpol:State:pollenDiameter"], true);
-// else if (data[lang+:"rcpol:State:smallerPollenDiameter"] && data[lang+":rcpol:State:largerPollenDiameter"])
-//   $("#tamanhoDoPolen").append("tamanho do pólen maior: ", data[lang+":rcpol:State:smallerPollenDiameter"].value, ", tamanho do pólen menor: ", data["rcpol:largerPollenDiameter"].value);
-//
-// if (data[lang+":rcpol:NumericalDescriptor:pollenDiameter"]){
-//   var d = data[lang+":rcpol:NumericalDescriptor:pollenDiameter"];
-//   $("#pollenDiameter").append("D = " +d.mean + " ± " + d.sd + " (" + d.min + " - " + d.max + "), " );
-// }
-//
-// if (data[lang+":rcpol:NumericalDescriptor:smallerPollenDiameter"]){
-//   var smalld = data[lang+":rcpol:NumericalDescriptor:smallerPollenDiameter"];
-//   $("#smallerPollenDiameter").append("Dmenor = " +smalld.mean + " ± " + smalld.sd + " (" + smalld.min + " - " + smalld.max + "), " );
-// }
-//
-// if (data["rcpol:largerPollenDiameter"]){
-//   var larged = data["rcpol:largerPollenDiameter"];
-//   $("#largerPollenDiameter").append("Dmaior = " +larged.mean + " ± " + larged.sd + " (" + larged.min + " - " + larged.max + "), " );
-// }
-//
-// if (data["rcpol:polarAxis"]){
-//   var p = data["rcpol:polarAxis"];
-//   $("#polarAxis").append("P = " +p.mean + " ± " + p.sd + " (" + p.min + " - " + p.max + "), " );
-// }
-//
-// if (data["rcpol:equatorialAxis"]){
-//   var e = data["rcpol:equatorialAxis"];
-//   $("#equatorialAxis").append("E = " + e.mean + " ± " + e.sd + " (" + e.min + " - " + e.max + "), " );
-// }
-// escreverEstados("#formaDoPolen", data[lang+":rcpol:pollenShape"], true);
-// if(data["rcpol:pollenShapePE"]){
-//   var p_e = data[lang+":rcpol:pollenShapePE"];
-//   $("#formaDoPolenPE").append("P/E = " + p_e.mean + " ± " + p_e.sd + " (" + p_e.min + " - " + p_e.max + "). " );
-//   escreverEstados("#tipoDeAberturaDoPolen", data[lang+":rcpol:pollenAperture"], true); //letra maiuscula
-// } else {
-//   escreverEstados("#tipoDeAberturaDoPolen", data[lang+":rcpol:pollenAperture"], true); //letra minuscula
-//   $("#tipoDeAberturaDoPolen").addClass("tipoDeAberturaDoPolen-minusculo").removeClass("tipoDeAberturaDoPolen");
-// }
-//
-// if(data["rcpol:colpeFeature"]){
-//   if (data["rcpol:colpeFeature"].value.indexOf("ausente") == -1){
-//     $("#caracteristicaDoColpo").append("ectoabertura do tipo colpo ");
-//     escreverEstados("#caracteristicaDoColpo", data[lang+":rcpol:colpeFeature"], true);
-//   } else
-//     $("#caracteristicaDoColpo").append("ectoabertura ausente, ");
-// }
-//
-// if (data["rcpol:poreFeature"]){
-//   $("#caracteristicaDoPoro").append("endoabertura ");
-//   escreverEstados("#caracteristicaDoPoro", data[lang+":rcpol:poreFeature"]);
-//   //$("#caracteristicaDoPoro").append(" (Figuras C-D). ");
-// }
-//
-// if (data[lang+":rcpol:espexi"]){
-//   var espexi = data[lang+":rcpol:espexi"];
-//   $("#espexi").append(". Exina de espessura " + espexi.mean + " ± " + espexi.sd + " (" + espexi.min + " - " + espexi.max + "), " );
-// }
-//
-// $("#ornamentacaoDaExina").append("superficie ");
-// escreverEstados("#ornamentacaoDaExina", data[lang+":rcpol:exineOrnamentation"]);
-// //$("#ornamentacaoDaExina").append("  (visível em 2.500x, Figuras E-F ).");
-// $("#ornamentacaoDaExina").append(".");
