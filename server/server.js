@@ -234,7 +234,10 @@ app.get('/profile/palinoteca/:id', function(req, res) {
     },
     function(callback) {
       collection(params.id,params,callback);
-    }
+    },
+    function(callback) {
+      profilesDwc(params,callback);
+    },
   ],function done() {
     var template = fs.readFileSync('./client/palinoteca.mustache', 'utf8');
     res.send(mustache.render(template, params));
@@ -271,10 +274,34 @@ function siteLabel(params,callback) {
   params.label = params.label?params.label:{};
   var Schema = app.models.Schema;
   Schema.find({where:{"class":"SiteLabel",language:params.language}},function(err,siteLabel) {
-    siteLabel.forEach(function(item) {
+    siteLabel.forEach(function(item) {      
+      var parsedId = item.id.split(":");
+      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3];      
+      if(domId=="rcpol:SiteLabel:citation"){
+        var field = item.field;
+        var formattedDate = "";
+        var date = new Date();
+        var day = date.getDate();
+        var monthIndex = date.getMonth();
+        var year = date.getFullYear();
+        if(parsedId[0]=="en-US"){
+          formattedDate = monthIndex+"/"+day+"/"+year;
+        } else formattedDate = day+"/"+monthIndex+"/"+year;
+        field = field+" "+formattedDate;
+        params.label[domId] = field;
+      } else params.label[domId] = item.field;
+    });
+    callback();
+  });
+}
+function profilesDwc(params,callback) {
+  params.label = params.label?params.label:{};
+  var Schema = app.models.Schema;
+  Schema.find({where:{"schema":"dwc",language:params.language}},function(err,profilesLabel) {
+    profilesLabel.forEach(function(item) {
       var parsedId = item.id.split(":");
       var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]
-      params.label[domId] = item.field;
+      params.label[domId] = item.field;          
     });
     callback();
   });
@@ -298,14 +325,26 @@ app.get('/profile/glossary/individual/:id', function(req, res) {
     if(typeof schema.images != "undefined" && schema.images.length>0){
       schema.image = schema.images[0].resized;
     } else {
-      schema.image = "/img/lspm.jpg"
+      schema.image = false;
     }
     if(schema.class == "State"){
       schema.subtitle = schema.category+" : "+schema.field;
     } else{
       schema.subtitle = schema.category;
     }
-    res.send(mustache.render(template, schema));
+    if(schema.references && schema.references.length>0){
+      Schema.findById(req.params.id.split(":")[0]+":rcpol:ProfilesLabel:profilesBibliographicReferences",function(err,label) {      
+        if(label)
+        schema.referenceLabel = label.field;
+        schema.references = schema.references.map(function(item) {
+          return {ref:item};
+        });
+        res.send(mustache.render(template, schema));
+      });
+    } else {
+      schema.references = false;
+      res.send(mustache.render(template, schema));   
+    }            
   });
 });
 

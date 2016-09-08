@@ -17,13 +17,12 @@
 
 	<script type="text/javascript">
       var lang = "{{lang}}"
-	  var language = (lang == "")?"pt-BR":lang;
-
+	  var language = (lang == "")?"pt-BR":lang;	  
 	  function setLanguage(language){
 		localStorage.language = language;
 		window.location = "/profile/glossary/"+localStorage.language;
 	  }
-
+	  
 	  window.onload = function(){
 		if(localStorage && localStorage.language)
 		  language = localStorage.language;
@@ -32,14 +31,18 @@
 			$("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
 		  });
 		});
-		$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22ProfilesLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){
-		  data.forEach(function(label) {
-			if(label.term == "profilesDepositedInCollection"){
-			  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field.toLowerCase());
-			} else {
-			  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
-			}
-		  });
+		$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22ProfilesLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){	
+			referenceLabel = "";	
+			data.forEach(function(label) {
+				if(label.term == "profilesBibliographicReferences"){
+			  		referenceLabel = label.field;
+			  	} else if(label.term == "profilesDepositedInCollection"){
+				  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field.toLowerCase());
+				} else {
+				  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
+				}
+			});
+			load(referenceLabel);
 		});
 		if (typeof(Storage) !== "undefined") {
 		  localStorage.language = localStorage.language?localStorage.language:"pt-BR";
@@ -57,11 +60,12 @@
 			  btpglossario.value = '';
 			}
 		  });
-		}
-
-        $.getJSON("/api/Schemas?filter[fields][id]=true&filter[order]=order%20asc&filter[where][language]="+language, function(schemas){
+		}        
+	  }
+	  var load = function(referenceLabel) {
+	  	$.getJSON("/api/Schemas?filter[fields][id]=true&filter[order]=category%20asc&filter[order]=field%20asc&filter[order]=state%20asc&filter[where][language]="+language, function(schemas){
           schemas.forEach(function(schema){
-            writeSchema(schema);
+            writeSchema(schema,referenceLabel);
           })
         });
 	  }
@@ -106,11 +110,13 @@
 			<input type="text" id="buscaglossario" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
 			<input class="fbbotao" type="reset" value="Limpar">
 		</form>
-
-
-	</article>
-	<!-- Final das informações da Palinoteca -->
-
+		<div id="content"></div>
+		<div class="glossario-s">
+			<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">Como citar:</h2>
+			<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.gov.br">http://chave.rcpol.gov.br/</a> >. Date of access: </p>	
+		</div>
+	</article>	
+	<!-- Final das informações da Palinoteca -->		
 	<!-- Início do Rodapé -->
 	<footer>
 		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
