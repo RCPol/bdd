@@ -41,14 +41,14 @@
 		  },
 		  columns: [
 			{ field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
-			{ field: 'species', caption: 'Nome da Espécie', size: '30%', sortable: true, resizable: true },
-			{ field: 'tipo', caption: 'Nome do Coletor', size: '20%', resizable: true },
-			{ field: 'cidade', caption: 'Cidade', size: '10%', resizable: true }
+			{ field: 'species', caption: '{{dwc:Taxon:scientificName}}', size: '30%', sortable: true, resizable: true },
+			{ field: 'tipo', caption: '{{dwc:Occurrence:recordedBy}}', size: '20%', resizable: true },
+			{ field: 'cidade', caption: '{{dwc:Location:municipality}}', size: '10%', resizable: true }
 		  ],
 		  searches: [
-			{ field: 'species', caption: 'Nome da espécie', type: 'text' },
-			{ field: 'tipo', caption: 'Nome do Coletor', type: 'text' },
-			{ field: 'cidade', caption: 'Cidade', type: 'text' }
+			{ field: 'species', caption: '{{dwc:Taxon:scientificName}}', type: 'text' },
+			{ field: 'tipo', caption: '{{dwc:Occurrence:recordedBy}}', type: 'text' },
+			{ field: 'cidade', caption: '{{dwc:Location:municipality}}', type: 'text' }
 		  ],
 		  sortData: [{ field: 'recid', direction: 'ASC' }]
 		});
@@ -146,6 +146,8 @@
 
 		</div>
 		<!-- Final: Espécimes depositados na coleção -->
+		<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">{{rcpol:SiteLabel:howToCite}}:</h2>
+		<p id="rcpol-SiteLabel-citation">{{rcpol:SiteLabel:citation}}</p>
 		{{/value}}
 	</article>
 	<!-- Final das informações da Palinoteca -->
