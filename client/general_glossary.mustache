@@ -63,7 +63,7 @@
 		}        
 	  }
 	  var load = function(referenceLabel) {
-	  	$.getJSON("/api/Schemas?filter[fields][id]=true&filter[order]=category%20asc&filter[order]=field%20asc&filter[order]=state%20asc&filter[where][language]="+language, function(schemas){
+	  	$.getJSON("/api/Schemas?filter[fields][id]=true&filter[order]=order%20asc&filter[where][language]="+language, function(schemas){
           schemas.forEach(function(schema){
             writeSchema(schema,referenceLabel);
           })
