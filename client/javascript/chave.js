@@ -1,6 +1,6 @@
 function Identification() {
   this.internacionalization = new Internacionalization();
-  this.internacionalization.siteTranslator().keyTranslator();
+  this.internacionalization.siteTranslator().keyTranslator()
   this.species = {};
   this.descriptors = {};
   this.eligibleSpecies = {};
@@ -209,7 +209,7 @@ Identification.prototype.printDescriptors = function() {
             // IS SELECTED STATE?
             if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id]){
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#descritoresSelecionados"));
-              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='#' onclick='identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='http://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Button-Close-icon.png'/></a>")
+              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='#' onclick='identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='img/x.png'/></a>")
             }
           }
         }

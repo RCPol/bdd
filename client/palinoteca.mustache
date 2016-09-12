@@ -21,6 +21,7 @@
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
 
     <script type="text/javascript" src="/javascript/palinoteca.js"></script>
+    <script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
 	<!-- Início: Códigos para o Mapa -->
 	<script type="text/javascript">
@@ -30,6 +31,8 @@
 			window.location = "/profile/palinoteca/"+language+id.substring(5,id.length);
 		}
  	  $(document).ready(function(){
+ 	  	var internacionalization = new Internacionalization();
+	  		internacionalization.updateLogo();
 
 		// Início do código do Grid-Tabela
 		$('#grid').w2grid({
@@ -76,13 +79,15 @@
 		<!-- Menu: início -->
 		<nav>
 			<ul>
-				<li> <!-- inserir link para o portal --> <a href="#">{{rcpol:SiteLabel:siteHome}}</a></li>
-				<li> <!-- inserir link para a ferramenta --> <a href="/">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
-        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
+				<li> <!-- inserir link para o portal --> <a href="#" id="rcpol-SiteLabel-siteHome">{{rcpol:SiteLabel:siteHome}}</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
 				<li>
-					<img onclick="setLanguage('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
-					<img onclick="setLanguage('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
-					<img onclick="setLanguage('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+					<span class="t-lang">
+							<img onclick="setLanguage('en-US')"  src="/img/en.png">
+							<img onclick="setLanguage('es-ES')"  src="/img/es.png">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt-br.png">
+						</span>
 				</li>
 			</ul>
 		</nav>

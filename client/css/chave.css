@@ -90,11 +90,48 @@ nav ul li a:hover {
 	background-color: #F27224;
 }
 
+/* Bandeiras de troca de língua */
+span.t-lang {
+	display: block;
+	background-color: #FFAD60;
+	padding: 17px 16px;
+}
+
+span.t-lang img {
+	height: 11px;
+	width: 16px;
+	margin: 0 9px;
+}
+
+/* Contador */
+
+#count {
+	color: #470054;
+	display: block;
+	float: right;
+	font-size: 12px;
+	padding: 14px 16px;
+	background-color: #FFAD60;
+	margin-bottom: -12px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+#activeUsers {
+	color: #470054;
+	display: block;
+	float: right;
+	font-size: 12px;
+	padding: 14px 16px;
+	background-color: #FFAD60;
+	margin-bottom: -12px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
 /* Logotipo */
 div.logo {
 	display: block;
 	float: left;
-	margin: 50px 0 44px 50px;
+	margin: 25px 0 25px 50px;
 }
 
 /* Fundo translucido artigo*/

@@ -14,10 +14,12 @@
 	<link rel="stylesheet" type="text/css" href="http://w2ui.com/src/w2ui-1.4.min.css" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script type="text/javascript" src="http://w2ui.com/src/w2ui-1.4.min.js"></script>
+	
+	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
 	<!-- Arquivos Galeria - Fotorama -->
-	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
+	<link  href="/javascript/fotorama/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<script src="/javascript/fotorama/fotorama.js"></script> <!-- 16 KB -->
 
     <!-- Javascript Documento -->
     <script type="text/javascript" src="/javascript/especie.js"></script>
@@ -31,6 +33,8 @@
 			window.location = "/profile/species/"+localStorage.language+":"+id.split(":")[1];
 		}
 	  $(document).ready(function(){
+	  		var internacionalization = new Internacionalization();
+	  		internacionalization.updateLogo();
 			if(localStorage && localStorage.language)
 				language = localStorage.language;
 			$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){
@@ -135,9 +139,11 @@
 				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
         <li> <!-- inserir link para o glossário --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 				<li>
-					<img onclick="setLanguage('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
-					<img onclick="setLanguage('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
-					<img onclick="setLanguage('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+					<span class="t-lang">
+							<img onclick="setLanguage('en-US')"  src="/img/en.png">
+							<img onclick="setLanguage('es-ES')"  src="/img/es.png">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt-br.png">
+						</span>
 				</li>
 			</ul>
 		</nav>
@@ -266,7 +272,7 @@
 
 			<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPlantFlowerFruit">Imagens da Planta, Flor e Frutos</span>:</h2>
 
-			<div id="foto_planta" class="fotorama" data-allowfullscreen="native" data-width="425" data-height="365">
+			<div id="foto_planta" class="fotorama" data-allowfullscreen="native" data-width="425" data-maxheight="638">
               <!-- <img src="/img/lspm.jpg">-->
 			</div>
 
@@ -276,10 +282,11 @@
 
 		<!-- Início: Fotos do Grão de Pólen -->
 		<div class="img-polen">
+			<p class="clique-full">Clique em <img src="/img/full.png"> para ver as imagens em tela cheia</p>
 
 			<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPollen">Imagens do Gr&atilde;o de P&oacute;len</span>:</h2>
 
-			<div id="foto_polen" class="fotorama" data-allowfullscreen="native" data-width="900" data-height="300">
+			<div id="foto_polen" class="fotorama" data-allowfullscreen="native" data-width="425" data-maxheight="425">
               <!-- <img src="/img/lspm.jpg">-->
 			</div>
 

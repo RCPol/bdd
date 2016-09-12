@@ -37,14 +37,24 @@ function readGlossary(id){
       $("#" + id.split(":").join("-") +" > a").find('#image').show();
     }
     if(data.references && data.references.length>0){
+      var content = $('<div></div>');
       var refLabel = $('<div>'+referenceLabel+':</div>');      
-      $("#" + id.split(":").join("-")).find('#references').append(referenceLabel+':');
+      // $("#" + id.split(":").join("-")).find('#references').append(referenceLabel+':');
+      content.append(referenceLabel+':');
       data.references.forEach(function(ref) {        
-        $("#" + id.split(":").join("-")).find('#references').append('<p style="margin:0px"><span style="color:grey; font-size: 80%;">'+ref+'</span></p>');        
-      });      
-    }
+        content.append('<p style="margin:0px"><span style="color:grey; font-size: 80%;">'+ref+'</span></p>');        
+      });                  
+      var iconRef = $('<img src="/img/ref.png" title="teste" class="popsref">');          
+      iconRef.tooltip({
+        content: function() {
+          return content;
+        }
+      });
+      $("#" + id.split(":").join("-")).find('#references').append(iconRef);
+    }    
   });
 }
+
 
 function busca(nothing){
   var key = $("#buscaglossario").val().trim().toLowerCase();
