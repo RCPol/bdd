@@ -101,9 +101,10 @@
 				$(this).addClass('selecionado');
 			}
 		});
-	}
+	}	
 	var identification = new Identification();
 	$(document).ready(function(){
+		identification.internacionalization.updateLogo();
 		$.get("/api/Identification/accessCount",function(rs) {
 		$('#count').html("#"+rs.response+" acessos");
 		});
@@ -124,7 +125,7 @@
 			}			
 		} else {
 			msg.dialog('open');
-		} 		
+		} 			
 	});		
 </script>
 
@@ -166,13 +167,15 @@
 					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
 					<li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 					<li>
-						<img onclick="identification.translate('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
-						<img onclick="identification.translate('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
-						<img onclick="identification.translate('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+						<span class="t-lang">
+							<img onclick="identification.translate('en-US')"  src="/img/en.png">
+							<img onclick="identification.translate('es-ES')"  src="/img/es.png">
+							<img onclick="identification.translate('pt-BR')"  src="/img/pt-br.png">
+						</span>
 					</li>
 					<li>						
-						<span id="count" style="color:#F27224; opacity:0.6"></span>	<br>				
-						<span id="activeUsers" style="color:#F27224; opacity:0.6"></span>					
+						<span id="count" ></span>	<br>				
+						<span id="activeUsers"></span>					
 					</li>					
 				</ul>
 			</nav>
@@ -180,7 +183,7 @@
 
 			<!-- logotipo -->
 			<div class="logo">
-				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+				<img src="/img/logo_mel_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="455px" height="194px">
 			</div>
 			<!-- logotipo -->
 
