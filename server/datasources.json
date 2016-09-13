@@ -4,7 +4,7 @@
     "connector": "memory"
   },
   "BDD": {
-    "host": "localhost",
+    "host": "mongo",
     "port": 27017,
     "database": "bdd",
     "name": "BDD",
