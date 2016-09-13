@@ -15,18 +15,23 @@
 			<h3 id="sublabel">{{subtitle}}</h3>
 
 			<!-- Descrição do estado do descritor -->
-			<p id="description">{{definition}}</p>			
+			<p id="description">{{definition}}</p>	
+
 			{{#referenceLabel}}
-				<h3 id="ref_title">{{referenceLabel}}</h3>						
+				<!-- <h3 id="ref_title">{{referenceLabel}}</h3>						 -->
+				<p style="margin:0px"><span style="color:grey; font-size: 80%;">{{referenceLabel}}:</span></p>				
 			{{/referenceLabel}}
 			<!-- Div que envolve as referências -->
-			<div id="references" class="ref-glossario">
+			<!-- <div id="references" class="ref-glossario"> -->
+			<div style="margin:0px">
 				{{#references}}
 				<!-- Cada referência é um elemento <p> -->
-				<p>{{ref}}</p>
+				<!-- <p></p> -->
+				<p style="margin:0px"><span style="color:grey; font-size: 80%;">{{ref}}</span></p>
 				{{/references}}
 			</div>			
 		</div>
+
 
 	
 <!-- </body>
