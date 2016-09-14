@@ -2,6 +2,7 @@ function readSpecimens(lang,institutionCode, collectionCode){
     //lista de especimes
     var getChunk = function(skip) {
       var url = "/api/Specimens?filter[fields][id]=true&"
+                    +"filter[fields]["+lang+":dwc:RecordLevel:catalogNumber]=true&"
                     +"filter[fields]["+lang+":dwc:Taxon:scientificName]=true&"
                     +"filter[fields]["+lang+":dwc:Taxon:scientificNameAuthorship]=true&"
                     +"filter[fields]["+lang+":dwc:Occurrence:recordedBy]=true&"
@@ -14,7 +15,7 @@ function readSpecimens(lang,institutionCode, collectionCode){
       $.getJSON(url, function(especimes){        
         if(especimes.length>0) getChunk(skip+chunkSize)
         especimes.forEach(function(especime, id){
-          w2ui['grid'].add({recid: id, species: especime[lang+":dwc:Taxon:scientificName"].value + " " + especime[lang+":dwc:Taxon:scientificNameAuthorship"].value, tipo: especime[lang+":dwc:Occurrence:recordedBy"].value, cidade: especime[lang+":dwc:Location:municipality"].value + " - " + especime[lang+":dwc:Location:stateProvince"].value, specimen_id: especime.id});
+          w2ui['grid'].add({recid: especime[lang+":dwc:RecordLevel:catalogNumber"].value, species: especime[lang+":dwc:Taxon:scientificName"].value + " " + especime[lang+":dwc:Taxon:scientificNameAuthorship"].value, tipo: especime[lang+":dwc:Occurrence:recordedBy"].value, cidade: especime[lang+":dwc:Location:municipality"].value + " - " + especime[lang+":dwc:Location:stateProvince"].value, specimen_id: especime.id});
         });
       });
     }

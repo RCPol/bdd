@@ -1,6 +1,26 @@
+
+
 var xlsx = require('node-xlsx');
 var hash = require('object-hash');
 module.exports = function(app) {
+  
+  
+
+  // var OAuth2 = google.auth.OAuth2;
+  // var oauth2Client = new OAuth2(key.client_id, key.privat_key, null);
+
+  // // generate a url that asks permissions for Google+ and Google Calendar scopes
+  // var scopes = [
+  //   'https://www.googleapis.com/auth/analytics.readonly',    
+  // ];
+
+  // var url = oauth2Client.generateAuthUrl({
+  //   access_type: 'offline', // 'online' (default) or 'offline' (gets refresh_token)
+  //   scope: scopes // If you only need one scope you can pass it as string
+  // });
+  // console.log("VAI PORRA: ",url);  
+
+  // var drive = google.analytics({ version: 'v3', auth: oauth2Client });
   // var data = xlsx.parse(__dirname + '/template-palinotecas.xlsx')[0].data;
   // var schema = data[0];
   // var collumns = data[1];

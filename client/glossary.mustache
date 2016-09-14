@@ -1,51 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-	<meta charset="UTF-8">
 
 	<!-- Css Documento -->
 	<link rel="stylesheet" href="/css/gloss.css">
 
-	<!-- jQuery -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-
-	<!-- Arquivos Galeria - Fotorama -->
-	<link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
-
-    <!-- Javascript Documento -->
-    <script type="text/javascript" src="/javascript/glossary.js"></script>
-
-	<script type="text/javascript">
-	</script>
-</head>
-<body>
 
 		<!-- Div que envolve todo o conteúdo -->
 		<div class="glossario" id="{{id}}">
 
-			<!-- Imagem do estado do descritor -->
+			<!-- Imagem do estado do descritor -->			
+			{{#image}}
 			<img id="image" src="{{image}}">
-
+			{{/image}}
 			<!-- Nome do estado do descritor -->
 			<h2 id="label">{{state}}</h2>
 			<h3 id="sublabel">{{subtitle}}</h3>
 
 			<!-- Descrição do estado do descritor -->
-			<p id="description">{{definition}}</p>
+			<p id="description">{{definition}}</p>	
 
-			<!-- <h3 id="ref_title">Refer&ecirc;ncias Bibliogr&aacute;ficas</h3> -->
-
+			{{#referenceLabel}}
+				<!-- <h3 id="ref_title">{{referenceLabel}}</h3>						 -->
+				<p style="margin:0px"><span style="color:grey; font-size: 80%;">{{referenceLabel}}:</span></p>				
+			{{/referenceLabel}}
 			<!-- Div que envolve as referências -->
 			<!-- <div id="references" class="ref-glossario"> -->
-
+			<div style="margin:0px">
+				{{#references}}
 				<!-- Cada referência é um elemento <p> -->
-				<!-- <p>Silva C I, Ballesteros PLO, Palmero MA, Bauermann SG, Evaldt ACP, Oliveira PE (2010). Catálogo polínico: palinologia aplicada em estudos de conservação de abelhas do gênero Xylocopa no Triângulo Mineiro. Uberlândia: Edufu, 154p.</p>
+				<!-- <p></p> -->
+				<p style="margin:0px"><span style="color:grey; font-size: 80%;">{{ref}}</span></p>
+				{{/references}}
+			</div>			
+		</div>
 
-				<p>Silva C I, Ballesteros PLO, Palmero MA, Bauermann SG, Evaldt ACP, Oliveira PE (2010). Catálogo polínico: palinologia aplicada em estudos de conservação de abelhas do gênero Xylocopa no Triângulo Mineiro. Uberlândia: Edufu, 154p.</p> -->
 
-			</div>
-
-	</div>
-</body>
+	
+<!-- </body>
 </html>
+ -->

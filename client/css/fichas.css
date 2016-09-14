@@ -76,6 +76,20 @@ nav ul li a:hover {
 	color:#111111
 }
 
+/* Bandeiras de troca de língua */
+span.t-lang {
+	display: block;
+	background-color: #FFAD60;
+	padding: 17px 16px;
+	margin-bottom: -12px;
+}
+
+span.t-lang img {
+	height: 11px;
+	width: 16px;
+	margin: 0 9px;
+}
+
 /* Logotipo */
 div.logo {
 	display: block;
@@ -146,11 +160,27 @@ h2.popname {
 	font-size: 16px;
 }
 
+/* Div dos Textos Coluna esquerda */
+div.infos-txt {
+	display: block;
+	float: left;
+	width: 425px;
+	overflow: auto;
+}
+
 /* Características da Planta */
 div.info-planta {
 	display: block;
 	float: left;
 	width: 425px;
+}
+
+/* Div das Imagens Coluna direita */
+div.infos-img {
+	display: block;
+	float: left;
+	width: 475px;
+	overflow: auto;
 }
 
 /* Fotos da Planta */
@@ -159,6 +189,13 @@ div.img-planta {
 	float: left;
 	width: 425px;
 	margin: 0 0 0 50px;
+}
+
+div.img-planta-ae {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 50px 0 0 50px;
 }
 
 div.img-planta-me {
@@ -172,6 +209,10 @@ div.img-planta h2 {
 	display: none;
 }
 
+div.img-planta-ae h2 {
+	display: none;
+}
+
 div.img-planta-me h2 {
 	display: none;
 }
@@ -179,9 +220,27 @@ div.img-planta-me h2 {
 /* Descrição Polínica */
 div.info-polen {
 	display: block;
-	clear: both;
-	margin: 25px 0 0 0;
-	overflow: auto;
+	float: left;
+	width: 425px;
+	margin: 0 0 50px 0;
+}
+
+/* Fotos do Polen */
+div.img-polen {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 50px 0 0 50px;
+}
+
+div.img-polen h2 {
+	display: none;
+}
+
+p.clique-full {
+	color: #F27224;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
 }
 
 span.tipoDeAberturaDoPolen {
@@ -194,6 +253,11 @@ p span.tipoDeAberturaDoPolen:first-letter {
 
 .tipoDeAberturaDoPolen-minusculo {
     text-transform: lowercase;
+}
+
+/* Mapa */
+div.mapa {
+	clear: both;
 }
 
 /* Informações Palinoteca*/
@@ -237,7 +301,9 @@ div.mspm {
 
 /* Referências */
 div.rre {
+	display: block;
 	margin: 0 0 -12px 0;
+	clear: both;
 }
 
 div.rre p {

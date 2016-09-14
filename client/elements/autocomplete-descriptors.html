@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 <dom-module id="autocomplete-descriptors">
   <style>
-    .fbcampo {
+    :host {
     	margin: 0;
     	padding: 5px 10px;
     	font-family: 'Roboto Condensed', sans-serif;
@@ -20,47 +20,32 @@
 <script>
   Polymer({
     is: "autocomplete-descriptors",
+    extends: 'input',
     properties:{
         source: String
     },
     ready: function(){
       var self = this;
-      var field = Polymer.dom(this.root).querySelector('#searchDescriptors');
-      $(field).autocomplete({
-        source: [],
-        search: function(event, ui) {
-          var data = [];
-          if (eval(self.source)) {
-            var currentSource = eval(self.source);
-            Object.keys(currentSource).forEach(function (categoryKey) {
-              Object.keys(currentSource[categoryKey]).forEach(function (descriptorKey) {
-                Object.keys(currentSource[categoryKey][descriptorKey]).forEach(function (stateKey) {
-                  if(typeof currentSource[categoryKey][descriptorKey][stateKey].value != "undefined" && typeof currentSource[categoryKey][descriptorKey][stateKey].html != "undefined"){
-                    console.log(currentSource[categoryKey][descriptorKey][stateKey]);
-                    var item = {};
-                    item.value = currentSource[categoryKey][descriptorKey][stateKey].value
-                    item.category = categoryKey;
-                    item.descriptor = descriptorKey;
-                    item.label = currentSource[categoryKey][descriptorKey][stateKey].value+categoryKey+descriptorKey
-                    item.html = currentSource[categoryKey][descriptorKey][stateKey].html;
-                    data.push(item);
-                  }
-                });
-              });
+      $.ui.autocomplete.prototype._renderMenu = function( ul, items ) {
+         var autocomplete = this;
+         $.each( items, function( index, item ) {
+            if (index < 12) // here we define how many results to show
+               {autocomplete._renderItem( ul, item );}
             });
-          }
-          if(typeof $(field).autocomplete != "undefined") $(field).autocomplete("option",{source:data})          
-        }
+      }
+      $(self).autocomplete({
+        source: [],
+        search: self.search
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
-        var rs = $("<div>").append(item.html.clone().css("margin","0").css("height","150px")).css("display","inline-block").css("height","100%");
-        rs.prepend('<p style="line-height:105%;letter-spacing: 1px;font-size:small;height:100%;vertical-align:top;top:0px;"><b>'+item.category+'</b>:<br>'+item.descriptor+"</p>")
+        var rs = $("<div>").append(item.html.clone().css("margin","0").css("height","150px").css("width","150px")).css("display","inline-block").css("height","100%");
+        rs.prepend('<p style="line-height:105%;letter-spacing: 1px;font-size:small;height:100%;vertical-align:top;top:0px;"><b>'+item.category+'</b>:<br>'+item.descriptor+"</p>")        
         rs.css("margin-left","6px");
         rs.css("margin-right","6px");
         rs.css("padding-left","6px");
         rs.css("padding-right","6px");
         // rs.css("background-color","#FBE0D2")
 
-        rs.css("width","120px")
+        rs.css("width","160px")
         // rs.css("height","150%")
         // rs.children().css("width","250px")
         // rs.children().css("height","100%")
@@ -70,6 +55,30 @@
         ul.css("background-color","#F9C6A7")
         return rs.appendTo( ul );
       };
+    },
+    search: function(event, ui) {
+      var self = this;
+      var data = [];
+      if (eval(self.source)) {
+        var currentSource = eval(self.source);
+        Object.keys(currentSource).forEach(function (categoryKey) {
+          Object.keys(currentSource[categoryKey]).forEach(function (descriptorKey) {
+            Object.keys(currentSource[categoryKey][descriptorKey]).forEach(function (stateKey) {
+              if(typeof currentSource[categoryKey][descriptorKey][stateKey].value != "undefined" && typeof currentSource[categoryKey][descriptorKey][stateKey].html != "undefined"){                    
+                var item = {};
+                item.value = currentSource[categoryKey][descriptorKey][stateKey].value
+                item.category = categoryKey;
+                item.descriptor = descriptorKey;
+                item.label = currentSource[categoryKey][descriptorKey][stateKey].value+categoryKey+descriptorKey
+                item.html = currentSource[categoryKey][descriptorKey][stateKey].html;                    
+                data.push(item);
+              }
+            });
+          });
+        });
+      }
+      console.log(data.length)
+      if(typeof $(self).autocomplete != "undefined") $(self).autocomplete("option",{source:data})          
     }
   });
 

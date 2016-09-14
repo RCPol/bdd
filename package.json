@@ -9,6 +9,7 @@
     "async": "^1.5.2",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
+    "googleapis": "^12.4.0",
     "http-request": "^0.7.0",
     "loopback": "^2.22.0",
     "loopback-boot": "^2.6.5",

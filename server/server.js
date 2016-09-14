@@ -93,15 +93,15 @@ app.get('/profile/specimen/:id', function(req, res) {
               params.label[domIdLabel] = specimen[key].field+": ";
             if(specimen[key].value && !specimen[key].states && !specimen[key].months){
               // NORMAL VALUE
-              params.value[domIdValue] = specimen[key].value;
+              params.value[domIdValue] = specimen[key].value;              
               // COORDINATES
               if(parsedId[3]=="decimalLatitude" || parsedId[3]=="decimalLongitude")
                 params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
               // IMAGE
               if(parsedId[2]=="Image"){
                 params.value[domIdValue] = [];
-                specimen[key].value.split("|").forEach(function(image){
-                 params.value[domIdValue].push({value:image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=")});
+                specimen[key].images.forEach(function(image){
+                 params.value[domIdValue].push({value:image.resized});
                 });
               }
               // REFERENCES
@@ -112,11 +112,88 @@ app.get('/profile/specimen/:id', function(req, res) {
                 });
               }
             } else if(specimen[key].states){
+              // NORMAL CATEGORICAL DESCRIPTOR
               params.value[domIdValue] = "";
               specimen[key].states.forEach(function(state) {
                 params.value[domIdValue] += state.state+", ";
               });
               params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+
+              // POLLEN SIZE
+              if(specimen[key].term=="pollenSize"){
+                if(specimen[key].states.length==1){
+                  params.value[domIdValue] = specimen[key].states[0].state;
+                } else {            
+                  var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
+                  var lowestIndex = Infinity;
+                  var highestIndex = -1;                        
+                  var lowestValue = "?";
+                  var highestValue = "?";                        
+                  specimen[key].states.forEach(function(state) {              
+                      var position  = order.indexOf(state.term);
+                      if(position < lowestIndex) {
+                        lowestIndex = position;
+                        lowestValue = state.state;
+                      }
+                      if(position > highestIndex) {
+                        highestIndex = position;
+                        highestValue = state.state;
+                      }
+                  });
+                  var sep = specimen.language=='en-US'?' to ':' a ';
+                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                } 
+              }
+              // POLLEN SHAPE
+              if(specimen[key].term=="pollenShape"){
+                if(specimen[key].states.length==1){
+                  params.value[domIdValue] = specimen[key].states[0].state;
+                } else {            
+                  var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
+                  var lowestIndex = Infinity;
+                  var highestIndex = -1;                        
+                  var lowestValue = "?";
+                  var highestValue = "?";                        
+                  specimen[key].states.forEach(function(state) {              
+                      var position  = order.indexOf(state.term);
+                      if(position < lowestIndex) {
+                        lowestIndex = position;
+                        lowestValue = state.state;
+                      }
+                      if(position > highestIndex) {
+                        highestIndex = position;
+                        highestValue = state.state;
+                      }
+                  });
+                  var sep = specimen.language=='en-US'?' to ':' a ';
+                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                } 
+              }
+              // FLOWER SIZE
+              if(specimen[key].term=="flowerSize"){
+                if(specimen[key].states.length==1){
+                  params.value[domIdValue] = specimen[key].states[0].state;
+                } else {            
+                  var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];
+                  var lowestIndex = Infinity;
+                  var highestIndex = -1;                        
+                  var lowestValue = "?";
+                  var highestValue = "?";                        
+                  specimen[key].states.forEach(function(state) {              
+                      var position  = order.indexOf(state.term);
+                      if(position < lowestIndex) {
+                        lowestIndex = position;
+                        lowestValue = state.state;
+                      }
+                      if(position > highestIndex) {
+                        highestIndex = position;
+                        highestValue = state.state;
+                      }
+                  });
+                  var sep = specimen.language=='en-US'?' to ':' a ';
+                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                } 
+              }
             } else if(specimen[key].months){
               params.value[domIdValue] = "";
               specimen[key].months.forEach(function(month) {
@@ -157,7 +234,10 @@ app.get('/profile/palinoteca/:id', function(req, res) {
     },
     function(callback) {
       collection(params.id,params,callback);
-    }
+    },
+    function(callback) {
+      profilesDwc(params,callback);
+    },
   ],function done() {
     var template = fs.readFileSync('./client/palinoteca.mustache', 'utf8');
     res.send(mustache.render(template, params));
@@ -194,10 +274,34 @@ function siteLabel(params,callback) {
   params.label = params.label?params.label:{};
   var Schema = app.models.Schema;
   Schema.find({where:{"class":"SiteLabel",language:params.language}},function(err,siteLabel) {
-    siteLabel.forEach(function(item) {
+    siteLabel.forEach(function(item) {      
+      var parsedId = item.id.split(":");
+      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3];      
+      if(domId=="rcpol:SiteLabel:citation"){
+        var field = item.field;
+        var formattedDate = "";
+        var date = new Date();
+        var day = date.getDate();
+        var monthIndex = date.getMonth();
+        var year = date.getFullYear();
+        if(parsedId[0]=="en-US"){
+          formattedDate = monthIndex+"/"+day+"/"+year;
+        } else formattedDate = day+"/"+monthIndex+"/"+year;
+        field = field+" "+formattedDate;
+        params.label[domId] = field;
+      } else params.label[domId] = item.field;
+    });
+    callback();
+  });
+}
+function profilesDwc(params,callback) {
+  params.label = params.label?params.label:{};
+  var Schema = app.models.Schema;
+  Schema.find({where:{"schema":"dwc",language:params.language}},function(err,profilesLabel) {
+    profilesLabel.forEach(function(item) {
       var parsedId = item.id.split(":");
       var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]
-      params.label[domId] = item.field;
+      params.label[domId] = item.field;          
     });
     callback();
   });
@@ -221,14 +325,26 @@ app.get('/profile/glossary/individual/:id', function(req, res) {
     if(typeof schema.images != "undefined" && schema.images.length>0){
       schema.image = schema.images[0].resized;
     } else {
-      schema.image = "/img/lspm.jpg"
+      schema.image = false;
     }
     if(schema.class == "State"){
       schema.subtitle = schema.category+" : "+schema.field;
     } else{
       schema.subtitle = schema.category;
     }
-    res.send(mustache.render(template, schema));
+    if(schema.references && schema.references.length>0){
+      Schema.findById(req.params.id.split(":")[0]+":rcpol:ProfilesLabel:profilesBibliographicReferences",function(err,label) {      
+        if(label)
+        schema.referenceLabel = label.field;
+        schema.references = schema.references.map(function(item) {
+          return {ref:item};
+        });
+        res.send(mustache.render(template, schema));
+      });
+    } else {
+      schema.references = false;
+      res.send(mustache.render(template, schema));   
+    }            
   });
 });
 
