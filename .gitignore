@@ -19,9 +19,7 @@ npm-debug.log
 
 deployment-config.json
 
-
 client/images/*
-client/resized/*
 
 uploads/*
 storage/*
