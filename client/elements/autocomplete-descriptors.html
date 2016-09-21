@@ -37,22 +37,10 @@
         source: [],
         search: self.search
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
-        var rs = $("<div>").append(item.html.clone().css("margin","0").css("height","150px").css("width","150px")).css("display","inline-block").css("height","100%");
-        rs.prepend('<p style="line-height:105%;letter-spacing: 1px;font-size:small;height:100%;vertical-align:top;top:0px;"><b>'+item.category+'</b>:<br>'+item.descriptor+"</p>")        
-        rs.css("margin-left","6px");
-        rs.css("margin-right","6px");
-        rs.css("padding-left","6px");
-        rs.css("padding-right","6px");
-        // rs.css("background-color","#FBE0D2")
 
-        rs.css("width","160px")
-        // rs.css("height","150%")
-        // rs.children().css("width","250px")
-        // rs.children().css("height","100%")
+        var rs = $('<div class="autocdescwrap">').append(item.html.clone());
+        rs.prepend('<p class="autocdescwrapcat"><b>'+item.category+'</b>:<br>'+item.descriptor+"</h1>") 
 
-        // rs.children().css("background-color","#FBE0D2")
-        rs.css("background-color","#F9C6A7")
-        ul.css("background-color","#F9C6A7")
         return rs.appendTo( ul );
       };
     },

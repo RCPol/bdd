@@ -31,13 +31,8 @@
         source: [],
         search: self.search,
       }).autocomplete( "instance" )._renderItem = function( ul, item ) {
-        var rs = item.html.clone();
-        rs.css("padding","6px");
-        rs.css("background-color","#FBE0D2")
-        rs.children().css("padding","6")
-        rs.children().css("margin","0")
-        rs.children().find(".nomesp").css("width","212px")
-        rs.children().css("background-color","#F9C6A7")
+        var rs = $('<div class="autocespcwrap">').append(item.html.clone());
+
         return rs.appendTo( ul );
       };
     },

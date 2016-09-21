@@ -19,12 +19,20 @@ div.glossario h2 {
 	font-size: 25px;
 	color: #470054;
 	font-weight: normal;
-	margin: 0 0 12px 0;
+	margin: 0;
+}
+
+div.glossario h3.subtitulo {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 16px;
+	color: #A37FA9;
+	font-weight: normal;
+	margin: 0 0 13px 0;
 }
 
 div.glossario h3 {
 	font-family: 'Roboto Condensed', sans-serif;
-	font-size: 16px;
+	font-size: 14px;
 	color: #470054;
 	font-weight: normal;
 	margin: 13px 0 0 0;
@@ -53,7 +61,7 @@ div.ref-glossario {
 }
 
 div.ref-glossario p {
-	padding: 12px 0 0 0;
+	padding: 7px 0 0 0;
 	margin: 0;
 	font-size: 12px;
 	line-height: 18px;
