@@ -37,12 +37,12 @@ function readGlossary(id){
       $("#" + id.split(":").join("-") +" > a").find('#image').show();
     }
     if(data.references && data.references.length>0){
-      var content = $('<div></div>');
-      var refLabel = $('<div>'+referenceLabel+':</div>');      
+      var content = $('<div class="popsreft"></div>');
+      var refLabel = $('<div class="popsreft">'+referenceLabel+':</div>');      
       // $("#" + id.split(":").join("-")).find('#references').append(referenceLabel+':');
       content.append(referenceLabel+':');
       data.references.forEach(function(ref) {        
-        content.append('<p style="margin:0px"><span style="color:grey; font-size: 80%;">'+ref+'</span></p>');        
+        content.append('<p><span class="popsrefp">'+ref+'</span></p>');        
       });                  
       var iconRef = $('<img src="/img/ref.png" title="teste" class="popsref">');          
       iconRef.tooltip({
