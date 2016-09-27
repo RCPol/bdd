@@ -8,12 +8,12 @@ services:
     links:
       - mongo
     ports:
-      - "80:80" 
+      - "80:3030" 
     container_name: rcpol_node   
   mongo:
     image: mongo
     ports:
-      - "27017:27017"
+      - "27027:27017"
     volumes:
       - ../db:/data/db
     container_name: rcpol_mongo
