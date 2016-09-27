@@ -2,24 +2,43 @@
   this.language = "pt-BR";
   if(localStorage){
     this.language = typeof localStorage.language!="undefined"?localStorage.language:this.language;
-  } else alert("O seu navegador de Internet pode não suportar alguns dos recursos utilizados por este sistema.\n Para uma melhor experiência, por favor, atualize o seu navegador ou utilize outro de sua preferência.");
+  } else alert("O seu navegador de Internet pode não suportar alguns dos recursos utilizados por este sistema.\n Para uma melhor experiência, por favor, atualize o seu navegador ou utilize outro de sua preferência.");  
 }
 Internacionalization.prototype.setLanguage = function(language){
   var self = this;
   self.language = language;
   localStorage.language = self.language;
+  self.updateLogo();  
+  return this;
+}
+Internacionalization.prototype.updateLogo = function(){  
+  var self = this;
+  $('.logo > img').attr('src','/img/logo_mel_'+self.language+'.png');
   return this;
 }
 Internacionalization.prototype.siteTranslator = function(){
   var self = this;
   $.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+self.language+"%22%7D%7D", function(data){
-    data.forEach(function(label) {
+    console.log("LOG: ",data);
+    data.forEach(function(label) {      
       if(label.term=="siteSearch"){
-        $(".formbusca > :text").val(label.field)
-      } else
-      if(label.term=="siteClean"){
-        $(".formbusca > :reset").val(label.field)
-      } else
+        $(".formbusca > :text").attr("placeholder",label.field);
+      } else if(label.term=="citation"){
+        var field = label.field;
+        var formattedDate = "";
+        var date = new Date();
+        var day = date.getDate();
+        var monthIndex = date.getMonth();
+        var year = date.getFullYear();
+        if(self.language=="en-US"){
+          formattedDate = monthIndex+"/"+day+"/"+year;
+        } else formattedDate = day+"/"+monthIndex+"/"+year;
+        field = field+" "+formattedDate;
+        $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(field);
+      } else 
+      // if(label.term=="siteClean"){
+      //   $(".formbusca > :reset").val(label.field)
+      // } else
         $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
     });
   });

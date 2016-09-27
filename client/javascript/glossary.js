@@ -1,8 +1,10 @@
-function writeSchema(schema){
+function writeSchema(schema, referenceLabel){  
   lang = localStorage.language?localStorage.language:"pt-BR";
   var id= schema.id;
   if (id.split(":")[2] == "State" || id.split(":")[2] == "CategoricalDescriptor" || id.split(":")[2] == "NumericalDescriptor" || id.split(":")[2] == "Category"){
-    $("article").append('<div class="glossario-s" id="'+id.split(":").join("-")+'"><img id="image"><h2></h2><h3></h3><p id="description"></p><div class="ref-glossario" id="references"></div></div>');
+    var html = $('<div class="glossario-s" id="'+id.split(":").join("-")+'"><a target="_blank"><img id="image"></img></a> <h2></h2><h3></h3><p id="description"></p><div id="references" style="color:grey; font-size: 80%;"></div></div>');    
+    $("#content").append(html);    
+    $("#" + id.split(":").join("-") +" > a > #image ").hide();
     readGlossary(id);
   }
 }
@@ -29,21 +31,30 @@ function readGlossary(id){
       $("#" + id.split(":").join("-")).find("h3").html(data.category + ": " + data.field);
     $("#" + id.split(":").join("-") + " > #description").html(description);
 
-    if (data.images && data.images.length > 0)
-      $("#" + id.split(":").join("-") + " > #image").attr("src", data.images[0].resized);
-    else
-      $("#" + id.split(":").join("-") +" >  #image").hide();
-
-    // var url = "/api/Schemas/mainImage?id="+id;
-    // $.getJSON(url, function(image){
-    //   if (image.response != ""){
-    //     $("#" + id.split(":").join("-") + " > #image").attr("src", image.response);
-    //   }else{
-    //     $("#" + id.split(":").join("-") +" >  #image").hide();
-    //   }
-    // });
+    if (data.images && data.images.length > 0){
+      $("#" + id.split(":").join("-") + " > a").find('#image').attr("src", data.images[0].resized);
+      $("#" + id.split(":").join("-") + " > a").attr("href", data.images[0].original);
+      $("#" + id.split(":").join("-") +" > a").find('#image').show();
+    }
+    if(data.references && data.references.length>0){
+      var content = $('<div class="popsreft"></div>');
+      var refLabel = $('<div class="popsreft">'+referenceLabel+':</div>');      
+      // $("#" + id.split(":").join("-")).find('#references').append(referenceLabel+':');
+      content.append(referenceLabel+':');
+      data.references.forEach(function(ref) {        
+        content.append('<p><span class="popsrefp">'+ref+'</span></p>');        
+      });                  
+      var iconRef = $('<img src="/img/ref.png" title="teste" class="popsref">');          
+      iconRef.tooltip({
+        content: function() {
+          return content;
+        }
+      });
+      $("#" + id.split(":").join("-")).find('#references').append(iconRef);
+    }    
   });
 }
+
 
 function busca(nothing){
   var key = $("#buscaglossario").val().trim().toLowerCase();

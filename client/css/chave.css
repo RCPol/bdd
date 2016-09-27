@@ -90,11 +90,49 @@ nav ul li a:hover {
 	background-color: #F27224;
 }
 
+/* Bandeiras de troca de língua */
+span.t-lang {
+	display: block;
+	background-color: rgba(255, 240, 196, 0.6);
+	padding: 15px 8px;
+	height: 25px;
+}
+
+span.t-lang img {
+	height: 25px;
+	width: 38px;
+	margin: 0 7px;
+}
+
+/* Contador */
+
+#count {
+	color: #470054;
+	display: block;
+	float: right;
+	font-size: 12px;
+	padding: 14px 16px;
+	background-color: rgba(255, 240, 196, 0.6);
+	margin-bottom: -12px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+#activeUsers {
+	color: #470054;
+	display: block;
+	float: right;
+	font-size: 12px;
+	padding: 14px 16px;
+	background-color: rgba(255, 240, 196, 0.6);
+	margin-bottom: -12px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
 /* Logotipo */
 div.logo {
 	display: block;
 	float: left;
-	margin: 50px 0 44px 50px;
+	margin: 25px 0 25px 50px;
 }
 
 /* Fundo translucido artigo*/
@@ -138,12 +176,20 @@ div.cdireita {
 	float: left;
 }
 
+/* Número de espécies disponíveis */
+div.count-species {
+	float:r ight;
+	text-align: right;
+	margin: 0 27px 10px 0;
+	color: #F27224;
+}
+
 
 /* Busca */
 .formbusca {
 	float:right;
 	width: 250px;
-	padding-right: 25px;
+	padding-right: 35px;
 	text-align: right;
 }
 
@@ -155,6 +201,22 @@ div.cdireita {
 	color: #F27224;
 	border:1px solid #FFAD60;
 	border-right:0px;
+}
+
+::-webkit-input-placeholder {
+   color: #F27224;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: #F27224;  
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: #F27224;  
+}
+
+:-ms-input-placeholder {  
+   color: #F27224;  
 }
 
 .fbbotao {
@@ -182,6 +244,194 @@ div.cdireita {
   border: 0;
 }*/
 
+/* Autocomplete Descriptors */
+.ui-autocomplete {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	float: left;
+	display: none;
+	max-width: 640px;
+	padding: 4px 0;
+	margin: 2px 0 0 0;
+	list-style: none;
+	background-color: white;
+	border: none !important;
+}
+
+.ui-autocomplete .ui-menu-item > a.ui-corner-all {
+	display: block;
+	clear: both;
+	white-space: nowrap;
+}
+
+div.autocdescwrap.ui-menu-item {
+	display: inline-block;
+	vertical-align: top;
+	margin: 10px 0 5px 10px;
+	padding: 5px 0;
+	width: 150px;
+}
+
+p.autocdescwrapcat.ui-menu-item-wrapper {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+	padding: 0 0 10px 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper {
+	width: 100px;
+	margin: 0 25px;
+	padding: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper img.vimg {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper img.vglos {
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 3px;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family:  'Roboto Condensed', sans-serif;
+}
+
+div.autocdescwrap.ui-menu-item:hover {
+	display: inline-block;
+	vertical-align: top;
+	width: 150px;
+	margin: 10px 0 5px 10px;
+	padding: 5px 0;
+	background-color: #FFAD60;
+	-moz-box-shadow: 0px 0px 0px 2px #F27224;
+	-webkit-box-shadow: 0px 0px 0px 2px #F27224;
+	box-shadow: 0px 0px 0px 2px #F27224;
+}
+
+p.autocdescwrapcat.ui-menu-item-wrapper.ui-state-active {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+	padding: 0 0 10px 0;
+	background-color: transparent;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active {
+	width: 100px;
+	margin: 0 25px;
+	padding: 0;
+	background-color: transparent;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active img.vimg {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active img.vglos {
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 3px;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family:  'Roboto Condensed', sans-serif;
+}
+
+/* Autocomplete Species */
+#ui-id-2.ui-autocomplete {
+	background-color: transparent !important;
+	max-width: 200px;
+}
+
+div.autocespcwrap.ui-menu-item {
+	width: 375px;
+	padding: 10px 10px 0 10px;
+	background-color: #FFF;
+	position: relative;
+	left: -236px;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper {
+	margin: 0;
+	padding: 12px;
+	width: 351px;
+	background-color: #F9C6A7;
+	overflow: auto;
+	display: flex;
+	align-itens: center;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper img {
+    min-height: 100px;
+    min-width: 100px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin: 0 12px 0 0;
+	order: <integer>;
+	text-align: center;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp {
+	order: <integer>;
+	margin: auto 0;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.nomesp {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: normal;
+	width: 250px;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.famisp {
+	font-weight: normal;
+	line-height: 21px;
+	font-size: 16px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.popn {
+	font-weight: normal;
+	line-height: 16px;
+	font-size: 13px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+}
+
+/* Clear */
 .tfclear{
 	clear:both;
 }
@@ -353,6 +603,7 @@ div.vimagens p {
 	font-size: 14px;
 	line-height: 16px;
 	text-align: center;
+	font-family:  'Roboto Condensed', sans-serif;
 }
 
 /* Toggle Chaves */
@@ -519,6 +770,7 @@ p.nomesp {
 	font-size: 18px;
 	line-height: 21px;
 	font-weight: normal;
+	width: 250px;
 }
 
 p.famisp {

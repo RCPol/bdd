@@ -19,10 +19,11 @@ npm-debug.log
 
 deployment-config.json
 
-uploads/*
-storage/*
 client/images/*
 client/resized/*
 client/thumbnails/*
+
+uploads/*
+storage/*
 
 *.xlsx
