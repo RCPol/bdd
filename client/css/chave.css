@@ -372,7 +372,7 @@ div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active
 
 div.autocespcwrap.ui-menu-item {
 	width: 375px;
-	padding: 10px 10px 0 10px;
+	padding: 10px 10px 10px 10px;
 	background-color: #FFF;
 	position: relative;
 	left: -236px;
