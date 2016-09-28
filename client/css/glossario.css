@@ -263,6 +263,17 @@ span.popsrefp {
 	color: black;
 }
 
+div#references {
+	display: block;
+	float: left;
+}
+
+div#credits {
+	display: block;
+	float: left;
+	margin: 0 0 0 5px;
+}
+
 /* Rodapé */
 footer {
 	display: block;
