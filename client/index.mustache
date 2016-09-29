@@ -106,13 +106,13 @@
 	function updateActiveUser() {		
 		$.get("/api/Identification/activeUsers",function(rs) {
 			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");			
-			setTimeout(updateActiveUser, 3000);
+			setTimeout(updateActiveUser, 120000);
 		});
 	}
 	function updateAccessCount() {		
 		$.get("/api/Identification/accessCount",function(rs) {
 			$('#count').html("#"+rs.response+" acessos");
-			setTimeout(updateAccessCount, 3000);
+			setTimeout(updateAccessCount, 120000);
 		});		
 	}
 	$(document).ready(function(){
