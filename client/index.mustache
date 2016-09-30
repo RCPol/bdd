@@ -112,7 +112,7 @@
 	function updateAccessCount() {		
 		$.get("/api/Identification/accessCount",function(rs) {
 			$('#count').html("#"+rs.response+" acessos");
-			setTimeout(updateAccessCount, 120000);
+			setTimeout(updateAccessCount, 600000);
 		});		
 	}
 	$(document).ready(function(){
