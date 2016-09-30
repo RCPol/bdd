@@ -37,7 +37,7 @@
 		}
 		$(document).ready(function(){
 			var internacionalization = new Internacionalization();
-	  		internacionalization.updateLogo();
+	  		internacionalization.updateLogo().siteTranslator();	  		
 
 			$("#rcpol-ProfilesLabel-profilesDepositedInCollection").html($("#rcpol-ProfilesLabel-profilesDepositedInCollection").html().toLowerCase());
 			$(".fotorama").fotorama();
@@ -408,8 +408,8 @@
 			<!-- Final: Embrulho Informações da Coleta e Mapa -->		
 			
 			<!-- Final: Slideshow com as imagens da planta -->
-			<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">{{rcpol:SiteLabel:howToCite}}:</h2>
-			<p id="rcpol-SiteLabel-citation">{{rcpol:SiteLabel:citation}}</p>
+			<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">Como citar:</h2>
+		<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.gov.br">http://chave.rcpol.gov.br/</a> >. Date of access: </p>
 			{{/value}}			
 		</article>
 		<!-- Final das informações do espécime -->
