@@ -39,15 +39,18 @@
 		});
 		$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22ProfilesLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){	
 			referenceLabel = "";	
+			creditLabel = "Credit photos";
 			data.forEach(function(label) {
 				if(label.term == "profilesBibliographicReferences"){
 			  		referenceLabel = label.field;
+			  	} else if(label.term == "profilesCreditPhotos"){
+			  		creditLabel = label.field;
 			  	} else if(label.term == "profilesDepositedInCollection"){
 				  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field.toLowerCase());
 				} else {
 				  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
 				}
-			});
+			});			
 			load(referenceLabel);
 		});
 		if (typeof(Storage) !== "undefined") {
@@ -89,13 +92,13 @@
 		<!-- Menu: início -->
 		<nav>
 			<ul>
-				<li> <!-- inserir link para o portal --> <a href="#" id="rcpol-SiteLabel-siteHome">Home</a></li>
+				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
 				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
 				<li>
 					<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
 							<img onclick="setLanguage('en-US')"  src="/img/en_GB.png">
 							<img onclick="setLanguage('es-ES')"  src="/img/es_ES.png">
-							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
 						</span>
 				</li>
 			</ul>
@@ -127,7 +130,7 @@
 		</div>
 		<div class="glossario-s">
 			<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">Como citar:</h2>
-			<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.gov.br">http://chave.rcpol.gov.br/</a> >. Date of access: </p>	
+			<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.org.br">http://chave.rcpol.org.br/</a> >. Date of access: </p>	
 		</div>
 	</article>	
 	<!-- Final das informações da Palinoteca -->		

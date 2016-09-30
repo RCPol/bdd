@@ -59,6 +59,12 @@ module.exports = function(Schema) {
                 record.references.push(ref.trim());
               });
             }
+            if (toString(line[9]).trim().length>0) {
+              record.credits = [];
+              toString(line[9]).trim().split("|").forEach(function (ref) {
+                record.credits.push(ref.trim());
+              });
+            }
             //ler o campo das imagens
             if (toString(line[8]).trim().length>0) {
               record.images = [];

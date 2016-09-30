@@ -103,14 +103,22 @@
 		});
 	}	
 	var identification = new Identification();
-	$(document).ready(function(){
-		identification.internacionalization.updateLogo();
-		$.get("/api/Identification/accessCount",function(rs) {
-		$('#count').html("#"+rs.response+" acessos");
-		});
+	function updateActiveUser() {		
 		$.get("/api/Identification/activeUsers",function(rs) {
-			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");
+			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");			
+			setTimeout(updateActiveUser, 300000);
 		});
+	}
+	function updateAccessCount() {		
+		$.get("/api/Identification/accessCount",function(rs) {
+			$('#count').html("#"+rs.response+" acessos");
+			setTimeout(updateAccessCount, 1200000);
+		});		
+	}
+	$(document).ready(function(){
+		identification.internacionalization.updateLogo();	
+		setTimeout(updateActiveUser, 1500);	
+		setTimeout(updateAccessCount, 1500);					
 		identification.startup();
 		var msg  = $( "#msg" ).dialog({
 				title:"Comunicado Importante!",
@@ -168,9 +176,9 @@
 					<li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 					<li>
 						<span class="t-lang">
+							<img onclick="identification.translate('pt-BR')"  src="/img/pt_BR.png">
 							<img onclick="identification.translate('en-US')"  src="/img/en_GB.png">
 							<img onclick="identification.translate('es-ES')"  src="/img/es_ES.png">
-							<img onclick="identification.translate('pt-BR')"  src="/img/pt_BR.png">
 						</span>
 					</li>
 					<li>						
