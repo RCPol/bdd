@@ -32,7 +32,7 @@
 		}
  	  $(document).ready(function(){
  	  	var internacionalization = new Internacionalization();
-	  		internacionalization.updateLogo();
+	  	internacionalization.updateLogo().siteTranslator();	  		
 
 		// Início do código do Grid-Tabela
 		$('#grid').w2grid({
@@ -79,14 +79,14 @@
 		<!-- Menu: início -->
 		<nav>
 			<ul>
-				<li> <!-- inserir link para o portal --> <a href="#" id="rcpol-SiteLabel-siteHome">{{rcpol:SiteLabel:siteHome}}</a></li>
+				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">{{rcpol:SiteLabel:siteHome}}</a></li>
 				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
         <li> <!-- inserir link para o glossário --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
 				<li>
 					<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
 							<img onclick="setLanguage('en-US')"  src="/img/en_GB.png">
 							<img onclick="setLanguage('es-ES')"  src="/img/es_ES.png">
-							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
 						</span>
 				</li>
 			</ul>
@@ -151,8 +151,8 @@
 
 		</div>
 		<!-- Final: Espécimes depositados na coleção -->
-		<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">{{rcpol:SiteLabel:howToCite}}:</h2>
-		<p id="rcpol-SiteLabel-citation">{{rcpol:SiteLabel:citation}}</p>
+		<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">Como citar:</h2>
+		<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.gov.br">http://chave.rcpol.gov.br/</a> >. Date of access: </p>
 		{{/value}}
 	</article>
 	<!-- Final das informações da Palinoteca -->
