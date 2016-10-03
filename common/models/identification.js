@@ -15,7 +15,7 @@ module.exports = function(Identification) {
         var analytics = google.analytics('v3');
         var now = new Date();
         var year = now.getFullYear();
-        var month = now.getMonth().toString().length==1?"0"+(now.getMonth()+1):now.getMonth()+1;
+        var month = (now.getMonth()+1).toString().length==1?"0"+(now.getMonth()+1):now.getMonth()+1;
         var day = now.getDate().toString().length==1?"0"+now.getDate():now.getDate();                  
         analytics.data.ga.get({
             'auth': jwtClient,
