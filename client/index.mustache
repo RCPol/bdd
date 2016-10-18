@@ -117,6 +117,10 @@
 		});		
 	}
 	$(document).ready(function(){
+		$("#base_selector").val('{{base}}');
+		$("#base_selector").change(function() {			
+			window.location = "/"+$("#base_selector").val();			
+		});
 		identification.internacionalization.base = '{{base}}';
 		identification.internacionalization.updateLogo();			
 		setTimeout(updateActiveUser, 1500);	
@@ -177,6 +181,12 @@
 					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
 					<li> <!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 					<li>
+						Base: 
+						<select id="base_selector">
+						  <option value="melisso">Melissopalinologia</option>
+						  <option value="taxon">Palinotaxonomia</option>
+						</select>
+
 						<span class="t-lang">
 							<img onclick="identification.translate('pt-BR')"  src="/img/pt_BR.png">
 							<img onclick="identification.translate('en-US')"  src="/img/en_GB.png">

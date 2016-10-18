@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/fichas.css">
+	<link rel="stylesheet" href="/css/{{base}}_fichas.css">
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="/javascript/leaflet/leaflet.css" />
@@ -30,7 +30,7 @@
 		var language = "pt-BR";
 		function setLanguage(language){
 			localStorage.language = language;
-			window.location = "/profile/species/"+localStorage.language+":"+id.split(":")[1];
+			window.location = "/profile/species/{{base}}/"+localStorage.language+":"+id.split(":")[1];
 		}
 	  $(document).ready(function(){
 	  		var internacionalization = new Internacionalization();
