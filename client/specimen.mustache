@@ -7,7 +7,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/fichas.css">
+	<link rel="stylesheet" href="/css/{{base}}_fichas.css">
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="/javascript/leaflet/leaflet.css" />
@@ -33,10 +33,11 @@
 		var language = "pt-BR";
 		function setLanguage(language){
 			localStorage.language = language;
-			window.location = "/profile/specimen/"+language+id.substring(5,id.length);
+			window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
 		}
 		$(document).ready(function(){
 			var internacionalization = new Internacionalization();
+			internacionalization.base = '{{base}}';
 	  		internacionalization.updateLogo().siteTranslator();	  		
 
 			$("#rcpol-ProfilesLabel-profilesDepositedInCollection").html($("#rcpol-ProfilesLabel-profilesDepositedInCollection").html().toLowerCase());
@@ -47,7 +48,7 @@
 			if (typeof(Storage) !== "undefined") {
 				localStorage.language = localStorage.language?localStorage.language:"pt-BR";
 				if(id.split(":")[0]!=localStorage.language)
-					window.location = "/profile/specimen/"+language+id.substring(5,id.length);
+					window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
 			} else {
 				alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
 			}
@@ -76,8 +77,8 @@
 			<nav>
 				<ul>
 					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br">{{rcpol:SiteLabel:siteHome}}</a></li>
-					<li><a href="/">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
-					<li><a href="/profile/glossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
+					<li><a href="/{{base}}">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
+					<li><a href="/profile/glossary/{{base}}">{{rcpol:SiteLabel:siteGlossary}}</a></li>
 					<li>						
 						<span class="t-lang">
 							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
@@ -115,9 +116,9 @@
 					<p><b>{{rcpol:Collection:homepage:label}}:</b> <a id="homepage_link" href="{{rcpol:Collection:homepage:value}}" target="_blank"><span id="homepage">{{rcpol:Collection:homepage:value}}:</span></a></p>
 					<p>&nbsp;</p>
 					<!-- Link para página da Palinoteca -->
-					<p><a target="_blank" href="/profile/palinoteca/{{language}}:{{dwc:RecordLevel:institutionCode:value}}:{{dwc:RecordLevel:collectionCode:value}}" id="rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection">{{rcpol:ProfilesLabel:profilesSeeSpecimensOfThisCollection}}</a></p>
+					<p><a target="_blank" href="/profile/palinoteca/{{base}}/{{language}}:{{dwc:RecordLevel:institutionCode:value}}:{{dwc:RecordLevel:collectionCode:value}}" id="rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection">{{rcpol:ProfilesLabel:profilesSeeSpecimensOfThisCollection}}</a></p>
 					<!-- Link para página da Espécie -->
-					<p><a target="_blank" href="/profile/species/{{language}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
+					<p><a target="_blank" href="/profile/species/{{base}}/{{language}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
 				</div>
 				<!-- Final: Informações Palinoteca -->
 				<!-- Início: Logotipo da Palinoteca -->
