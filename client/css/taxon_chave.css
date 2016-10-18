@@ -1,0 +1,810 @@
+/* CSS reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+/* Fundo, links e caixa central */
+body {
+	background: url(21.jpg) no-repeat center top;
+	background-color: #FFAD60;
+	font-family: 'Roboto', sans-serif;
+	font-size: 14px;
+	line-height: 21px;
+}
+
+/* Barra de rolagem */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Fundo */
+::-webkit-scrollbar-track {
+	background-color: #F27224;
+}
+
+/* Indicador */
+::-webkit-scrollbar-thumb {
+	background-color: rgba(81,10,84,0.4);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+	background-color: rgba(81,10,84,0.2);
+}
+
+/* Links */
+a:link, a:visited {
+	text-decoration: none;
+	color: #470054;
+}
+
+div.contem {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+/* Header */
+
+header {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	overflow: auto;
+}
+
+/* Menu */
+nav {
+	margin: 0;
+}
+
+nav ul {
+	list-style-type: none;
+	margin: 12px 0 0 0;
+	padding: 0;
+	float: right;
+}
+
+nav ul li {
+	float: right;
+	clear: both;
+	padding: 0 0 12px 0;
+	margin: 0;
+}
+
+nav ul li a {
+	display: block;
+	background-color: #FFAD60;
+	color: #470054;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 16px;
+}
+
+nav ul li a:hover {
+	background-color: #F27224;
+}
+
+/* Bandeiras de troca de língua */
+span.t-lang {
+	display: block;
+	background-color: rgba(255, 240, 196, 0.6);
+	padding: 15px 8px;
+	height: 25px;
+}
+
+span.t-lang img {
+	height: 25px;
+	width: 38px;
+	margin: 0 7px;
+}
+
+/* Contador */
+
+#count {
+	color: #470054;
+	display: block;
+	float: right;
+	font-size: 12px;
+	padding: 14px 16px;
+	background-color: rgba(255, 240, 196, 0.6);
+	margin-bottom: -12px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+#activeUsers {
+	color: #470054;
+	display: block;
+	float: right;
+	font-size: 12px;
+	padding: 14px 16px;
+	background-color: rgba(255, 240, 196, 0.6);
+	margin-bottom: -12px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+/* Logotipo */
+div.logo {
+	display: block;
+	float: left;
+	margin: 25px 0 25px 50px;
+}
+
+/* Fundo translucido artigo*/
+div.qbranco {
+	overflow: auto;
+	background-color: white;
+	padding: 40px 50px;
+}
+
+/* Título */
+div.qbranco h1 {
+	font-size: 20px;
+	line-height: 21px;
+	font-weight: normal;
+	margin: 5px 0 16px 13px;
+	color: #F27224;
+	float: left;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+div.qbranco h2 {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: normal;
+	color: #F27224;
+	margin: 13px 13px;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+/* Div esquerda */
+div.cesquerda {
+	width: 437px;
+	margin: 0 13px 0 0;
+	float: left;
+}
+
+/* Div direita */
+div.cdireita {
+	width: 437px;
+	margin: 0 0 0 13px;
+	float: left;
+}
+
+/* Número de espécies disponíveis */
+div.count-species {
+	float:r ight;
+	text-align: right;
+	margin: 0 27px 10px 0;
+	color: #F27224;
+}
+
+
+/* Busca */
+.formbusca {
+	float:right;
+	width: 250px;
+	padding-right: 35px;
+	text-align: right;
+}
+
+.fbcampo {
+	margin: 0;
+	padding: 5px 10px;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 14px;
+	color: #F27224;
+	border:1px solid #FFAD60;
+	border-right:0px;
+}
+
+::-webkit-input-placeholder {
+   color: #F27224;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: #F27224;  
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: #F27224;  
+}
+
+:-ms-input-placeholder {  
+   color: #F27224;  
+}
+
+.fbbotao {
+	margin: 0;
+	padding: 5px 7px;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 13px;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	color: #470054;
+	border: solid 1px #FFAD60;
+	background: #FFAD60;
+	line-height: 17px;
+	/*firefox 18 edge 16*/
+}
+
+.fbbotao:hover {
+	text-decoration: none;
+	background: #F27224;
+}
+/*
+.fbbotao::-moz-focus-inner {
+  border: 0;
+}*/
+
+/* Autocomplete Descriptors */
+.ui-autocomplete {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	float: left;
+	display: none;
+	max-width: 640px;
+	padding: 4px 0;
+	margin: 2px 0 0 0;
+	list-style: none;
+	background-color: white;
+	border: 1px solid #FFAD60 !important;
+}
+
+.ui-autocomplete .ui-menu-item > a.ui-corner-all {
+	display: block;
+	clear: both;
+	white-space: nowrap;
+}
+
+div.autocdescwrap.ui-menu-item {
+	display: inline-block;
+	vertical-align: top;
+	margin: 10px 0 5px 10px;
+	padding: 5px 0;
+	width: 150px;
+}
+
+p.autocdescwrapcat.ui-menu-item-wrapper {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+	padding: 0 0 10px 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper {
+	width: 100px;
+	margin: 0 25px;
+	padding: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper img.vimg {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper img.vglos {
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 3px;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family:  'Roboto Condensed', sans-serif;
+}
+
+div.autocdescwrap.ui-menu-item:hover {
+	display: inline-block;
+	vertical-align: top;
+	width: 150px;
+	margin: 10px 0 5px 10px;
+	padding: 5px 0;
+	background-color: #FFAD60;
+	-moz-box-shadow: 0px 0px 0px 2px #F27224;
+	-webkit-box-shadow: 0px 0px 0px 2px #F27224;
+	box-shadow: 0px 0px 0px 2px #F27224;
+}
+
+p.autocdescwrapcat.ui-menu-item-wrapper.ui-state-active {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+	padding: 0 0 10px 0;
+	background-color: transparent;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active {
+	width: 100px;
+	margin: 0 25px;
+	padding: 0;
+	background-color: transparent;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active img.vimg {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active img.vglos {
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 3px;
+	left: 0;
+}
+
+div.autocdescwrap.ui-menu-item div.vimagens.ui-menu-item-wrapper.ui-state-active p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family:  'Roboto Condensed', sans-serif;
+}
+
+/* Autocomplete Species */
+#ui-id-2.ui-autocomplete {
+	background-color: transparent !important;
+	max-width: 200px;
+	border: none !important;
+}
+
+div.autocespcwrap.ui-menu-item {
+	width: 375px;
+	padding: 0 10px 10px 10px;
+	background-color: #FFF6CF;
+	position: relative;
+	left: -246px;
+}
+
+div.autocespcwrap.ui-menu-item:first-of-type {
+	width: 375px;
+	padding: 10px 10px 10px 10px;
+	background-color: #FFF6CF;
+	position: relative;
+	left: -246px;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper {
+	margin: 0;
+	padding: 12px;
+	width: 351px;
+	background-color: #F9C6A7;
+	overflow: auto;
+	display: flex;
+	align-itens: center;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper img {
+    min-height: 100px;
+    min-width: 100px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin: 0 12px 0 0;
+	order: <integer>;
+	text-align: center;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp {
+	order: <integer>;
+	margin: auto 0;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.nomesp {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: normal;
+	width: 250px;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.famisp {
+	font-weight: normal;
+	line-height: 21px;
+	font-size: 16px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+}
+
+div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.popn {
+	font-weight: normal;
+	line-height: 16px;
+	font-size: 13px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #470054;
+}
+
+/* Clear */
+.tfclear{
+	clear:both;
+}
+
+@-moz-document url-prefix(http://) {
+	button::-moz-focus-inner, input[type="button"]::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
+		padding: 0 !important;
+		border: 0 none !important;
+	}
+}
+
+/* Quadrados conteúdo */
+div.roxinho {
+	background-color: #FBE0D2;
+	width: 412px;
+	height: 387px;
+	padding: 25px 0 25px 25px;
+	overflow: auto;
+	position: relative;
+}
+
+div.roxinhodesc {
+	background-color: #FBE0D2;
+	width: 412px;
+	height: 330px;
+	padding: 25px 0 25px 25px;
+	overflow: auto;
+	position: relative;
+}
+
+div.roxinhobtn {
+	background-color: #FBE0D2;
+	width: 412px;
+	padding: 25px 0 0 25px;
+	overflow: auto;
+	position: relative;
+}
+
+/* Botões expandir/ocultar */
+.expocu {
+	margin: 0;
+	padding: 5px 7px;
+	font-size: 13px;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	color: #470054;
+	border: solid 1px #FFAD60;
+	background: #FFAD60;
+	font-family: 'Roboto Condensed', sans-serif;
+	line-height: 15px;
+}
+
+.expocu:hover {
+	background-color: #F27224;
+}
+
+.btnident {
+	margin: 0;
+	padding: 5px 7px;
+	font-size: 13px;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	border: solid 1px #F27224;
+	background: #F27224;
+	color: white;
+	font-family: 'Roboto Condensed', sans-serif;
+	line-height: 15px;
+}
+
+.btnident:hover {
+	color: #470054;
+}
+
+div.divaeh {
+	width: 375px;
+	text-align: right;
+	margin: 0 37px 0 0;
+	display: block;
+	clear: both;
+}
+
+div.agregadordescritores {
+	width: 356px;
+}
+
+ul.descritor {
+	padding: 0 0 7px 19px !important;
+	width: 356px;
+}
+
+div.valoresn {
+	padding: 0 0 7px 19px !important;
+	width: 337px;
+	font-size: 14px;
+}
+
+form.valornum {
+	margin: 0;
+}
+
+img.lala {
+	padding: 0 0 0 3px;
+}
+
+/* Textos descritores*/
+div.agregadordescritores p {
+	font-size: 16px;
+	line-height: 21px;
+}
+
+/* Campos descritores numéricos */
+.numnum {
+	margin: 0;
+	padding: 5px 10px;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 14px;
+	color: #F27224;
+	border:1px solid #FFAD60;
+}
+
+/* Imagens descritores */
+div.valoresi {
+	padding: 0 0 0 10px !important;
+	width: 333px;
+	margin: 0;
+	float: none;
+	overflow: auto;
+}
+
+div.vimagens {
+	display: inline-block;
+	vertical-align: top;
+	width: 100px;
+	margin: 2px 0 5px 10px;
+	position: relative;
+	left: 0;
+	top: 0;
+	cursor: pointer;
+}
+
+div.vimagens.selecionado {
+	background-color: #FFAD60;
+	-moz-box-shadow: 0px 0px 0px 2px #F27224;
+	-webkit-box-shadow: 0px 0px 0px 2px #F27224;
+	box-shadow: 0px 0px 0px 2px #F27224;
+}
+
+img.vimg {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+img.vglos {
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 3px;
+	left: 3px;
+}
+
+div.vimagens p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+	font-family:  'Roboto Condensed', sans-serif;
+}
+
+/* Toggle Chaves */
+ul.accordion {
+	list-style: none;
+	padding: 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+ul .inner {
+	list-style: none;
+	overflow: hidden;
+	display: none;
+}
+
+ul .inner.show {
+	/*display: block;*/
+}
+
+ul li {
+	margin: 0;
+}
+
+ul li section.toggle {
+	display: block;
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+	padding: 0 0 3px 0;
+	color: #470054;
+	cursor: pointer;
+}
+
+ul li section.toggle span {
+	display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #F27224;
+	color: #F27224;
+	font-weight: bold;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 12px;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 3px 0 0;
+}
+
+ul li a.toggle {
+	display: block;
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+	padding: 0 0 3px 0;
+	color: #470054;
+	cursor: pointer;
+}
+
+ul li a.toggle span {
+	display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #F27224;
+	color: #F27224;
+	font-weight: bold;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 12px;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 3px 0 0;
+}
+
+/* Descritores Selecionados*/
+.descel {
+	width: width: 356px;
+	font-family: 'Roboto Condensed', sans-serif;
+	margin: 25px 0 0 0;
+}
+
+.descel input[type=checkbox] {
+	display:none;
+}
+
+.descel label {
+	font-size: 16px;
+	line-height: 21px;
+	font-weight: normal;
+	color: #470054;
+}
+
+.descel input[type=checkbox] + label:before {
+	content: "\00a0";
+	display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #F27224;
+	font-weight: bold;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 12px;
+	color: #F27224;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 5px 0 0;
+}
+
+.descel input[type=checkbox]:checked + label:before {
+	content: "\00d7";
+    display: inline-block;
+	vertical-align: 1px;
+	width: 8px;
+	height: 8px;
+	padding: 2px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #F27224;
+	font-weight: bold;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 12px;
+	color: #F27224;
+	line-height: 10px;
+	text-align: center;
+	margin: 0 5px 0 0;
+}
+
+/* Espécies */
+div.especies {
+	margin: 0 0 12px 0;
+	padding: 12px;
+	width: 351px;
+	background-color: #F9C6A7;
+	overflow: auto;
+	display: flex;
+	align-itens: center;
+}
+
+div.especies img {
+    min-height: 100px;
+    min-width: 100px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin: 0 12px 0 0;
+	order: <integer>;
+	text-align: center;
+}
+
+div.nsp {
+	order: <integer>;
+	margin: auto 0;
+}
+
+p.nomesp {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: normal;
+	width: 250px;
+}
+
+p.famisp {
+	font-weight: normal;
+	line-height: 21px;
+	font-size: 16px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+p.popn {
+	font-weight: normal;
+	line-height: 16px;
+	font-size: 13px;
+	margin: 7px 0 0 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+/* Rodapé */
+footer {
+	display: block;
+	background-color: #F27224;
+	padding: 25px 50px;
+	text-align: center;
+	margin: 0 0 50px 0;
+	color: white;
+	font-size: 12px;
+}

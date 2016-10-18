@@ -1,5 +1,6 @@
  function Internacionalization() {
-  this.language = "pt-BR";
+  this.language = "pt-BR";  
+  this.base = 'melisso';
   if(localStorage){
     this.language = typeof localStorage.language!="undefined"?localStorage.language:this.language;
   } else alert("O seu navegador de Internet pode não suportar alguns dos recursos utilizados por este sistema.\n Para uma melhor experiência, por favor, atualize o seu navegador ou utilize outro de sua preferência.");  
@@ -13,7 +14,7 @@ Internacionalization.prototype.setLanguage = function(language){
 }
 Internacionalization.prototype.updateLogo = function(){  
   var self = this;
-  $('.logo > img').attr('src','/img/logo_mel_'+self.language+'.png');
+  $('.logo > img').attr('src','/img/logo_'+self.base+'_'+self.language+'.png');
   return this;
 }
 Internacionalization.prototype.siteTranslator = function(){

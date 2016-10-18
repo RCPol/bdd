@@ -3,7 +3,7 @@
     {    
     "name"        : "bdd",
     "script"      : ".",    
-    "watch"       : false,    
+    "watch"       : true,    
     "ignore_watch": ["uploads","client","node_modules"],
     "merge_logs"  : true,
     "no_daemon"   : true,
