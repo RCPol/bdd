@@ -134,7 +134,7 @@ module.exports = function(Species) {
             }
           });
         });
-        species.id = Species.app.defineSpeciesID(language,name);
+        species.id = Species.app.defineSpeciesID(language,base,name);
         Species.upsert(species,function (err,instance) {
           if(err)
             console.log(err);

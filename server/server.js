@@ -27,10 +27,10 @@ app.start = function() {
     else
       return null;
   }
-  app.defineSpeciesID = function(language, scientificName) {
+  app.defineSpeciesID = function(language, base, scientificName) {
     scientificName = (typeof scientificName == 'undefined')?'':String(scientificName).trim();
-    if(language && language.trim().length>0 && scientificName.trim().length>0)
-      return language.trim().concat(":").concat(scientificName.trim());
+    if(language && language.trim().length>0 && scientificName.trim().length>0 && base)
+      return language.trim().concat(":").concat(base.trim()).concat(":").concat(scientificName.trim());
     else
       return null;
   }
