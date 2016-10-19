@@ -27,9 +27,9 @@ Identification.prototype.tooltipConfig = function() {
         });
       } 
       else if (element.is( ".lala" ) ) {
-        console.log("ALT: ",element.attr( "alt" ));
+        // console.log("ALT: ",element.attr( "alt" ));
         var parsedAlt = element.attr( "alt" ).split("|");
-        console.log("PARSED ALT: ",parsedAlt);
+        // console.log("PARSED ALT: ",parsedAlt);
         var category = parsedAlt[1];        
         var descriptor = parsedAlt[0];
         $.get("/api/Schemas/findOne?filter[where][category]="+category+"&filter[where][field]="+descriptor,function(rs) {          
@@ -260,6 +260,7 @@ Identification.prototype.identify = function() {
     self.printSpecies();
     self.eligibleStates = {};
     data.response.eligibleStates.forEach(function(remoteEligibleState) {
+        // console.log("ELIGIBLE STATES: ",data.response.eligibleStates);
         self.eligibleStates[remoteEligibleState._id] = {count: remoteEligibleState.count}
     });
     self.printDescriptors();

@@ -79,6 +79,7 @@ module.exports = function(Species) {
     async.each(sciName, function iterator(name, callback){
       var query = {where:{}};
       query.where[language+":dwc:Taxon:scientificName.value"] = name;
+      query.where.base = base;
       Specimen.find(query, function (err,specimens) {
 
         var species = {};
