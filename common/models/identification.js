@@ -64,13 +64,13 @@ module.exports = function(Identification) {
         });         
     });
   } 
-  Identification.populate = function(base,filter, callback){
+  Identification.populate = function(filter, callback){
     Identification.getApp(function(err, app){
       if (err) throw new Error(err);
       var Species = app.models.Species;
       var Schema = app.models.Schema;
       var BDD = app.dataSources.BDD;
-      getIdentificationItems(base, filter, Identification, Species, Schema, BDD, callback);
+      getIdentificationItems(filter, Identification, Species, Schema, BDD, callback);
     });
   };
 
@@ -249,7 +249,7 @@ module.exports = function(Identification) {
     'populate',
     {
       http: {verb: 'get'},
-      accepts: [{arg: 'base', type: 'string',required:true},{arg: 'filter', type: 'object'}],
+      accepts: [{arg: 'filter', type: 'object'}],
       returns: {arg: 'response', type: 'number'}
     }
   );
@@ -264,7 +264,7 @@ module.exports = function(Identification) {
   );
 };
 
-function getIdentificationItems(base, filter, Identification, Species, Schema, mongoDs, callback){
+function getIdentificationItems(filter, Identification, Species, Schema, mongoDs, callback){
   // filter = filter?filter:{};
   // filter.base = base;
   Species.find({where: filter}, function(err, all_species){
