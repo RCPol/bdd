@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/fichas.css">
+	<link rel="stylesheet" href="/css/{{base}}_fichas.css">
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="/javascript/leaflet/leaflet.css" />
@@ -30,10 +30,11 @@
 		var language = "pt-BR";
 		function setLanguage(language){
 			localStorage.language = language;
-			window.location = "/profile/species/"+localStorage.language+":"+id.split(":")[1];
+			window.location = "/profile/species/{{base}}/"+localStorage.language+":"+id.split(":")[1];
 		}
 	  $(document).ready(function(){
 	  		var internacionalization = new Internacionalization();
+	  		internacionalization.base = '{{base}}';
 	  		internacionalization.updateLogo();
 			if(localStorage && localStorage.language)
 				language = localStorage.language;
@@ -62,7 +63,7 @@
 			if (typeof(Storage) !== "undefined") {
 					localStorage.language = localStorage.language?localStorage.language:"pt-BR";
 					if(id.split(":")[0]!=localStorage.language)
-						window.location = "/profile/species/"+localStorage.language+":"+id.split(":")[1];
+						window.location = "/profile/species/{{base}}/"+localStorage.language+":"+id.split(":")[1];
 			} else {
 					alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
 			}
@@ -114,7 +115,7 @@
 							sortData: [{ field: 'recid', direction: 'ASC' }]
 						});
 					    w2ui.grid.on('click', function(event) {
-			              window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
+			              window.open("/profile/specimen/{{base}}/" + w2ui['grid'].get(event.recid).specimen_id);
 			            });
 						//Final do Código da Tabela-Grid
 			        readSpecies(id, map);
@@ -136,8 +137,8 @@
 		<nav>
 			<ul>
 				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
-				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
-        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 				<li>
 					<span class="t-lang">
 							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">

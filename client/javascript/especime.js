@@ -1,5 +1,6 @@
 var coordinates = {};
-function readSpecimen(id, cb){
+function readSpecimen(id,base,cb){
+
   var lang = localStorage.language?localStorage.language:"pt-BR";
   $.getJSON("/api/Specimens/"+id, function(data){
     console.log(data);
@@ -68,7 +69,7 @@ function readSpecimen(id, cb){
       $("#email").append(palinoteca["rcpol:email"].value);
       $("#homepage").append(palinoteca["rcpol:homepage"].value);
       $("#homepage_link").attr("href", palinoteca["rcpol:homepage"].value);
-      $("#link_palinoteca").attr("href", "/profile/palinoteca/"+palinoteca["id"]);
+      $("#link_palinoteca").attr("href", "/profile/palinoteca/"+base+"/"+palinoteca["id"]);
       if(palinoteca["rcpol:logotipo"].url)
         $("#logo").attr("src", palinoteca["rcpol:logotipo"].url);
       // console.log(palinoteca["rcpol:logotipo"].url);

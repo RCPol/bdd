@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/fichas.css">
+	<link rel="stylesheet" href="/css/{{base}}_fichas.css">
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
@@ -28,10 +28,11 @@
 		var id = "{{id}}"
 		function setLanguage(language){
 			localStorage.language = language;
-			window.location = "/profile/palinoteca/"+language+id.substring(5,id.length);
+			window.location = "/profile/palinoteca/{{base}}/"+language+id.substring(5,id.length);
 		}
  	  $(document).ready(function(){
  	  	var internacionalization = new Internacionalization();
+ 	  	internacionalization.base = '{{base}}';
 	  	internacionalization.updateLogo().siteTranslator();	  		
 
 		// Início do código do Grid-Tabela
@@ -57,7 +58,7 @@
 		});
 
 		w2ui.grid.on('select', function(event) {
-		  window.open("/profile/specimen/" + w2ui['grid'].get(event.recid).specimen_id);
+		  window.open("/profile/specimen/{{base}}/" + w2ui['grid'].get(event.recid).specimen_id);
 		});
 		{{#value}}
       readSpecimens("{{language}}","{{dwc:RecordLevel:institutionCode:value}}","{{dwc:RecordLevel:collectionCode:value}}");
@@ -80,8 +81,8 @@
 		<nav>
 			<ul>
 				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">{{rcpol:SiteLabel:siteHome}}</a></li>
-				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
-        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
 				<li>
 					<span class="t-lang">
 							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">

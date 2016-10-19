@@ -49,23 +49,40 @@ app.start = function() {
 app.use(loopback.static(path.resolve(__dirname, '../client')));
 
 // Aqui (para a chave) vai ter que ser diferente porque a quantidade de parâmetros é variável. Vai ter que usar os parametros do tipo ?parmA=X&paramB=Y
-app.get('/', function(req, res) {
+app.get('/', function(req, res) {  
+  res.redirect("/melisso");
+});
+app.get('', function(req, res) {  
+  res.redirect("/melisso");
+});
+app.get('/melisso', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');
   // var partials = {
   //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
   // };
-  var params = {query: req.query};
+  // var params = {query: req.query};
+  var params = {base: "melisso"};
+  res.send(mustache.render(template, params));
+});
+app.get('/taxon', function(req, res) {
+  var template = fs.readFileSync('./client/index.mustache', 'utf8');
+  // var partials = {
+  //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
+  // };
+  // var params = {query: req.query};
+  var params = {base: "taxon"};
   res.send(mustache.render(template, params));
 });
 
 // Repetir para os outros profiles
-app.get('/profile/species/:id', function(req, res) {
+app.get('/profile/species/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
-  var params = {id: req.params.id};
+  var params = {id: req.params.id,base: req.params.base?req.params.base:"melisso"};
+
   res.send(mustache.render(template, params));
 });
 
-app.get('/profile/specimen/:id', function(req, res) {
+app.get('/profile/specimen/:base/:id', function(req, res) {
   var Specimen = app.models.Specimen;
   var params = {};
   params.id =req.params.id;
@@ -210,18 +227,20 @@ app.get('/profile/specimen/:id', function(req, res) {
     }
   ],function done() {
     var template = fs.readFileSync('./client/specimen.mustache', 'utf8');
+    params.base = req.params.base?req.params.base:"melisso";
     res.send(mustache.render(template, params));
   });
 });
 
 app.get('/quality/check', function(req, res) {
   var template = fs.readFileSync('./client/quality.mustache', 'utf8');
-  var params = {};
+  var params = {base: "melisso"};
+
   res.send(mustache.render(template, params));
 });
 
-app.get('/profile/palinoteca/:id', function(req, res) {
-  var params = {};
+app.get('/profile/palinoteca/:base/:id', function(req, res) {
+  var params = {base: req.params.base?req.params.base:"melisso"};
   params.id =req.params.id;
   params.language = req.params.id.split(":")[0];
   params.value = {};
@@ -318,7 +337,7 @@ function profilesLabel(params,callback) {
     callback();
   });
 }
-app.get('/profile/glossary/individual/:id', function(req, res) {
+app.get('/profile/glossary/individual/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/glossary.mustache', 'utf8');
   var Schema = app.models.Schema;
   Schema.findById(req.params.id,function(err,schema) {
@@ -343,20 +362,22 @@ app.get('/profile/glossary/individual/:id', function(req, res) {
       });
     } else {
       schema.references = false;
+      schema.base = req.params.base?req.params.base:"melisso";
       res.send(mustache.render(template, schema));   
     }            
   });
 });
 
-app.get('/profile/glossary/:lang*?', function(req, res){
+app.get('/profile/glossary/:base/:lang*?', function(req, res){
   var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
-  var params = {lang: req.params.lang};
+  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"melisso"};
   res.send(mustache.render(template, params));
 });
 
-app.get('/profile/glossary', function(req, res){
+app.get('/profile/glossary/:base', function(req, res){
   var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
-  res.send(mustache.render(template));
+  var params = {base:req.params.base?req.params.base:"melisso"};
+  res.send(mustache.render(template, params));
 });
 
 var ds = loopback.createDataSource({

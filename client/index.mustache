@@ -14,7 +14,7 @@
 	<script src="javascript/md5.min.js"></script>
 
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/chave.css">
+	<link rel="stylesheet" href="/css/{{base}}_chave.css">
 	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 
 	<!-- JQuery -->
@@ -103,6 +103,7 @@
 		});
 	}	
 	var identification = new Identification();
+	identification.base = '{{base}}';
 	function updateActiveUser() {		
 		$.get("/api/Identification/activeUsers",function(rs) {
 			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");			
@@ -116,7 +117,12 @@
 		});		
 	}
 	$(document).ready(function(){
-		identification.internacionalization.updateLogo();	
+		$("#base_selector").val('{{base}}');
+		$("#base_selector").change(function() {			
+			window.location = "/"+$("#base_selector").val();			
+		});
+		identification.internacionalization.base = '{{base}}';
+		identification.internacionalization.updateLogo();			
 		setTimeout(updateActiveUser, 1500);	
 		setTimeout(updateAccessCount, 1500);					
 		identification.startup();
@@ -173,8 +179,14 @@
 			<nav>
 				<ul>
 					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
-					<li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
+					<li> <!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 					<li>
+						Base: 
+						<select id="base_selector">
+						  <option value="melisso">Melissopalinologia</option>
+						  <option value="taxon">Palinotaxonomia</option>
+						</select>
+
 						<span class="t-lang">
 							<img onclick="identification.translate('pt-BR')"  src="/img/pt_BR.png">
 							<img onclick="identification.translate('en-US')"  src="/img/en_GB.png">
@@ -191,7 +203,7 @@
 
 			<!-- logotipo -->
 			<div class="logo">
-				<img src="/img/logo_mel_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
+				<img src="/img/logo_{{base}}_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
 			</div>
 			<!-- logotipo -->
 
