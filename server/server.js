@@ -55,13 +55,22 @@ app.get('/', function(req, res) {
 app.get('', function(req, res) {  
   res.redirect("/melisso");
 });
-app.get('/:base', function(req, res) {
+app.get('/melisso', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');
   // var partials = {
   //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
   // };
   // var params = {query: req.query};
-  var params = {base: req.params.base?req.params.base:"melisso"};
+  var params = {base: "melisso"};
+  res.send(mustache.render(template, params));
+});
+app.get('/taxon', function(req, res) {
+  var template = fs.readFileSync('./client/index.mustache', 'utf8');
+  // var partials = {
+  //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
+  // };
+  // var params = {query: req.query};
+  var params = {base: "taxon"};
   res.send(mustache.render(template, params));
 });
 

@@ -112,7 +112,7 @@ Identification.prototype.unselectState = function(id) {
 }
 Identification.prototype.createSpecies = function(callback) {
   var self = this;
-  $.getJSON("/api/Species?filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.internacionalization.language+":dwc:Taxon:family%20ASC&filter[order][1]="+self.internacionalization.language+":dwc:Taxon:scientificName%20ASC"/*, { filter : query }*/, function(species){
+  $.getJSON("/api/Species?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.internacionalization.language+":dwc:Taxon:family%20ASC&filter[order][1]="+self.internacionalization.language+":dwc:Taxon:scientificName%20ASC"/*, { filter : query }*/, function(species){
     species.forEach(function(sp) {
       self.species[sp.id] = {};
       self.species[sp.id].id = sp.id;
@@ -250,7 +250,7 @@ function imageError(img) {
 Identification.prototype.identify = function() {
   console.time("Identify");
   var self = this;
-  var query = {language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}
+  var query = {base:self.base, language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}
   self.printDescriptors();
   $.get("/api/Identification/identify", {param: query}, function(data){
     self.eligibleSpecies = {};
