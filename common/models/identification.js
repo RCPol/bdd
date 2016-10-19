@@ -89,7 +89,9 @@ module.exports = function(Identification) {
     console.log(param);
 
     composeQuery(param, function(query, queryMongo){
-      console.log(JSON.stringify(queryMongo));
+      queryMongo.base = param.base;
+      query.base = param.base;
+      // console.log("******** QUERY ********\n",JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
@@ -221,6 +223,7 @@ module.exports = function(Identification) {
             count: {$sum:1}
           }}
         ], function (error, states) {
+          // console.log("****** ELIGIBLE STATES ***** \n: ",states);
           if (err) throw new Error(err);
           var results = {eligibleStates: states, eligibleSpecies: items};
           callback(null, results);
@@ -262,15 +265,17 @@ module.exports = function(Identification) {
 };
 
 function getIdentificationItems(base, filter, Identification, Species, Schema, mongoDs, callback){
-  filter = filter?filter:{};
-  filter.base = base;
+  // filter = filter?filter:{};
+  // filter.base = base;
   Species.find({where: filter}, function(err, all_species){
     if (err) throw new Error(err);
 
     var list_of_items = [];
     async.eachSeries(all_species, function(species, callback1){
       var identification_item = {};
-      identification_item.id = species.id;      
+      identification_item.id = species.id; 
+      identification_item.base = species.base; 
+      // identification_item.base = base;      
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
         if (species.hasOwnProperty(key) && species[key] && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
@@ -280,7 +285,7 @@ function getIdentificationItems(base, filter, Identification, Species, Schema, m
 
           var entry = {
             language: species[key].language,
-            base: base,
+            base: species.base,
             id: species[key].id,
             order: species[key].order,
             schema: species[key].schema,
@@ -347,7 +352,7 @@ function composeQuery(param, callback){
     Object.keys(param_grouped_by_descriptor).forEach(function(descriptor){
       query.and.push({or: param_grouped_by_descriptor[descriptor]});
       queryMongo.$and.push({$or: param_grouped_by_descriptor[descriptor]});
-    });
+    });    
     // numerical descriptors:
     numerical_param.forEach(function(elem){
       query.and.push(
