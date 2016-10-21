@@ -176,6 +176,13 @@ div.info-planta {
 	width: 425px;
 }
 
+/* Características da Flor */
+div.info-flor {
+	display: block;
+	float: left;
+	width: 425px;
+}
+
 /* Div das Imagens Coluna direita */
 div.infos-img {
 	display: block;

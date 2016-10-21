@@ -176,6 +176,13 @@ div.info-planta {
 	width: 425px;
 }
 
+/* Características da Flor */
+div.info-flor {
+	display: none;
+	float: left;
+	width: 425px;
+}
+
 /* Div das Imagens Coluna direita */
 div.infos-img {
 	display: block;
@@ -186,21 +193,21 @@ div.infos-img {
 
 /* Fotos da Planta */
 div.img-planta {
-	display: block;
+	display: none;
 	float: left;
 	width: 425px;
 	margin: 0 0 0 50px;
 }
 
 div.img-planta-ae {
-	display: block;
+	display: none;
 	float: left;
 	width: 425px;
 	margin: 50px 0 0 50px;
 }
 
 div.img-planta-me {
-	display: block;
+	display: none;
 	float: left;
 	width: 425px;
 	margin: 50px 0 0 50px;
@@ -345,7 +352,7 @@ div.msize {
 
 /* Visitantes */
 div.visitantes {
-	display: block;
+	display: none;
 	margin: 50px 0 0 0;
 	padding: 4px;
 	text-align: center;
