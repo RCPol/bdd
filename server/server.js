@@ -50,18 +50,18 @@ app.use(loopback.static(path.resolve(__dirname, '../client')));
 
 // Aqui (para a chave) vai ter que ser diferente porque a quantidade de parâmetros é variável. Vai ter que usar os parametros do tipo ?parmA=X&paramB=Y
 app.get('/', function(req, res) {  
-  res.redirect("/melisso");
+  res.redirect("/eco");
 });
 app.get('', function(req, res) {  
-  res.redirect("/melisso");
+  res.redirect("/eco");
 });
-app.get('/melisso', function(req, res) {
+app.get('/eco', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');
   // var partials = {
   //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
   // };
   // var params = {query: req.query};
-  var params = {base: "melisso"};
+  var params = {base: "eco"};
   res.send(mustache.render(template, params));
 });
 app.get('/taxon', function(req, res) {
@@ -77,7 +77,7 @@ app.get('/taxon', function(req, res) {
 // Repetir para os outros profiles
 app.get('/profile/species/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
-  var params = {id: req.params.id,base: req.params.base?req.params.base:"melisso"};
+  var params = {id: req.params.id,base: req.params.base?req.params.base:"eco"};
 
   res.send(mustache.render(template, params));
 });
@@ -97,7 +97,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
     },
     function(callback) {
       var parsedId = params.id.split(":");
-      collection([parsedId[0],parsedId[1],parsedId[2]].join(":"),params,callback);
+      collection([parsedId[0],parsedId[1],parsedId[2]].join(":"),params,callback);      
     },
     function specimen(callback) {
       Specimen.findById(params.id,function(err,specimen) {
@@ -227,20 +227,20 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
     }
   ],function done() {
     var template = fs.readFileSync('./client/specimen.mustache', 'utf8');
-    params.base = req.params.base?req.params.base:"melisso";
+    params.base = req.params.base?req.params.base:"eco";
     res.send(mustache.render(template, params));
   });
 });
 
 app.get('/quality/check', function(req, res) {
   var template = fs.readFileSync('./client/quality.mustache', 'utf8');
-  var params = {base: "melisso"};
+  var params = {base: "eco"};
 
   res.send(mustache.render(template, params));
 });
 
 app.get('/profile/palinoteca/:base/:id', function(req, res) {
-  var params = {base: req.params.base?req.params.base:"melisso"};
+  var params = {base: req.params.base?req.params.base:"eco"};
   params.id =req.params.id;
   params.language = req.params.id.split(":")[0];
   params.value = {};
@@ -262,7 +262,6 @@ app.get('/profile/palinoteca/:base/:id', function(req, res) {
     res.send(mustache.render(template, params));
   });
 });
-
 function collection(id, params, callback) {
   params.value = params.value?params.value:{};
   var Collection = app.models.Collection;
@@ -288,7 +287,6 @@ function collection(id, params, callback) {
     callback();
   });
 }
-
 function siteLabel(params,callback) {
   params.label = params.label?params.label:{};
   var Schema = app.models.Schema;
@@ -358,12 +356,12 @@ app.get('/profile/glossary/individual/:base/:id', function(req, res) {
         schema.references = schema.references.map(function(item) {
           return {ref:item};
         });
-        schema.base = req.params.base?req.params.base:"melisso";
+        schema.base = req.params.base?req.params.base:"eco";
         res.send(mustache.render(template, schema));
       });
     } else {
       schema.references = false;
-      schema.base = req.params.base?req.params.base:"melisso";
+      schema.base = req.params.base?req.params.base:"eco";
       res.send(mustache.render(template, schema));   
     }            
   });
@@ -371,13 +369,13 @@ app.get('/profile/glossary/individual/:base/:id', function(req, res) {
 
 app.get('/profile/glossary/:base/:lang*?', function(req, res){
   var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
-  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"melisso"};
+  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"eco"};
   res.send(mustache.render(template, params));
 });
 
 app.get('/profile/glossary/:base', function(req, res){
   var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
-  var params = {base:req.params.base?req.params.base:"melisso"};
+  var params = {base:req.params.base?req.params.base:"eco"};
   res.send(mustache.render(template, params));
 });
 

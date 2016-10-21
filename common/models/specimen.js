@@ -553,7 +553,7 @@ module.exports = function(Specimen) {
       accepts: [
         {arg: 'url', type: 'string', required:true, description: 'link para tabela de espécimes'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR ou es-ES'},
-        {arg: 'base', type: 'string', required:true, description: 'melisso ou taxon'}
+        {arg: 'base', type: 'string', required:true, description: 'eco ou taxon'}
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
