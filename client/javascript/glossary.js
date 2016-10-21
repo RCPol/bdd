@@ -1,15 +1,15 @@
-function writeSchema(schema, referenceLabel){  
+function writeSchema(base, schema, referenceLabel){  
   lang = localStorage.language?localStorage.language:"pt-BR";
   var id= schema.id;
   if (id.split(":")[2] == "State" || id.split(":")[2] == "CategoricalDescriptor" || id.split(":")[2] == "NumericalDescriptor" || id.split(":")[2] == "Category"){
     var html = $('<div class="glossario-s" id="'+id.split(":").join("-")+'"><a target="_blank"><img id="image"></img></a> <h2></h2><h3></h3><p id="description"></p><div id="references" style="color:grey; font-size: 80%;"></div><div id="credits" style="color:grey; font-size: 80%;"></div></div>');    
     $("#content").append(html);    
     $("#" + id.split(":").join("-") +" > a > #image ").hide();
-    readGlossary(id);
+    readGlossary(base,id);
   }
 }
 
-function readGlossary(id){
+function readGlossary(base,id){
   $.getJSON("/api/Schemas/"+id, function(data){
     var name = "Não disponível";
     if(data["class"]=="CategoricalDescriptor" || data["class"]=="NumericalDescriptor"){
@@ -45,7 +45,7 @@ function readGlossary(id){
       data.references.forEach(function(ref) {        
         content.append('<p><span class="popsrefp">'+ref+'</span></p>');        
       });                  
-      var iconRef = $('<img src="/img/ref.png" title="teste" class="popsref">');          
+      var iconRef = $('<img src="/img/'+base+'_ref.png" title="teste" class="popsref">');          
       iconRef.tooltip({
         content: function() {
           return content;
@@ -62,7 +62,7 @@ function readGlossary(id){
       data.credits.forEach(function(credit) {        
         contentCred.append('<p><span class="popsrefp">'+credit+'</span></p>');        
       });                  
-      var iconCred = $('<img src="/img/copyr.png" title="teste" class="popsref">');          
+      var iconCred = $('<img src="/img/'+base+'_copyr.png" title="teste" class="popsref">');          
       iconCred.tooltip({
         content: function() {
           return contentCred;

@@ -178,15 +178,20 @@
 			<!-- Menu: início -->
 			<nav>
 				<ul>
-					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
-					<li> <!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 					<li>
-						Base: 
+					<!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a>
+					<!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a>
+					</li>
+					<li>
+						<div class="wrap-label-select-menu">
+						<span class="label-select-menu">Base: </span>
 						<select id="base_selector">
 						  <option value="melisso">Melissopalinologia</option>
 						  <option value="taxon">Palinotaxonomia</option>
 						</select>
-
+						</div>
+					</li>
+					<li>
 						<span class="t-lang">
 							<img onclick="identification.translate('pt-BR')"  src="/img/pt_BR.png">
 							<img onclick="identification.translate('en-US')"  src="/img/en_GB.png">
@@ -203,7 +208,7 @@
 
 			<!-- logotipo -->
 			<div class="logo">
-				<img src="/img/logo_{{base}}_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
+				<img src="/img/logo_{{base}}_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
 			</div>
 			<!-- logotipo -->
 

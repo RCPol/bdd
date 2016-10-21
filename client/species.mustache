@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
 	<!-- Arquivos Galeria - Fotorama -->
-	<link  href="/javascript/fotorama/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<link  href="/javascript/fotorama/{{base}}_fotorama.css" rel="stylesheet"> <!-- 3 KB -->
 	<script src="/javascript/fotorama/fotorama.js"></script> <!-- 16 KB -->
 
     <!-- Javascript Documento -->
@@ -152,7 +152,7 @@
 
 		<!-- logotipo -->
 		<div class="logo">
-			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
 		</div>
 		<!-- logotipo -->
 
@@ -179,7 +179,10 @@
 					<p><b><span id="dwc-Occurrence-establishmentMean-label"></span></b> <span id="dwc-Occurrence-establishmentMean-value"></span></p>
 					<p><b><span id="rcpol-Sample-floweringPeriod-label"></span></b> <span id="rcpol-Sample-floweringPeriod-value"></span></p>
 					<p><b><span id="rcpol-CategoricalDescriptor-pollinationSyndrome-label"/></b> <span id="rcpol-CategoricalDescriptor-pollinationSyndrome-value"/></p>
+	  </div>
 
+	  <!-- Início: Características da Flor -->
+	  <div class="info-flor">
 			<h2> <span id="rcpol-ProfilesLabel-profilesFlowerFeatures">Caracter&iacute;sticas da Flor</span>:</h2>
 				<p><b><span id="rcpol-CategoricalDescriptor-attractionUnit-label"/></b> <span id="rcpol-CategoricalDescriptor-attractionUnit-value"/></p>
 				<p><b><span id="rcpol-CategoricalDescriptor-flowerSexuality-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSexuality-value"/></p>
@@ -203,7 +206,7 @@
 				<p><b><span id="rcpol-CategoricalDescriptor-flowerSize-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSize-value"/></p>
 
 		</div>
-		<!-- Final: Características da Planta -->
+		<!-- Final: Características da Flor -->
 
 		<!-- Início: Descrição Polínica -->
 		<div class="info-polen">
@@ -283,7 +286,7 @@
 
 		<!-- Início: Fotos do Grão de Pólen -->
 		<div class="img-polen">
-			<p class="clique-full">Clique em <img src="/img/full.png"> para ver as imagens em tela cheia</p>
+			<p class="clique-full">Clique em <img src="/img/{{base}}_full.png"> para ver as imagens em tela cheia</p>
 
 			<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPollen">Imagens do Gr&atilde;o de P&oacute;len</span>:</h2>
 

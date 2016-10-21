@@ -21,7 +21,7 @@
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
 	<!-- Arquivos Galeria - Fotorama -->
-	<link  href="/javascript/fotorama/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<link  href="/javascript/fotorama/{{base}}_fotorama.css" rel="stylesheet"> <!-- 3 KB -->
 	<script src="/javascript/fotorama/fotorama.js"></script> <!-- 16 KB -->
 
 	<!-- Javascript Documento -->
@@ -91,7 +91,7 @@
 			<!-- Menu: fim -->
 			<!-- logotipo -->
 			<div class="logo">
-				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
+				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
 			</div>
 			<!-- logotipo -->
 		</header>
@@ -179,7 +179,10 @@
 						</b>
 						<span id="rcpol-CategoricalDescriptor-pollinationSyndrome-value"/>{{rcpol:CategoricalDescriptor:pollinationSyndrome:value}}
 					</p>
-
+				</div>
+				<!-- Final: Informações da Planta -->
+				<!-- Início: Características da Flor -->
+				<div class="info-flor">
 					<h2>
 						<span id="rcpol-ProfilesLabel-profilesFlowerFeatures">{{rcpol:ProfilesLabel:profilesFlowerFeatures}}</span>:
 					</h2>					
@@ -222,7 +225,7 @@
 						{{rcpol:CategoricalDescriptor:flowerSize:value}}
 					</p>
 				</div>
-				<!-- Final: Características da Planta -->
+				<!-- Final: Características da Flor -->
 				<!-- Início: Descrição Polínica -->
 				<div class="info-polen">
 					<h2><span id="rcpol-ProfilesLabel-profilesPollenDescription">{{rcpol:ProfilesLabel:profilesPollenDescription}}</span>:
@@ -379,7 +382,7 @@
 				</div>	
 				<!-- Início: Fotos do Grão de Pólen -->
 				<div class="img-polen">
-					<p class="clique-full">Clique em <img src="/img/full.png"> para ver as imagens em tela cheia</p>
+					<p class="clique-full">Clique em <img src="/img/{{base}}_full.png"> para ver as imagens em tela cheia</p>
 					
 					<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPollen">{{rcpol:ProfilesLabel:profilesImagesOfPollen}}</span>:</h2>
 					<div id="foto_polen" class="fotorama" data-allowfullscreen="native" data-width="425" data-maxheight="425">
