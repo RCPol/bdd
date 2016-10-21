@@ -1,6 +1,6 @@
  function Internacionalization() {
   this.language = "pt-BR";  
-  this.base = 'melisso';
+  this.base = 'eco';
   if(localStorage){
     this.language = typeof localStorage.language!="undefined"?localStorage.language:this.language;
   } else alert("O seu navegador de Internet pode não suportar alguns dos recursos utilizados por este sistema.\n Para uma melhor experiência, por favor, atualize o seu navegador ou utilize outro de sua preferência.");  
