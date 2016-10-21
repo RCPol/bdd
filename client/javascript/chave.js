@@ -150,7 +150,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field] = self.descriptors[state.category][state.field]?self.descriptors[state.category][state.field]:{};
         self.descriptors[state.category][state.field].htmlId = "descriptor_"+(state.category+state.field).htmlId();
         self.descriptors[state.category][state.field].value = state.field;
-        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.base+"/"+self.descriptors[state.category][state.field].value+"'><img alt='"+self.descriptors[state.category][state.field].value+"|"+self.descriptors[state.category].value+"' src='img/glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'></div></li>");
+        self.descriptors[state.category][state.field].html = $("<li><section class='toggle'><span>+</span>" + self.descriptors[state.category][state.field].value + "<a target='_blank' href='/profile/glossary/"+self.base+"/"+self.descriptors[state.category][state.field].value+"'><img alt='"+self.descriptors[state.category][state.field].value+"|"+self.descriptors[state.category].value+"' src='img/"+self.base+"_glo.png' class='lala'></a></section><div id='"+self.descriptors[state.category][state.field].htmlId+"'class='valoresi inner show' style='display: block;'></div></li>");
         // self.descriptors[state.category][state.field].html.find("li").append("<div class='valoresn inner'><input name='" + self.descriptors[state.category][state.field].htmlId +"' type='text' class='numnum' size='5' maxlength='12' placeholder='00.00'> un </div>");
       }
       // STATE
@@ -159,7 +159,7 @@ Identification.prototype.createDescriptors = function(callback) {
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
         self.descriptors[state.category][state.field][state.state].value = state.state;
         self.descriptors[state.category][state.field][state.state].id = state.id;
-        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\').identify();" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/'+self.base+'/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img alt="'+self.descriptors[state.category][state.field][state.state].id+'" src="/img/glo.png" class="lala vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
+        self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\').identify();" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/'+self.base+'/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img alt="'+self.descriptors[state.category][state.field][state.state].id+'" src="/img/'+self.base+'_glo.png" class="lala vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
       }
     });
     callback();
@@ -212,7 +212,7 @@ Identification.prototype.printDescriptors = function() {
             // IS SELECTED STATE?
             if(self.selectedStates[self.descriptors[idCategory][idDescriptor][idState].id]){
               self.descriptors[idCategory][idDescriptor][idState].html.detach().appendTo($("#descritoresSelecionados"));
-              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='#' onclick='identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='img/x.png'/></a>")
+              $("#count_"+self.descriptors[idCategory][idDescriptor][idState].htmlId).html("<br><a href='#' onclick='identification.unselectState(\""+self.descriptors[idCategory][idDescriptor][idState].id+"\")'><img style='width:20px;margin-top:5px' src='img/"+self.base+"_x.png'/></a>")
             }
           }
         }

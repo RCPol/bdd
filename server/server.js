@@ -358,6 +358,7 @@ app.get('/profile/glossary/individual/:base/:id', function(req, res) {
         schema.references = schema.references.map(function(item) {
           return {ref:item};
         });
+        schema.base = req.params.base?req.params.base:"melisso";
         res.send(mustache.render(template, schema));
       });
     } else {
