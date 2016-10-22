@@ -19,10 +19,15 @@ Internacionalization.prototype.updateLogo = function(){
 }
 Internacionalization.prototype.siteTranslator = function(){
   var self = this;
+  $('#base_selector').html('');
   $.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+self.language+"%22%7D%7D", function(data){
     console.log("LOG: ",data);
-    data.forEach(function(label) {      
-      if(label.term=="siteSearch"){
+    data.forEach(function(label) {
+      if(label.term=="baseTaxon"){
+        $('#base_selector').append('<option value="taxon">'+label.field+'</option>');            
+      } else if(label.term=="baseEco"){
+        $('#base_selector').append('<option value="eco">'+label.field+'</option>');            
+      } else if(label.term=="siteSearch"){
         $(".formbusca > :text").attr("placeholder",label.field);
       } else if(label.term=="citation"){
         var field = label.field;
