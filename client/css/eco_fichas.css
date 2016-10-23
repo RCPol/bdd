@@ -1,0 +1,401 @@
+/* CSS reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+/* Fundo, links e caixa central */
+body {
+	background: url(21.jpg) no-repeat center top;
+	background-color: #FFAD60;
+	font-family: 'Roboto', sans-serif;
+	font-size: 14px;
+	line-height: 21px;
+}
+
+a:link, a:visited {
+	text-decoration: none;
+	color: #510A5E;
+}
+a:hover, a:active {
+	background-color: #F8C88A;
+	color: #111111;
+}
+
+div.contem {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+/* Header */
+
+header {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	overflow: auto;
+}
+
+/* Menu */
+nav {
+	margin: 0;
+}
+
+nav ul {
+	list-style-type: none;
+	margin: 12px 0 0 0;
+	padding: 0;
+	float: right;
+}
+
+nav ul li {
+	float: right;
+	clear: both;
+	padding: 0 0 12px 0;
+	margin: 0;
+}
+
+nav ul li a {
+	display: block;
+	background-color: #FFAD60;
+	color: #470054;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 16px;
+}
+
+nav ul li a:hover {
+	background-color: #F27224;
+	color:#111111
+}
+
+/* Bandeiras de troca de língua */
+span.t-lang {
+	display: block;
+	background-color: rgba(255, 240, 196, 0.6);
+	padding: 15px 8px;
+	height: 25px;
+	margin: 0 0 -12px 0;
+}
+
+span.t-lang img {
+	height: 25px;
+	width: 38px;
+	margin: 0 7px;
+}
+
+/* Logotipo */
+div.logo {
+	display: block;
+	float: left;
+	margin: 25px 0 25px 50px;
+}
+
+/* Fundo translucido artigo*/
+article {
+	overflow: auto;
+	background-color: white;
+	padding: 40px 50px;
+}
+
+/* Título */
+article h1 {
+	font-size: 35px;
+	font-weight: normal;
+	line-height: 35px;
+	margin: 0 0 0 0;
+	color: #F27224;
+}
+
+/* Título Espécime */
+article h1.spm {
+	line-height: 35px;
+	font-size: 28px;
+	margin: 0 0 25px 0;
+}
+
+/* Título Palinoteca */
+article h1.pal {
+	line-height: 35px;
+	font-size: 28px;
+	margin: 0 0 25px 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+article h2 {
+	font-size: 21px;
+	font-weight: normal;
+	color: #F27224;
+	margin: 25px 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+#rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection {
+	color: #F27224;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+}
+
+#rcpol-ProfilesLabel-profilesSeeSpeciesProfile {
+	color: #F27224;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+}
+
+/* Familia Espécie */
+h2.famesp {
+	margin: 0 0 12px 0;
+	color: #470054;
+}
+
+/* Nome popular */
+h2.popname {
+	margin: 0 0 25px 0;
+	font-size: 16px;
+}
+
+/* Div dos Textos Coluna esquerda */
+div.infos-txt {
+	display: block;
+	float: left;
+	width: 425px;
+	overflow: auto;
+}
+
+/* Características da Planta */
+div.info-planta {
+	display: block;
+	float: left;
+	width: 425px;
+}
+
+/* Características da Flor */
+div.info-flor {
+	display: block;
+	float: left;
+	width: 425px;
+}
+
+/* Div das Imagens Coluna direita */
+div.infos-img {
+	display: block;
+	float: left;
+	width: 475px;
+	overflow: auto;
+}
+
+/* Fotos da Planta */
+div.img-planta {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 0 0 0 50px;
+}
+
+div.img-planta-ae {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 50px 0 0 50px;
+}
+
+div.img-planta-me {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 50px 0 0 50px;
+}
+
+div.img-planta h2 {
+	display: none;
+}
+
+div.img-planta-ae h2 {
+	display: none;
+}
+
+div.img-planta-me h2 {
+	display: none;
+}
+
+/* Descrição Polínica */
+div.info-polen {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 0 0 50px 0;
+}
+
+/* Fotos do Polen */
+div.img-polen {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 50px 0 0 50px;
+}
+
+div.img-polen h2 {
+	display: none;
+}
+
+p.clique-full {
+	color: #F27224;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+	margin: -15px 0 50px 0;
+	text-align: center;
+}
+
+span.tipoDeAberturaDoPolen {
+    display:inline-block;
+}
+
+p span.tipoDeAberturaDoPolen:first-letter {
+	text-transform: uppercase;
+}
+
+.tipoDeAberturaDoPolen-minusculo {
+    text-transform: lowercase;
+}
+
+/* Mapa */
+div.mapa {
+	clear: both;
+	margin: 0 0 50px 0;
+}
+
+/* Informações Palinoteca*/
+div.cspm {
+	overflow: auto;
+}
+
+div.info-spal {
+	display: block;
+	float: left;
+	width: 650px;
+}
+
+div.info-pal {
+	display: block;
+	float: left;
+	width: 650px;
+	margin: 0;
+}
+
+div.img-spal {
+	display: block;
+	float: left;
+	width: 200px;
+	margin: 0 0 0 50px;
+}
+
+/* Informações da Coleta */
+div.info-col {
+	display: block;
+	float: left;
+	width: 425px;
+}
+
+div.mspm {
+	display: block;
+	float: left;
+	width: 425px;
+	margin: 0 0 0 50px;
+}
+
+/* Referências */
+div.rre {
+	display: block;
+	margin: 0 0 -12px 0;
+	clear: both;
+}
+
+div.rre p {
+	margin: 0 0 7px 0;
+}
+
+/* Rodapé */
+footer {
+	display: block;
+	background-color: #F27224;
+	padding: 25px 50px;
+	text-align: center;
+	margin: 0 0 50px 0;
+	color: white;
+	font-size: 12px;
+}
+
+/* Tamanho Mapa Espécie */
+div.esize {
+	height: 450px;
+	width: 900px;
+}
+
+/* Tamanho Mapa Espécime */
+div.msize {
+	height: 425px;
+	width: 425px;
+}
+
+/* Tamanho Tabela Amostras */
+#grid {
+	height: 450px;
+	width: 900px;
+}
+
+/* Visitantes */
+div.visitantes {
+	display: block;
+	margin: 50px 0 0 0;
+	padding: 4px;
+	text-align: center;
+	background-color: #FFAD60;
+}
+
+div.visitantes h2 {
+	color: #470054;
+}
+
+div.visitantes:hover {
+	background-color: #F27224;
+}
+
+/* Imagem Gráfico */
+img.graf_int {
+	float: right;
+	margin: 0 0 0 50px;
+}
+
+div.graf img {
+	margin: 0 4px 0 0;
+}
+
+/* Visitantes da Espécie */
+div.visitante {
+	display: inline-block;
+	vertical-align: top;
+	width: 200px;
+	margin: 0 0 22px 22px;
+}
+
+img.visit-img {
+	width: 200px;
+	height: 200px;
+	min-width: 200px;
+	min-height: 200px;
+	max-height: 200px;
+	max-height: 200px;
+}
+
+div.visitante p {
+	font-size: 14px;
+	line-height: 16px;
+	text-align: center;
+}

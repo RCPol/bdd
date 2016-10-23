@@ -81,6 +81,7 @@ module.exports = function(Identification) {
     //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":{"min":30, "max":40}}]}
 
     param.language = typeof param.language != "undefined"?param.language:"pt-BR";
+    param.base = param.base;
     param.states = typeof param.states != "undefined"?param.states:[];
     param.numerical = typeof param.numerical != "undefined"?param.numerical:[];
 
@@ -88,7 +89,9 @@ module.exports = function(Identification) {
     console.log(param);
 
     composeQuery(param, function(query, queryMongo){
-      console.log(JSON.stringify(queryMongo));
+      queryMongo.base = param.base;
+      query.base = param.base;
+      // console.log("******** QUERY ********\n",JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
@@ -220,6 +223,7 @@ module.exports = function(Identification) {
             count: {$sum:1}
           }}
         ], function (error, states) {
+          // console.log("****** ELIGIBLE STATES ***** \n: ",states);
           if (err) throw new Error(err);
           var results = {eligibleStates: states, eligibleSpecies: items};
           callback(null, results);
@@ -245,7 +249,7 @@ module.exports = function(Identification) {
     'populate',
     {
       http: {verb: 'get'},
-      accepts: {arg: 'filter', type: 'object'},
+      accepts: [{arg: 'filter', type: 'object'}],
       returns: {arg: 'response', type: 'number'}
     }
   );
@@ -261,13 +265,17 @@ module.exports = function(Identification) {
 };
 
 function getIdentificationItems(filter, Identification, Species, Schema, mongoDs, callback){
+  // filter = filter?filter:{};
+  // filter.base = base;
   Species.find({where: filter}, function(err, all_species){
     if (err) throw new Error(err);
 
     var list_of_items = [];
     async.eachSeries(all_species, function(species, callback1){
       var identification_item = {};
-      identification_item.id = species.id;
+      identification_item.id = species.id; 
+      identification_item.base = species.base; 
+      // identification_item.base = base;      
       identification_item["states"] = [];
       async.forEachOfSeries(species, function(item, key, callback2){
         if (species.hasOwnProperty(key) && species[key] && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
@@ -277,6 +285,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 
           var entry = {
             language: species[key].language,
+            base: species.base,
             id: species[key].id,
             order: species[key].order,
             schema: species[key].schema,
@@ -331,10 +340,11 @@ function composeQuery(param, callback){
   var categorical_param = param.states;
   var numerical_param = param.numerical;
   var lang = param.language;;
+  var base = param.base;;
 
   var param_grouped_by_descriptor = _.groupBy(categorical_param, function(elem){ return elem["states.states.id"]; });
 
-  if (categorical_param.length == 0 && numerical_param.length == 0) callback({"states.language": lang}, {"states.language": lang});
+  if (categorical_param.length == 0 && numerical_param.length == 0) callback({"states.language": lang,"states.base": base}, {"states.language": lang,"states.base": base});
 
   else {
     var query = {and: []};
@@ -342,7 +352,7 @@ function composeQuery(param, callback){
     Object.keys(param_grouped_by_descriptor).forEach(function(descriptor){
       query.and.push({or: param_grouped_by_descriptor[descriptor]});
       queryMongo.$and.push({$or: param_grouped_by_descriptor[descriptor]});
-    });
+    });    
     // numerical descriptors:
     numerical_param.forEach(function(elem){
       query.and.push(

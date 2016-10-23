@@ -35,25 +35,25 @@ module.exports = function(Species) {
       returns: {arg: 'response', type: 'string'}
     }
   );
-  Species.fromSpecimensAggregation = function(filter,cb) {
+  Species.fromSpecimensAggregation = function(base,filter,cb) {
     async.parallel([
       function en(callback) {
-        selectScientificNames("en-US",filter,function (scientificNames) {
-          generateSpecies("en-US",scientificNames,function(species) {
+        selectScientificNames(base,"en-US",filter,function (scientificNames) {
+          generateSpecies(base,"en-US",scientificNames,function(species) {
             callback();
           });
         });
       },
       function pt(callback) {
-        selectScientificNames("pt-BR",filter,function (scientificNames) {
-          generateSpecies("pt-BR",scientificNames,function(species) {
+        selectScientificNames(base,"pt-BR",filter,function (scientificNames) {
+          generateSpecies(base,"pt-BR",scientificNames,function(species) {
             callback();
           });
         });
       },
       function es(callback) {
-        selectScientificNames("es-ES",filter,function (scientificNames) {
-          generateSpecies("es-ES",scientificNames,function(species) {
+        selectScientificNames(base,"es-ES",filter,function (scientificNames) {
+          generateSpecies(base,"es-ES",scientificNames,function(species) {
             callback();
           });
         });
@@ -67,23 +67,26 @@ module.exports = function(Species) {
     {
       http: {path: '/fromSpecimensAggregation', verb: 'get'},
       accepts: [
+        {arg: 'base', type: 'string', required:true},
         {arg: 'filter', type: 'array', required:false}
       ],
       returns: {arg: 'response', type: 'object'}
     }
   );
-  function generateSpecies(language,sciName,cb) {
+  function generateSpecies(base, language,sciName,cb) {
     var Specimen = Species.app.models.Specimen;
     var count = 0;
     async.each(sciName, function iterator(name, callback){
       var query = {where:{}};
       query.where[language+":dwc:Taxon:scientificName.value"] = name;
+      query.where.base = base;
       Specimen.find(query, function (err,specimens) {
 
         var species = {};
         species.specimens = [];
-        species["language"] = language;
+        species["language"] = language;        
         species[language+":dwc:Taxon:family"] = specimens[0][language+":dwc:Taxon:family"];
+        species.base = base;
         species[language+":dwc:Taxon:scientificName"] = specimens[0][language+":dwc:Taxon:scientificName"];
         species[language+":dwc:Taxon:scientificNameAuthorship"] = specimens[0][language+":dwc:Taxon:scientificNameAuthorship"];
         // TODO multiple specimens with different popular names
@@ -132,7 +135,7 @@ module.exports = function(Species) {
             }
           });
         });
-        species.id = Species.app.defineSpeciesID(language,name);
+        species.id = Species.app.defineSpeciesID(language,base,name);
         Species.upsert(species,function (err,instance) {
           if(err)
             console.log(err);
@@ -144,10 +147,10 @@ module.exports = function(Species) {
       cb(count);
     });
   }
-  function selectScientificNames(language,filter,cb) {
+  function selectScientificNames(base, language,filter,cb) {
     var Specimen = Species.app.models.Specimen;
     var sp = Specimen.getDataSource().connector.collection(Specimen.modelName);
-    sp.aggregate({'$match':{'language': language}},{
+    sp.aggregate({'$match':{'language': language,base:base}},{
       $group: {
         _id: { value: '$'+language+':dwc:Taxon:scientificName.value'}
       }

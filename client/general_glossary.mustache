@@ -7,7 +7,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/glossario.css">
+	<link rel="stylesheet" href="/css/{{base}}_glossario.css">
 
 	<!-- jQuery -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -20,14 +20,16 @@
 
 	<script type="text/javascript">
       var lang = "{{lang}}"
+      var base = '{{base}}';
 	  var language = (lang == "")?"pt-BR":lang;	  
 	  function setLanguage(language){
 		localStorage.language = language;
-		window.location = "/profile/glossary/"+localStorage.language;
+		window.location = "/profile/glossary/{{base}}/"+localStorage.language;
 	  }
 	  
 	  window.onload = function(){
 		var internacionalization = new Internacionalization();
+		internacionalization.base = '{{base}}';
 	  	internacionalization.updateLogo();	  	
 
 		if(localStorage && localStorage.language)
@@ -75,7 +77,7 @@
 	  	$.getJSON("/api/Schemas?filter[fields][id]=true&filter[order]=order%20asc&filter[where][language]="+language, function(schemas){
 	  		$('#content').html('');
           schemas.forEach(function(schema){
-            writeSchema(schema,referenceLabel);
+            writeSchema(base,schema,referenceLabel);
           });
         });
 	  }
@@ -93,7 +95,7 @@
 		<nav>
 			<ul>
 				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
-				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
 				<li>
 					<span class="t-lang">
 							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
@@ -107,7 +109,7 @@
 
 		<!-- logotipo -->
 		<div class="logo">
-			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
 		</div>
 		<!-- logotipo -->
 

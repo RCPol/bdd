@@ -7,7 +7,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
 
 	<!-- Css Documento -->
-	<link rel="stylesheet" href="/css/fichas.css">
+	<link rel="stylesheet" href="/css/{{base}}_fichas.css">
 
 	<!-- Arquivos Leaflet Map -->
 	<link rel="stylesheet" href="/javascript/leaflet/leaflet.css" />
@@ -21,7 +21,7 @@
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 
 	<!-- Arquivos Galeria - Fotorama -->
-	<link  href="/javascript/fotorama/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<link  href="/javascript/fotorama/{{base}}_fotorama.css" rel="stylesheet"> <!-- 3 KB -->
 	<script src="/javascript/fotorama/fotorama.js"></script> <!-- 16 KB -->
 
 	<!-- Javascript Documento -->
@@ -33,10 +33,12 @@
 		var language = "pt-BR";
 		function setLanguage(language){
 			localStorage.language = language;
-			window.location = "/profile/specimen/"+language+id.substring(5,id.length);
+			window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
 		}
 		$(document).ready(function(){
+			loadHerbariumInfo();
 			var internacionalization = new Internacionalization();
+			internacionalization.base = '{{base}}';
 	  		internacionalization.updateLogo().siteTranslator();	  		
 
 			$("#rcpol-ProfilesLabel-profilesDepositedInCollection").html($("#rcpol-ProfilesLabel-profilesDepositedInCollection").html().toLowerCase());
@@ -47,7 +49,7 @@
 			if (typeof(Storage) !== "undefined") {
 				localStorage.language = localStorage.language?localStorage.language:"pt-BR";
 				if(id.split(":")[0]!=localStorage.language)
-					window.location = "/profile/specimen/"+language+id.substring(5,id.length);
+					window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
 			} else {
 				alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
 			}
@@ -55,7 +57,7 @@
 			var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
 			map.on("layeradd",function (e) {
 				if(marker == null){
-					var p = [{{dwc:Location:decimalLatitude:value}}, {{dwc:Location:decimalLongitude:value}}];
+					var p = [{{dwc:Location:decimalLatitude:value}}?{{dwc:Location:decimalLatitude:value}}:0, {{dwc:Location:decimalLongitude:value}}?{{dwc:Location:decimalLongitude:value}}:0];
 					marker = "Not null";
 					L.marker(p,{opacity:0.9}).addTo(map);
 					map.setView(p, 17);
@@ -64,6 +66,16 @@
 			mapLink = '';
 			L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: mapLink, maxZoom: 17}).addTo(map);
 		});
+		function loadHerbariumInfo() {					
+			$.getJSON("/api/Collections?filter=%7B%22where%22%3A%7B%22"+language+"%3Adwc%3ARecordLevel%3AinstitutionCode.value%22%3A%22{{dwc:RecordLevel:institutionCode:value}}%22%2C%22"+language+"%3Adwc%3ARecordLevel%3AcollectionCode.value%22%3A%22{{rcpol:Sample:collectionCodeHerbarium:value}}%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){				
+    			if(data[0]){    				
+    				$("#rcpol-ProfilesLabel-profilesHerbarium-value").html(data[0][language+":rcpol:Collection:collectionName"].value+" ({{rcpol:Sample:collectionCodeHerbarium:value}}) - {{dwc:RecordLevel:institutionCode:value}}");
+    			}else {
+    				$("#rcpol-ProfilesLabel-profilesHerbarium-value").html("{{rcpol:Sample:collectionCodeHerbarium:value}} - {{dwc:RecordLevel:institutionCode:value}}");
+    				
+    			}    			
+    		});			
+		}
 		{{/value}}
 	</script>
 	<title>RCPol</title>
@@ -76,8 +88,8 @@
 			<nav>
 				<ul>
 					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br">{{rcpol:SiteLabel:siteHome}}</a></li>
-					<li><a href="/">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
-					<li><a href="/profile/glossary">{{rcpol:SiteLabel:siteGlossary}}</a></li>
+					<li><a href="/{{base}}">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
+					<li><a href="/profile/glossary/{{base}}">{{rcpol:SiteLabel:siteGlossary}}</a></li>
 					<li>						
 						<span class="t-lang">
 							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
@@ -90,7 +102,7 @@
 			<!-- Menu: fim -->
 			<!-- logotipo -->
 			<div class="logo">
-				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="636px" height="194px">
+				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
 			</div>
 			<!-- logotipo -->
 		</header>
@@ -115,9 +127,9 @@
 					<p><b>{{rcpol:Collection:homepage:label}}:</b> <a id="homepage_link" href="{{rcpol:Collection:homepage:value}}" target="_blank"><span id="homepage">{{rcpol:Collection:homepage:value}}:</span></a></p>
 					<p>&nbsp;</p>
 					<!-- Link para página da Palinoteca -->
-					<p><a target="_blank" href="/profile/palinoteca/{{language}}:{{dwc:RecordLevel:institutionCode:value}}:{{dwc:RecordLevel:collectionCode:value}}" id="rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection">{{rcpol:ProfilesLabel:profilesSeeSpecimensOfThisCollection}}</a></p>
+					<p><a target="_blank" href="/profile/palinoteca/{{base}}/{{language}}:{{dwc:RecordLevel:institutionCode:value}}:{{dwc:RecordLevel:collectionCode:value}}" id="rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection">{{rcpol:ProfilesLabel:profilesSeeSpecimensOfThisCollection}}</a></p>
 					<!-- Link para página da Espécie -->
-					<p><a target="_blank" href="/profile/species/{{language}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
+					<p><a target="_blank" href="/profile/species/{{base}}/{{language}}:{{base}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
 				</div>
 				<!-- Final: Informações Palinoteca -->
 				<!-- Início: Logotipo da Palinoteca -->
@@ -134,9 +146,12 @@
 					<h2><span id="rcpol-ProfilesLabel-profilesCollectionInformation">{{rcpol:ProfilesLabel:profilesCollectionInformation}}</span>:</h2>
 					<p><b id="dwc-Occurrence-recordedBy-label"></b> <span id="dwc-Occurrence-recordedBy-value"></span></p>
 					<!-- <p><b>N&uacute;mero do Coletor:</b> 0671</p>  -->
-					<!-- TODO: *** HERBARIUM *** -->
-					<!-- <p><b>Herb&aacute;rio:</b> <span id="herbario"></span></p> -->
+					<!-- TODO: *** HERBARIUM *** -->															
+
 					<p><b id="dwc-RecordLevel-catalogNumber-label">{{dwc:RecordLevel:catalogNumber:label}}</b> <span id="dwc-RecordLevel-catalogNumber-value">{{dwc:RecordLevel:catalogNumber:value}}</span></p>
+					
+					<p><b id="rcpol-ProfilesLabel-profilesHerbarium">{{rcpol:ProfilesLabel:profilesHerbarium}}:</b> <span id="rcpol-ProfilesLabel-profilesHerbarium-value"></span></p>
+
 					<p><b id="rcpol-Sample-catalogNumberHerbarium-label">{{rcpol:Sample:catalogNumberHerbarium:label}}</b> <span id="rcpol-Sample-catalogNumberHerbarium-value">{{rcpol:Sample:catalogNumberHerbarium:value}}</span></p>
 					<p><b id="dwc-Event-eventDate-label">{{dwc:Event:eventDate:label}}</b> <span id="dwc-Event-eventDate-value">{{dwc:Event:eventDate:value}}</span></p>
 					<p><b id="dwc-Location-country-label">{{dwc:Location:country:label}}</b> <span id="dwc-Location-country-value">{{dwc:Location:country:value}}</span></p>
@@ -178,7 +193,10 @@
 						</b>
 						<span id="rcpol-CategoricalDescriptor-pollinationSyndrome-value"/>{{rcpol:CategoricalDescriptor:pollinationSyndrome:value}}
 					</p>
-
+				</div>
+				<!-- Final: Informações da Planta -->
+				<!-- Início: Características da Flor -->
+				<div class="info-flor">
 					<h2>
 						<span id="rcpol-ProfilesLabel-profilesFlowerFeatures">{{rcpol:ProfilesLabel:profilesFlowerFeatures}}</span>:
 					</h2>					
@@ -221,7 +239,7 @@
 						{{rcpol:CategoricalDescriptor:flowerSize:value}}
 					</p>
 				</div>
-				<!-- Final: Características da Planta -->
+				<!-- Final: Características da Flor -->
 				<!-- Início: Descrição Polínica -->
 				<div class="info-polen">
 					<h2><span id="rcpol-ProfilesLabel-profilesPollenDescription">{{rcpol:ProfilesLabel:profilesPollenDescription}}</span>:
@@ -378,7 +396,7 @@
 				</div>	
 				<!-- Início: Fotos do Grão de Pólen -->
 				<div class="img-polen">
-					<p class="clique-full">Clique em <img src="/img/full.png"> para ver as imagens em tela cheia</p>
+					<p class="clique-full">Clique em <img src="/img/{{base}}_full.png"> para ver as imagens em tela cheia</p>
 					
 					<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPollen">{{rcpol:ProfilesLabel:profilesImagesOfPollen}}</span>:</h2>
 					<div id="foto_polen" class="fotorama" data-allowfullscreen="native" data-width="425" data-maxheight="425">

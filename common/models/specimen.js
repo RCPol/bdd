@@ -18,7 +18,7 @@ module.exports = function(Specimen) {
   }
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
-  Specimen.inputFromURL = function(url,language, cb) {
+  Specimen.inputFromURL = function(url,language, base, cb) {
     //substitui a url da imagem
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url); //define o nome da url
@@ -44,7 +44,7 @@ module.exports = function(Specimen) {
           function(callbackSave) {
             // console.log("start en-US",line);
             //para salvar em  inglês
-            saveRecord(language,"en-US",line, schema, class_, terms, function() {
+            saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
               // console.log("finish en-US");
               callbackSave();
             });
@@ -52,7 +52,7 @@ module.exports = function(Specimen) {
           function(callbackSave) {
             // console.log("start pt-BR", line);
             //para salvar em português
-            saveRecord(language,"pt-BR",line, schema, class_, terms, function() {
+            saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
               // console.log("finish pt-BR");
               callbackSave();
             });
@@ -60,7 +60,7 @@ module.exports = function(Specimen) {
           function(callbackSave) {
             // console.log("start es-ES",line);
             //para salvar em espanhol
-            saveRecord(language,"es-ES",line, schema, class_, terms, function() {
+            saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
               // console.log("finish es-ES");
               callbackSave();
             });
@@ -85,7 +85,7 @@ module.exports = function(Specimen) {
     });    
     request(url).pipe(w);
   };
-  function saveRecord(originalLanguage,language,line, schema, class_, terms, callback) {
+  function saveRecord(base, originalLanguage,language,line, schema, class_, terms, callback) {
     var Schema = Specimen.app.models.Schema; //usando o schema
     var c = 0;
     var record = {}; //dados as serem gravados no banco
@@ -100,6 +100,7 @@ module.exports = function(Specimen) {
           record.language = language; //recebe a linguagem
           record.originalLanguage = originalLanguage;  //linguagem original
           record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
+          record.base = base;
           if(schemaId){ //se existe id definido no esquema
             Schema.findById(schemaId,function(err,schema) { //busca o id que está no schema
               if(err) //se existe erro na busca
@@ -551,7 +552,8 @@ module.exports = function(Specimen) {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
         {arg: 'url', type: 'string', required:true, description: 'link para tabela de espécimes'},
-        {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'}
+        {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR ou es-ES'},
+        {arg: 'base', type: 'string', required:true, description: 'eco ou taxon'}
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
