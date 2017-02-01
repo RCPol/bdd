@@ -500,7 +500,7 @@ module.exports = function(Schema) {
         self.emit("resizedFileWrote");
       }
     });
-    return this;
+    return this; 
   }
   Image.prototype.convertThumbnail = function() {
     var self = this;
