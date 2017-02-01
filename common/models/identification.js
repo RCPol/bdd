@@ -339,8 +339,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 function composeQuery(param, callback){
   var categorical_param = param.states;
   var numerical_param = param.numerical;
-  var lang = param.language;;
-  var base = param.base;;
+  var lang = param.language;
+  var base = param.base;
 
   var param_grouped_by_descriptor = _.groupBy(categorical_param, function(elem){ return elem["states.states.id"]; });
 

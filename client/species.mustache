@@ -28,9 +28,11 @@
 	<script type="text/javascript">
 		var id = "{{id}}";
 		var language = "pt-BR";
+		var base = "{{base}}"
 		function setLanguage(language){
+			alert(id + " - "+base);
 			localStorage.language = language;
-			window.location = "/profile/species/{{base}}/"+localStorage.language+":"+id.split(":")[1];
+			window.location = "/profile/species/"+base+"/"+id.split(":")[0]+":"+localStorage.language+":"+id.split(":")[2];
 		}
 	  $(document).ready(function(){
 	  		var internacionalization = new Internacionalization();
@@ -62,8 +64,8 @@
 			});
 			if (typeof(Storage) !== "undefined") {
 					localStorage.language = localStorage.language?localStorage.language:"pt-BR";
-					if(id.split(":")[0]!=localStorage.language)
-						window.location = "/profile/species/{{base}}/"+localStorage.language+":"+id.split(":")[1];
+					if(id.split(":")[1]!=localStorage.language)
+						window.location = "/profile/species/{{base}}/"+id.split(":")[0]+":"+localStorage.language+":"+id.split(":")[2];
 			} else {
 					alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
 			}
@@ -118,7 +120,7 @@
 			              window.open("/profile/specimen/{{base}}/" + w2ui['grid'].get(event.recid).specimen_id);
 			            });
 						//Final do Código da Tabela-Grid
-			        readSpecies(id, map);
+			        readSpecies(id, base, map);
 					});     
 			});		  		   
 		    

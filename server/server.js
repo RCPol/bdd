@@ -9,12 +9,12 @@ require('compression');
 var app = module.exports = loopback();
 
 app.start = function() {
-  app.defineSchemaID = function(language, schema, class_, term) {
+  app.defineSchemaID = function(base,language, schema, class_, term) {    
     schema = (typeof schema == 'undefined')?'':String(schema).trim();
     class_ = (typeof class_ == 'undefined')?'':String(class_).trim();
     term = (typeof term == 'undefined')?'':String(term).trim();
-    if(language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0)
-      return language.trim().concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
+    if(base && base.trim().length>0 && language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0)
+      return base.trim().concat(":").concat(language.trim()).concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
     else
       return null;
   }
@@ -30,7 +30,7 @@ app.start = function() {
   app.defineSpeciesID = function(language, base, scientificName) {
     scientificName = (typeof scientificName == 'undefined')?'':String(scientificName).trim();
     if(language && language.trim().length>0 && scientificName.trim().length>0 && base)
-      return language.trim().concat(":").concat(base.trim()).concat(":").concat(scientificName.trim());
+      return base.trim().concat(":").concat(language.trim()).concat(":").concat(scientificName.trim());
     else
       return null;
   }
@@ -78,7 +78,7 @@ app.get('/taxon', function(req, res) {
 app.get('/profile/species/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
   var params = {id: req.params.id,base: req.params.base?req.params.base:"eco"};
-
+  console.log("LOG: ",req.params);
   res.send(mustache.render(template, params));
 });
 
@@ -104,25 +104,26 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
         Object.keys(specimen.toJSON()).forEach(function(key) {
           var parsedId = key.split(":");
           if(parsedId.length){
-            var domIdLabel = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":label";
-            var domIdValue = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":value";
+            console.log("LOG: ",parsedId);
+            var domIdLabel = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":label";
+            var domIdValue = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":value";
             if(specimen[key].field)
               params.label[domIdLabel] = specimen[key].field+": ";
             if(specimen[key].value && !specimen[key].states && !specimen[key].months){
               // NORMAL VALUE
               params.value[domIdValue] = specimen[key].value;              
               // COORDINATES
-              if(parsedId[3]=="decimalLatitude" || parsedId[3]=="decimalLongitude")
+              if(parsedId[4]=="decimalLatitude" || parsedId[4]=="decimalLongitude")
                 params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
               // IMAGE
-              if(parsedId[2]=="Image"){
+              if(parsedId[3]=="Image"){
                 params.value[domIdValue] = [];
                 specimen[key].images.forEach(function(image){
                  params.value[domIdValue].push({value:image.resized});
                 });
               }
               // REFERENCES
-              if(parsedId[2]=="Reference"){
+              if(parsedId[3]=="Reference"){
                 params.value[domIdValue] = [];
                 specimen[key].value.split("|").forEach(function(referencia){
                  params.value[domIdValue].push({value:referencia});
@@ -232,8 +233,8 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
   });
 });
 
-app.get('/quality/check', function(req, res) {
-  var template = fs.readFileSync('./client/quality.mustache', 'utf8');
+app.get('/admin/update', function(req, res) {
+  var template = fs.readFileSync('./client/update.mustache', 'utf8');
   var params = {base: "eco"};
 
   res.send(mustache.render(template, params));
@@ -293,7 +294,7 @@ function siteLabel(params,callback) {
   Schema.find({where:{"class":"SiteLabel",language:params.language}},function(err,siteLabel) {
     siteLabel.forEach(function(item) {      
       var parsedId = item.id.split(":");
-      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3];      
+      var domId = parsedId[2]+":"+parsedId[3]+":"+parsedId[4];      
       if(domId=="rcpol:SiteLabel:citation"){
         var field = item.field;
         var formattedDate = "";
@@ -301,7 +302,7 @@ function siteLabel(params,callback) {
         var day = date.getDate();
         var monthIndex = date.getMonth();
         var year = date.getFullYear();
-        if(parsedId[0]=="en-US"){
+        if(parsedId[1]=="en-US"){
           formattedDate = monthIndex+"/"+day+"/"+year;
         } else formattedDate = day+"/"+monthIndex+"/"+year;
         field = field+" "+formattedDate;
@@ -317,7 +318,7 @@ function profilesDwc(params,callback) {
   Schema.find({where:{"schema":"dwc",language:params.language}},function(err,profilesLabel) {
     profilesLabel.forEach(function(item) {
       var parsedId = item.id.split(":");
-      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]
+      var domId = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]
       params.label[domId] = item.field;          
     });
     callback();
@@ -329,7 +330,7 @@ function profilesLabel(params,callback) {
   Schema.find({where:{"class":"ProfilesLabel",language:params.language}},function(err,profilesLabel) {
     profilesLabel.forEach(function(item) {
       var parsedId = item.id.split(":");
-      var domId = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]
+      var domId = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]
       params.label[domId] = item.field;
     });
     callback();

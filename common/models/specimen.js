@@ -36,59 +36,61 @@ module.exports = function(Specimen) {
       var label = data[4]; //define o rotulo      
       data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
       var response = {}; //resposta de execução
-      response.count = 0;
-
-      async.each(data,function(line, callback){ //para cada linha lida salve os dados
-        if(line && line.length>0){          
-          async.series([
-          function(callbackSave) {
-            // console.log("start en-US",line);
-            //para salvar em  inglês
-            saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
-              // console.log("finish en-US");
-              callbackSave();
-            });
-          },
-          function(callbackSave) {
-            // console.log("start pt-BR", line);
-            //para salvar em português
-            saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
-              // console.log("finish pt-BR");
-              callbackSave();
-            });
-          },
-          function(callbackSave) {
-            // console.log("start es-ES",line);
-            //para salvar em espanhol
-            saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
-              // console.log("finish es-ES");
-              callbackSave();
-            });
-          }
-        ],function done() {
-          console.log("COUTING: ",response.count++);
-          callback(); //retorno da função
-        });     
-        } else {
-          callback(); //retorno da função
-        }      
-      },function() {
-        //executa o download das imagens
+      response.count = 0;      
+      var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
+          var line = rec.line;          
+          async.parallel([
+            function(callbackSave) {
+              // console.log("start en-US",line);
+              //para salvar em  inglês
+              saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
+                // console.log("finish en-US");
+                callbackSave();
+              });
+            },
+            function(callbackSave) {
+              // console.log("start pt-BR", line);
+              //para salvar em português
+              saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
+                // console.log("finish pt-BR");
+                callbackSave();
+              });
+            },
+            function(callbackSave) {
+              // console.log("start es-ES",line);
+              //para salvar em espanhol
+              saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
+                // console.log("finish es-ES");
+                callbackSave();
+              });
+            }
+          ],function done() {
+            console.log("COUTING: ",response.count++);
+            callback(); //retorno da função
+          });             
+      },1);
+      queue.drain(function() {
+        //executa o download das image
        // downloadImages(downloadQueue, redownload);
         console.log("Done.");
         for (var key in logs) {
           console.log(logs[key]);
         }
-
         cb(null, response);
-      });        
+      });
+      console.log("SIZE: ",data.length);
+      data.forEach(function(line) {
+        if(line[1] && line[2] && line[3]){          
+          queue.push({line:line});          
+        }          
+      });
     });    
     request(url).pipe(w);
   };
   function saveRecord(base, originalLanguage,language,line, schema, class_, terms, callback) {
     var Schema = Specimen.app.models.Schema; //usando o schema
     var c = 0;
-    var record = {}; //dados as serem gravados no banco
+    var record = {}; //dados as serem gravados no banco    
     record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]); //definição do id do specimen
     if(record.id){   //se o id existir execute
       //para termo da planilha
@@ -96,7 +98,7 @@ module.exports = function(Specimen) {
         c++;
         //se existe o termo e a linha existe da amostra
         if(term && toString(line[c]) != ""){
-          var schemaId = Specimen.app.defineSchemaID(language,schema[c],class_[c],terms[c]); //define o id do esquema
+          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema
           record.language = language; //recebe a linguagem
           record.originalLanguage = originalLanguage;  //linguagem original
           record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
@@ -117,7 +119,7 @@ module.exports = function(Specimen) {
                     if(language==originalLanguage){
                     //  SAME LANGUAGE
                       if(stateValue.length>0){
-                        Schema.findOne({where:{language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
+                        Schema.findOne({where:{base:base,language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
                           if(state){
                             record[schema.id].states.push(state.toJSON());
                           }else {
@@ -131,10 +133,10 @@ module.exports = function(Specimen) {
                       }
                     } else {
                     // DIFFERENT LANGUAGES
-                      var schemaIdOriginal = Specimen.app.defineSchemaID(originalLanguage,schema.schema,schema["class"],schema.term);
+                      var schemaIdOriginal = Specimen.app.defineSchemaID(base, originalLanguage,schema.schema,schema["class"],schema.term);
                       Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {
                         if(schemaOriginal){
-                          Schema.findOne({where:{language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
+                          Schema.findOne({where:{base:base, language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
                             if(state){
                               Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
                                 if(translatedState){

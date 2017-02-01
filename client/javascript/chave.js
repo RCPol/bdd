@@ -112,17 +112,18 @@ Identification.prototype.unselectState = function(id) {
 }
 Identification.prototype.createSpecies = function(callback) {
   var self = this;
-  $.getJSON("/api/Species?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.internacionalization.language+":dwc:Taxon:family%20ASC&filter[order][1]="+self.internacionalization.language+":dwc:Taxon:scientificName%20ASC"/*, { filter : query }*/, function(species){
-    species.forEach(function(sp) {
+  $.getJSON("/api/Species?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:family%20ASC&filter[order][1]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName%20ASC", function(data){          
+    var species = data;
+    species.forEach(function(sp) {      
       self.species[sp.id] = {};
       self.species[sp.id].id = sp.id;
-      self.species[sp.id].htmlId = sp.id.htmlId();
-      self.species[sp.id].scientificName = sp[self.internacionalization.language+":dwc:Taxon:scientificName"].value;
-      self.species[sp.id].family = sp[self.internacionalization.language+":dwc:Taxon:family"].value;
-      self.species[sp.id].scientificNameAuthorship = sp[self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship"].value;
-      self.species[sp.id].vernacularName = sp[self.internacionalization.language+":dwc:Taxon:vernacularName"]?sp[self.internacionalization.language+":dwc:Taxon:vernacularName"].value:"";
+      self.species[sp.id].htmlId = sp.id.htmlId();            
+      self.species[sp.id].scientificName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName"].value;
+      self.species[sp.id].family = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:family"].value;
+      self.species[sp.id].scientificNameAuthorship = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship"].value;
+      self.species[sp.id].vernacularName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName"]?sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName"].value:"";
       self.species[sp.id].html = $("<div class='especies' id = " + self.species[sp.id].htmlId + "></div>");
-      self.species[sp.id].thumbnail = sp[self.internacionalization.language+":rcpol:Image:flowerImage"]?sp[self.internacionalization.language+":rcpol:Image:flowerImage"].images[0].thumbnail:sp[self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.internacionalization.language+":rcpol:Image:plantImage"].images[0].thumbnail:sp[self.internacionalization.language+":rcpol:Image:allPollenImage"]?sp[self.internacionalization.language+":rcpol:Image:allPollenImage"].images[0].thumbnail:"img/lspm.jpg"
+      self.species[sp.id].thumbnail = sp[self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage"]?sp[self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage"].images[0].thumbnail:sp[self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage"].images[0].thumbnail:sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage"]?sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage"].images[0].thumbnail:"img/lspm.jpg"
       self.species[sp.id].html.append("<a href='/profile/species/"+self.base+"/" + sp.id + "' target='_blank' ><img id='_img_"+self.species[sp.id].htmlId+"' src='"+self.species[sp.id].thumbnail+"' onerror='imageError(this)'/></a>");
       self.species[sp.id].html.append("<div class='nsp'></div>");
       self.species[sp.id].html.find(".nsp").append("<a href='/profile/species/"+self.base+"/" + sp.id + "' target='_blank' ><p class='famisp'>" + self.species[sp.id].family + "</p></a>");
@@ -135,7 +136,7 @@ Identification.prototype.createSpecies = function(callback) {
 }
 Identification.prototype.createDescriptors = function(callback) {
   var self = this;
-  $.getJSON("/api/Schemas?filter[where][language]="+self.internacionalization.language+"&filter[where][class]=State&filter[order]=order"/*, { filter : query }*/, function(states){
+  $.getJSON("/api/Schemas?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[where][class]=State&filter[order]=order"/*, { filter : query }*/, function(states){
     states.forEach(function(state) {
       var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
       // CATEGORY
@@ -254,7 +255,8 @@ Identification.prototype.identify = function() {
   self.printDescriptors();
   $.get("/api/Identification/identify", {param: query}, function(data){
     self.eligibleSpecies = {};
-    data.response.eligibleSpecies.forEach(function(remoteEligibleSpecies) {
+    console.log("ELIGIBLE SPECIES: ",data.response.eligibleSpecies);
+    data.response.eligibleSpecies.forEach(function(remoteEligibleSpecies) {      
       self.eligibleSpecies[remoteEligibleSpecies.id] = true;
     });
     self.printSpecies();

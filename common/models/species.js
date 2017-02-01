@@ -78,27 +78,27 @@ module.exports = function(Species) {
     var count = 0;
     async.each(sciName, function iterator(name, callback){
       var query = {where:{}};
-      query.where[language+":dwc:Taxon:scientificName.value"] = name;
+      query.where[base+":"+language+":dwc:Taxon:scientificName.value"] = name;
       query.where.base = base;
       Specimen.find(query, function (err,specimens) {
 
         var species = {};
         species.specimens = [];
         species["language"] = language;        
-        species[language+":dwc:Taxon:family"] = specimens[0][language+":dwc:Taxon:family"];
+        species[base+":"+language+":dwc:Taxon:family"] = specimens[0][base+":"+language+":dwc:Taxon:family"];
         species.base = base;
-        species[language+":dwc:Taxon:scientificName"] = specimens[0][language+":dwc:Taxon:scientificName"];
-        species[language+":dwc:Taxon:scientificNameAuthorship"] = specimens[0][language+":dwc:Taxon:scientificNameAuthorship"];
+        species[base+":"+language+":dwc:Taxon:scientificName"] = specimens[0][base+":"+language+":dwc:Taxon:scientificName"];
+        species[base+":"+language+":dwc:Taxon:scientificNameAuthorship"] = specimens[0][base+":"+language+":dwc:Taxon:scientificNameAuthorship"];
         // TODO multiple specimens with different popular names
-        species[language+":dwc:Taxon:vernacularName"] = specimens[0][language+":dwc:Taxon:vernacularName"];
+        species[base+":"+language+":dwc:Taxon:vernacularName"] = specimens[0][base+":"+language+":dwc:Taxon:vernacularName"];
 
-        species[language+":dwc:Occurrence:establishmentMean"] = specimens[0][language+":dwc:Occurrence:establishmentMean"];
-        species[language+":rcpol:Sample:floweringPeriod"] = specimens[0][language+":rcpol:Sample:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
-        species[language+":rcpol:Image:plantImage"] = specimens[0][language+":rcpol:Image:plantImage"];
-        species[language+":rcpol:Image:flowerImage"] = specimens[0][language+":rcpol:Image:flowerImage"];
-        species[language+":rcpol:Image:beeImage"] = specimens[0][language+":rcpol:Image:beeImage"];
-        species[language+":rcpol:Image:pollenImage"] = specimens[0][language+":rcpol:Image:pollenImage"];
-        species[language+":rcpol:Image:allPollenImage"] = specimens[0][language+":rcpol:Image:allPollenImage"];
+        species[base+":"+language+":dwc:Occurrence:establishmentMean"] = specimens[0][base+":"+language+":dwc:Occurrence:establishmentMean"];
+        species[base+":"+language+":rcpol:Sample:floweringPeriod"] = specimens[0][base+":"+language+":rcpol:Sample:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
+        species[base+":"+language+":rcpol:Image:plantImage"] = specimens[0][base+":"+language+":rcpol:Image:plantImage"];
+        species[base+":"+language+":rcpol:Image:flowerImage"] = specimens[0][base+":"+language+":rcpol:Image:flowerImage"];
+        species[base+":"+language+":rcpol:Image:beeImage"] = specimens[0][base+":"+language+":rcpol:Image:beeImage"];
+        species[base+":"+language+":rcpol:Image:pollenImage"] = specimens[0][base+":"+language+":rcpol:Image:pollenImage"];
+        species[base+":"+language+":rcpol:Image:allPollenImage"] = specimens[0][base+":"+language+":rcpol:Image:allPollenImage"];
         specimens.forEach(function (sp) {
           species.specimens.push({id:sp.id});
           Object.keys(sp).forEach(function(key,index) {
@@ -152,7 +152,7 @@ module.exports = function(Species) {
     var sp = Specimen.getDataSource().connector.collection(Specimen.modelName);
     sp.aggregate({'$match':{'language': language,base:base}},{
       $group: {
-        _id: { value: '$'+language+':dwc:Taxon:scientificName.value'}
+        _id: { value: '$'+base+":"+language+':dwc:Taxon:scientificName.value'}
       }
     }, function(err, groupByRecords) {
       if(err) {

@@ -101,6 +101,7 @@
 				$(this).addClass('selecionado');
 			}
 		});
+		$("#base_selector").val('{{base}}');
 	}	
 	var identification = new Identification();
 	identification.base = '{{base}}';
@@ -116,16 +117,16 @@
 			setTimeout(updateAccessCount, 1200000);
 		});		
 	}
-	$(document).ready(function(){
-		$("#base_selector").val('{{base}}');
-		$("#base_selector").change(function() {			
-			window.location = "/"+$("#base_selector").val();			
-		});
+	$(document).ready(function(){		
 		identification.internacionalization.base = '{{base}}';
 		identification.internacionalization.updateLogo();			
 		setTimeout(updateActiveUser, 1500);	
 		setTimeout(updateAccessCount, 1500);					
 		identification.startup();
+		$("#base_selector").val('{{base}}');
+		$("#base_selector").change(function() {			
+			window.location = "/"+$("#base_selector").val();			
+		});
 		var msg  = $( "#msg" ).dialog({
 				title:"Comunicado Importante!",
 				autoOpen: false,

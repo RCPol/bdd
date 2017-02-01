@@ -31,6 +31,7 @@
 		var marker = null;
 		var id = "{{id}}";
 		var language = "pt-BR";
+		var base = "{{base}}";
 		function setLanguage(language){
 			localStorage.language = language;
 			window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
@@ -129,7 +130,7 @@
 					<!-- Link para página da Palinoteca -->
 					<p><a target="_blank" href="/profile/palinoteca/{{base}}/{{language}}:{{dwc:RecordLevel:institutionCode:value}}:{{dwc:RecordLevel:collectionCode:value}}" id="rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection">{{rcpol:ProfilesLabel:profilesSeeSpecimensOfThisCollection}}</a></p>
 					<!-- Link para página da Espécie -->
-					<p><a target="_blank" href="/profile/species/{{base}}/{{language}}:{{base}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
+					<p><a target="_blank" href="/profile/species/{{base}}/{{base}}:{{language}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
 				</div>
 				<!-- Final: Informações Palinoteca -->
 				<!-- Início: Logotipo da Palinoteca -->

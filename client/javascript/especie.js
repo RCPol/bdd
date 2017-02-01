@@ -1,14 +1,17 @@
-function readSpecies(id, map){
+function readSpecies(id, base_, map){
   var lang = localStorage.language?localStorage.language:"pt-BR";
+  var scope = base_ +":"+lang;
   $.getJSON("/api/Species/"+id, function(data){
     // titulo
-    var name = data[lang+":dwc:Taxon:scientificName"].value + " " + data[lang+":dwc:Taxon:scientificNameAuthorship"].value;
+    console.log("SPECIES: ",data);
+    var name = data[scope+":dwc:Taxon:scientificName"].value + " " + data[scope+":dwc:Taxon:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
     Object.keys(data).forEach(function(key) {
       var parsedId = key.split(":");
-      var schema = parsedId.length==4?parsedId[1]:"";
-      var class_ = parsedId.length==4?parsedId[2]:"";
-      var term = parsedId.length==4?parsedId[3]:"";
+      console.log("LOG: ",parsedId);
+      var schema = parsedId.length==5?parsedId[2]:"";
+      var class_ = parsedId.length==5?parsedId[3]:"";
+      var term = parsedId.length==5?parsedId[4]:"";
       var base = schema+"-"+class_+"-"+term;
       if(term=="pollenSize"){       
         if(data[key].states){
@@ -88,7 +91,7 @@ function readSpecies(id, map){
             $("#"+base+"-value").append(lowestValue+sep+highestValue);           
           }            
         }
-      } else if(parsedId.length==4 && class_!="NumericalDescriptor"){        
+      } else if(parsedId.length==5 && class_!="NumericalDescriptor"){        
         if(data[key].value && !data[key].states && !data[key].months){
           $("#"+base+"-label").append(data[key].field+": ");
           $("#"+base+"-value").append(data[key].value);
@@ -135,22 +138,22 @@ function readSpecies(id, map){
       }
     });
     // IMAGES
-    if(data[lang+':rcpol:Image:plantImage'] && data[lang+':rcpol:Image:plantImage'].images && data[lang+':rcpol:Image:plantImage'].images.length>0)
-      data[lang+":rcpol:Image:plantImage"].images.forEach(function(media){
+    if(data[scope+':rcpol:Image:plantImage'] && data[scope+':rcpol:Image:plantImage'].images && data[scope+':rcpol:Image:plantImage'].images.length>0)
+      data[scope+":rcpol:Image:plantImage"].images.forEach(function(media){
           $("#foto_planta").append("<img src='" +media.resized+"'/>");
           $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
       });
-    if(data[lang+':rcpol:Image:flowerImage'] && data[lang+':rcpol:Image:flowerImage'].images && data[lang+':rcpol:Image:flowerImage'].images.length>0)
-      data[lang+":rcpol:Image:flowerImage"].images.forEach(function(media){
+    if(data[scope+':rcpol:Image:flowerImage'] && data[scope+':rcpol:Image:flowerImage'].images && data[scope+':rcpol:Image:flowerImage'].images.length>0)
+      data[scope+":rcpol:Image:flowerImage"].images.forEach(function(media){
           $("#foto_planta").append("<img src='" +media.resized+"'/>");
           $("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
       });
-    if(data[lang+':rcpol:Image:pollenImage'] && data[lang+':rcpol:Image:pollenImage'].images && data[lang+':rcpol:Image:pollenImage'].images.length>0)
-      data[lang+":rcpol:Image:pollenImage"].images.forEach(function(media){
+    if(data[scope+':rcpol:Image:pollenImage'] && data[scope+':rcpol:Image:pollenImage'].images && data[scope+':rcpol:Image:pollenImage'].images.length>0)
+      data[scope+":rcpol:Image:pollenImage"].images.forEach(function(media){
           $("#foto_polen").append("<img src='" +media.resized+"'/>");
       });
-    if(data[lang+':rcpol:Image:allPollenImage'] && data[lang+':rcpol:Image:allPollenImage'].images && data[lang+':rcpol:Image:allPollenImage'].images.length>0)
-      data[lang+":rcpol:Image:allPollenImage"].images.forEach(function(media){
+    if(data[scope+':rcpol:Image:allPollenImage'] && data[scope+':rcpol:Image:allPollenImage'].images && data[scope+':rcpol:Image:allPollenImage'].images.length>0)
+      data[scope+":rcpol:Image:allPollenImage"].images.forEach(function(media){
           $("#foto_polen").append("<img src='" +media.resized+"'/>");
       });
     $(".fotorama").fotorama();
@@ -158,7 +161,7 @@ function readSpecies(id, map){
     map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
     //especimes
     var specimen_ids = data.specimens.map(function(elem){return elem.id;});
-    var specimen_query = "filter[fields]["+lang+":dwc:RecordLevel:institutionCode]=true&filter[fields]["+lang+":dwc:RecordLevel:catalogNumber]=true&filter[fields]["+lang+":dwc:Location:decimalLatitude]=true&filter[fields]["+lang+":dwc:Location:decimalLongitude]=true&filter[fields]["+lang+":dwc:RecordLevel:collectionCode]=true&filter[fields]["+lang+":dwc:Occurrence:recordedBy]=true&filter[fields]["+lang+":dwc:Location:municipality]=true&filter[fields]["+lang+":dwc:Location:stateProvince]=true&filter[fields][id]=true&filter[where][id][inq]=" + specimen_ids[0];
+    var specimen_query = "filter[fields]["+scope+":dwc:RecordLevel:institutionCode]=true&filter[fields]["+scope+":dwc:RecordLevel:catalogNumber]=true&filter[fields]["+scope+":dwc:Location:decimalLatitude]=true&filter[fields]["+scope+":dwc:Location:decimalLongitude]=true&filter[fields]["+scope+":dwc:RecordLevel:collectionCode]=true&filter[fields]["+scope+":dwc:Occurrence:recordedBy]=true&filter[fields]["+scope+":dwc:Location:municipality]=true&filter[fields]["+scope+":dwc:Location:stateProvince]=true&filter[fields][id]=true&filter[where][id][inq]=" + specimen_ids[0];
     specimen_ids.forEach(function(id){
       specimen_query += "&filter[where][id][inq]=" + id;
     });
@@ -166,17 +169,17 @@ function readSpecies(id, map){
     $.getJSON("/api/Specimens?" + specimen_query, function(specimens){
       specimens.forEach(function(specimen, id){        
         // mapa
-        var p = [specimen[lang+":dwc:Location:decimalLatitude"].value, specimen[lang+":dwc:Location:decimalLongitude"].value];
+        var p = [specimen[scope+":dwc:Location:decimalLatitude"].value, specimen[scope+":dwc:Location:decimalLongitude"].value];
         var marker = L.marker(p, {opacity:0.9}).addTo(map);
-        $.getJSON("/api/Collections/"+lang+"%3A"+specimen[lang+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[lang+":dwc:RecordLevel:collectionCode"].value,
+        $.getJSON("/api/Collections/"+lang+"%3A"+specimen[scope+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[scope+":dwc:RecordLevel:collectionCode"].value,
             function(collection){
               w2ui['grid'].add(
                 {
-                recid: specimen[lang+":dwc:RecordLevel:catalogNumber"].value,
+                recid: specimen[scope+":dwc:RecordLevel:catalogNumber"].value,
                 scientificName: "<i>"+name+"</i>",
-                collectionName: ((collection[lang+":rcpol:Collection:collectionName"]?collection[lang+":rcpol:Collection:collectionName"].value:"")+" - "+(specimen[lang+":dwc:RecordLevel:institutionCode"]?specimen[lang+":dwc:RecordLevel:institutionCode"].value:"")),
-                recordedBy: specimen[lang+":dwc:Occurrence:recordedBy"].value,
-                municipality: specimen[lang+":dwc:Location:municipality"].value + " - " + specimen[lang+":dwc:Location:stateProvince"].value,
+                collectionName: ((collection[scope+":rcpol:Collection:collectionName"]?collection[scope+":rcpol:Collection:collectionName"].value:"")+" - "+(specimen[scope+":dwc:RecordLevel:institutionCode"]?specimen[scope+":dwc:RecordLevel:institutionCode"].value:"")),
+                recordedBy: specimen[scope+":dwc:Occurrence:recordedBy"].value,
+                municipality: specimen[scope+":dwc:Location:municipality"].value + " - " + specimen[scope+":dwc:Location:stateProvince"].value,
                 specimen_id: specimen.id}
               );
             });

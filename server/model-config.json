@@ -50,6 +50,10 @@
     "$promise": {},
     "$resolved": true
   },
+  "Test": {
+    "dataSource": "BDD",
+    "public": true
+  },
   "Species": {
     "dataSource": "BDD",
     "public": true,
