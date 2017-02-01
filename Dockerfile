@@ -1,17 +1,15 @@
 # Set the base image to Ubuntu
 FROM ubuntu:14.04
 
-MAINTAINER Allan Koch Veiga
-
 # Install Node.js and other dependencies
 RUN apt-get update && \
     apt-get -y install curl && \
     apt-get -y install git && \
     apt-get -y install wget && \
     curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
-    apt-get install --yes nodejs 
-
-RUN apt-get install build-essential -y && apt-get install imagemagick -y
+    apt-get install --yes nodejs && \
+    apt-get -y install build-essential && \
+    apt-get -y install imagemagick
 
 # Install PM2
 RUN npm install -g pm2

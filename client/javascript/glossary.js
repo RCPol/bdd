@@ -1,7 +1,7 @@
 function writeSchema(base, schema, referenceLabel){  
   lang = localStorage.language?localStorage.language:"pt-BR";
   var id= schema.id;
-  if (id.split(":")[2] == "State" || id.split(":")[2] == "CategoricalDescriptor" || id.split(":")[2] == "NumericalDescriptor" || id.split(":")[2] == "Category"){
+  if (id.split(":")[3] == "State" || id.split(":")[3] == "CategoricalDescriptor" || id.split(":")[3] == "NumericalDescriptor" || id.split(":")[3] == "Category"){
     var html = $('<div class="glossario-s" id="'+id.split(":").join("-")+'"><a target="_blank"><img id="image"></img></a> <h2></h2><h3></h3><p id="description"></p><div id="references" style="color:grey; font-size: 80%;"></div><div id="credits" style="color:grey; font-size: 80%;"></div></div>');    
     $("#content").append(html);    
     $("#" + id.split(":").join("-") +" > a > #image ").hide();

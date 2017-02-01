@@ -61,7 +61,7 @@
 		  window.open("/profile/specimen/{{base}}/" + w2ui['grid'].get(event.recid).specimen_id);
 		});
 		{{#value}}
-      readSpecimens("{{language}}","{{dwc:RecordLevel:institutionCode:value}}","{{dwc:RecordLevel:collectionCode:value}}");
+      readSpecimens("{{language}}","{{base}}","{{dwc:RecordLevel:institutionCode:value}}","{{dwc:RecordLevel:collectionCode:value}}");
 		{{/value}}
 	  });
 	  //Final do Código do Grid-Tabela
