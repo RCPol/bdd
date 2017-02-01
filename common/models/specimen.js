@@ -272,15 +272,42 @@ module.exports = function(Specimen) {
       callback();
     }
   }
-  Specimen.downloadImages = function (cb) {
+  Specimen.downloadImages = function (base,cb) {
     //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
     //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
     //Onde a imagem vai ser salva na pasta do cliente
     var startTime = new Date();
-    Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
-    {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
-    fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
-    "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){    
+    var query = {
+      where:{
+        or:[
+        ]
+      },
+      fields:{}
+    };
+
+    var allPollen =  {};
+    allPollen[base+":pt-BR:rcpol:Image:allPollenImage"] = {exists:true};
+    var plant =  {};
+    plant[base+":pt-BR:rcpol:Image:plantImage"] = {exists:true};
+    var flower =  {};
+    flower[base+":pt-BR:rcpol:Image:flowerImage"] = {exists:true};
+    var bee =  {};
+    bee[base+":pt-BR:rcpol:Image:beeImage"] = {exists:true};
+    var pollen =  {};
+    pollen[base+":pt-BR:rcpol:Image:pollenImage"] = {exists:true};
+    query.where.or.push(allPollen);
+    query.where.or.push(plant);
+    query.where.or.push(flower);
+    query.where.or.push(bee);
+    query.where.or.push(pollen);
+
+    query.fields[base+":pt-BR:rcpol:Image:allPollenImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:plantImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:flowerImage"] = true; 
+    query.fields[base+":pt-BR:rcpol:Image:beeImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:pollenImage"] = true;    
+  
+    Specimen.find(query, function(err,results){         
       
       var i = 0;
       console.time("download");
@@ -292,28 +319,28 @@ module.exports = function(Specimen) {
       },5);
 
       results.forEach(function (result){
-        if(result["pt-BR:rcpol:Image:allPollenImage"]){
-            result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:allPollenImage"]){
+            result[base+":pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:flowerImage"]){
-            result["pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:flowerImage"]){
+            result[base+":pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:plantImage"]){
-            result["pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:plantImage"]){
+            result[base+":pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:beeImage"]){
-            result["pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:beeImage"]){
+            result[base+":pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:pollenImage"]){
-            result["pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:pollenImage"]){
+            result[base+":pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
@@ -507,7 +534,7 @@ module.exports = function(Specimen) {
       http: {path: '/downloadImages', verb: 'get'},
       accepts: [
         // {arg:'download'}
-        // {arg: 'download', type: 'boolean', required:true, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: true}
+        {arg: 'base', type: 'string', required:true}
       ],
       returns: {arg: 'response', type: 'object'}
     }
