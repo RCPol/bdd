@@ -1,7 +1,7 @@
 var _ = require('underscore');
 var async = require('async');
 var google = require('googleapis');
-var key = require('rcpol-google-key.json');
+var key = require('key.json');
 const VIEW_ID = 'ga:128522305';
 
 module.exports = function(Identification) {
