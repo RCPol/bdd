@@ -41,7 +41,7 @@ module.exports = function(Identification) {
               // console.log("Count",JSON.stringify(response, null, 4));              
               var rs = 0;
               response.rows.forEach(function(item) {
-                rs = rs+item[1];
+                rs = rs+Number(item[1]);
               });
               cb(err,rs);          
             }          
