@@ -36,7 +36,7 @@ module.exports = function(Identification) {
             'start-date': '2016-08-23',
             'end-date': year+'-'+month+'-'+day,
             'sort': '-ga:pageviews',
-            'max-results': 10,        
+            'max-results': 100,        
           }, function (err, response) {
             if (err) {
               console.log("[ERR] Access count: ",err);
