@@ -42,7 +42,7 @@ module.exports = function(Identification) {
               var rs = 0;
               response.rows.forEach(function(item) {
                 rs = rs+item[1];
-              }
+              });
               cb(err,rs);          
             }          
         }); 
