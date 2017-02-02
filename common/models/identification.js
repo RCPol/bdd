@@ -7,11 +7,6 @@ const VIEW_ID = 'ga:128522305';
 module.exports = function(Identification) {
   Identification.accessCount = function(cb) {    
 
-    console.log("=================");   
-    console.log("key.client_email: ",key.client_email);   
-    console.log("key.private_key: ",key.private_key);   
-    console.log("=================");
-    
     var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'] , null);    
     jwtClient.authorize(function(err, tokens) {
       if (err) {
@@ -43,8 +38,12 @@ module.exports = function(Identification) {
               cb('','');            
             } else {
               console.log("RESPONSE: ",JSON.stringify(response));
-              // console.log("Count",JSON.stringify(response, null, 4));
-              cb(err,response.rows[0][1]);          
+              // console.log("Count",JSON.stringify(response, null, 4));              
+              var rs = 0;
+              response.rows.forEach(function(item) {
+                rs = rs+item[1];
+              }
+              cb(err,rs);          
             }          
         }); 
       }      
