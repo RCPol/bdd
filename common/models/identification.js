@@ -6,10 +6,18 @@ const VIEW_ID = 'ga:128522305';
 
 module.exports = function(Identification) {
   Identification.accessCount = function(cb) {    
-    var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'], null);    
+
+    console.log("=================");   
+    console.log("key.client_email: ",key.client_email);   
+    console.log("key.private_key: ",key.private_key);   
+    console.log("=================");
+    
+    var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'] , null);    
     jwtClient.authorize(function(err, tokens) {
       if (err) {
-        console.log("Autorize access count: ",err);
+        console.log("=================");   
+        console.log("[ERR] Autorize access count: ",err);
+        console.log("=================");   
         cb('','');   
       } else {
         var analytics = google.analytics('v3');
@@ -17,6 +25,9 @@ module.exports = function(Identification) {
         var year = now.getFullYear();
         var month = (now.getMonth()+1).toString().length==1?"0"+(now.getMonth()+1):now.getMonth()+1;
         var day = now.getDate().toString().length==1?"0"+now.getDate():now.getDate();                  
+        console.log("year: ",year);
+        console.log("month: ",month);
+        console.log("day: ",day);
         analytics.data.ga.get({
             'auth': jwtClient,
             'ids': VIEW_ID,
@@ -28,9 +39,10 @@ module.exports = function(Identification) {
             'max-results': 10,        
           }, function (err, response) {
             if (err) {
-              console.log("Access count: ",err);
+              console.log("[ERR] Access count: ",err);
               cb('','');            
             } else {
+              console.log("RESPONSE: ",JSON.stringify(response));
               // console.log("Count",JSON.stringify(response, null, 4));
               cb(err,response.rows[0][1]);          
             }          
