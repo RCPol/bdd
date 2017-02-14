@@ -12,10 +12,48 @@ var util = require('util');
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+
+  Specimen.aggregationByField = function(prefix, base, lang, field, cb) {        
+    
+    var queryMongo = { 'language':lang, base:base }        
+    var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
+    Specimen.getDataSource().connector.safe = false;    
+    SpecimenCollection.aggregate([
+      { $match: queryMongo},
+      { $group: {
+        _id: '$'+prefix+field+'.value',
+        count: {$sum:1}
+        }
+      }
+    ], function (err, states) {          
+      var results = {values: states};
+      console.log("ERROR: ",err);
+      cb(null, results);
+    });   
+  }
+
+  Specimen.remoteMethod(     
+    'aggregationByField',
+    {
+      http: {path: '/aggregationByField', verb: 'get'},
+          accepts: [    
+        {arg: 'prefix', type: 'string', required:false},
+        {arg: 'base', type: 'string', required:true},
+        {arg: 'lang', type: 'string', required:true},
+        {arg: 'field', type: 'string', required:true}        
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+
+
+
   var logs = {};
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
+  
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
   Specimen.inputFromURL = function(url,language, base, cb) {
@@ -163,6 +201,13 @@ module.exports = function(Specimen) {
                 // OTHER FIELDS
                 } else {
                 record[schema.id].value = value;
+                if(value.split("|").length>1){
+                  record[schema.id].values = value.split("|").map(function(item) {
+                    return item.trim();
+                  });                  
+                } else {
+                  record[schema.id].values = [value];
+                }
                 // EVENT DATE
                 if(schema.term=="eventDate"){
                   var parsedDate = record[schema.id].value.split("-");
@@ -210,28 +255,28 @@ module.exports = function(Specimen) {
                     //   }
                     // });
 
-                  }else
+                  } else
                   // REFERENCE
                   if(schema["class"]=="Reference"){
                     record[schema.id].references = [];
                     record[schema.id].value.split("|").forEach(function (ref) {
                       record[schema.id].references.push(ref.trim());
                     });
-                  }else
+                  } else
                   // INTERACTION
                   if(schema["class"]=="Interaction"){
                     record[schema.id].species = [];
                     record[schema.id].value.split("|").forEach(function (sp) {
                       record[schema.id].species.push(sp.trim());
                     });
-                  }else
+                  } else
                   // FLOWERING PERIOD
                   if(schema.term=="floweringPeriod"){
                     record[schema.id].months = [];
                     record[schema.id].value.split("|").forEach(function (month) {
                       record[schema.id].months.push(month.trim());
                     });
-                  }else
+                  } else
                   // LATITUDE
                   if(schema.term=="decimalLatitude"){
                     var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
@@ -239,7 +284,7 @@ module.exports = function(Specimen) {
                       record[schema.id].rawValue = record[schema.id].value;
                       record[schema.id].value = converted;
                     }
-                  }else
+                  } else
                   // LONGITUDE
                   if(schema.term=="decimalLongitude"){
                     var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
@@ -261,11 +306,18 @@ module.exports = function(Specimen) {
           callbackCell();
         }
       },function done() {
-        Specimen.upsert(record,function (err,instance) {
-          if(err)
-            console.log(err);
-          callback();
-        });
+        var Collection = Specimen.app.models.Collection;
+        var sID = record.id.split(":");
+        var cID = sID[0]+":"+sID[1]+":"+sID[2];        
+        Collection.findById(cID, function(err,collection) {          
+          if(err) console.log("ERROR FIND COLLECTION: ",err);          
+          record.collection = collection;          
+          Specimen.upsert(record,function (err,instance) {
+            if(err)
+              console.log(err);
+            callback();
+          });
+        });        
       });
     } else {
       console.log("Cannot define an ID for specimen: ",language,line[1],line[2],line[3]);
@@ -556,6 +608,7 @@ module.exports = function(Specimen) {
       });
     });
   };
+  
   Specimen.remoteMethod(
     'cleanDB',
     {

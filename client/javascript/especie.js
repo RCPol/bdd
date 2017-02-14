@@ -2,13 +2,11 @@ function readSpecies(id, base_, map){
   var lang = localStorage.language?localStorage.language:"pt-BR";
   var scope = base_ +":"+lang;
   $.getJSON("/api/Species/"+id, function(data){
-    // titulo
-    console.log("SPECIES: ",data);
+    // titulo    
     var name = data[scope+":dwc:Taxon:scientificName"].value + " " + data[scope+":dwc:Taxon:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
     Object.keys(data).forEach(function(key) {
-      var parsedId = key.split(":");
-      console.log("LOG: ",parsedId);
+      var parsedId = key.split(":");      
       var schema = parsedId.length==5?parsedId[2]:"";
       var class_ = parsedId.length==5?parsedId[3]:"";
       var term = parsedId.length==5?parsedId[4]:"";
@@ -177,7 +175,7 @@ function readSpecies(id, base_, map){
                 {
                 recid: specimen[scope+":dwc:RecordLevel:catalogNumber"].value,
                 scientificName: "<i>"+name+"</i>",
-                collectionName: ((collection[scope+":rcpol:Collection:collectionName"]?collection[scope+":rcpol:Collection:collectionName"].value:"")+" - "+(specimen[scope+":dwc:RecordLevel:institutionCode"]?specimen[scope+":dwc:RecordLevel:institutionCode"].value:"")),
+                collectionName: ((collection[lang+":rcpol:Collection:collectionName"]?collection[lang+":rcpol:Collection:collectionName"].value:"")+" - "+(specimen[scope+":dwc:RecordLevel:institutionCode"]?specimen[scope+":dwc:RecordLevel:institutionCode"].value:"")),
                 recordedBy: specimen[scope+":dwc:Occurrence:recordedBy"].value,
                 municipality: specimen[scope+":dwc:Location:municipality"].value + " - " + specimen[scope+":dwc:Location:stateProvince"].value,
                 specimen_id: specimen.id}

@@ -28,6 +28,7 @@
 
 	<script type="text/javascript" src="/javascript/chave.js"></script>
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/filter.js"></script>
 
 	<style>
 		.ui-state-active,
@@ -46,6 +47,7 @@
 </style>
 <!-- Campos de busca, scrollbar e botões  -->
 <script type="text/javascript">
+	var filter;
 
 	/* Open the sidenav */
 	function openNav() {
@@ -65,7 +67,7 @@
         this.value = this.value.slice(0,-1);
     }
 });
-	window.onload = function(){
+	window.onload = function(){		
         //Barras de Rolagem das caixas
         // $(".roxinho").mCustomScrollbar({
         // 	scrollButtons:{ enable: true },
@@ -151,7 +153,32 @@
 			}			
 		} else {
 			msg.dialog('open');
-		} 			
+		}
+		filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:vegetalFormationType","Bioma / Tipo de vegetação",function(data) {
+			filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:municipality","Município",function(data) {
+				filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:stateProvince","Estado",function(data) {
+					filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:country","País",function(data) {
+						filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:region","Região",function(data) {
+							filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:continent","Continente",function(data) {							
+								filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:collectionCode","Código da Coleção",function(data) {
+									filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:institutionCode","Código da Instituição",function(data) {
+										filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:collectionName","Nome da Coleção",function(data) {											
+											filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:institutionName","Nome da Institutição",function(data) {											
+												filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório",function(data) {											
+													filter.setAutocomplete("filterField");
+												});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+
 	});		
 </script>
 
@@ -305,7 +332,7 @@
     	<!-- Início: Espécies disponíveis -->
     	<div class="roxinho">
     		<div class="count-species">
-    			#<span id="speciesCount">...</span></span>
+    			<!-- #<span id="speciesCount">...</span></span> -->
     		</div>
     		<div id="especiesElegiveis"></div>
     	</div>
@@ -342,29 +369,30 @@
 
 	<div class="sidecontent">
 
-		<div class="sidecontent-e">
+		<div >
 
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-			<h1>Filtre nossa base de dados por:</h1>
-			<ul>
-			<li>Bioma / Tipo de vegetação</li>
-			<li>Localidade (Município, Estado, País ou Continente)</li>
-			<li>Coleção (Nome ou Código)</li>
-			<li>Laboratório (Nome ou Código)</li>
-			<li>Instituição (Nome ou Código)</li>
-			</ul>
-
-		</div>
-
-		<div class="sidecontent-d">
-
-			<!-- Implementar Autocomplete -->
-			<form class="formfilters">
-				<input class="fbfilter" type="text" placeholder="Pesquisar"></input>					
-			</form>
-
-		</div>
-
+			<h1 style="width:100%;text-align: center">Filtros:</h1>
+			<div style="text-align: center; ">
+				<input id="filterField" class="fbfilter" type="text" placeholder="Pesquisar"></input>								
+			</div>			
+			<div style="padding: 20px; background-color: lightgray;margin: 30px;font-size: 80%">
+				<p style="font-family: 'Roboto Condensed', sans-serif; font-size: 16px; color:#470054">Você pode filtrar a base de dados por um ou mais dos seguintes campos:</p>
+				<ul style="padding: 20px;">
+					<li>Bioma / Tipo de vegetação: <i id="selected-rcpol-Sample-vegetalFormationType" style="color:darkgrey">nenhum</i></li>
+					<li>Município: <i id="selected-dwc-Location-municipality" style="color:darkgrey">nenhum</i></li>
+					<li>Estado: <i id="selected-dwc-Location-stateProvince" style="color:darkgrey">nenhum</i></li>
+					<li>País: <i id="selected-dwc-Location-country" style="color:darkgrey">nenhum</i></li>
+					<li>Região: <i id="selected-rcpol-Sample-region" style="color:darkgrey">nenhum</i></li>
+					<li>Continente: <i id="selected-dwc-Location-continent" style="color:darkgrey">nenhum</i></li>
+					<li>Nome da Coleção: <i id="selected-rcpol-Collection-collectionName" style="color:darkgrey">nenhum</i></li>
+					<li>Código da Coleção: <i id="selected-dwc-RecordLevel-collectionCode" style="color:darkgrey">nenhum</i></li>					
+					<li>Nome da Instituição: <i id="selected-rcpol-Collection-institutionName" style="color:darkgrey">nenhum</i></li>
+					<li>Código da Instituição: <i id="selected-dwc-RecordLevel-institutionCode" style="color:darkgrey">nenhum</i></li>					
+					<li>Nome do Laboratório: <i id="selected-rcpol-Collection-laboratory" style="color:darkgrey">nenhum</i></li>					
+				</ul>
+			</div>			
+		</div>		
 	<div>
 
 </div>
