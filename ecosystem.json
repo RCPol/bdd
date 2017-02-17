@@ -1,0 +1,35 @@
+{
+  "apps" : [
+    {    
+    "name"        : "bdd",
+    "script"      : ".",    
+    // "watch"       : true,    
+    "watch"       : ["common","server"],    
+    // "ignore_watch": ["uploads","client","node_modules"],
+    "merge_logs"  : true,
+    "no_daemon"   : true,
+    "cwd"         : "/var/www/bdd",    
+    "env": {
+      "NODE_ENV": "development",
+      "AWESOME_SERVICE_API_TOKEN": "xxx"
+    },
+    "env_production" : {
+       "NODE_ENV": "production"
+    },
+    "env_staging" : {
+       "NODE_ENV" : "staging",
+       "TEST"     : true
+    }
+  }
+  // ,{
+  //   // Application #2
+  //   "name"       : "api-app",
+  //   "script"     : "api.js",
+  //   "instances"  : 4,
+  //   "exec_mode"  : "cluster_mode",
+  //   "error_file" : "./examples/child-err.log",
+  //   "out_file"   : "./examples/child-out.log",
+  //   "pid_file"   : "./examples/child.pid"
+  // }
+  ]
+}

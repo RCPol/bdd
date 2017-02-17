@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/{{base}}_glossario.css">
+
+	<!-- jQuery -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+
+    <!-- Javascript Documento -->
+    <script type="text/javascript" src="/javascript/glossary.js"></script>
+    <script type="text/javascript" src="/javascript/internacionalization.js"></script>
+
+	<script type="text/javascript">
+      var lang = "{{lang}}"
+      var base = '{{base}}';
+	  var language = (lang == "")?"pt-BR":lang;	  
+	  function setLanguage(language){
+		localStorage.language = language;
+		window.location = "/profile/glossary/{{base}}/"+localStorage.language;
+	  }
+	  
+	  window.onload = function(){
+		var internacionalization = new Internacionalization();
+		internacionalization.base = '{{base}}';
+	  	internacionalization.updateLogo();	  	
+
+		if(localStorage && localStorage.language)
+		  language = localStorage.language;
+		$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){
+		  data.forEach(function(label) {
+			$("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
+		  });
+		});
+		$.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22ProfilesLabel%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){	
+			referenceLabel = "";	
+			creditLabel = "Credit photos";
+			data.forEach(function(label) {
+				if(label.term == "profilesBibliographicReferences"){
+			  		referenceLabel = label.field;
+			  	} else if(label.term == "profilesCreditPhotos"){
+			  		creditLabel = label.field;
+			  	} else if(label.term == "profilesDepositedInCollection"){
+				  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field.toLowerCase());
+				} else {
+				  $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
+				}
+			});			
+			// load(referenceLabel);
+		});
+		if (typeof(Storage) !== "undefined") {
+		  localStorage.language = localStorage.language?localStorage.language:"pt-BR";
+		  if(language!=localStorage.language)
+			window.location = "/profile/glossary/"+language;
+		} else {
+		  alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
+		}
+		//Limpa texto da busca dos descritores
+		var btpglossario = document.getElementById("buscaglossario");
+
+		if(btpglossario.addEventListener){
+		  btpglossario.addEventListener("click", function() {
+			if (btpglossario.value == 'Pesquisar'){
+			  btpglossario.value = '';
+			}
+		  });
+		}        
+	  }
+	  function start() {
+	  	var id  = $("#id_spreadsheet").val();
+	  	$('#content').html('Loading...');
+	  	$.getJSON("/api/Schemas/googleSpreadsheet/import?id="+id, function(data){
+	  		$('#content').html('');
+	  		var data = data.response;
+	  		Object.keys(data).forEach(function(key) {
+	  			if(key == "sheets"){
+	  				$('#content').append("<h1>"+key+"</h1>");			  			
+	  				Object.keys(data[key]).forEach(function(sub) {
+	  					$('#content').append("<h2>"+sub+"</h2>");			  			
+	  					Object.keys(data[key][sub]).forEach(function(subsub) {	  						
+				  			$('#content').append("<p><strong>"+subsub+"</strong>: "+data[key][sub][subsub]+"</p>");			  			
+				  		});			  			
+			  		});
+	  			} if(key == "DQStatus") {
+	  				 $('#content').append("<h1>"+key+"</h1>");			  			
+		  				Object.keys(data[key]).forEach(function(sub) {
+		  					$('#content').append("<h2>"+sub+"</h2>");			  			
+		  					data[key][sub].forEach(function(item) {
+		  						Object.keys(item).forEach(function(subsub) {
+		  							if(item.result=="NOT CONFORM"){		  								
+			  							if(subsub=="details"){		  								
+			  								$('#content').append("<p><strong>"+subsub+"</strong>: "+item[subsub].nontechnical+"</p>");			  		
+			  							} else if(subsub=="dr"){		  								
+			  								$('#content').append("<p><strong>"+subsub+"</strong>: "+item[subsub].value+"</p>");		  					
+			  							} else {		  								
+			  								$('#content').append("<p><strong>"+subsub+"</strong>: "+item[subsub]+"</p>");			  			
+			  							}	
+		  							}
+						  		});
+						  		if(item.result=="NOT CONFORM")
+						  			$('#content').append("<hr>");						  		
+					  		});			  								  		
+				  		}); 				
+	  			} else {	  				
+	  				$('#content').append("<h2>"+key+": "+data[key]+"</h2>");
+	  			}
+	  		});
+		});
+	  }
+	  // var load = function(referenceLabel) {
+	  // 	$.getJSON("/api/Schemas?filter[fields][id]=true&filter[order]=order%20asc&filter[where][language]="+language, function(schemas){
+	  // 		$('#content').html('');
+   //        schemas.forEach(function(schema){
+   //          writeSchema(base,schema,referenceLabel);
+   //        });
+   //      });
+	  // }
+
+	</script>
+
+	<title>RCPol - Atualizar dados a partir do Google Spreadsheet</title>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">Chave de identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+				<li>
+					<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
+							<img onclick="setLanguage('en-US')"  src="/img/en_GB.png">
+							<img onclick="setLanguage('es-ES')"  src="/img/es_ES.png">
+						</span>
+				</li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<article>
+
+		<h1 class="glo-tit" id="rcpol-Admin-siteGlossary">Autualizar dados do Glossário</h1>
+
+		<form class="formbusca" onreset="busca(true)" onsubmit="busca(false); return false;">
+			<input type="text" id="buscaglossario" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			<input class="fbbotao" type="reset" value="Limpar">
+		</form>		
+		<div class="glossario-s">
+			<h2 style="margin-bottom:10px" id="rcpol-Admin-howToCite">ID da Planilha: <input type="text" id="id_spreadsheet"> <button onclick="start()">Iniciar</button></h2>
+			<!-- <p id="rcpol-Admin-citation"><input type="text" name="id"></p>	 -->
+		</div>
+		<div id="content">						
+		</div>
+	</article>	
+	<!-- Final das informações da Palinoteca -->		
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+</html>
