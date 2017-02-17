@@ -229,7 +229,7 @@ module.exports = function(Specimen) {
                     //recebe um vetor de images
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
-                        var imageId = schema.id.split(":").slice(1).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                        var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;                        
                         var image = {
                           id: imageId,
                           // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
