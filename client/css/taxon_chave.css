@@ -212,9 +212,20 @@ div.count-species {
 /* Busca */
 .formbusca {
 	float:right;
-	width: 250px;
+	/*width: 250px;*/
 	padding-right: 35px;
 	text-align: right;
+}
+
+.opcoes-de-busca {
+	margin: 0 5px 0 0;
+	padding: 5px 10px;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 14px;
+	color: #2f3d5d;
+	background-color: #7dca90;
+	border:1px solid #7dca90;
+	cursor: pointer;
 }
 
 .fbcampo, .ui-autocomplete-input {
