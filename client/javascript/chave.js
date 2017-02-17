@@ -42,7 +42,7 @@ Identification.prototype.tooltipConfig = function() {
     }
   });
 }
-Identification.prototype.startup = function() {
+Identification.prototype.startup = function() {  
   $("#category").html("");
   $("#descritoresSelecionados").html("");
   $("#especiesElegiveis").html("");
@@ -55,6 +55,7 @@ Identification.prototype.startup = function() {
   this.eligibleStates = {};
   this.selectedStates = {};
   this.definedNumericals = {};
+  delete this.filter
   console.time("load species");
   console.time("load descriptors");
   var self = this;
@@ -80,7 +81,7 @@ Identification.prototype.startup = function() {
 }
 Identification.prototype.translate = function(language) {
   var self = this;
-  self.internacionalization.setLanguage(language).siteTranslator().keyTranslator();
+  self.internacionalization.setLanguage(language).siteTranslator().keyTranslator();  
   self.startup();
   return this;
 }
@@ -111,14 +112,14 @@ Identification.prototype.unselectState = function(id) {
   return this;
 }
 Identification.prototype.createSpecies = function(callback) {
-  var self = this;
-  $.getJSON("/api/Species?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:family%20ASC&filter[order][1]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName%20ASC", function(data){          
-    var species = data;
+  var self = this;  
+  $.getJSON("/api/Species?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:family.value%20ASC&filter[order][1]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName.value%20ASC", function(data){          
+    var species = data;    
     species.forEach(function(sp) {      
       self.species[sp.id] = {};
       self.species[sp.id].id = sp.id;
       self.species[sp.id].htmlId = sp.id.htmlId();            
-      self.species[sp.id].scientificName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName"].value;
+      self.species[sp.id].scientificName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName"].value;            
       self.species[sp.id].family = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:family"].value;
       self.species[sp.id].scientificNameAuthorship = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship"].value;
       self.species[sp.id].vernacularName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName"]?sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName"].value:"";
@@ -169,7 +170,7 @@ Identification.prototype.createDescriptors = function(callback) {
 }
 Identification.prototype.printSpecies = function() {
   var self = this;
-  $("#speciesCount").html(Object.keys(self.eligibleSpecies).length);
+  // $("#speciesCount").html(Object.keys(self.eligibleSpecies).length);
   Object.keys(self.species).forEach(function(id) {
       self.species[id].html.detach().appendTo(self.eligibleSpecies[id]?"#especiesElegiveis":"#especiesDescartadas");// species is eligible
   });
@@ -251,17 +252,20 @@ function imageError(img) {
 Identification.prototype.identify = function() {
   console.time("Identify");
   var self = this;
-  var query = {base:self.base, language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}
+  var query = {filter:self.filter, base:self.base, language:self.internacionalization.language, states:Object.keys(self.selectedStates).map(function(item){return {"states.states.id":item}}), numerical:self.definedNumericals}  
+  console.log("QUERY: ",query);
   self.printDescriptors();
   $.get("/api/Identification/identify", {param: query}, function(data){
     self.eligibleSpecies = {};
-    console.log("ELIGIBLE SPECIES: ",data.response.eligibleSpecies);
+    // console.log("ELIGIBLE SPECIES: ",data.response.eligibleSpecies);
+    console.log("ELIGIBLE SPECIES: ",data.response.eligibleSpecies.length);
     data.response.eligibleSpecies.forEach(function(remoteEligibleSpecies) {      
       self.eligibleSpecies[remoteEligibleSpecies.id] = true;
     });
     self.printSpecies();
     self.eligibleStates = {};
-    data.response.eligibleStates.forEach(function(remoteEligibleState) {
+    console.log("STATES: ",data.response.eligibleStates.length);
+    data.response.eligibleStates.forEach(function(remoteEligibleState) {      
         // console.log("ELIGIBLE STATES: ",data.response.eligibleStates);
         self.eligibleStates[remoteEligibleState._id] = {count: remoteEligibleState.count}
     });

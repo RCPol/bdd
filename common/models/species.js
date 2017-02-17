@@ -2,6 +2,7 @@ var async = require('async');
 var hash = require('object-hash');
 var request = require('request');
 module.exports = function(Species) {
+
   Species.mainImage = function(id,cb) {
     Species.findById(id, function (err, data) {
       if(err) throw new Error(err);
@@ -83,7 +84,8 @@ module.exports = function(Species) {
       Specimen.find(query, function (err,specimens) {
 
         var species = {};
-        species.specimens = [];
+        species.specimens = species.specimens?species.specimens:[];
+        species.collections = species.collections?species.collections:[];
         species["language"] = language;        
         species[base+":"+language+":dwc:Taxon:family"] = specimens[0][base+":"+language+":dwc:Taxon:family"];
         species.base = base;
@@ -91,7 +93,7 @@ module.exports = function(Species) {
         species[base+":"+language+":dwc:Taxon:scientificNameAuthorship"] = specimens[0][base+":"+language+":dwc:Taxon:scientificNameAuthorship"];
         // TODO multiple specimens with different popular names
         species[base+":"+language+":dwc:Taxon:vernacularName"] = specimens[0][base+":"+language+":dwc:Taxon:vernacularName"];
-
+        
         species[base+":"+language+":dwc:Occurrence:establishmentMean"] = specimens[0][base+":"+language+":dwc:Occurrence:establishmentMean"];
         species[base+":"+language+":rcpol:Sample:floweringPeriod"] = specimens[0][base+":"+language+":rcpol:Sample:floweringPeriod"]; //TODO isso é uma caracteristica da especie ou do especime?
         species[base+":"+language+":rcpol:Image:plantImage"] = specimens[0][base+":"+language+":rcpol:Image:plantImage"];
@@ -100,12 +102,21 @@ module.exports = function(Species) {
         species[base+":"+language+":rcpol:Image:pollenImage"] = specimens[0][base+":"+language+":rcpol:Image:pollenImage"];
         species[base+":"+language+":rcpol:Image:allPollenImage"] = specimens[0][base+":"+language+":rcpol:Image:allPollenImage"];
         specimens.forEach(function (sp) {
-          species.specimens.push({id:sp.id});
+          var specimen = {};
+          specimen.id = sp.id;
+          specimen.collection = sp.collection;
+          species.specimens.push(specimen);          
           Object.keys(sp).forEach(function(key,index) {
-            if(key!='__cachedRelations'&&key!='__data'&&key!='__dataSource'&&key!='__strict'&&key!='__persisted'){
+            if(key!='__cachedRelations'&&key!='__data'&&key!='__dataSource'&&key!='__strict'&&key!='__persisted'&&key!='collection'){
               if(sp[key].class=="CategoricalDescriptor"){
                 if(species[key]){
                   species[key].states.concat(sp[key].states);
+                }else{
+                  species[key] = sp[key];
+                }
+              } else if(sp[key].class=="Sample" || sp[key].schema=="dwc"){
+                if(species[key]){                                 
+                  species[key].values.concat(sp[key].values);
                 }else{
                   species[key] = sp[key];
                 }
@@ -135,7 +146,7 @@ module.exports = function(Species) {
             }
           });
         });
-        species.id = Species.app.defineSpeciesID(language,base,name);
+        species.id = Species.app.defineSpeciesID(language,base,name);        
         Species.upsert(species,function (err,instance) {
           if(err)
             console.log(err);

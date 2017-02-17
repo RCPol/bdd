@@ -212,9 +212,20 @@ div.count-species {
 /* Busca */
 .formbusca {
 	float:right;
-	width: 250px;
+	/*width: 250px;*/
 	padding-right: 35px;
 	text-align: right;
+}
+
+.opcoes-de-busca {
+	margin: 0 5px 0 0;
+	padding: 5px 10px;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 14px;
+	color: #2f3d5d;
+	background-color: #7dca90;
+	border:1px solid #7dca90;
+	cursor: pointer;
 }
 
 .fbcampo, .ui-autocomplete-input {
@@ -830,4 +841,81 @@ footer {
 	margin: 0 0 50px 0;
 	color: white;
 	font-size: 12px;
+}
+
+/* The side navigation menu */
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #7dca90; 
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+div.sidecontent {
+	margin: 0 auto 0 auto;
+	width: 900px;
+	padding: 50px;
+	background-color: white;
+	overflow: auto;
+}
+
+div.sidecontent-e {
+	width: 437px;
+	margin: 0 13px 0 0;
+	float: left;
+}
+
+div.sidecontent h1 {
+	font-size: 20px;
+	line-height: 21px;
+	font-weight: normal;
+	margin: 5px 0 16px 0;
+	color: #409f5b;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+div.sidecontent ul li {
+	font-weight: normal;
+	line-height: 21px;
+	font-size: 16px;
+	margin: 3px 0 0 13px;
+	font-family: 'Roboto Condensed', sans-serif;
+	color: #2f3d5d;
+}
+
+div.sidecontent-d {
+	width: 437px;
+	margin: 0 0 0 13px;
+	float: right;
+}
+
+.formfilters {
+	width: 437px;
+	text-align: center;
+	margin: 10px 0 0 0;
+}
+
+.fbfilter {
+	margin: 0;
+	padding: 5px 10px;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 14px;
+	color: #409f5b;
+	border:1px solid #7dca90;
+	width: 415px;
 }
