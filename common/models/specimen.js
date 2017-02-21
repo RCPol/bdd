@@ -26,9 +26,28 @@ module.exports = function(Specimen) {
         }
       }
     ], function (err, states) {          
-      var results = {values: states};
+      // var results = {values: states};
       console.log("ERROR: ",err);
-      cb(null, results);
+      var results = {values: []};
+      console.log("STATES: ",states);
+      states.forEach(function(item) {        
+        if(item._id){
+          item._id.split('|').forEach(function(subItem) {
+            subItem = subItem.trim();
+            var nil = true;  
+            results.values.forEach(function(rs) {
+              if(rs._id==subItem){
+                nil = false;
+                return false;
+              }
+            });
+            if(nil)
+              results.values.push({_id:subItem,count:0})        
+          });       
+        } 
+      });
+      console.log("RESULTS: ",results);
+      cb(null, results);      
     });   
   }
 
@@ -230,7 +249,7 @@ module.exports = function(Specimen) {
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
                         var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
-                        console.log("IMG: ",imageId)
+                        // console.log("IMG: ",imageId)
                         var image = {
                           id: imageId,
                           // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
