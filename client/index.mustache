@@ -46,17 +46,16 @@
 	}
 </style>
 <!-- Campos de busca, scrollbar e botões  -->
-<script type="text/javascript">
-	var filter;
+<script type="text/javascript">	
 
 	/* Open the sidenav */
 	function openNav() {
-	    document.getElementById("mySidenav").style.width = "100%";
+		document.getElementById("mySidenav").style.width = "100%";
 	}
 
 	/* Close/hide the sidenav */
 	function closeNav() {
-	    document.getElementById("mySidenav").style.width = "0";
+		document.getElementById("mySidenav").style.width = "0";
 	}
 
 
@@ -130,6 +129,30 @@
 			setTimeout(updateAccessCount, 1200000);
 		});		
 	}
+	function setFilter() {				
+		var filter = new Filter(identification);		
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:vegetalFormationType","Bioma / Tipo de vegetação");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:municipality","Município");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:stateProvince","Estado");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:country","País");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:region","Região");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:continent","Continente");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:collectionCode","Código da Coleção");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:institutionCode","Código da Instituição");
+		var filter = new Filter(identification);
+		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:collectionName","Nome da Coleção");
+		var filter = new Filter(identification);
+		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:institutionName","Nome da Institutição");
+		var filter = new Filter(identification);
+		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório");
+	}	
 	$(document).ready(function(){		
 		identification.internacionalization.base = '{{base}}';
 		identification.internacionalization.updateLogo();			
@@ -141,11 +164,11 @@
 			window.location = "/"+$("#base_selector").val();			
 		});
 		var msg  = $( "#msg" ).dialog({
-				title:"Comunicado Importante!",
-				autoOpen: false,
-				minWidth: 500,
-		      	modal: true	      
-		    });
+			title:"Comunicado Importante!",
+			autoOpen: false,
+			minWidth: 500,
+			modal: true	      
+		});
 		if(localStorage){
 			if(typeof localStorage.showCommunication=="undefined" || localStorage.showCommunication=='true'){
 				localStorage.showCommunication = false;
@@ -153,33 +176,9 @@
 			}			
 		} else {
 			msg.dialog('open');
-		}
-		filter = new Filter(identification);
-		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:vegetalFormationType","Bioma / Tipo de vegetação",function(data) {
-			filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:municipality","Município",function(data) {
-				filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:stateProvince","Estado",function(data) {
-					filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:country","País",function(data) {
-						filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:region","Região",function(data) {
-							filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:continent","Continente",function(data) {							
-								filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:collectionCode","Código da Coleção",function(data) {
-									filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:institutionCode","Código da Instituição",function(data) {
-										filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:collectionName","Nome da Coleção",function(data) {											
-											filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:institutionName","Nome da Institutição",function(data) {											
-												filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório",function(data) {											
-													filter.setAutocomplete("filterField");
-												});
-											});
-										});
-									});
-								});
-							});
-						});
-					});
-				});
-			});
-		});
-
-	});		
+		}	
+		setFilter();	
+});		
 </script>
 
 
@@ -189,26 +188,26 @@
 <body>	
 	<google-analytics code="UA-83157202-1"></google-analytics>		
 	<div id="msg" style="" >	
-	  <h2>Verifique a versão de seu navegador de Internet.</h2>
-	  <br>
-	  <p>
-	  	Recomendamos utilizar o navegador web <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Google Chrome</a>. Disponível para Windows, MacOS e Linux, o <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Google Chrome</a> é o navegador que oferece melhor desempenho e suporte aos recursos do sistema RCPol. <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Clique aqui para baixar e instalar gratuitamente em seu computador</a>.
-	  </p>
-	  <br>
-	  <p>
-	  	As últimas versões dos navegadores Safari e Firefox também suportam os recursos do sistema, porém com um menor desempenho e sujeito a instabilidades. Não recomendamos utilizar o Microsoft Internet Explorer.
+		<h2>Verifique a versão de seu navegador de Internet.</h2>
+		<br>
+		<p>
+			Recomendamos utilizar o navegador web <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Google Chrome</a>. Disponível para Windows, MacOS e Linux, o <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Google Chrome</a> é o navegador que oferece melhor desempenho e suporte aos recursos do sistema RCPol. <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Clique aqui para baixar e instalar gratuitamente em seu computador</a>.
+		</p>
+		<br>
+		<p>
+			As últimas versões dos navegadores Safari e Firefox também suportam os recursos do sistema, porém com um menor desempenho e sujeito a instabilidades. Não recomendamos utilizar o Microsoft Internet Explorer.
 
-	  	Para garantir o correto funcionamento de todos os recursos do sistema, <strong>recomendamos fortemente utilizar um navegador de Internet moderno e atualizado</strong>, capaz de suportar as tecnlogias utilizadas pela chave interativa da RCPol.
-	  </p>
-	  <br>
-	  <p>
-	  	O sistema de chaves interativas da RCPol utiliza tecnologias modernas de aplicações web para proporcionar uma melhor experiência aos seus usuários.
-	  </p>
-	  <br>
-	  <p>
-	  	Para garantir o correto funcionamento de todos os recursos do sistema, <strong>recomendamos fortemente utilizar um navegador de Internet moderno e atualizado</strong>, capaz de suportar as tecnologias utilizadas pela chave interativa da RCPol.
-	  </p>
-	  <br>
+			Para garantir o correto funcionamento de todos os recursos do sistema, <strong>recomendamos fortemente utilizar um navegador de Internet moderno e atualizado</strong>, capaz de suportar as tecnlogias utilizadas pela chave interativa da RCPol.
+		</p>
+		<br>
+		<p>
+			O sistema de chaves interativas da RCPol utiliza tecnologias modernas de aplicações web para proporcionar uma melhor experiência aos seus usuários.
+		</p>
+		<br>
+		<p>
+			Para garantir o correto funcionamento de todos os recursos do sistema, <strong>recomendamos fortemente utilizar um navegador de Internet moderno e atualizado</strong>, capaz de suportar as tecnologias utilizadas pela chave interativa da RCPol.
+		</p>
+		<br>
 	</div>
 	<div class="contem">
 		<!-- Início Header: Menu e Logotipo -->
@@ -218,23 +217,23 @@
 			<nav>
 				<ul>
 					<li>
-					<!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a>
-					<!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a>
+						<!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a>
+						<!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a>
 					</li>
 					<li>
 						<div class="wrap-label-select-menu">
-						<span class="label-select-menu">Base: </span>
-						<select id="base_selector">
-						  <!-- <option value="eco">Palinoecologia</option> -->
-						  <!-- <option value="taxon">Palinotaxonomia</option> -->
-						</select>
+							<span class="label-select-menu">Base: </span>
+							<select id="base_selector">
+								<!-- <option value="eco">Palinoecologia</option> -->
+								<!-- <option value="taxon">Palinotaxonomia</option> -->
+							</select>
 						</div>
 					</li>
 					<li>
 						<span class="t-lang">
-							<img onclick="identification.translate('pt-BR')"  src="/img/pt_BR.png">
-							<img onclick="identification.translate('en-US')"  src="/img/en_GB.png">
-							<img onclick="identification.translate('es-ES')"  src="/img/es_ES.png">
+							<img onclick="identification.translate('pt-BR');setFilter();"  src="/img/pt_BR.png">
+							<img onclick="identification.translate('en-US');setFilter();"  src="/img/en_GB.png">
+							<img onclick="identification.translate('es-ES');setFilter();"  src="/img/es_ES.png">
 						</span>
 					</li>
 					<li>						
@@ -264,7 +263,7 @@
 
 				<!-- Início: Busca Descritores -->
 				<form class="formbusca">
-				<a class="opcoes-de-busca" onclick="openNav()">Opções de Busca</a>
+				<a class="opcoes-de-busca" onclick="openNav()" id="rcpol-KeyLabel-searchOptions">Opções de Busca</a>
 					<input type="text" is="autocomplete-descriptors" source="identification.descriptors" placeholder="Pesquisar"></input>					
 				</form>
 
@@ -274,7 +273,7 @@
 				<!-- Início: Descritores disponíveis -->
 				<div class="roxinhobtn">
 					<!-- Botões de Expandir/Ocultar -->
-					<div class="divaeh">
+					<div class="divaeh">						
 						<button type="button" class="open expocu" id="rcpol-KeyLabel-keySeeAll">Ver todos</button>
 						<button type="button" class="close expocu" id="rcpol-KeyLabel-keyHideAll">Ocultar todos</button>
 						<!-- <button type="button" class="btnident" onclick="identification.identify()"><span id="rcpol-KeyLabel-keyIdentify">Identificar</span> &#9654;</button> -->
@@ -373,29 +372,51 @@
 
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 			<h1 style="width:100%;text-align: center">Filtros:</h1>
-			<div style="text-align: center; ">
+			<!-- <div style="text-align: center; ">
 				<input id="filterField" class="fbfilter" type="text" placeholder="Pesquisar"></input>								
-			</div>			
+			</div>			 -->
 			<div style="padding: 20px; background-color: lightgray;margin: 30px;font-size: 80%">
 				<p style="font-family: 'Roboto Condensed', sans-serif; font-size: 16px; color:#470054">Você pode filtrar a base de dados por um ou mais dos seguintes campos:</p>
 				<ul style="padding: 20px;">
-					<li>Bioma / Tipo de vegetação: <i id="selected-rcpol-Sample-vegetalFormationType" style="color:darkgrey">nenhum</i></li>
-					<li>Município: <i id="selected-dwc-Location-municipality" style="color:darkgrey">nenhum</i></li>
-					<li>Estado: <i id="selected-dwc-Location-stateProvince" style="color:darkgrey">nenhum</i></li>
-					<li>País: <i id="selected-dwc-Location-country" style="color:darkgrey">nenhum</i></li>
-					<li>Região: <i id="selected-rcpol-Sample-region" style="color:darkgrey">nenhum</i></li>
-					<li>Continente: <i id="selected-dwc-Location-continent" style="color:darkgrey">nenhum</i></li>
-					<li>Nome da Coleção: <i id="selected-rcpol-Collection-collectionName" style="color:darkgrey">nenhum</i></li>
-					<li>Código da Coleção: <i id="selected-dwc-RecordLevel-collectionCode" style="color:darkgrey">nenhum</i></li>					
-					<li>Nome da Instituição: <i id="selected-rcpol-Collection-institutionName" style="color:darkgrey">nenhum</i></li>
-					<li>Código da Instituição: <i id="selected-dwc-RecordLevel-institutionCode" style="color:darkgrey">nenhum</i></li>					
-					<li>Nome do Laboratório: <i id="selected-rcpol-Collection-laboratory" style="color:darkgrey">nenhum</i></li>					
+					<li>Bioma / Tipo de vegetação: <select id="selected-rcpol-Sample-vegetalFormationType">
+						<option value=""></option>
+					</select></li>
+					<li>Município: <select id="selected-dwc-Location-municipality">
+						<option value=""></option>
+					</select></li>
+					<li>Estado: <select id="selected-dwc-Location-stateProvince">
+						<option value=""></option>
+					</select></li>
+					<li>País: <select id="selected-dwc-Location-country">
+						<option value=""></option>
+					</select></li>
+					<li>Região: <select id="selected-rcpol-Sample-region">
+						<option value=""></option>
+					</select></li>
+					<li>Continente: <select id="selected-dwc-Location-continent">
+						<option value=""></option>
+					</select></li>
+					<li>Nome da Coleção: <select id="selected-rcpol-Collection-collectionName">
+						<option value=""></option>
+					</select></li>
+					<li>Código da Coleção: <select id="selected-dwc-RecordLevel-collectionCode">
+						<option value=""></option>
+					</select></li>					
+					<li>Nome da Instituição: <select id="selected-rcpol-Collection-institutionName">
+						<option value=""></option>
+					</select></li>
+					<li>Código da Instituição: <select id="selected-dwc-RecordLevel-institutionCode">
+						<option value=""></option>
+					</select></li>					
+					<li>Nome do Laboratório: <select id="selected-rcpol-Collection-laboratory">
+						<option value=""></option>
+					</select></li>					
 				</ul>
 			</div>			
 		</div>		
-	<div>
+		<div>
 
-</div>
+		</div>
 
-</body>
-</html>
+	</body>
+	</html>

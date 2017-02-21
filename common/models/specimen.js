@@ -172,11 +172,12 @@ module.exports = function(Specimen) {
                     } else {
                     // DIFFERENT LANGUAGES
                       var schemaIdOriginal = Specimen.app.defineSchemaID(base, originalLanguage,schema.schema,schema["class"],schema.term);
-                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {
+                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {                        
                         if(schemaOriginal){
+
                           Schema.findOne({where:{base:base, language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
-                            if(state){
-                              Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
+                            if(state){                              
+                              Schema.findById(Schema.app.defineSchemaID(base,language, state.schema, state.class, state.term),function(err,translatedState) {
                                 if(translatedState){
                                   record[schema.id].states.push(translatedState.toJSON());
                                 } else{
@@ -228,7 +229,8 @@ module.exports = function(Specimen) {
                     //recebe um vetor de images
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
-                        var imageId = schema.id.split(":").slice(1).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                        var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                        console.log("IMG: ",imageId)
                         var image = {
                           id: imageId,
                           // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),

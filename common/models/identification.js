@@ -92,7 +92,7 @@ module.exports = function(Identification) {
     //{language:pt-BR, states:[{states.states.id:pt-BR:rcpol:State:flowerColorPurple}], numerical: []}
     //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":{"min":30, "max":40}}]}
 
-    param.language = typeof param.language != "undefined"?param.language:"pt-BR";
+    param.language = typeof param.language != "undefined"?param.language:"pt-BR";    
     param.base = param.base;
     param.states = typeof param.states != "undefined"?param.states:[];    
     param.numerical = typeof param.numerical != "undefined"?param.numerical:[];
@@ -106,7 +106,21 @@ module.exports = function(Identification) {
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName,{strict:true,j:false,w:'majority'});
-
+        console.log("AGGRAGATE: ",
+          JSON.stringify([
+              { $match: queryMongo},           
+              { $unwind: '$states'},
+              { $unwind: '$states.states'},          
+              { $project: {
+                _id: 0,
+                'state': '$states.states.id'
+              }},
+              { $group: {
+                _id: '$state',
+                count: {$sum:1}
+              }}
+            ])
+          );
         IdentificationCollection.aggregate([
           { $match: queryMongo}, // utilizar a query para filtar apenas as espécies que queremos
            // cada espécie tem uma lista de descritores, cada um com uma lista de estados. Montar uma lista unindo todos estes descritores
@@ -234,6 +248,7 @@ module.exports = function(Identification) {
             count: {$sum:1}
           }}
         ], function (error, states) {
+          console.log("STATES: ",states.length);
           // console.log("****** ELIGIBLE STATES ***** \n: ",states);
           if (error) {
             // console.log("ERROR STATES: ",error);
