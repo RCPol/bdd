@@ -370,7 +370,7 @@ app.get('/profile/glossary/individual/:base/:id', function(req, res) {
 
 app.get('/profile/glossary/:base/:lang*?', function(req, res){
   var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
-  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"eco"};
+  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"eco"};  
   res.send(mustache.render(template, params));
 });
 
