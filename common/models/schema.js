@@ -8,12 +8,218 @@ var fs = require('fs');
 var qt = require('quickthumb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var google = require('googleapis');
+var googleAuth = require('google-auth-library');
 
-module.exports = function(Schema) {
+module.exports = function(Schema) {  
+  function GoogleSpreadsheetImportDQ() {
+    this.DQStatus = {};
+  }
+  GoogleSpreadsheetImportDQ.prototype.schemaConformity =  function(sheet) {
+    var self = this;        
+    var reference = ["SCHEMA","CLASS","TERM","Category","Field","State","Definition","Reference","Image","Credit photos"];  
+    self.DQStatus.schemaConformity = self.DQStatus.schemaConformity?self.DQStatus.schemaConformity:[];
+    for (var i = 0; i < reference.length; i++) {
+      if(reference[i].toUpperCase().trim()==sheet.header[i].toUpperCase().trim()){
+          self.DQStatus.schemaConformity.push({
+            name: "Schema Conformity",
+            ie: "Sheet Schema",
+            dr:{
+              id: sheet.sheetId,
+              value: sheet.header[i],              
+              rt: "dataset"
+            },         
+            description: "If all the columns of the sheet match with the defined schema, it is conform to the sheet schema, otherwise, it is not conform to the sheet schema.",
+            details: {
+              technical: {columnIndex:i},
+              language: sheet.language,
+              nontechnical: 'The column ['+i+'] "'+sheet.header[i]+'" is equal "'+reference[i]+'"'
+            },
+            result: "CONFORM"
+          });          
+      } else {
+        self.DQStatus.schemaConformity.push({
+          name: "Schema Conformity",
+          ie: "Sheet Schema",
+          dr:{
+            id: sheet.sheetId,
+            value: sheet.header[i],
+            language: sheet.language,
+            rt: "dataset"
+          },         
+          description: "If all the columns of the sheet match with the defined schema, it is conform to the sheet schema, otherwise, it is not conform to the sheet schema.",
+          details: {
+            technical: {columnIndex:i},
+            language: sheet.language,
+            nontechnical: 'The column ['+i+'] "'+sheet.header[i]+'" should be "'+reference[i]+'"'
+          },
+          result: "NOT CONFORM"
+        }); 
+      }      
+    }        
+    return this;   
+  }
+  Schema.googleSpreadsheetImport = function(id,cb){  
+    var spreadsheet  =  new GoogleSpreadsheetImport(id);  
+    spreadsheet.authorize();
+    spreadsheet.on('authorized',function() {
+      async.series(
+        [
+          function getInfo(cont) {
+            spreadsheet.getInfo(cont);
+          },
+          function getData(cont){
+            async.forEach(Object.keys(spreadsheet.info.sheets),function(item,callback) {
+              spreadsheet.getData(item,callback);
+            },function doneForEach() {
+              cont();
+            });            
+          },
+          function getDQAssessment(cont){
+            var dq = new GoogleSpreadsheetImportDQ();
+            Object.keys(spreadsheet.info.sheets).forEach(function(key) {
+              var sheet = spreadsheet.info.sheets[key];      
+              dq.schemaConformity(sheet);                      
+            });            
+            spreadsheet.info.DQStatus = dq.DQStatus;              
+            cont();
+          },
+          function updates(cont) {            
+              spreadsheet.updateTitle();
+              spreadsheet.DQFeedback();
+              // ... other updates
+              spreadsheet.commit(cont);                            
+          },          
+        ],
+        function done() {
+          cb(null,spreadsheet.info);
+        }
+      );      
+    });
+    spreadsheet.on('unauthorized',function() {
+      cb("Unauthorized spreadsheet: "+id, id);
+    });
+  }
+  function GoogleSpreadsheetImport(id) {
+    EventEmitter.call(this);
+    var self = this;
+    self.id = id;    
+    self.info = {};
+    self.data = {};
+    self.requests = [];
+  }
+  util.inherits(GoogleSpreadsheetImport, EventEmitter);
+
+  GoogleSpreadsheetImport.prototype.authorize =  function() {
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];   
+    var key = require('key.json');
+    var self = this;    
+    self.auth = new google.auth.JWT(key.client_email,null,key.private_key,[SCOPES],null);    
+    self.auth.authorize(function(err,tokens) {
+      if(!err && tokens){
+        self.service = google.sheets('v4');        
+        self.emit("authorized");
+      } else {
+        self.emit("unauthorized");
+      }
+    });
+    return this;   
+  }
+  GoogleSpreadsheetImport.prototype.DQFeedback =  function(){
+    var self = this; 
+    // var action = {
+    //   "updateSpreadsheetProperties": {
+    //     "properties": {"title": "["+self.info.base+"] "+self.info.title+" [uploaded at "+self.info.uploaded+"]"},
+    //     "fields": "title"
+    //   }
+    // };    
+    // self.requests.push(action);    
+  }
+  GoogleSpreadsheetImport.prototype.getData =  function(lang,cb) {    
+    var self = this;       
+    self.service.spreadsheets.values.get({
+      auth: self.auth,
+      spreadsheetId: self.id,
+      range: self.info.sheets[lang].title+'!A1:JJ'      
+    }, function(err, rs) {
+      if (err) {
+        self.info.error = 'The API returned an error: ' + err;    
+        cb();
+        return;          
+      }      
+      self.data[lang] = { values:rs.values, 
+                          header:rs.values[0]
+                        };            
+      self.info.sheets[lang].rows = self.data[lang].values.length;      
+      self.info.sheets[lang].header = self.data[lang].header;      
+      cb();
+    }); 
+  }  
+  GoogleSpreadsheetImport.prototype.getInfo =  function(cb) {    
+    var self = this;       
+    self.service.spreadsheets.get({
+      auth: self.auth,
+      spreadsheetId: self.id
+    }, function(err, rs) {
+      if (err) {
+        self.info.error = 'The API returned an error: ' + err;    
+        cb();
+        return;          
+      }      
+      var currentTitle = rs.properties.title;
+      self.info.title = currentTitle.split("]")[1].split("[")[0].trim();        
+      self.info.base = currentTitle.split("]")[0].split("[")[1].trim();
+      self.info.sheets = {};
+      rs.sheets.forEach(function(item) {
+        var language = item.properties.title.split(".")[1].trim();        
+        self.info.sheets[language] = {};
+        self.info.sheets[language].language = language;
+        self.info.sheets[language].sheetId = item.properties.sheetId; 
+        self.info.sheets[language].title = item.properties.title;                
+      });
+      self.info.uploaded = new Date();
+      cb();
+    }); 
+  }  
+  GoogleSpreadsheetImport.prototype.updateTitle =  function(){
+    var self = this; 
+    var action = {
+      "updateSpreadsheetProperties": {
+        "properties": {"title": "["+self.info.base+"] "+self.info.title+" [uploaded at "+self.info.uploaded+"]"},
+        "fields": "title"
+      }
+    };    
+    self.requests.push(action);    
+  }
+  GoogleSpreadsheetImport.prototype.commit = function(cb){    
+    var self = this;
+    self.service.spreadsheets.get({
+      auth: self.auth,
+      spreadsheetId: self.id        
+    }, function(err, rs) {
+      if (err) {
+        self.info.error = 'The API returned an error: ' + err;    
+        cb();
+        return;
+      }    
+      var batchUpdateRequest = {requests: self.requests}
+      self.service.spreadsheets.batchUpdate({
+        auth: self.auth,
+        spreadsheetId: self.id,        
+        resource: batchUpdateRequest
+      }, function(err, response) {
+        if (err) {
+          self.info('The API returned an error: ' + err);    
+          cb();
+          return;
+        } cb();
+      });
+    }); 
+  }
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
-  Schema.inputFromURL = function(url, language, sheetNumber, cb) {
+  Schema.inputFromURL = function(url, language, base, sheetNumber, cb) {
     if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
       //definição da url
       url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
@@ -34,8 +240,9 @@ module.exports = function(Schema) {
         async.each(data, function iterator(line, callback){
           //line é o campo da tabela
           var record = {};
-          record.id = Schema.app.defineSchemaID(language,line[0],line[1],line[2]);
+          record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
           record.order = response.count;
+          record.base = base;
           if(record.id){
             response.count++;
             record.schema = toString(line[0]).trim();
@@ -108,173 +315,7 @@ module.exports = function(Schema) {
     } else {
       cb("invalid language",language);
     }
-  };
-  // Schema.inputFromURL = function(url, language, sheetNumber, redownload, cb) {
-  //   if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
-  //     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-  //     var name = defineName(url);
-  //     if(name==null)
-  //       cb("Invalid XLSX file.",null);
-  //     var path = __dirname +"/../../uploads/"+name+".xlsx";
-  //     saveDataset(name,url,path);
-  //     var downloadQueue = [];
-  //
-  //     var w = fs.createWriteStream(path).on("close",function (argument) {
-  //       var data = xlsx.parse(path)[sheetNumber || 0].data;
-  //       var schema = data[0];
-  //       var class_ = data[1];
-  //       var term = data[2];
-  //       var label = data[3];
-  //       data =  data.slice(4,data.length);
-  //       var rs = {};
-  //       rs.count = 0;
-  //       async.each(data, function iterator(line, callback){
-  //         var record = {};
-  //         record.id = line[1] && line[1].trim().length>0?line[1].trim():null;
-  //         record.order = rs.count;
-  //         // rs.count ++;
-  //         if(record.id){
-  //           rs.count++;
-  //           // If State is empty
-  //           if (line[4] && line[4].trim().length==0){
-  //             for(var c = 2; c < term.length; c++){
-  //               if(line[c]){
-  //                 var field = toString(schema[c])+":"+toString(term[c]);
-  //                 var current = {};
-  //                 current.schema = toString(schema[c]);
-  //                 current.class = toString(class_[c]);
-  //                 current.term = toString(term[c]);
-  //                 current.label = toString(label[c]);
-  //                 current.value = toString(line[c]);
-  //                 // REFERENCE
-  //                 if(current.class=="Reference"){
-  //                   current.references = [];
-  //                   current.value.split("|").forEach(function (ref) {
-  //                     current.references.push(ref.trim());
-  //                   });
-  //                 }
-  //                 // IMAGE
-  //                 if(current.class=="Image"){
-  //                   current.images = [];
-  //                   current.value.split("|").forEach(function (image) {
-  //                     current.images.push(image.trim());
-  //                   });
-  //                 }
-  //                 // Check if exist field with the same key
-  //                 if(record[field]){
-  //                   // Check if the field is the is an Array
-  //                   if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
-  //                       record[field].push(current);
-  //                   } else {
-  //                     var old = Object.create(record[field]);
-  //                     record[field] = [];
-  //                     record[field].push(old);
-  //                     record[field].push(current);
-  //                   }
-  //                 } else {
-  //                   record[field] = current;
-  //                 }
-  //               }
-  //             }
-  //             Schema.upsert(record,function (err,instance) {
-  //               if(err)
-  //                 console.log(err);
-  //               callback();
-  //             });
-  //           } else {
-  //           // adicionar estados
-  //             for(var c = 2; c < term.length; c++){
-  //               if(line[c]){
-  //                 var field = toString(schema[c])+":"+toString(term[c]);
-  //                 var current = {};
-  //                 current.schema = toString(schema[c]);
-  //                 current.class = toString(class_[c]);
-  //                 current.term = toString(term[c]);
-  //                 current.label = toString(label[c]);
-  //                 current.value = toString(line[c]);
-  //                 // REFERENCE
-  //                 if(current.class=="Reference"){
-  //                   current.references = [];
-  //                   current.value.split("|").forEach(function (ref) {
-  //                     current.references.push(ref.trim());
-  //                   });
-  //                 }
-  //                 // IMAGE
-  //                 if(current.class=="Image"){
-  //                   current.images = [];
-  //                   current.value.split("|").forEach(function (image) {
-  //                     current.images.push(image.trim());
-  //                   });
-  //                 }
-  //                 // Check if exist field with the same key
-  //                 if(record[field]){
-  //                   // Check if the field is the is an Array
-  //                   if(Object.prototype.toString.call( record[field] ) === '[object Array]' ){
-  //                       record[field].push(current);
-  //                   } else {
-  //                     var old = Object.create(record[field]);
-  //                     record[field] = [];
-  //                     record[field].push(old);
-  //                     record[field].push(current);
-  //                   }
-  //                 } else {
-  //                   record[field] = current;
-  //                 }
-  //               }
-  //             }
-  //             if (!line[2]) {
-  //               line[2] = "";
-  //             }
-  //             if (!line[3]) {
-  //               line[3] = "";
-  //             }
-  //             if (!line[4]) {
-  //               line[4] = "";
-  //             }
-  //             // record.id = hash.MD5(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase());
-  //             // console.log(line[2].trim().toLowerCase()+":"+line[3].trim().toLowerCase()+":"+line[4].trim().toLowerCase()+" "+record.id);
-  //             record.image = line[7];
-  //             record.url = "/images/" + record.id + ".jpeg";
-  //             if (record.image != undefined){
-  //               record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-  //               downloadQueue.push({url:record.image, name:record.id});
-  //             }
-  //           }
-  //           Schema.findById(record.id, function(err, instance){
-  //             if(err){
-  //                 console.log(err);
-  //             }
-  //             if(instance){
-  //               instance[language] = record;
-  //               delete instance[language].id;
-  //               instance.save(function(e,d) {
-  //                 callback();
-  //               });
-  //             } else {
-  //               var multiLangRecord = {};
-  //               multiLangRecord.id = record.id;
-  //               multiLangRecord[language] = record;
-  //               delete multiLangRecord[language].id    ;
-  //               Schema.create(multiLangRecord, function(err,ok) {
-  //                 callback();
-  //               });
-  //             }
-  //           });
-  //         } else {
-  //           callback();
-  //         }
-  //       }, function done(){
-  //         downloadImages(downloadQueue, redownload);
-  //         cb(null, rs);
-  //       });
-  //     });
-  //     request(url).pipe(w);
-  //   } else {
-  //     cb("invalid language",language)
-  //   }
-  // };
-
-
+  };  
   //Método by Raquel
   Schema.downloadImages = function (cb) {
     //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
@@ -459,7 +500,7 @@ module.exports = function(Schema) {
         self.emit("resizedFileWrote");
       }
     });
-    return this;
+    return this; 
   }
   Image.prototype.convertThumbnail = function() {
     var self = this;
@@ -682,6 +723,17 @@ module.exports = function(Schema) {
       }
     });
   };
+  
+  Schema.remoteMethod(
+    'googleSpreadsheetImport',
+    {
+      http: {path: '/googleSpreadsheet/import', verb: 'get'},
+      accepts: [
+        {arg: 'id', type: 'string', required:true}
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Schema.remoteMethod(
     'mainImage',
     {
@@ -699,6 +751,7 @@ module.exports = function(Schema) {
       accepts: [
         {arg: 'url', type: 'string', required:true, description: 'link para tabela do glossário'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'},
+        {arg: 'base', type: 'string', required:true, description: 'eco or taxon'},
         {arg: 'sheetNumber', type: 'number', required:false, description: 'Sheet number. Default: 0'},
         //  {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],

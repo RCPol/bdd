@@ -1,15 +1,18 @@
 var _ = require('underscore');
 var async = require('async');
 var google = require('googleapis');
-var key = require('rcpol-google-key.json');
+var key = require('key.json');
 const VIEW_ID = 'ga:128522305';
 
 module.exports = function(Identification) {
   Identification.accessCount = function(cb) {    
-    var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'], null);    
+
+    var jwtClient = new google.auth.JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/analytics.readonly'] , null);    
     jwtClient.authorize(function(err, tokens) {
       if (err) {
-        console.log("Autorize access count: ",err);
+        console.log("=================");   
+        console.log("[ERR] Autorize access count: ",err);
+        console.log("=================");   
         cb('','');   
       } else {
         var analytics = google.analytics('v3');
@@ -17,6 +20,9 @@ module.exports = function(Identification) {
         var year = now.getFullYear();
         var month = (now.getMonth()+1).toString().length==1?"0"+(now.getMonth()+1):now.getMonth()+1;
         var day = now.getDate().toString().length==1?"0"+now.getDate():now.getDate();                  
+        console.log("year: ",year);
+        console.log("month: ",month);
+        console.log("day: ",day);
         analytics.data.ga.get({
             'auth': jwtClient,
             'ids': VIEW_ID,
@@ -25,14 +31,19 @@ module.exports = function(Identification) {
             'start-date': '2016-08-23',
             'end-date': year+'-'+month+'-'+day,
             'sort': '-ga:pageviews',
-            'max-results': 10,        
+            'max-results': 100,        
           }, function (err, response) {
             if (err) {
-              console.log("Access count: ",err);
+              console.log("[ERR] Access count: ",err);
               cb('','');            
             } else {
-              // console.log("Count",JSON.stringify(response, null, 4));
-              cb(err,response.rows[0][1]);          
+              console.log("RESPONSE: ",JSON.stringify(response));
+              // console.log("Count",JSON.stringify(response, null, 4));              
+              var rs = 0;
+              response.rows.forEach(function(item) {
+                rs = rs+Number(item[1]);
+              });
+              cb(err,rs);          
             }          
         }); 
       }      
@@ -44,24 +55,25 @@ module.exports = function(Identification) {
       if (err) {
         console.log(err);
         cb('','');
+      } else {
+        var analytics = google.analytics('v3');      
+        analytics.data.realtime.get({
+              'auth': jwtClient,
+              'ids': VIEW_ID,
+              'metrics': 'rt:activeUsers',
+              'dimensions': 'rt:medium',              
+            }, function (err, response) {
+              if (err) {
+                console.log('Active Users',err);
+                cb('','');
+                // return;
+              } else {
+                cb(err,response.totalsForAllResults['rt:activeUsers']);
+              }
+              // console.log("LOG: ",response.totalsForAllResults['rt:activeUsers']);            
+              // console.log(JSON.stringify(response, null, 4));
+          });   
       }
-      var analytics = google.analytics('v3');      
-      analytics.data.realtime.get({
-            'auth': jwtClient,
-            'ids': VIEW_ID,
-            'metrics': 'rt:activeUsers',
-            'dimensions': 'rt:medium',              
-          }, function (err, response) {
-            if (err) {
-              console.log('Active Users',err);
-              cb('','');
-              // return;
-            } else {
-              cb(err,response.totalsForAllResults['rt:activeUsers']);
-            }
-            // console.log("LOG: ",response.totalsForAllResults['rt:activeUsers']);            
-            // console.log(JSON.stringify(response, null, 4));
-        });         
     });
   } 
   Identification.populate = function(filter, callback){
@@ -80,22 +92,35 @@ module.exports = function(Identification) {
     //{language:pt-BR, states:[{states.states.id:pt-BR:rcpol:State:flowerColorPurple}], numerical: []}
     //{"language":"pt-BR", "states":[{"states.states.id":"pt-BR:rcpol:State:flowerColorPurple"}], "numerical": [{"descriptor_id":"pt-BR:rcpol:NumericalDescriptor:polarAxis", "value":{"min":30, "max":40}}]}
 
-    param.language = typeof param.language != "undefined"?param.language:"pt-BR";
+    param.language = typeof param.language != "undefined"?param.language:"pt-BR";    
     param.base = param.base;
-    param.states = typeof param.states != "undefined"?param.states:[];
+    param.states = typeof param.states != "undefined"?param.states:[];    
     param.numerical = typeof param.numerical != "undefined"?param.numerical:[];
 
-    console.log("received parameters:");
-    console.log(param);
-
     composeQuery(param, function(query, queryMongo){
-      queryMongo.base = param.base;
+      queryMongo.base = param.base;             
       query.base = param.base;
+      console.log("QUERY: ",JSON.stringify(queryMongo));
+
       // console.log("******** QUERY ********\n",JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
         if (err) throw new Error(err);
-        var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName);
-
+        var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName,{strict:true,j:false,w:'majority'});
+        console.log("AGGRAGATE: ",
+          JSON.stringify([
+              { $match: queryMongo},           
+              { $unwind: '$states'},
+              { $unwind: '$states.states'},          
+              { $project: {
+                _id: 0,
+                'state': '$states.states.id'
+              }},
+              { $group: {
+                _id: '$state',
+                count: {$sum:1}
+              }}
+            ])
+          );
         IdentificationCollection.aggregate([
           { $match: queryMongo}, // utilizar a query para filtar apenas as espécies que queremos
            // cada espécie tem uma lista de descritores, cada um com uma lista de estados. Montar uma lista unindo todos estes descritores
@@ -223,9 +248,13 @@ module.exports = function(Identification) {
             count: {$sum:1}
           }}
         ], function (error, states) {
+          console.log("STATES: ",states.length);
           // console.log("****** ELIGIBLE STATES ***** \n: ",states);
-          if (err) throw new Error(err);
-          var results = {eligibleStates: states, eligibleSpecies: items};
+          if (error) {
+            // console.log("ERROR STATES: ",error);
+            throw new Error(error);
+          }
+          var results = {eligibleStates: states, eligibleSpecies: items};          
           callback(null, results);
         });
       });
@@ -277,8 +306,9 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
       identification_item.base = species.base; 
       // identification_item.base = base;      
       identification_item["states"] = [];
+      identification_item["filter"] = {};
       async.forEachOfSeries(species, function(item, key, callback2){
-        if (species.hasOwnProperty(key) && species[key] && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor") && species[key].term != "espexi"){
+        if (species.hasOwnProperty(key) && species[key] && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor" || species[key].class == "Sample" || species[key].schema == "dwc" || key == 'specimens') && species[key].term != "espexi"){
           //TODO: handle pollenShape and espexi
           // we only want entries with classes CategoricalDescriptor or NumericalDescriptor
           // we can have multiple states
@@ -310,6 +340,19 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             entry.numerical = species[key].numerical;
             identification_item["states"].push(entry);
             callback2();
+          } else if (key == 'specimens'){            
+            species.specimens.forEach(function(specimen) {
+              Object.keys(specimen.collection).forEach(function(subkey) {                
+                if(specimen.collection[subkey].term == 'institutionName' || specimen.collection[subkey].term == 'collectionName' || specimen.collection[subkey].term == 'laboratory'){                     
+                  identification_item["filter"][subkey] = identification_item["filter"][subkey]?identification_item["filter"][subkey]:[];
+                  identification_item["filter"][subkey].push(specimen.collection[subkey].value);            
+                }
+              });              
+            });
+            callback2();
+          } else if (species[key].values){
+            identification_item["filter"][key] = species[key].values;            
+            callback2();
           } else {
             identification_item["states"].push(entry);
             callback2();
@@ -339,12 +382,12 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
 function composeQuery(param, callback){
   var categorical_param = param.states;
   var numerical_param = param.numerical;
-  var lang = param.language;;
-  var base = param.base;;
+  var lang = param.language;
+  var base = param.base;
 
   var param_grouped_by_descriptor = _.groupBy(categorical_param, function(elem){ return elem["states.states.id"]; });
 
-  if (categorical_param.length == 0 && numerical_param.length == 0) callback({"states.language": lang,"states.base": base}, {"states.language": lang,"states.base": base});
+  if (categorical_param.length == 0 && numerical_param.length == 0 && Object.keys(param.filter||{}).length==0) callback({"states.language": lang,"states.base": base}, {"states.language": lang,"states.base": base});
 
   else {
     var query = {and: []};
@@ -352,7 +395,17 @@ function composeQuery(param, callback){
     Object.keys(param_grouped_by_descriptor).forEach(function(descriptor){
       query.and.push({or: param_grouped_by_descriptor[descriptor]});
       queryMongo.$and.push({$or: param_grouped_by_descriptor[descriptor]});
-    });    
+    });
+    // FILTER    
+    if(param.filter && Object.keys(param.filter).length>0){
+
+      Object.keys(param.filter).forEach(function(key) {
+        var filter  = {};
+        filter['filter.'+key] = param.filter[key];
+        query.and.push(filter);
+        queryMongo.$and.push(filter);
+      });
+    }
     // numerical descriptors:
     numerical_param.forEach(function(elem){
       query.and.push(

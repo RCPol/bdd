@@ -12,10 +12,48 @@ var util = require('util');
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+
+  Specimen.aggregationByField = function(prefix, base, lang, field, cb) {        
+    
+    var queryMongo = { 'language':lang, base:base }        
+    var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
+    Specimen.getDataSource().connector.safe = false;    
+    SpecimenCollection.aggregate([
+      { $match: queryMongo},
+      { $group: {
+        _id: '$'+prefix+field+'.value',
+        count: {$sum:1}
+        }
+      }
+    ], function (err, states) {          
+      var results = {values: states};
+      console.log("ERROR: ",err);
+      cb(null, results);
+    });   
+  }
+
+  Specimen.remoteMethod(     
+    'aggregationByField',
+    {
+      http: {path: '/aggregationByField', verb: 'get'},
+          accepts: [    
+        {arg: 'prefix', type: 'string', required:false},
+        {arg: 'base', type: 'string', required:true},
+        {arg: 'lang', type: 'string', required:true},
+        {arg: 'field', type: 'string', required:true}        
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+
+
+
   var logs = {};
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
+  
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
   Specimen.inputFromURL = function(url,language, base, cb) {
@@ -36,59 +74,61 @@ module.exports = function(Specimen) {
       var label = data[4]; //define o rotulo      
       data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
       var response = {}; //resposta de execução
-      response.count = 0;
-
-      async.each(data,function(line, callback){ //para cada linha lida salve os dados
-        if(line && line.length>0){          
-          async.series([
-          function(callbackSave) {
-            // console.log("start en-US",line);
-            //para salvar em  inglês
-            saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
-              // console.log("finish en-US");
-              callbackSave();
-            });
-          },
-          function(callbackSave) {
-            // console.log("start pt-BR", line);
-            //para salvar em português
-            saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
-              // console.log("finish pt-BR");
-              callbackSave();
-            });
-          },
-          function(callbackSave) {
-            // console.log("start es-ES",line);
-            //para salvar em espanhol
-            saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
-              // console.log("finish es-ES");
-              callbackSave();
-            });
-          }
-        ],function done() {
-          console.log("COUTING: ",response.count++);
-          callback(); //retorno da função
-        });     
-        } else {
-          callback(); //retorno da função
-        }      
-      },function() {
-        //executa o download das imagens
+      response.count = 0;      
+      var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
+          var line = rec.line;          
+          async.parallel([
+            function(callbackSave) {
+              // console.log("start en-US",line);
+              //para salvar em  inglês
+              saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
+                // console.log("finish en-US");
+                callbackSave();
+              });
+            },
+            function(callbackSave) {
+              // console.log("start pt-BR", line);
+              //para salvar em português
+              saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
+                // console.log("finish pt-BR");
+                callbackSave();
+              });
+            },
+            function(callbackSave) {
+              // console.log("start es-ES",line);
+              //para salvar em espanhol
+              saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
+                // console.log("finish es-ES");
+                callbackSave();
+              });
+            }
+          ],function done() {
+            console.log("COUTING: ",response.count++);
+            callback(); //retorno da função
+          });             
+      },1);
+      queue.drain(function() {
+        //executa o download das image
        // downloadImages(downloadQueue, redownload);
         console.log("Done.");
         for (var key in logs) {
           console.log(logs[key]);
         }
-
         cb(null, response);
-      });        
+      });
+      console.log("SIZE: ",data.length);
+      data.forEach(function(line) {
+        if(line[1] && line[2] && line[3]){          
+          queue.push({line:line});          
+        }          
+      });
     });    
     request(url).pipe(w);
   };
   function saveRecord(base, originalLanguage,language,line, schema, class_, terms, callback) {
     var Schema = Specimen.app.models.Schema; //usando o schema
     var c = 0;
-    var record = {}; //dados as serem gravados no banco
+    var record = {}; //dados as serem gravados no banco    
     record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]); //definição do id do specimen
     if(record.id){   //se o id existir execute
       //para termo da planilha
@@ -96,7 +136,7 @@ module.exports = function(Specimen) {
         c++;
         //se existe o termo e a linha existe da amostra
         if(term && toString(line[c]) != ""){
-          var schemaId = Specimen.app.defineSchemaID(language,schema[c],class_[c],terms[c]); //define o id do esquema
+          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema
           record.language = language; //recebe a linguagem
           record.originalLanguage = originalLanguage;  //linguagem original
           record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
@@ -117,7 +157,7 @@ module.exports = function(Specimen) {
                     if(language==originalLanguage){
                     //  SAME LANGUAGE
                       if(stateValue.length>0){
-                        Schema.findOne({where:{language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
+                        Schema.findOne({where:{base:base,language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
                           if(state){
                             record[schema.id].states.push(state.toJSON());
                           }else {
@@ -131,12 +171,13 @@ module.exports = function(Specimen) {
                       }
                     } else {
                     // DIFFERENT LANGUAGES
-                      var schemaIdOriginal = Specimen.app.defineSchemaID(originalLanguage,schema.schema,schema["class"],schema.term);
-                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {
+                      var schemaIdOriginal = Specimen.app.defineSchemaID(base, originalLanguage,schema.schema,schema["class"],schema.term);
+                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {                        
                         if(schemaOriginal){
-                          Schema.findOne({where:{language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
-                            if(state){
-                              Schema.findById(Schema.app.defineSchemaID(language, state.schema, state.class, state.term),function(err,translatedState) {
+
+                          Schema.findOne({where:{base:base, language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
+                            if(state){                              
+                              Schema.findById(Schema.app.defineSchemaID(base,language, state.schema, state.class, state.term),function(err,translatedState) {
                                 if(translatedState){
                                   record[schema.id].states.push(translatedState.toJSON());
                                 } else{
@@ -161,6 +202,13 @@ module.exports = function(Specimen) {
                 // OTHER FIELDS
                 } else {
                 record[schema.id].value = value;
+                if(value.split("|").length>1){
+                  record[schema.id].values = value.split("|").map(function(item) {
+                    return item.trim();
+                  });                  
+                } else {
+                  record[schema.id].values = [value];
+                }
                 // EVENT DATE
                 if(schema.term=="eventDate"){
                   var parsedDate = record[schema.id].value.split("-");
@@ -181,7 +229,8 @@ module.exports = function(Specimen) {
                     //recebe um vetor de images
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
-                        var imageId = schema.id.split(":").slice(1).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                        var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                        console.log("IMG: ",imageId)
                         var image = {
                           id: imageId,
                           // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
@@ -208,28 +257,28 @@ module.exports = function(Specimen) {
                     //   }
                     // });
 
-                  }else
+                  } else
                   // REFERENCE
                   if(schema["class"]=="Reference"){
                     record[schema.id].references = [];
                     record[schema.id].value.split("|").forEach(function (ref) {
                       record[schema.id].references.push(ref.trim());
                     });
-                  }else
+                  } else
                   // INTERACTION
                   if(schema["class"]=="Interaction"){
                     record[schema.id].species = [];
                     record[schema.id].value.split("|").forEach(function (sp) {
                       record[schema.id].species.push(sp.trim());
                     });
-                  }else
+                  } else
                   // FLOWERING PERIOD
                   if(schema.term=="floweringPeriod"){
                     record[schema.id].months = [];
                     record[schema.id].value.split("|").forEach(function (month) {
                       record[schema.id].months.push(month.trim());
                     });
-                  }else
+                  } else
                   // LATITUDE
                   if(schema.term=="decimalLatitude"){
                     var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
@@ -237,7 +286,7 @@ module.exports = function(Specimen) {
                       record[schema.id].rawValue = record[schema.id].value;
                       record[schema.id].value = converted;
                     }
-                  }else
+                  } else
                   // LONGITUDE
                   if(schema.term=="decimalLongitude"){
                     var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
@@ -259,26 +308,60 @@ module.exports = function(Specimen) {
           callbackCell();
         }
       },function done() {
-        Specimen.upsert(record,function (err,instance) {
-          if(err)
-            console.log(err);
-          callback();
-        });
+        var Collection = Specimen.app.models.Collection;
+        var sID = record.id.split(":");
+        var cID = sID[0]+":"+sID[1]+":"+sID[2];        
+        Collection.findById(cID, function(err,collection) {          
+          if(err) console.log("ERROR FIND COLLECTION: ",err);          
+          record.collection = collection;          
+          Specimen.upsert(record,function (err,instance) {
+            if(err)
+              console.log(err);
+            callback();
+          });
+        });        
       });
     } else {
       console.log("Cannot define an ID for specimen: ",language,line[1],line[2],line[3]);
       callback();
     }
   }
-  Specimen.downloadImages = function (cb) {
+  Specimen.downloadImages = function (base,cb) {
     //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
     //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
     //Onde a imagem vai ser salva na pasta do cliente
     var startTime = new Date();
-    Specimen.find({where:{or:[{"pt-BR:rcpol:Image:allPollenImage":{exists:true}},{"pt-BR:rcpol:Image:plantImage":{exists:true}},
-    {"pt-BR:rcpol:Image:flowerImage":{exists:true}},{"pt-BR:rcpol:Image:beeImage":{exists:true}},{"pt-BR:rcpol:Image:pollenImage":{exists:true}}]},
-    fields:{"pt-BR:rcpol:Image:allPollenImage":true,"pt-BR:rcpol:Image:plantImage":true,
-    "pt-BR:rcpol:Image:flowerImage":true, "pt-BR:rcpol:Image:beeImage":true,"pt-BR:rcpol:Image:pollenImage":true}}, function(err,results){    
+    var query = {
+      where:{
+        or:[
+        ]
+      },
+      fields:{}
+    };
+
+    var allPollen =  {};
+    allPollen[base+":pt-BR:rcpol:Image:allPollenImage"] = {exists:true};
+    var plant =  {};
+    plant[base+":pt-BR:rcpol:Image:plantImage"] = {exists:true};
+    var flower =  {};
+    flower[base+":pt-BR:rcpol:Image:flowerImage"] = {exists:true};
+    var bee =  {};
+    bee[base+":pt-BR:rcpol:Image:beeImage"] = {exists:true};
+    var pollen =  {};
+    pollen[base+":pt-BR:rcpol:Image:pollenImage"] = {exists:true};
+    query.where.or.push(allPollen);
+    query.where.or.push(plant);
+    query.where.or.push(flower);
+    query.where.or.push(bee);
+    query.where.or.push(pollen);
+
+    query.fields[base+":pt-BR:rcpol:Image:allPollenImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:plantImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:flowerImage"] = true; 
+    query.fields[base+":pt-BR:rcpol:Image:beeImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:pollenImage"] = true;    
+  
+    Specimen.find(query, function(err,results){         
       
       var i = 0;
       console.time("download");
@@ -290,28 +373,28 @@ module.exports = function(Specimen) {
       },5);
 
       results.forEach(function (result){
-        if(result["pt-BR:rcpol:Image:allPollenImage"]){
-            result["pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:allPollenImage"]){
+            result[base+":pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:flowerImage"]){
-            result["pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:flowerImage"]){
+            result[base+":pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:plantImage"]){
-            result["pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:plantImage"]){
+            result[base+":pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:beeImage"]){
-            result["pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:beeImage"]){
+            result[base+":pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result["pt-BR:rcpol:Image:pollenImage"]){
-            result["pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
+        if(result[base+":pt-BR:rcpol:Image:pollenImage"]){
+            result[base+":pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
@@ -505,7 +588,7 @@ module.exports = function(Specimen) {
       http: {path: '/downloadImages', verb: 'get'},
       accepts: [
         // {arg:'download'}
-        // {arg: 'download', type: 'boolean', required:true, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: true}
+        {arg: 'base', type: 'string', required:true}
       ],
       returns: {arg: 'response', type: 'object'}
     }
@@ -527,6 +610,7 @@ module.exports = function(Specimen) {
       });
     });
   };
+  
   Specimen.remoteMethod(
     'cleanDB',
     {
