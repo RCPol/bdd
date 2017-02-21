@@ -371,47 +371,107 @@
 		<div >
 
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-			<h1 style="width:100%;text-align: center">Filtros:</h1>
+			<h1>Filtros:</h1>
 			<!-- <div style="text-align: center; ">
 				<input id="filterField" class="fbfilter" type="text" placeholder="Pesquisar"></input>								
 			</div>			 -->
-			<div style="padding: 20px; background-color: lightgray;margin: 30px;font-size: 80%">
-				<p style="font-family: 'Roboto Condensed', sans-serif; font-size: 16px; color:#470054">Você pode filtrar a base de dados por um ou mais dos seguintes campos:</p>
-				<ul style="padding: 20px;">
-					<li>Bioma / Tipo de vegetação: <select id="selected-rcpol-Sample-vegetalFormationType">
+			<div class="sidecontent-c">
+
+				<p class="sidecontent-sub">Você pode filtrar a base de dados por um ou mais dos seguintes campos:</p>
+
+			<table class="sidecontent-select">
+
+			<tr>
+				<td class="side-p"><p>Bioma / Tipo de vegetação:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Sample-vegetalFormationType">
 						<option value=""></option>
-					</select></li>
-					<li>Município: <select id="selected-dwc-Location-municipality">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Município:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-municipality">
 						<option value=""></option>
-					</select></li>
-					<li>Estado: <select id="selected-dwc-Location-stateProvince">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Estado:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-stateProvince">
 						<option value=""></option>
-					</select></li>
-					<li>País: <select id="selected-dwc-Location-country">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>País:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-country">
 						<option value=""></option>
-					</select></li>
-					<li>Região: <select id="selected-rcpol-Sample-region">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Região:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Sample-region">
 						<option value=""></option>
-					</select></li>
-					<li>Continente: <select id="selected-dwc-Location-continent">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Continente:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-continent">
 						<option value=""></option>
-					</select></li>
-					<li>Nome da Coleção: <select id="selected-rcpol-Collection-collectionName">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Nome da Coleção:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Collection-collectionName">
 						<option value=""></option>
-					</select></li>
-					<li>Código da Coleção: <select id="selected-dwc-RecordLevel-collectionCode">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Código da Coleção:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-RecordLevel-collectionCode">
 						<option value=""></option>
-					</select></li>					
-					<li>Nome da Instituição: <select id="selected-rcpol-Collection-institutionName">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Nome da Instituição:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Collection-institutionName">
 						<option value=""></option>
-					</select></li>
-					<li>Código da Instituição: <select id="selected-dwc-RecordLevel-institutionCode">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Código da Instituição:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-RecordLevel-institutionCode">
 						<option value=""></option>
-					</select></li>					
-					<li>Nome do Laboratório: <select id="selected-rcpol-Collection-laboratory">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p>Nome do Laboratório:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Collection-laboratory">
 						<option value=""></option>
-					</select></li>					
-				</ul>
+					</select>
+				</td>
+			</tr>
+
+			</table>
+
 			</div>			
 		</div>		
 		<div>
