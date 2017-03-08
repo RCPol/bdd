@@ -11,8 +11,8 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 
 /* Fundo, links e caixa central */
 body {
-	background: url(21v.jpg) no-repeat center top;
-	background-color: #7dca90;
+	background: url(21b.jpg) no-repeat center top;
+	background-color: #3d4a7a;
 	font-family: 'Roboto', sans-serif;
 	font-size: 14px;
 	line-height: 21px;
@@ -25,21 +25,21 @@ body {
 
 /* Fundo */
 ::-webkit-scrollbar-track {
-	background-color: #409f5b;
+	background-color: #2a2672;
 }
 
 /* Indicador */
 ::-webkit-scrollbar-thumb {
-	background-color: rgba(81,10,84,0.4);
+	background-color: rgba(197,110,164,0.4);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-	background-color: rgba(81,10,84,0.2);
+	background-color: rgba(197,110,164,0.2);
 }
 
 /* Links */
 a:link, a:visited {
 	text-decoration: none;
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 div.contem {
@@ -79,8 +79,8 @@ nav ul li a {
 	display: block;
 	float: right;
 	margin: 0 0 0 12px;
-	background-color: #7dca90;
-	color: #2f3d5d;
+	background-color: #3d4a7a;
+	color: #c56ea4;
 	text-align: center;
 	padding: 14px 16px;
 	text-decoration: none;
@@ -89,15 +89,15 @@ nav ul li a {
 }
 
 nav ul li a:hover {
-	background-color: #409f5b;
+	background-color: #2a2672;
 }
 
 div.wrap-label-select-menu {
 	display: block;
 	float: right;
 	margin: 0 0 0 12px;
-	background-color: #7dca90;
-	color: #2f3d5d;
+	background-color: #3d4a7a;
+	color: #c56ea4;
 	text-align: center;
 	padding: 14px 16px;
 	text-decoration: none;
@@ -109,15 +109,15 @@ select {
 	border: none;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 16px;
-	color: #2f3d5d;
-	background-color: #7dca90;
+	color: #c56ea4;
+	background-color: #3d4a7a;
 	margin: 0;
 }
 
 /* Bandeiras de troca de língua */
 span.t-lang {
 	display: block;
-	background-color: rgba(214, 240, 211, 0.6);
+	background-color: rgba(224,239,249, 0.6);
 	padding: 14px 8px;
 	height: 25px;
 }
@@ -131,23 +131,23 @@ span.t-lang img {
 /* Contador */
 
 #count {
-	color: #2f3d5d;
+	color: #c56ea4;
 	display: block;
 	float: right;
 	font-size: 12px;
 	padding: 14px 16px;
-	background-color: rgba(214, 240, 211, 0.6);
+	background-color: rgba(224,239,249, 0.6);
 	margin-bottom: -12px;
 	font-family: 'Roboto Condensed', sans-serif;
 }
 
 #activeUsers {
-	color: #2f3d5d;
+	color: #c56ea4;
 	display: block;
 	float: right;
 	font-size: 12px;
 	padding: 14px 16px;
-	background-color: rgba(214, 240, 211, 0.6);
+	background-color: rgba(224,239,249, 0.6);
 	margin-bottom: -12px;
 	font-family: 'Roboto Condensed', sans-serif;
 }
@@ -172,7 +172,7 @@ div.qbranco h1 {
 	line-height: 21px;
 	font-weight: normal;
 	margin: 5px 0 16px 13px;
-	color: #409f5b;
+	color: #2a2672;
 	float: left;
 	font-family: 'Roboto Condensed', sans-serif;
 }
@@ -181,7 +181,7 @@ div.qbranco h2 {
 	font-size: 18px;
 	line-height: 21px;
 	font-weight: normal;
-	color: #409f5b;
+	color: #2a2672;
 	margin: 13px 13px;
 	font-family: 'Roboto Condensed', sans-serif;
 }
@@ -205,7 +205,7 @@ div.count-species {
 	float:r ight;
 	text-align: right;
 	margin: 0 27px 10px 0;
-	color: #409f5b;
+	color: #2a2672;
 }
 
 
@@ -220,14 +220,14 @@ div.count-species {
 	padding: 5px 10px;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 14px;
-	color: #2f3d5d;
-	background-color: #7dca90;
-	border:1px solid #7dca90;
+	color: #c56ea4;
+	background-color: #3d4a7a;
+	border:1px solid #3d4a7a;
 	cursor: pointer;
 }
 
 .opcoes-de-busca:hover {
-	background-color: #409f5b;
+	background-color: #2a2672;
 }
 
 .fbcampo, .ui-autocomplete-input {
@@ -235,24 +235,24 @@ div.count-species {
 	padding: 5px 10px;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 14px;
-	color: #409f5b;
-	border:1px solid #7dca90;
+	color: #2a2672;
+	border:1px solid #3d4a7a;
 }
 
 ::-webkit-input-placeholder {
-   color: #409f5b;
+   color: #2a2672;
 }
 
 :-moz-placeholder { /* Firefox 18- */
-   color: #409f5b;  
+   color: #2a2672;  
 }
 
 ::-moz-placeholder {  /* Firefox 19+ */
-   color: #409f5b;  
+   color: #2a2672;  
 }
 
 :-ms-input-placeholder {  
-   color: #409f5b;  
+   color: #2a2672;  
 }
 
 .fbbotao {
@@ -264,16 +264,16 @@ div.count-species {
 	cursor: pointer;
 	text-align: center;
 	text-decoration: none;
-	color: #2f3d5d;
-	border: solid 1px #7dca90;
-	background: #7dca90;
+	color: #c56ea4;
+	border: solid 1px #3d4a7a;
+	background: #3d4a7a;
 	line-height: 17px;
 	/*firefox 18 edge 16*/
 }
 
 .fbbotao:hover {
 	text-decoration: none;
-	background: #409f5b;
+	background: #2a2672;
 }
 /*
 .fbbotao::-moz-focus-inner {
@@ -293,7 +293,7 @@ div.count-species {
 	margin: 2px 0 0 0;
 	list-style: none;
 	background-color: white;
-	border: 1px solid #7dca90 !important;
+	border: 1px solid #3d4a7a !important;
 }
 
 .ui-autocomplete .ui-menu-item > a.ui-corner-all {
@@ -315,7 +315,7 @@ p.autocdescwrapcat.ui-menu-item-wrapper {
 	line-height: 16px;
 	text-align: center;
 	font-family: 'Roboto Condensed', sans-serif;
-	color: #2f3d5d;
+	color: #c56ea4;
 	padding: 0 0 10px 0;
 }
 
@@ -354,10 +354,10 @@ div.autocdescwrap.ui-menu-item:hover {
 	width: 150px;
 	margin: 10px 0 5px 10px;
 	padding: 5px 0;
-	background-color: #7dca90;
-	-moz-box-shadow: 0px 0px 0px 2px #409f5b;
-	-webkit-box-shadow: 0px 0px 0px 2px #409f5b;
-	box-shadow: 0px 0px 0px 2px #409f5b;
+	background-color: #3d4a7a;
+	-moz-box-shadow: 0px 0px 0px 2px #2a2672;
+	-webkit-box-shadow: 0px 0px 0px 2px #2a2672;
+	box-shadow: 0px 0px 0px 2px #2a2672;
 }
 
 p.autocdescwrapcat.ui-menu-item-wrapper.ui-state-active {
@@ -365,7 +365,7 @@ p.autocdescwrapcat.ui-menu-item-wrapper.ui-state-active {
 	line-height: 16px;
 	text-align: center;
 	font-family: 'Roboto Condensed', sans-serif;
-	color: #2f3d5d;
+	color: #c56ea4;
 	padding: 0 0 10px 0;
 	background-color: transparent;
 }
@@ -427,7 +427,7 @@ div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper {
 	margin: 0;
 	padding: 12px;
 	width: 351px;
-	background-color: #94db98;
+	background-color: #b4c4d9;
 	overflow: auto;
 	display: flex;
 	align-itens: center;
@@ -455,7 +455,7 @@ div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.nomes
 	font-weight: normal;
 	width: 250px;
 	font-family: 'Roboto Condensed', sans-serif;
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.famisp {
@@ -464,7 +464,7 @@ div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.famis
 	font-size: 16px;
 	margin: 7px 0 0 0;
 	font-family: 'Roboto Condensed', sans-serif;
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.popn {
@@ -473,7 +473,7 @@ div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.popn 
 	font-size: 13px;
 	margin: 7px 0 0 0;
 	font-family: 'Roboto Condensed', sans-serif;
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 /* Clear */
@@ -490,7 +490,7 @@ div.autocespcwrap.ui-menu-item div.especies.ui-menu-item-wrapper div.nsp p.popn 
 
 /* Quadrados conteúdo */
 div.roxinho {
-	background-color: #dbf0c2;
+	background-color: #e0eff9;
 	width: 412px;
 	height: 387px;
 	padding: 25px 0 25px 25px;
@@ -499,7 +499,7 @@ div.roxinho {
 }
 
 div.roxinhodesc {
-	background-color: #dbf0c2;
+	background-color: #e0eff9;
 	width: 412px;
 	height: 330px;
 	padding: 25px 0 25px 25px;
@@ -508,7 +508,7 @@ div.roxinhodesc {
 }
 
 div.roxinhobtn {
-	background-color: #dbf0c2;
+	background-color: #e0eff9;
 	width: 412px;
 	padding: 25px 0 0 25px;
 	overflow: auto;
@@ -524,15 +524,15 @@ div.roxinhobtn {
 	cursor: pointer;
 	text-align: center;
 	text-decoration: none;
-	color: #2f3d5d;
-	border: solid 1px #7dca90;
-	background: #7dca90;
+	color: #c56ea4;
+	border: solid 1px #3d4a7a;
+	background: #3d4a7a;
 	font-family: 'Roboto Condensed', sans-serif;
 	line-height: 15px;
 }
 
 .expocu:hover {
-	background-color: #409f5b;
+	background-color: #2a2672;
 }
 
 .btnident {
@@ -543,15 +543,15 @@ div.roxinhobtn {
 	cursor: pointer;
 	text-align: center;
 	text-decoration: none;
-	border: solid 1px #409f5b;
-	background: #409f5b;
+	border: solid 1px #2a2672;
+	background: #2a2672;
 	color: white;
 	font-family: 'Roboto Condensed', sans-serif;
 	line-height: 15px;
 }
 
 .btnident:hover {
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 div.divaeh {
@@ -597,8 +597,8 @@ div.agregadordescritores p {
 	padding: 5px 10px;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 14px;
-	color: #409f5b;
-	border:1px solid #7dca90;
+	color: #2a2672;
+	border:1px solid #3d4a7a;
 }
 
 /* Imagens descritores */
@@ -622,10 +622,10 @@ div.vimagens {
 }
 
 div.vimagens.selecionado {
-	background-color: #7dca90;
-	-moz-box-shadow: 0px 0px 0px 2px #409f5b;
-	-webkit-box-shadow: 0px 0px 0px 2px #409f5b;
-	box-shadow: 0px 0px 0px 2px #409f5b;
+	background-color: #3d4a7a;
+	-moz-box-shadow: 0px 0px 0px 2px #2a2672;
+	-webkit-box-shadow: 0px 0px 0px 2px #2a2672;
+	box-shadow: 0px 0px 0px 2px #2a2672;
 }
 
 img.vimg {
@@ -678,7 +678,7 @@ ul li section.toggle {
 	line-height: 21px;
 	font-weight: normal;
 	padding: 0 0 3px 0;
-	color: #2f3d5d;
+	color: #c56ea4;
 	cursor: pointer;
 }
 
@@ -690,8 +690,8 @@ ul li section.toggle span {
 	padding: 2px;
 	border-style: solid;
 	border-width: 2px;
-	border-color: #409f5b;
-	color: #409f5b;
+	border-color: #2a2672;
+	color: #2a2672;
 	font-weight: bold;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 12px;
@@ -706,7 +706,7 @@ ul li a.toggle {
 	line-height: 21px;
 	font-weight: normal;
 	padding: 0 0 3px 0;
-	color: #2f3d5d;
+	color: #c56ea4;
 	cursor: pointer;
 }
 
@@ -718,8 +718,8 @@ ul li a.toggle span {
 	padding: 2px;
 	border-style: solid;
 	border-width: 2px;
-	border-color: #409f5b;
-	color: #409f5b;
+	border-color: #2a2672;
+	color: #2a2672;
 	font-weight: bold;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 12px;
@@ -743,7 +743,7 @@ ul li a.toggle span {
 	font-size: 16px;
 	line-height: 21px;
 	font-weight: normal;
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 .descel input[type=checkbox] + label:before {
@@ -755,11 +755,11 @@ ul li a.toggle span {
 	padding: 2px;
 	border-style: solid;
 	border-width: 2px;
-	border-color: #409f5b;
+	border-color: #2a2672;
 	font-weight: bold;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 12px;
-	color: #409f5b;
+	color: #2a2672;
 	line-height: 10px;
 	text-align: center;
 	margin: 0 5px 0 0;
@@ -774,11 +774,11 @@ ul li a.toggle span {
 	padding: 2px;
 	border-style: solid;
 	border-width: 2px;
-	border-color: #409f5b;
+	border-color: #2a2672;
 	font-weight: bold;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 12px;
-	color: #409f5b;
+	color: #2a2672;
 	line-height: 10px;
 	text-align: center;
 	margin: 0 5px 0 0;
@@ -789,7 +789,7 @@ div.especies {
 	margin: 0 0 12px 0;
 	padding: 12px;
 	width: 351px;
-	background-color: #94db98;
+	background-color: #b4c4d9;
 	overflow: auto;
 	display: flex;
 	align-itens: center;
@@ -837,7 +837,7 @@ p.popn {
 /* Rodapé */
 footer {
 	display: block;
-	background-color: #409f5b;
+	background-color: #2a2672;
 	padding: 25px 50px;
 	text-align: center;
 	margin: 0 0 50px 0;
@@ -853,7 +853,7 @@ footer {
     z-index: 1; /* Stay on top */
     top: 0;
     left: 0;
-    background-color: #7dca90; 
+    background-color: #3d4a7a; 
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 60px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
@@ -887,21 +887,21 @@ div.sidecontent h1 {
 	line-height: 21px;
 	font-weight: normal;
 	margin: 0 0 16px 0;
-	color: #409f5b;
+	color: #2a2672;
 	font-family: 'Roboto Condensed', sans-serif;
 	text-align: center;
 }
 
 div.sidecontent-c {
 	padding: 25px;
-	background-color: #DBF0C2;
+	background-color: #e0eff9;
 	margin: 30px;
 }
 
 div.sidecontent-c p.sidecontent-sub {
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 16px;
-	color: #2f3d5d;
+	color: #c56ea4;
 	text-align: center;
 	margin: 0 0 25px 0;
 }
@@ -909,12 +909,12 @@ div.sidecontent-c p.sidecontent-sub {
 div.sidecontent-c p {
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 18px;
-	color: #2f3d5d;
+	color: #c56ea4;
 	text-align: right;
 }
 
 select.opcoes-select {
-	background-color: #94DB98;
+	background-color: #b4c4d9;
 	width: 350px;
 }
 
@@ -939,7 +939,7 @@ div.sidecontent ul li {
 	font-size: 16px;
 	margin: 3px 0 0 13px;
 	font-family: 'Roboto Condensed', sans-serif;
-	color: #2f3d5d;
+	color: #c56ea4;
 }
 
 div.sidecontent-d {
@@ -959,7 +959,7 @@ div.sidecontent-d {
 	padding: 5px 10px;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 14px;
-	color: #409f5b;
-	border:1px solid #7dca90;
+	color: #2a2672;
+	border:1px solid #3d4a7a;
 	width: 415px;
 }
