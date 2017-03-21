@@ -329,10 +329,12 @@ module.exports = function(Specimen) {
       },function done() {
         var Collection = Specimen.app.models.Collection;
         var sID = record.id.split(":");
-        var cID = sID[0]+":"+sID[1]+":"+sID[2];        
+        var cID = sID[0]+":"+sID[1]+":"+sID[2];   
+        console.log(cID);             
         Collection.findById(cID, function(err,collection) {          
           if(err) console.log("ERROR FIND COLLECTION: ",err);          
-          record.collection = collection;          
+          record.collection = collection;
+          
           Specimen.upsert(record,function (err,instance) {
             if(err)
               console.log(err);

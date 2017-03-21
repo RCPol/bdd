@@ -104,14 +104,14 @@
 								{ field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
 								{ field: 'scientificName', caption: scientificName, size: '20%', sortable: true, resizable: true },
 								{ field: 'collectionName', caption: collectionName, size: '30%', sortable: true, resizable: true },
-								{ field: 'recordedBy', caption: recordedBy, size: '25%', resizable: true },
+								// { field: 'recordedBy', caption: recordedBy, size: '25%', resizable: true },
 							    { field: 'municipality', caption: municipality, size: '25%', resizable: true },
 			                    { field: 'specimen_id', caption: 'Specimen_id', size: '20px', resizable: true, hidden: true }
 							],
 							searches: [
 							  { field: 'scientificName', caption: scientificName, type: 'text' },
 							  { field: 'collectionName', caption: collectionName, type: 'text' },
-							  { field: 'recordedBy', caption: recordedBy, type: 'text' },
+							//   { field: 'recordedBy', caption: recordedBy, type: 'text' },
 							  { field: 'municipality', caption: municipality, type: 'text' }
 							],
 							sortData: [{ field: 'recid', direction: 'ASC' }]
@@ -166,7 +166,7 @@
 
 	  <!-- Nome da espécie -->
       <h2 class="famesp" id="dwc-Taxon-family-value"></h2>
-	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
+	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> <span id="rcpol-Sample-palynomorphType-value"> </span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
 
       <!--Nome popular-->
 	  <h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
@@ -176,7 +176,7 @@
 
 	  <!-- Início: Características da Planta -->
 	  <div class="info-planta">
-      <h2> <span id="rcpol-ProfilesLabel-profilesPlantFeatures">Caracter&iacute;sticas da Planta</span>:</h2>
+      <h2> <span id="rcpol-ProfilesLabel-profilesPlantFeatures"></span></h2>
 		    	<p><b><span id="rcpol-CategoricalDescriptor-habit-label"></span></b> <span id="rcpol-CategoricalDescriptor-habit-value"></span> </p>
 					<p><b><span id="dwc-Occurrence-establishmentMean-label"></span></b> <span id="dwc-Occurrence-establishmentMean-value"></span></p>
 					<p><b><span id="rcpol-Sample-floweringPeriod-label"></span></b> <span id="rcpol-Sample-floweringPeriod-value"></span></p>
@@ -185,7 +185,7 @@
 
 	  <!-- Início: Características da Flor -->
 	  <div class="info-flor">
-			<h2> <span id="rcpol-ProfilesLabel-profilesFlowerFeatures">Caracter&iacute;sticas da Flor</span>:</h2>
+			<h2> <span id="rcpol-ProfilesLabel-profilesFlowerFeatures"></span>:</h2>
 				<p><b><span id="rcpol-CategoricalDescriptor-attractionUnit-label"/></b> <span id="rcpol-CategoricalDescriptor-attractionUnit-value"/></p>
 				<p><b><span id="rcpol-CategoricalDescriptor-flowerSexuality-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSexuality-value"/></p>
 				<p><b><span id="rcpol-CategoricalDescriptor-flowerForm-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerForm-value"/></p>
@@ -212,12 +212,8 @@
 
 		<!-- Início: Descrição Polínica -->
 		<div class="info-polen">
-			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription">Descri&ccedil;&atilde;o pol&iacute;nica</span>:</h2>            
-							<p>
-								<b>
-									<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/>
-								</b>
-								<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-value"></span>
+			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription"></span> <span id="rcpol-ProfilesLabel-profilesPalynomorphDescription"></span>:</h2>            
+							<p><b><span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/></b><span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-value"></span>
 							</p>
 							<p><b><span id="rcpol-CategoricalDescriptor-pollenSymmetry-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenSymmetry-value"></span>
 							</p>

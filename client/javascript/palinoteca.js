@@ -16,7 +16,12 @@ function readSpecimens(lang,base,institutionCode, collectionCode){
       $.getJSON(url, function(especimes){        
         if(especimes.length>0) getChunk(skip+chunkSize)
         especimes.forEach(function(especime, id){
-          w2ui['grid'].add({recid: especime[scope+":dwc:RecordLevel:catalogNumber"].value, species: especime[scope+":dwc:Taxon:scientificName"].value + " " + especime[scope+":dwc:Taxon:scientificNameAuthorship"].value, tipo: especime[scope+":dwc:Occurrence:recordedBy"].value, cidade: especime[scope+":dwc:Location:municipality"].value + " - " + especime[scope+":dwc:Location:stateProvince"].value, specimen_id: especime.id});
+          w2ui['grid'].add({
+            recid: especime[scope+":dwc:RecordLevel:catalogNumber"].value, 
+            species: especime[scope+":dwc:Taxon:scientificName"].value + " " + especime[scope+":dwc:Taxon:scientificNameAuthorship"].value, 
+            // tipo: especime[scope+":dwc:Occurrence:recordedBy"].value, 
+            cidade: especime[scope+":dwc:Location:municipality"].value + " - " + especime[scope+":dwc:Location:stateProvince"].value, 
+            specimen_id: especime.id});
         });
       });
     }

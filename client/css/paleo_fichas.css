@@ -171,7 +171,7 @@ div.infos-txt {
 
 /* Características da Planta */
 div.info-planta {
-	display: block;
+	display: none;	
 	float: left;
 	width: 425px;
 }
@@ -181,6 +181,9 @@ div.info-flor {
 	display: none;
 	float: left;
 	width: 425px;
+}
+#rcpol-ProfilesLabel-profilesPollenDescription {
+	display: none;
 }
 
 /* Div das Imagens Coluna direita */
