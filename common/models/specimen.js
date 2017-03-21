@@ -26,9 +26,28 @@ module.exports = function(Specimen) {
         }
       }
     ], function (err, states) {          
-      var results = {values: states};
+      // var results = {values: states};
       console.log("ERROR: ",err);
-      cb(null, results);
+      var results = {values: []};
+      console.log("STATES: ",states);
+      states.forEach(function(item) {        
+        if(item._id){
+          item._id.split('|').forEach(function(subItem) {
+            subItem = subItem.trim();
+            var nil = true;  
+            results.values.forEach(function(rs) {
+              if(rs._id==subItem){
+                nil = false;
+                return false;
+              }
+            });
+            if(nil)
+              results.values.push({_id:subItem,count:0})        
+          });       
+        } 
+      });
+      console.log("RESULTS: ",results);
+      cb(null, results);      
     });   
   }
 
@@ -230,7 +249,7 @@ module.exports = function(Specimen) {
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
                         var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
-                        console.log("IMG: ",imageId)
+                        // console.log("IMG: ",imageId)
                         var image = {
                           id: imageId,
                           // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
@@ -310,10 +329,12 @@ module.exports = function(Specimen) {
       },function done() {
         var Collection = Specimen.app.models.Collection;
         var sID = record.id.split(":");
-        var cID = sID[0]+":"+sID[1]+":"+sID[2];        
+        var cID = sID[0]+":"+sID[1]+":"+sID[2];   
+        console.log(cID);             
         Collection.findById(cID, function(err,collection) {          
           if(err) console.log("ERROR FIND COLLECTION: ",err);          
-          record.collection = collection;          
+          record.collection = collection;
+          
           Specimen.upsert(record,function (err,instance) {
             if(err)
               console.log(err);

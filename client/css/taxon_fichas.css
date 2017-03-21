@@ -23,8 +23,8 @@ a:link, a:visited {
 	color: #2f3d5d;
 }
 a:hover, a:active {
-	background-color: #F8C88A;
-	color: #111111;
+	background-color: #2f3d5d;
+	color: white;
 }
 
 div.contem {

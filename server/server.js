@@ -65,20 +65,20 @@ app.get('/eco', function(req, res) {
   res.send(mustache.render(template, params));
 });
 app.get('/taxon', function(req, res) {
-  var template = fs.readFileSync('./client/index.mustache', 'utf8');
-  // var partials = {
-  //   item: fs.readFileSync('./client/item_partial.mustache', 'utf8')
-  // };
-  // var params = {query: req.query};
+  var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "taxon"};
   res.send(mustache.render(template, params));
 });
+app.get('/paleo', function(req, res) {
+  var template = fs.readFileSync('./client/index.mustache', 'utf8');  
+  var params = {base: "paleo"};
+  res.send(mustache.render(template, params));
+});
 
-// Repetir para os outros profiles
 app.get('/profile/species/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
   var params = {id: req.params.id,base: req.params.base?req.params.base:"eco"};
-  console.log("LOG: ",req.params);
+  // console.log("LOG: ",req.params);
   res.send(mustache.render(template, params));
 });
 
@@ -104,14 +104,14 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
         Object.keys(specimen.toJSON()).forEach(function(key) {
           var parsedId = key.split(":");
           if(parsedId.length){
-            console.log("LOG: ",parsedId);
+            // console.log("LOG: ",parsedId);
             var domIdLabel = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":label";
             var domIdValue = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":value";
             if(specimen[key].field)
               params.label[domIdLabel] = specimen[key].field+": ";
             if(specimen[key].value && !specimen[key].states && !specimen[key].months){
               // NORMAL VALUE
-              params.value[domIdValue] = specimen[key].value;              
+              params.value[domIdValue] = specimen[key].value;                            
               // COORDINATES
               if(parsedId[4]=="decimalLatitude" || parsedId[4]=="decimalLongitude")
                 params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
@@ -326,12 +326,14 @@ function profilesDwc(params,callback) {
 }
 function profilesLabel(params,callback) {
   params.label = params.label?params.label:{};
-  var Schema = app.models.Schema;
+  var Schema = app.models.Schema;  
   Schema.find({where:{"class":"ProfilesLabel",language:params.language}},function(err,profilesLabel) {
     profilesLabel.forEach(function(item) {
       var parsedId = item.id.split(":");
       var domId = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]
       params.label[domId] = item.field;
+      // console.log(item);
+      // console.log(params.label[domId]);
     });
     callback();
   });
@@ -370,7 +372,7 @@ app.get('/profile/glossary/individual/:base/:id', function(req, res) {
 
 app.get('/profile/glossary/:base/:lang*?', function(req, res){
   var template = fs.readFileSync('./client/general_glossary.mustache', 'utf8');
-  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"eco"};
+  var params = {lang: req.params.lang, base: req.params.base?req.params.base:"eco"};  
   res.send(mustache.render(template, params));
 });
 

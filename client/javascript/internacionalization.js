@@ -27,6 +27,8 @@ Internacionalization.prototype.siteTranslator = function(){
         $('#base_selector').append('<option value="taxon">'+label.field+'</option>');            
       } else if(label.term=="baseEco"){
         $('#base_selector').append('<option value="eco">'+label.field+'</option>');            
+      } else if(label.term=="basePaleo"){
+        $('#base_selector').append('<option value="paleo">'+label.field+'</option>');            
       } else if(label.term=="siteSearch"){
         $(".formbusca > :text").attr("placeholder",label.field);
       } else if(label.term=="citation"){
