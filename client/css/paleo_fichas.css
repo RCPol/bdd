@@ -12,7 +12,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 /* Fundo, links e caixa central */
 body {
 	background: url(21b.jpg) no-repeat center top;
-	background-color: #3d4a7a;
+	background-color: #003366;
 	font-family: 'Roboto', sans-serif;
 	font-size: 14px;
 	line-height: 21px;
@@ -20,10 +20,10 @@ body {
 
 a:link, a:visited {
 	text-decoration: none;
-	color: #c56ea4;
+	color: #EE5859;
 }
 a:hover, a:active {
-	background-color: #c56ea4;
+	background-color: #EE5859;
 	color: white;
 }
 
@@ -62,8 +62,8 @@ nav ul li {
 
 nav ul li a {
 	display: block;
-	background-color: #3d4a7a;
-	color: #c56ea4;
+	background-color: #003366;
+	color: #EE5859;
 	text-align: center;
 	padding: 14px 16px;
 	text-decoration: none;
@@ -72,14 +72,14 @@ nav ul li a {
 }
 
 nav ul li a:hover {
-	background-color: #2a2672;
+	background-color: #333696;
 	color:#111111
 }
 
 /* Bandeiras de troca de língua */
 span.t-lang {
 	display: block;
-	background-color: rgba(224,239,249, 0.6);
+	background-color: rgba(202, 210, 231, 0.6);
 	padding: 15px 8px;
 	height: 25px;
 	margin: 0 0 -12px 0;
@@ -111,7 +111,7 @@ article h1 {
 	font-weight: normal;
 	line-height: 35px;
 	margin: 0 0 0 0;
-	color: #2a2672;
+	color: #333696;
 }
 
 /* Título Espécime */
@@ -132,19 +132,19 @@ article h1.pal {
 article h2 {
 	font-size: 21px;
 	font-weight: normal;
-	color: #2a2672;
+	color: #333696;
 	margin: 25px 0;
 	font-family: 'Roboto Condensed', sans-serif;
 }
 
 #rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection {
-	color: #2a2672;
+	color: #333696;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 18px;
 }
 
 #rcpol-ProfilesLabel-profilesSeeSpeciesProfile {
-	color: #2a2672;
+	color: #333696;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 18px;
 }
@@ -152,7 +152,7 @@ article h2 {
 /* Familia Espécie */
 h2.famesp {
 	margin: 0 0 12px 0;
-	color: #c56ea4;
+	color: #EE5859;
 }
 
 /* Nome popular */
@@ -249,7 +249,7 @@ div.img-polen h2 {
 }
 
 p.clique-full {
-	color: #2a2672;
+	color: #333696;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 18px;
 	margin: -15px 0 50px 0;
@@ -327,7 +327,7 @@ div.rre p {
 /* Rodapé */
 footer {
 	display: block;
-	background-color: #2a2672;
+	background-color: #333696;
 	padding: 25px 50px;
 	text-align: center;
 	margin: 0 0 50px 0;
@@ -359,15 +359,15 @@ div.visitantes {
 	margin: 50px 0 0 0;
 	padding: 4px;
 	text-align: center;
-	background-color: #3d4a7a;
+	background-color: #003366;
 }
 
 div.visitantes h2 {
-	color: #c56ea4;
+	color: #EE5859;
 }
 
 div.visitantes:hover {
-	background-color: #2a2672;
+	background-color: #333696;
 }
 
 /* Imagem Gráfico */
