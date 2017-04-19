@@ -12,7 +12,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 /* Fundo, links e caixa central */
 body {
 	background: url(21b.jpg) no-repeat center top;
-	background-color: #3d4a7a;
+	background-color: #003366;
 	font-family: 'Roboto', sans-serif;
 	font-size: 14px;
 	line-height: 21px;
@@ -20,11 +20,11 @@ body {
 
 a:link, a:visited {
 	text-decoration: none;
-	color: #c56ea4;
+	color: #EE5859;
 }
 
 a:hover, a:active {
-	background-color: #2a2672;
+	background-color: #333696;
 	color: black;
 }
 
@@ -63,8 +63,8 @@ ul li {
 
 ul li a {
 	display: block;
-	background-color: #3d4a7a;
-	color: #c56ea4;
+	background-color: #003366;
+	color: #EE5859;
 	text-align: center;
 	padding: 14px 16px;
 	text-decoration: none;
@@ -73,13 +73,13 @@ ul li a {
 }
 
 ul li a:hover {
-	background-color: #2a2672;
+	background-color: #333696;
 }
 
 /* Bandeiras de troca de língua */
 span.t-lang {
 	display: block;
-	background-color: rgba(224,239,249, 0.6);
+	background-color: rgba(202, 210, 231, 0.6);
 	padding: 15px 8px;
 	height: 25px;
 }
@@ -116,7 +116,7 @@ article h1.glo-tit {
 article h2 {
 	font-size: 21px;
 	font-weight: normal;
-	color: #2a2672;
+	color: #333696;
 	margin: 25px 0;
 	font-family: 'Roboto Condensed', sans-serif;
 }
@@ -134,8 +134,8 @@ article h2 {
 	padding: 5px 10px;
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 14px;
-	color: #2a2672;
-	border:1px solid #3d4a7a;
+	color: #333696;
+	border:1px solid #003366;
 	border-right:0px;
 }
 
@@ -148,16 +148,16 @@ article h2 {
 	cursor: pointer;
 	text-align: center;
 	text-decoration: none;
-	color: #c56ea4;
-	border: solid 1px #3d4a7a;
-	background: #3d4a7a;
+	color: #EE5859;
+	border: solid 1px #003366;
+	background: #003366;
 	line-height: 17px;
 	/*firefox 18 edge 16*/
 }
 
 .fbbotao:hover {
 	text-decoration: none;
-	background: #2a2672;
+	background: #333696;
 }
 /*
 .fbbotao::-moz-focus-inner {
@@ -181,7 +181,7 @@ article h1 {
 	font-weight: normal;
 	line-height: 35px;
 	margin: 0 0 25px 0;
-	color: #2a2672;
+	color: #333696;
 }
 
 /* Item agregador */
@@ -195,7 +195,7 @@ div.glossario-s {
 div.glossario-s h2 {
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 25px;
-	color: #c56ea4;
+	color: #EE5859;
 	font-weight: normal;
 	margin: 0 0 0 0;
 }
@@ -249,7 +249,7 @@ div.rre p {
 div.popsreft {
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 14px;
-	color: #c56ea4;
+	color: #EE5859;
 	font-weight: normal;
 	margin: 0;
 }
@@ -277,7 +277,7 @@ div#credits {
 /* Rodapé */
 footer {
 	display: block;
-	background-color: #2a2672;
+	background-color: #333696;
 	padding: 25px 50px;
 	text-align: center;
 	margin: 0 0 50px 0;
