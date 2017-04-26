@@ -1,0 +1,33 @@
+{
+  "name": "d3-plugins-sankey",
+  "version": "1.1.0",
+  "main": [
+    "sankey.js",
+    "sankey.css"
+  ],
+  "description": "A bower compatible fork of D3js's Sankey plugin",
+  "keywords": [
+    "d3",
+    "sankey"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "bower_components"
+  ],
+  "dependencies": {
+    "d3": "3"
+  },
+  "homepage": "https://github.com/squidsolutions/d3-plugins-sankey",
+  "_release": "1.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.1.0",
+    "commit": "7d2e093a9e0113ca0aa8250e7c1e943001773d06"
+  },
+  "_source": "https://github.com/squidsolutions/d3-plugins-sankey.git",
+  "_target": "^1.1.0",
+  "_originalSource": "d3-plugins-sankey",
+  "_direct": true
+}
