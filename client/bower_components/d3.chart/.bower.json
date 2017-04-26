@@ -1,0 +1,37 @@
+{
+  "name": "d3.chart",
+  "main": "d3.chart.js",
+  "ignore": [
+    "**/.*",
+    "Gruntfile.js",
+    "bower_components",
+    "examples",
+    "package.json",
+    "src",
+    "test"
+  ],
+  "dependencies": {
+    "d3": "~3.3.11"
+  },
+  "keywords": [
+    "d3.js",
+    "visualization"
+  ],
+  "devDependencies": {
+    "mocha": "~1.20.1",
+    "aight": "~1.2.5",
+    "assert": "~0.1.0"
+  },
+  "homepage": "https://github.com/misoproject/d3.chart",
+  "version": "0.3.0",
+  "_release": "0.3.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.3.0",
+    "commit": "a7dca264770e7a3e623315b1f7e47c6a599b18d2"
+  },
+  "_source": "https://github.com/misoproject/d3.chart.git",
+  "_target": "^0.3.0",
+  "_originalSource": "d3.chart",
+  "_direct": true
+}
