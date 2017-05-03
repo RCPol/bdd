@@ -116,7 +116,9 @@ Identification.prototype.createSpecies = function(callback) {
   $.getJSON("/api/Species?filter[where][base]="+self.base+"&filter[where][language]="+self.internacionalization.language+"&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[fields][id]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:family]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship]=true&filter[fields]["+self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName]=true&filter[order][0]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:family.value%20ASC&filter[order][1]="+self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName.value%20ASC", function(data){          
     var species = data;    
     species.forEach(function(sp) {      
-      self.species[sp.id] = {};
+      if(!sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship"])
+        console.log(sp);
+      self.species[sp.id] = {};      
       self.species[sp.id].id = sp.id;
       self.species[sp.id].htmlId = sp.id.htmlId();            
       self.species[sp.id].scientificName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificName"].value;            
