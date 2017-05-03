@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Interações</title>
+    <script src="../bower_components/d3/d3.js"></script>
+    <script src="../bower_components/d3-plugins-sankey/sankey.js"></script>
+    <script src="../bower_components/d3.chart/d3.chart.js"></script>
+    <script src="d3.chart.sankey.js"></script>
+    <style>
+      body {
+        padding: 10px;
+        min-width: 600px;
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      #chart {
+        height: 600px;
+        font: 13px sans-serif;
+      }
+
+      .node rect {
+        fill-opacity: .9;
+        shape-rendering: crispEdges;
+        stroke-width: 0;
+      }
+      .node text {
+        pointer-events: none;
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      .link {
+        fill: none;
+        stroke: #000;
+        stroke-opacity: .2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Interações com <i>Apis mellifera</i></h1>
+
+    <div id="chart"></div>
+
+    <p>Registros de interação de <i>Apis mellifera</i> de acordo com a distribuição geográfica.</p>
+
+    <script>
+      var colors = {
+            'environment':         '#edbd00',
+            'social':              '#367d85',
+            'animals':             '#97ba4c',
+            'health':              '#f5662b',
+            'research_ingredient': '#3f3e47',
+            'fallback':            '#9f9fa3'
+          };
+
+      d3.json("data/foo.json", function(error, json) {
+        var chart = d3.select("#chart").append("svg").chart("Sankey.Path");
+
+        chart
+          // .name(label)
+          // .colorNodes(function(name, node) {
+          //   return color(node, 1) || colors.environment;
+          // })
+          .colorLinks(function(link) {
+            return  colors.environment;
+          })
+          // .nodeWidth(15)
+          // .nodePadding(10)
+          // .spread(true)
+          // .iterations(0)
+          // .alignLabel('end')
+          .draw(json);
+
+
+        function label(node) {
+          return node.name.replace(/\s*\(.*?\)$/, '');
+        }
+
+        // function color(node, depth) {
+        //   var id = node.id.replace(/(_score)?(_\d+)?$/, '');
+
+        //   if (colors[id]) {
+        //     return colors[id];
+        //   } else if (depth > 0 && node.targetLinks && node.targetLinks.length == 1) {
+        //     return color(node.targetLinks[0].source, depth-1);
+        //   } else {
+        //     return null;
+        //   }
+        // }
+      });
+    </script>
+  </body>
+</html>

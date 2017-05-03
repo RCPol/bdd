@@ -11,7 +11,11 @@ function readSpecies(id, base_, map){
       var class_ = parsedId.length==5?parsedId[3]:"";
       var term = parsedId.length==5?parsedId[4]:"";
       var base = schema+"-"+class_+"-"+term;
-      if(term=="pollenSize"){       
+      if(term=="profilesPlantFeatures"){               
+        $("#"+base+"").append(data[key].field + ": ");                  
+      } else if(term=="palynomorphType"){               
+        $("#"+base+"-value").append(" / "+data[key].value + " - ");                  
+      } else if(term=="pollenSize"){       
         if(data[key].states){
           $("#"+base+"-label").append(data[key].field+": ");
           if(data[key].states.length==1){
@@ -61,7 +65,7 @@ function readSpecies(id, base_, map){
             });
             var sep = data.language=='en-US'?' to ':' a ';
             $("#"+base+"-value").append(lowestValue+sep+highestValue);
-          }            
+          }
         }
       } else if(term=="flowerSize"){        
         if(data[key].states){
@@ -164,11 +168,11 @@ function readSpecies(id, base_, map){
       specimen_query += "&filter[where][id][inq]=" + id;
     });
 
-    $.getJSON("/api/Specimens?" + specimen_query, function(specimens){
-      specimens.forEach(function(specimen, id){        
-        // mapa
-        var p = [specimen[scope+":dwc:Location:decimalLatitude"].value, specimen[scope+":dwc:Location:decimalLongitude"].value];
-        var marker = L.marker(p, {opacity:0.9}).addTo(map);
+    $.getJSON("/api/Specimens?" + specimen_query, function(specimens){      
+      specimens.forEach(function(specimen){        
+        // mapa                
+        var p = [specimen[scope+":dwc:Location:decimalLatitude"].value, specimen[scope+":dwc:Location:decimalLongitude"].value];        
+        var marker = L.marker(p, {opacity:0.9}).addTo(map);        
         $.getJSON("/api/Collections/"+lang+"%3A"+specimen[scope+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[scope+":dwc:RecordLevel:collectionCode"].value,
             function(collection){
               w2ui['grid'].add(
@@ -176,7 +180,7 @@ function readSpecies(id, base_, map){
                 recid: specimen[scope+":dwc:RecordLevel:catalogNumber"].value,
                 scientificName: "<i>"+name+"</i>",
                 collectionName: ((collection[lang+":rcpol:Collection:collectionName"]?collection[lang+":rcpol:Collection:collectionName"].value:"")+" - "+(specimen[scope+":dwc:RecordLevel:institutionCode"]?specimen[scope+":dwc:RecordLevel:institutionCode"].value:"")),
-                recordedBy: specimen[scope+":dwc:Occurrence:recordedBy"].value,
+                // recordedBy: specimen[scope+":dwc:Occurrence:recordedBy"]&&specimen[scope+":dwc:Occurrence:recordedBy"].value?specimen[scope+":dwc:Occurrence:recordedBy"].value:"",
                 municipality: specimen[scope+":dwc:Location:municipality"].value + " - " + specimen[scope+":dwc:Location:stateProvince"].value,
                 specimen_id: specimen.id}
               );

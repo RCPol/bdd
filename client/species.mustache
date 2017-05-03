@@ -104,14 +104,14 @@
 								{ field: 'recid', caption: 'ID', size: '50px', sortable: true, attr: 'align=center' },
 								{ field: 'scientificName', caption: scientificName, size: '20%', sortable: true, resizable: true },
 								{ field: 'collectionName', caption: collectionName, size: '30%', sortable: true, resizable: true },
-								{ field: 'recordedBy', caption: recordedBy, size: '25%', resizable: true },
+								// { field: 'recordedBy', caption: recordedBy, size: '25%', resizable: true },
 							    { field: 'municipality', caption: municipality, size: '25%', resizable: true },
 			                    { field: 'specimen_id', caption: 'Specimen_id', size: '20px', resizable: true, hidden: true }
 							],
 							searches: [
 							  { field: 'scientificName', caption: scientificName, type: 'text' },
 							  { field: 'collectionName', caption: collectionName, type: 'text' },
-							  { field: 'recordedBy', caption: recordedBy, type: 'text' },
+							//   { field: 'recordedBy', caption: recordedBy, type: 'text' },
 							  { field: 'municipality', caption: municipality, type: 'text' }
 							],
 							sortData: [{ field: 'recid', direction: 'ASC' }]
@@ -166,7 +166,7 @@
 
 	  <!-- Nome da espécie -->
       <h2 class="famesp" id="dwc-Taxon-family-value"></h2>
-	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
+	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> <span id="rcpol-Sample-palynomorphType-value"> </span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
 
       <!--Nome popular-->
 	  <h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
@@ -176,7 +176,7 @@
 
 	  <!-- Início: Características da Planta -->
 	  <div class="info-planta">
-      <h2> <span id="rcpol-ProfilesLabel-profilesPlantFeatures">Caracter&iacute;sticas da Planta</span>:</h2>
+      <h2> <span id="rcpol-ProfilesLabel-profilesPlantFeatures"></span></h2>
 		    	<p><b><span id="rcpol-CategoricalDescriptor-habit-label"></span></b> <span id="rcpol-CategoricalDescriptor-habit-value"></span> </p>
 					<p><b><span id="dwc-Occurrence-establishmentMean-label"></span></b> <span id="dwc-Occurrence-establishmentMean-value"></span></p>
 					<p><b><span id="rcpol-Sample-floweringPeriod-label"></span></b> <span id="rcpol-Sample-floweringPeriod-value"></span></p>
@@ -185,85 +185,155 @@
 
 	  <!-- Início: Características da Flor -->
 	  <div class="info-flor">
-			<h2> <span id="rcpol-ProfilesLabel-profilesFlowerFeatures">Caracter&iacute;sticas da Flor</span>:</h2>
-				<p><b><span id="rcpol-CategoricalDescriptor-attractionUnit-label"/></b> <span id="rcpol-CategoricalDescriptor-attractionUnit-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-flowerSexuality-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSexuality-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-flowerForm-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerForm-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-flowerSymmetry-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSymmetry-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-flowerColor-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerColor-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-numberOfCarpelsInOvary-label"/></b> <span id="rcpol-CategoricalDescriptor-numberOfCarpelsInOvary-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-numberOfLoculesInTheOvary-label"/></b> <span id="rcpol-CategoricalDescriptor-numberOfLoculesInTheOvary-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-placentation-label"/></b> <span id="rcpol-CategoricalDescriptor-placentation-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-style-label"/></b> <span id="rcpol-CategoricalDescriptor-style-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-stigma-label"/></b> <span id="rcpol-CategoricalDescriptor-stigma-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-whorls-label"/></b> <span id="rcpol-CategoricalDescriptor-whorls-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-calyx-label"/></b> <span id="rcpol-CategoricalDescriptor-calyx-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-corolla-label"/></b> <span id="rcpol-CategoricalDescriptor-corolla-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-petalsxStamen-label"/></b> <span id="rcpol-CategoricalDescriptor-petalsxStamen-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-ovaryPosition-label"/></b> <span id="rcpol-CategoricalDescriptor-ovaryPosition-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-flowerOpeningTime-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerOpeningTime-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-antherDehiscence-label"/></b> <span id="rcpol-CategoricalDescriptor-antherDehiscence-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-odorPresence-label"/></b> <span id="rcpol-CategoricalDescriptor-odorPresence-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-label"/></b> <span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-value"/></p>
-				<p><b><span id="rcpol-CategoricalDescriptor-flowerSize-label"/></b> <span id="rcpol-CategoricalDescriptor-flowerSize-value"/></p>
+			<h2> <span id="rcpol-ProfilesLabel-profilesFlowerFeatures"></span>:</h2>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-attractionUnit-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-attractionUnit-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-flowerSexuality-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-flowerSexuality-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-flowerForm-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-flowerForm-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-flowerSymmetry-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-flowerSymmetry-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-flowerColor-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-flowerColor-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-numberOfCarpelsInOvary-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-numberOfCarpelsInOvary-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-numberOfLoculesInTheOvary-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-numberOfLoculesInTheOvary-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-placentation-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-placentation-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-style-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-style-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-stigma-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-stigma-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-whorls-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-whorls-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-calyx-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-calyx-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-corolla-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-corolla-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-petalsxStamen-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-petalsxStamen-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-ovaryPosition-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-ovaryPosition-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-flowerOpeningTime-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-flowerOpeningTime-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-antherDehiscence-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-antherDehiscence-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-odorPresence-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-odorPresence-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-value"/></p>
+				<p>
+					<b><span id="rcpol-CategoricalDescriptor-flowerSize-label"/></b> 
+					<span id="rcpol-CategoricalDescriptor-flowerSize-value"/></p>
 
 		</div>
 		<!-- Final: Características da Flor -->
 
 		<!-- Início: Descrição Polínica -->
 		<div class="info-polen">
-			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription">Descri&ccedil;&atilde;o pol&iacute;nica</span>:</h2>            
+			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription"></span> <span id="rcpol-ProfilesLabel-profilesPalynomorphDescription"></span>:</h2>            
 							<p>
-								<b>
-									<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/>
-								</b>
+								<b><span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/></b>
 								<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-value"></span>
 							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-pollenSymmetry-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenSymmetry-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-pollenPolarity-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenPolarity-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-pollenAmbit-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenAmbit-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-pollenAperture-label"/></b> <span id="rcpol-CategoricalDescriptor-pollenAperture-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-colpeFeature-label"/></b> <span id="rcpol-CategoricalDescriptor-colpeFeature-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-poreFeature-label"/></b> <span id="rcpol-CategoricalDescriptor-poreFeature-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-numberOfApertures-label"/></b> <span id="rcpol-CategoricalDescriptor-numberOfApertures-value"></span>
-							</p>
-							<p><b><span id="rcpol-CategoricalDescriptor-exineOrnamentation-label"/></b> <span id="rcpol-CategoricalDescriptor-exineOrnamentation-value"></span>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-pollenSymmetry-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-pollenSymmetry-value"></span>
 							</p>
 							<p>
-								<b>
-									<span id="rcpol-CategoricalDescriptor-pollenShape-label"/>
-								</b>
+								<b><span id="rcpol-CategoricalDescriptor-pollenPolarity-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-pollenPolarity-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-pollenAmbit-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-pollenAmbit-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-pollenAperture-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-pollenAperture-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-colpeFeature-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-colpeFeature-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-poreFeature-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-poreFeature-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-numberOfApertures-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-numberOfApertures-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-exineOrnamentation-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-exineOrnamentation-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-pollenShape-label"/></b>
 								<span id="rcpol-CategoricalDescriptor-pollenShape-value"></span>
 							</p>
 							<p>
-								<b>
-									<span id="rcpol-CategoricalDescriptor-pollenSize-label"/>
-								</b>
+								<b><span id="rcpol-CategoricalDescriptor-pollenSize-label"/></b>
 								<span id="rcpol-CategoricalDescriptor-pollenSize-value"></span>
 							</p>
 
-							<p><b><span id="rcpol-NumericalDescriptor-pollenShape-label"/></b> <span id="rcpol-NumericalDescriptor-pollenShape-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-pollenShape-label"/></b>
+								<span id="rcpol-NumericalDescriptor-pollenShape-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-pollenShapePE-label"/></b> <span id="rcpol-NumericalDescriptor-pollenShapePE-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-pollenShapePE-label"/></b>
+								<span id="rcpol-NumericalDescriptor-pollenShapePE-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-polarAxis-label"/></b> <span id="rcpol-NumericalDescriptor-polarAxis-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-polarAxis-label"/></b>
+								<span id="rcpol-NumericalDescriptor-polarAxis-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-equatorialAxis-label"/></b> <span id="rcpol-NumericalDescriptor-equatorialAxis-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-equatorialAxis-label"/></b>
+								<span id="rcpol-NumericalDescriptor-equatorialAxis-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-smallerPollenDiameter-label"/></b> <span id="rcpol-NumericalDescriptor-smallerPollenDiameter-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-smallerPollenDiameter-label"/></b>
+								<span id="rcpol-NumericalDescriptor-smallerPollenDiameter-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-pollenDiameter-label"/></b> <span id="rcpol-NumericalDescriptor-pollenDiameter-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-pollenDiameter-label"/></b>
+								<span id="rcpol-NumericalDescriptor-pollenDiameter-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-largerPollenDiameter-label"/></b> <span id="rcpol-NumericalDescriptor-largerPollenDiameter-value"></span>
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-largerPollenDiameter-label"/></b>
+								<span id="rcpol-NumericalDescriptor-largerPollenDiameter-value"></span>
 							</p>
-							<p><b><span id="rcpol-NumericalDescriptor-espexi-label"/></b> <span id="rcpol-NumericalDescriptor-espexi-value"></span>
-							</p>						
+							<p>
+								<b><span id="rcpol-NumericalDescriptor-espexi-label"/></b>
+								<span id="rcpol-NumericalDescriptor-espexi-value"></span>
+							</p>	
+							<p>
+								<b><span id="rcpol-Sample-palynomorphSpecialInformation-label"/></b>
+								<span id="rcpol-Sample-palynomorphSpecialInformation-value"></span>
+							</p>																		
 		</div>
 		<!-- Final: Descrição Polínica -->
 

@@ -212,8 +212,6 @@ div.count-species {
 /* Busca */
 .formbusca {
 	float:right;
-	/*width: 250px;*/
-	/*padding-right: 35px;*/
 	text-align: right;
 }
 
@@ -226,6 +224,10 @@ div.count-species {
 	background-color: #FFAD60;
 	border:1px solid #FFAD60;
 	cursor: pointer;
+}
+
+.opcoes-de-busca:hover {
+	background-color: #F27224;
 }
 
 .fbcampo, .ui-autocomplete-input {
@@ -961,4 +963,3 @@ div.sidecontent-d {
 	border:1px solid #FFAD60;
 	width: 415px;
 }
-
