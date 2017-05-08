@@ -1,0 +1,43 @@
+<script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<!--<link rel="stylesheet" href="/ffub/DQProfile/main.scss">-->
+
+<dom-module id="interaction-list">  
+  <template>       
+    <template is="dom-repeat" items="{{interactions}}">
+        <!-- Início: Espécie de visitante -->
+		<div class="visitante">
+			<p><a href="#">
+			<!-- Imagem do visitante -->
+			<img src="{{item.image}}" class="visit-img">
+			<!-- Nome da Espécie -->
+			<i>{{item.pollinator}}</i>
+			</a></p>
+		</div>
+		<!-- Final: Espécie de visitante -->
+    </template>    
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "interaction-list",    
+    properties:{        
+        interactions: Array
+    },
+    ready: function(){        
+        var self = this;
+        self.load();
+    },
+    load: function(){   
+        var self = this;        
+        $.getJSON( "/api/Interactions/pollinators?plant=Anadenanthera macrocarpa", function( data ) {                             
+            self.interactions = data.response;
+            self.interactions = self.interactions.map(function(item){                
+                item.image = item.image?item.image.resized:"https://img1.etsystatic.com/048/0/9461448/il_340x270.708932871_m0vk.jpg";
+                return item;
+            });            
+        });
+    }    
+  });
+
+</script>

@@ -64,6 +64,11 @@ app.get('/eco', function(req, res) {
   var params = {base: "eco"};
   res.send(mustache.render(template, params));
 });
+app.get('/interaction', function(req, res) {
+  var template = fs.readFileSync('./client/interaction.mustache', 'utf8');  
+  var params = {base: "eco"};
+  res.send(mustache.render(template, params));
+});
 app.get('/taxon', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "taxon"};
