@@ -369,20 +369,45 @@ div.visitantes:hover {
 
 /* Imagem Gráfico */
 img.graf_int {
-	float: right;
-	margin: 0 0 0 50px;
+	width: 100%;
 }
 
-div.graf img {
-	margin: 0 4px 0 0;
+div.graf-e {
+	display: block;
+}
+
+div.graf-e p {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+	color: #470054;
+	text-align: left;
+}
+
+select.opcoes-select {
+	background-color: #F9C6A7;
+	width: 350px;
+}
+
+select {
+	border: none;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 16px;
+	color: #470054;
+	background-color: #ffad60;
+	margin: 0;
+}
+
+div.graf {
+	display: block;
+	margin: 25px 0 50px 0;
 }
 
 /* Visitantes da Espécie */
 div.visitante {
-	display: inline-block;
-	vertical-align: top;
-	width: 200px;
-	margin: 0 0 22px 22px;
+	display: block;
+	width: 100%;
+	margin: 0 0 22px 0;
+	overflow: auto;
 }
 
 img.visit-img {
@@ -391,11 +416,40 @@ img.visit-img {
 	min-width: 200px;
 	min-height: 200px;
 	max-height: 200px;
-	max-height: 200px;
+	float: left;
+	margin: 0 15px 0 0;
 }
 
-div.visitante p {
-	font-size: 14px;
-	line-height: 16px;
+p.div-visitante {
+	font-size: 21px;
+	font-weight: normal;
+	color: #F27224;
+	margin: 12px 0 15px 0;
+	font-family: 'Roboto Condensed', sans-serif;
+}
+
+p.div-visitante a {
+	color: #F27224;
+}
+
+div.legenda-int{
+	display: block;
+	width: 100%;
 	text-align: center;
+	margin: 0 0 25px 0;
+}
+
+p.legenda-int-p {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 18px;
+	color: #470054;
+}
+
+img.int-icon-leg {
+	margin: 0 5px 0 10px;
+	vertical-align: middle;
+}
+
+img.int-icon {
+	margin: 0 5px 0 0;
 }
