@@ -64,6 +64,11 @@ app.get('/eco', function(req, res) {
   var params = {base: "eco"};
   res.send(mustache.render(template, params));
 });
+app.get('/interaction/:plant', function(req, res) {
+  var template = fs.readFileSync('./client/interaction.mustache', 'utf8');  
+  var params = {base: "eco",plant:req.params.plant};
+  res.send(mustache.render(template, params));
+});
 app.get('/taxon', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "taxon"};
@@ -74,7 +79,12 @@ app.get('/paleo', function(req, res) {
   var params = {base: "paleo"};
   res.send(mustache.render(template, params));
 });
-
+app.get('/interaction-profile/:pollinator', function(req, res) {
+  var template = fs.readFileSync('./client/interaction-profile.mustache', 'utf8');
+  var params = {pollinator: req.params.pollinator};
+  // console.log("LOG: ",req.params);
+  res.send(mustache.render(template, params));
+});
 app.get('/profile/species/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
   var params = {id: req.params.id,base: req.params.base?req.params.base:"eco"};

@@ -3,6 +3,7 @@ function readSpecies(id, base_, map){
   var scope = base_ +":"+lang;
   $.getJSON("/api/Species/"+id, function(data){
     // titulo    
+    $("#interaction-url").attr("href","/interaction/"+data[scope+":dwc:Taxon:scientificName"].value);
     var name = data[scope+":dwc:Taxon:scientificName"].value + " " + data[scope+":dwc:Taxon:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
     Object.keys(data).forEach(function(key) {

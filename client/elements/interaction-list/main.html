@@ -1,0 +1,81 @@
+    <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="/bower_components/polymer/polymer.html">
+    <!--<link rel="stylesheet" href="/ffub/DQProfile/main.scss">-->
+
+    <dom-module id="interaction-list">  
+    <template>       
+        <!-- Título da Página -->
+        <h1 id="title" class="pal"><span id="rcpol-InteractionLabel-flowerVisitors">Visitantes florais de</span> <i>{{plant}}</i></h1>
+        <h1 class="pal">[[msg]] <i>{{plant}}</i></h1>
+        <!-- Início: Imagens de Abelhas -->        
+        <div class="cspm">            
+        <template id="vis" is="dom-repeat" items="{{interactions}}">
+                <!-- Início: Espécie de visitante -->
+                <div class="visitante">
+
+                    <!-- Imagem do visitante -->
+                    <img id="img-[[item.pollinator]]" src="[[item.image]]" class="visit-img">
+                        
+                    <p class="div-visitante">
+
+                    <!-- Link para Página com os gráficos -->
+                    <a href="/interaction-profile/{{item.pollinator}}">
+
+                    <!-- Nome da Espécie -->
+                    <i>{{item.pollinator}}</i> determinador da espécie
+
+                    </a></p>
+
+                    <!-- Tipo da visita registrada -->
+                    <p class="legenda-int-p">Tipo de visita registrada: Pilhador, Polinizador, Visitante </p>
+
+                    <p class="div-visitante">
+
+                    <!-- Mouse over como no glossário, mostrando a referência bibliográfica do tipo de interação -->
+                    <img src="/img/eco_ref.png" title="teste" class="popsref">
+
+                    <!-- Mouse over como no glossário, mostrando o crédito da imagem da abelha -->
+                    <img src="/img/eco_copyr.png" title="teste" class="popsref">
+                    </p>
+                        
+                </div>
+                <!-- Final: Espécie de visitante -->        
+        </template>    
+        </div>
+    </template>
+    </dom-module>
+    <script>
+    Polymer({
+        is: "interaction-list",    
+        properties:{    
+            plant: String,  
+            msg: String,           
+            interactions: {
+                type:Array            
+            }
+        },
+        ready: function(){
+            var self = this;        
+            $.getJSON( "/api/Interactions/pollinators?plant="+self.plant, function( data ) {                                                                              
+                $.getJSON( "/api/Interactions?filter=%7B%22where%22%3A%7B%22plant%22%3A%22"+self.plant+"%22%2C%20%22image%22%3A%7B%22exists%22%3Atrue%7D%7D%2C%22fields%22%3A%7B%22image%22%3Atrue%2C%22pollinator%22%3Atrue%7D%7D", function( imgs ) {
+                    self.interactions = data.response.map(function(item){  
+                        var rs = item._id;   
+                        rs.image = "/img/filler-200px.png";                                         
+                        imgs.forEach(function(img){
+                            if(img.pollinator==rs.pollinator){                            
+                                rs.image = img.image.resized;
+                                return false;
+                            }
+                        });                                        
+                        return rs;                    
+                });                     
+            });        
+            if(data.response.length==0){
+                self.msg = "Não há registros de interação para ";
+                $("#title").hide()
+            }
+        });
+        }    
+    });
+
+    </script>

@@ -50,6 +50,12 @@
     "$promise": {},
     "$resolved": true
   },
+  "Interaction": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
   "Test": {
     "dataSource": "BDD",
     "public": true
