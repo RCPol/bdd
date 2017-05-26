@@ -59,72 +59,77 @@
     ready: function(){        
         var self = this;        
         self.load();
-
-        // IN
-        var json = {nodes: [], links:[]};
-        var data = [];
-        data.push({species:"Montanoa bipinnatifida", value:80, region:"Sul", state:"Paraná", municipality:"Foz do Iguaçu"});      
-        data.push({species:"Montanoa bipinnatifida", value:70, region:"Sul", state:"Paraná", municipality:"Cascavel"});
-        data.push({species:"Montanoa bipinnatifida", value:10, region:"Sul", state:"Santa Catarina", municipality:"Florianópolis"});        
-        data.push({species:"Montanoa bipinnatifida", value:60, region:"Sul", state:"Santa Catarina", municipality:"Itajaí"});
-        data.push({species:"Montanoa bipinnatifida", value:30, region:"Nordeste", state:"Bahia", municipality:"Salvador"});
-        data.push({species:"Eugenia uniflora", value:50, region:"Sul", state:"Paraná", municipality:"Curitiba"});        
-        data.push({species:"Eugenia uniflora", value:50, region:"Sul", state:"Paraná", municipality:"Foz do Iguaçu"});        
-        data.push({species:"Handroanthus chrysotrichus", value:10, region:"Sul", state:"Santa Catarina", municipality:"Florianópolis"});              
-        data.push({species:"Handroanthus chrysotrichus", value:99, region:"Sul", state:"Paraná", municipality:"Curitiba"});            
-        data.push({species:"Handroanthus chrysotrichus", value:10, region:"Sul", state:"Paraná", municipality:"Cascavel"}); 
-        data.push({species:"Handroanthus chrysotrichus", value:90, region:"Nordeste", state:"Bahia", municipality:"Salvador"});   
-        data.push({species:"Handroanthus chrysotrichus", value:40, region:"Norte", state:"Pará", municipality:"Belém"});            
-        data.push({species:"Citrus limonia", value:40, region:"Norte", state:"Pará", municipality:"Belém"});
-        data.forEach(function(item){
-            if(self.index(json.nodes,item.species)==-1)
-            json.nodes.push({name:item.species});
-            if(self.index(json.nodes,item.municipality)==-1)
-            json.nodes.push({name:item.municipality});
-            if(self.index(json.nodes,item.state)==-1)
-            json.nodes.push({name:item.state});
-            if(self.index(json.nodes,item.region)==-1)
-            json.nodes.push({name:item.region});
-        });
-        // Link Specie - Cidade
-        data.forEach(function(item){
-            var s = self.index(json.nodes, item.municipality);
-            var t = self.index(json.nodes, item.species);
-            var v = item.value;
-            var link = {"source": s, "target":t, "value": v};
-            json.links.push(link);
-        });
-        // Link Cidade - Estado
-        data.forEach(function(item){
-            var s = self.index(json.nodes, item.state);
-            var t = self.index(json.nodes, item.municipality);
-            var v = item.value;
-            var link = {"source": s, "target": t, "value": v};
-            json.links.push(link);
-        });
-        // Link Estado - Região
-        data.forEach(function(item){
-            var s = self.index(json.nodes, item.region);
-            var t = self.index(json.nodes, item.state);
-            var v = item.value;
-            var link = {"source": s, "target": t, "value": v};
-            json.links.push(link);        
-        });
-        var chart = d3.select("#chart").append("svg").chart("Sankey.Path");        
-        chart.colorLinks(function(link) { return  '#F9C6A7'; }).draw(json);
-        // OUT
-
     },
-    load: function(){   
+    load: function(){
         var self = this;        
-        $.getJSON( "/api/Interactions?filter=%7B%22where%22%3A%7B%22pollinator%22%3A%22"+self.pollinator+"%22%7D%7D", function( data ) {                             
-            console.log(data);
-            self.interactions = data
-            // self.interactions = self.interactions.map(function(item){                
-            //     item.image = item.image?item.image.resized:"/img/filler-200px.png";
-            //     return item;
-            // });            
-        });
+        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator, function( interactions ) {                                         
+            // self.interactions = data
+            // IN
+            var json = {nodes: [], links:[]};
+            var data = interactions.response.map(function(item){
+                var d = {
+                    species: item._id.plant?item._id.plant:"", 
+                    value: item.avgQuantity?item.avgQuantity:0, 
+                    region: item._id.region?item._id.region:"", 
+                    state: item._id.state?item._id.state:"", 
+                    municipality: item._id.municipality?item._id.municipality:""};                
+                return d;
+            });
+            // console.log(interact);
+            // var data = [];
+            // data.push({species:"Montanoa bipinnatifida", value:80, region:"Sul", state:"Paraná", municipality:"Foz do Iguaçu"});      
+            // data.push({species:"Montanoa bipinnatifida", value:70, region:"Sul", state:"Paraná", municipality:"Cascavel"});
+            // data.push({species:"Montanoa bipinnatifida", value:10, region:"Sul", state:"Santa Catarina", municipality:"Florianópolis"});        
+            // data.push({species:"Montanoa bipinnatifida", value:60, region:"Sul", state:"Santa Catarina", municipality:"Itajaí"});
+            // data.push({species:"Montanoa bipinnatifida", value:30, region:"Nordeste", state:"Bahia", municipality:"Salvador"});
+            // data.push({species:"Eugenia uniflora", value:50, region:"Sul", state:"Paraná", municipality:"Curitiba"});        
+            // data.push({species:"Eugenia uniflora", value:50, region:"Sul", state:"Paraná", municipality:"Foz do Iguaçu"});        
+            // data.push({species:"Handroanthus chrysotrichus", value:10, region:"Sul", state:"Santa Catarina", municipality:"Florianópolis"});              
+            // data.push({species:"Handroanthus chrysotrichus", value:99, region:"Sul", state:"Paraná", municipality:"Curitiba"});            
+            // data.push({species:"Handroanthus chrysotrichus", value:10, region:"Sul", state:"Paraná", municipality:"Cascavel"}); 
+            // data.push({species:"Handroanthus chrysotrichus", value:90, region:"Nordeste", state:"Bahia", municipality:"Salvador"});   
+            // data.push({species:"Handroanthus chrysotrichus", value:40, region:"Norte", state:"Pará", municipality:"Belém"});            
+            // data.push({species:"Citrus limonia", value:40, region:"Norte", state:"Pará", municipality:"Belém"});            
+            data.forEach(function(item){
+                if(self.index(json.nodes,item.species)==-1)
+                json.nodes.push({name:item.species});
+                if(self.index(json.nodes,item.municipality)==-1)
+                json.nodes.push({name:item.municipality});
+                if(self.index(json.nodes,item.state)==-1)
+                json.nodes.push({name:item.state});
+                if(self.index(json.nodes,item.region)==-1)
+                json.nodes.push({name:item.region});
+            });
+            // Link Specie - Cidade
+            data.forEach(function(item){
+                var s = self.index(json.nodes, item.municipality);
+                var t = self.index(json.nodes, item.species);
+                var v = item.value;
+                var link = {"source": s, "target":t, "value": v};
+                json.links.push(link);
+            });
+            // Link Cidade - Estado
+            data.forEach(function(item){
+                var s = self.index(json.nodes, item.state);
+                var t = self.index(json.nodes, item.municipality);
+                var v = item.value;
+                var link = {"source": s, "target": t, "value": v};
+                json.links.push(link);
+            });
+            // Link Estado - Região
+            data.forEach(function(item){
+                var s = self.index(json.nodes, item.region);
+                var t = self.index(json.nodes, item.state);
+                var v = item.value;
+                var link = {"source": s, "target": t, "value": v};
+                json.links.push(link);        
+            });
+            
+            var chart = d3.select("#chart").append("svg").chart("Sankey.Path");        
+            // chart.colorLinks(function(link) { return  '#F9C6A7'; }).draw(json);            
+            console.log(json);
+            chart.draw(json);
+        });        
     },
     index: function(data, value){        
         for(var i = 0; i < data.length; i++){

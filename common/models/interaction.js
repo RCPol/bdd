@@ -17,45 +17,63 @@ var googleAuth = require('google-auth-library');
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Interaction) {
-  Interaction.pollinators = function(plant,cb) {    
-    var InteractionCollection = Interaction.getDataSource().connector.collection(Interaction.modelName);
-    var q = [
-      { $match: {plant:plant}},                 
-      {
-        $group: {
-          _id:  "$pollinator",                   
-          count: {$sum:1}
-        }
-      }
-    ];
-    InteractionCollection.aggregate(q,function(err,data){
-      if(err) console.log(err);
-      var rs = [];
-      var q = async.queue(function(task, callback){  
-          Interaction.find({where:{pollinator:task._id},limit:1},function(err,img){
-            if(err){
-              console.log(err); 
-              callback();
-              return;
-            }            
-            var i = {}          
-            i.pollinator = img[0].pollinator;
-            i.image = img[0].image;
-            console.log(i);
-            rs.push(i);          
-            callback();
-          });        
-      },1);
-      q.drain = function(){
-        console.log("end....");
-        cb(err,rs);
-      };              
-      data.forEach(function(item){
-        q.push(item,function(e){
-          if(e) console.log("err",e);
-        });
-      });            
+  
+  Interaction.plants = function(pollinator,cb) {        
+    var MongoClient = require('mongodb').MongoClient;    
+    // Connection URL 
+    var url = 'mongodb://mongo:27017/bdd';
+    // Use connect method to connect to the Server 
+    MongoClient.connect(url, function(err, db) {
+      var collection = db.collection('Interaction');
+      var q = [
+          { $match: {pollinator:pollinator}},                 
+          {
+            $group: {
+              _id: {
+                "plant":"$plant",                
+                "state":"$state",
+                "municipality":"$municipality",
+                "region":"$region"                
+              },                   
+              // count: {$sum:1}
+              avgQuantity: { $avg: "$percentual" }
+            }
+          }
+        ];
+      collection.aggregate(q).toArray(function(err, docs) {
+        console.log(err,docs);
+        cb(err,docs);
+        db.close();
+        
+      });
     });
+  }
+    Interaction.pollinators = function(plant,cb) {        
+    var MongoClient = require('mongodb').MongoClient;    
+    // Connection URL 
+    var url = 'mongodb://mongo:27017/bdd';
+    // Use connect method to connect to the Server 
+    MongoClient.connect(url, function(err, db) {
+      var collection = db.collection('Interaction');
+      var q = [
+          { $match: {plant:plant}},                 
+          {
+            $group: {
+              _id: {
+                "pollinator":"$pollinator"                
+              },                   
+              // count: {$sum:1}
+              // avgQuantity: { $avg: "$percentual" }
+            }
+          }
+        ];
+      collection.aggregate(q).toArray(function(err, docs) {
+        console.log(err,docs);
+        cb(err,docs);
+        db.close();
+        
+      });
+    });    
   }
   Interaction.remoteMethod(
     'pollinators',
@@ -63,6 +81,17 @@ module.exports = function(Interaction) {
       http: {path: '/pollinators', verb: 'get'},
       accepts: [
         {arg: 'plant', type: 'string', required:false, description: 'Plant name'}        
+       // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  ); 
+  Interaction.remoteMethod(
+    'plants',
+    {
+      http: {path: '/plants', verb: 'get'},
+      accepts: [
+        {arg: 'pollinator', type: 'string', required:false, description: 'Plant name'}        
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
@@ -106,7 +135,7 @@ module.exports = function(Interaction) {
               i.plant = item[1];
               i.type = item[2];
               i.pollinator = item[3];
-              i.percentual = item[4];
+              i.percentual = Number(item[4]);
               i.author = item[5];
               i.municipality = item[6];
               i.state = item[7];
@@ -119,7 +148,10 @@ module.exports = function(Interaction) {
                 console.log('The API returned an error: ' + err);    
                 cb(err,saved);
               }            
-              cb(err,saved)
+              downloadImages(id,function(){
+                console.log("Images downloaded.");
+              });
+              cb(err,saved);
             });                                 
         });
       });
@@ -156,6 +188,10 @@ module.exports = function(Interaction) {
           rs.values.shift();
           var queue = async.queue(function(img,callback) {
             var downloader = new ImageDownloader(); 
+            if(img.length<2) {
+              callback();
+              return false;
+            }
             var imageId = "interaction-"+img[1].split("?id=")[1];            
             if(img[1].split("?id=").length==1) 
               imageId = "interaction-"+hash.MD5(img[1]);            
