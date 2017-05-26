@@ -148,7 +148,7 @@ module.exports = function(Interaction) {
                 console.log('The API returned an error: ' + err);    
                 cb(err,saved);
               }            
-              downloadImages(id,function(){
+              Interaction.downloadImages(id,function(){
                 console.log("Images downloaded.");
               });
               cb(err,saved);
