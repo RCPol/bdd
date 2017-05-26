@@ -21,7 +21,7 @@ module.exports = function(Interaction) {
   Interaction.plants = function(pollinator,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
-    var url = 'mongodb://mongo:27017/bdd';
+    var url = 'mongodb://localhost:27017/bdd';
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
@@ -51,7 +51,7 @@ module.exports = function(Interaction) {
     Interaction.pollinators = function(plant,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
-    var url = 'mongodb://mongo:27017/bdd';
+    var url = 'mongodb://localhost:27017/bdd';
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
