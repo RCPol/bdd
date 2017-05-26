@@ -40,8 +40,7 @@ module.exports = function(Interaction) {
             }
           }
         ];
-      collection.aggregate(q).toArray(function(err, docs) {
-        console.log(err,docs);
+      collection.aggregate(q).toArray(function(err, docs) {        
         cb(err,docs);
         db.close();
         
@@ -67,8 +66,7 @@ module.exports = function(Interaction) {
             }
           }
         ];
-      collection.aggregate(q).toArray(function(err, docs) {
-        console.log(err,docs);
+      collection.aggregate(q).toArray(function(err, docs) {        
         cb(err,docs);
         db.close();
         

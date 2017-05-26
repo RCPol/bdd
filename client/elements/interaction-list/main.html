@@ -6,7 +6,7 @@
     <template>       
         <!-- Título da Página -->
         <h1 id="title" class="pal"><span id="rcpol-InteractionLabel-flowerVisitors">Visitantes florais de</span> <i>{{plant}}</i></h1>
-        <h1 class="pal">[[msg]] <i>{{plant}}</i></h1>
+        <h1 id="msg" class="pal">[[msg]] <i>{{plant}}</i></h1>
         <!-- Início: Imagens de Abelhas -->        
         <div class="cspm">            
         <template id="vis" is="dom-repeat" items="{{interactions}}">
@@ -73,6 +73,8 @@
             if(data.response.length==0){
                 self.msg = "Não há registros de interação para ";
                 $("#title").hide()
+            } else {
+                $("#msg").hide()
             }
         });
         }    
