@@ -27,15 +27,15 @@
                     </a></p>
 
                     <!-- Tipo da visita registrada -->
-                    <p class="legenda-int-p">Tipo de visita registrada: Pilhador, Polinizador, Visitante </p>
+                    <p class="legenda-int-p">Tipo de visita registrada: [[item.type]]</p>
 
                     <p class="div-visitante">
 
                     <!-- Mouse over como no glossário, mostrando a referência bibliográfica do tipo de interação -->
-                    <img src="/img/eco_ref.png" title="teste" class="popsref">
+                    <img src="/img/eco_ref.png" title="[[item.reference]]" class="popsref">
 
                     <!-- Mouse over como no glossário, mostrando o crédito da imagem da abelha -->
-                    <img src="/img/eco_copyr.png" title="teste" class="popsref">
+                    <img src="/img/eco_copyr.png" title="[[item.credits]]" class="popsref">
                     </p>
                         
                 </div>
@@ -55,8 +55,9 @@
             }
         },
         ready: function(){
-            var self = this;        
-            $.getJSON( "/api/Interactions/pollinators?plant="+self.plant, function( data ) {                                                                              
+            var self = this;                 
+            $.getJSON( "/api/Interactions/pollinators?plant="+self.plant, function( data ) {   
+                console.log("data",data)                                                                           
                 $.getJSON( "/api/Interactions?filter=%7B%22where%22%3A%7B%22plant%22%3A%22"+self.plant+"%22%2C%20%22image%22%3A%7B%22exists%22%3Atrue%7D%7D%2C%22fields%22%3A%7B%22image%22%3Atrue%2C%22pollinator%22%3Atrue%7D%7D", function( imgs ) {
                     self.interactions = data.response.map(function(item){  
                         var rs = item._id;   
@@ -64,6 +65,7 @@
                         imgs.forEach(function(img){
                             if(img.pollinator==rs.pollinator){                            
                                 rs.image = img.image.resized;
+                                rs.credits = img.image.credits;                                
                                 return false;
                             }
                         });                                        

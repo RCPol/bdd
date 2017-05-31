@@ -9,7 +9,15 @@ RUN apt-get update && \
     curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
     apt-get install --yes nodejs && \
     apt-get -y install build-essential && \
-    apt-get -y install imagemagick
+    apt-get -y install imagemagick && \
+    apt-get -y install ntpdate && \
+    apt-get -y install ntp
+
+RUN echo "server pool.ntp.org" > /etc/ntp.conf
+RUN /etc/init.d/ntp stop && ntpdate pool.ntp.org && /etc/init.d/ntp start
+
+ENV TZ=America/Sao_Paulo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install PM2
 RUN npm install -g pm2
