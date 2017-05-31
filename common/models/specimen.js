@@ -77,12 +77,15 @@ module.exports = function(Specimen) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
     var name = defineName(url); //define o nome da url
     if(name==null)
-    cb("Invalid XLSX file.",null);
+      cb("Invalid XLSX file.",null);
     var path = __dirname +"/../../uploads/"+name+".xlsx"; //define o caminho do arquivo
+    console.log("1",path);
     saveDataset(name,url,path); //salva os dados
     //ler o arquivo da planilha
     var w = fs.createWriteStream(path).on("close",function (argument) {
+      console.log("2",path);
       var data = xlsx.parse(path)[0].data; //recebe os dados
+      console.log("3",data);
       var schema = data[0]; //define o schema
       var class_ = data[1]; //define a classe
       var terms = data[2]; //define o termo

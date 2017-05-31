@@ -232,6 +232,7 @@ module.exports = function(Schema) {
 
       //Passa o diretorio da planilha a ser lida
       var w = fs.createWriteStream(path).on("close",function (argument) {
+        console.log(path, sheetNumber);
         var data = xlsx.parse(path)[sheetNumber || 0].data; //recebe os dados de uma planilha
         var header = data[0]; //primeira linha da planilha
         data =  data.slice(1,data.length); //slice = retorna a quantidade de dados

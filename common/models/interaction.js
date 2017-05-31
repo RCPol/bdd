@@ -18,15 +18,22 @@ var google = require('googleapis');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Interaction) {
   
-  Interaction.plants = function(pollinator,cb) {        
+  Interaction.plants = function(pollinator,region,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
+    console.log(pollinator,region);
     var url = 'mongodb://mongo:27017/bdd';
+    if(region=="Brasil" || String(region).trim().length==0){
+      var q = {pollinator:pollinator};
+    } else {
+      var q = {pollinator:pollinator, region:region};
+    }    
+    console.log(q)
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
       var q = [
-          { $match: {pollinator:pollinator}},                 
+          { $match: region=="Brasil" || String(region).trim().length==0?{pollinator:pollinator}:{pollinator:pollinator,region:region}},                 
           {
             $group: {
               _id: {
@@ -91,7 +98,8 @@ module.exports = function(Interaction) {
     {
       http: {path: '/plants', verb: 'get'},
       accepts: [
-        {arg: 'pollinator', type: 'string', required:false, description: 'Plant name'}        
+        {arg: 'pollinator', type: 'string', required:true, description: 'Pollinator name'},
+        {arg: 'region', type: 'string', required:false, description: 'Region'}        
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
@@ -154,7 +162,7 @@ module.exports = function(Interaction) {
               }            
               Interaction.downloadImages(id,function(){
                 console.log("Images downloaded.");
-              });
+              });              
               cb(err,saved);
             });                                 
         });
