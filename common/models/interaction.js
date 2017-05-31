@@ -12,13 +12,13 @@ var hash = require('object-hash');
 var util = require('util');
 var readline = require('readline');
 var google = require('googleapis');
-var googleAuth = require('google-auth-library');
+// var googleAuth = require('google-auth-library');
 
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Interaction) {
   
-  Interaction.plants = function(pollinator,cb) {        
+  Interaction.plants = function(pollinator,region,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
     var url = 'mongodb://localhost:27017/bdd';
@@ -26,14 +26,14 @@ module.exports = function(Interaction) {
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
       var q = [
-          { $match: {pollinator:pollinator}},                 
+          { $match: region=="Brasil" || String(region).trim().length==0?{pollinator:pollinator}:{pollinator:pollinator,region:region}},                 
           {
             $group: {
               _id: {
                 "plant":"$plant",                
                 "state":"$state",
                 "municipality":"$municipality",
-                "region":"$region"                
+                "region":"$region"                            
               },                   
               // count: {$sum:1}
               avgQuantity: { $avg: "$percentual" }
@@ -59,7 +59,9 @@ module.exports = function(Interaction) {
           {
             $group: {
               _id: {
-                "pollinator":"$pollinator"                
+                "pollinator":"$pollinator",
+                "reference":"$reference",
+                "type":"$type"
               },                   
               // count: {$sum:1}
               // avgQuantity: { $avg: "$percentual" }
@@ -89,7 +91,8 @@ module.exports = function(Interaction) {
     {
       http: {path: '/plants', verb: 'get'},
       accepts: [
-        {arg: 'pollinator', type: 'string', required:false, description: 'Plant name'}        
+        {arg: 'pollinator', type: 'string', required:true, description: 'Pollinator name'},
+        {arg: 'region', type: 'string', required:false, description: 'Region'}        
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
@@ -99,6 +102,8 @@ module.exports = function(Interaction) {
   Interaction.inputFromURL = function(id, cb) {
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
     var key = require('key.json');    
+        
+
     var jwtClient = new google.auth.JWT(
       key.client_email,
       null,
@@ -106,9 +111,10 @@ module.exports = function(Interaction) {
       [SCOPES],
       null
     );
+    
     jwtClient.authorize(function (err, tokens) {
       if (err) {
-        console.log(err);
+        console.log(err.errorDescription,err.error_description,tokens);
         cb(err,tokens)
         return;
       }
@@ -117,7 +123,7 @@ module.exports = function(Interaction) {
         service.spreadsheets.values.get({
             auth: jwtClient,
             spreadsheetId: id,
-            range: 'A:J'        
+            range: 'A:K'        
           }, function(err, rs) {
             if (err){
               console.log('The API returned an error: ' + err);    
@@ -138,7 +144,8 @@ module.exports = function(Interaction) {
               i.municipality = item[6];
               i.state = item[7];
               i.region = item[8];
-              i.reference = item[9];
+              i.vegetalForm = item[9];
+              i.reference = item[10];
               data.push(i);  
             });            
             Interaction.create(data,function(err,saved){
@@ -148,7 +155,7 @@ module.exports = function(Interaction) {
               }            
               Interaction.downloadImages(id,function(){
                 console.log("Images downloaded.");
-              });
+              });              
               cb(err,saved);
             });                                 
         });
@@ -157,7 +164,7 @@ module.exports = function(Interaction) {
   };
   Interaction.downloadImages = function (id,cb) {
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
-    var key = require('key.json');    
+    var key = require('key.json');     
     var jwtClient = new google.auth.JWT(
       key.client_email,
       null,
@@ -166,8 +173,7 @@ module.exports = function(Interaction) {
       null
     );
     jwtClient.authorize(function (err, tokens) {
-      if (err) {
-        console.log(err);
+      if (err) {        
         cb(err,tokens)
         return;
       }
@@ -176,7 +182,7 @@ module.exports = function(Interaction) {
       service.spreadsheets.values.get({
           auth: jwtClient,
           spreadsheetId: id,
-          range: 'images!A:B'        
+          range: 'images!A:C'        
         }, function(err, rs) {
           if (err){
             console.log('The API returned an error: ' + err);    
@@ -199,7 +205,8 @@ module.exports = function(Interaction) {
               original: img[1].replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
               local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
               resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-              thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+              thumbnail: "/thumbnails/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+              credits: img[2]
             };
             downloader.download(image,function(){});                        
             Interaction.find({where:{pollinator:img[0]}},function(err,data){

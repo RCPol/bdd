@@ -1,6 +1,8 @@
 <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <link rel="import" href="/bower_components/polymer/polymer.html">
 
+<link rel="import" href="/elements/interaction-profile/references.html"></script>	
+
 <script src="/bower_components/d3/d3.js"></script>
 <script src="/bower_components/d3-plugins-sankey/sankey.js"></script>
 <script src="/bower_components/d3.chart/d3.chart.js"></script>
@@ -17,13 +19,13 @@
 		<div class="graf-e">
 
 			<p> Selecionar Região:
-			<select class="opcoes-select">
-				<option value="">Brasil</option>
-				<option value="">Centro-Oeste</option>
-				<option value="">Nordeste</option>
-				<option value="">Norte</option>
-				<option value="">Sul</option>
-				<option value="">Sudeste</option>
+			<select value = "{{region::change}}" class="opcoes-select">
+				<option value="Brasil">Brasil</option>
+				<option value="Centro-Oeste">Centro-Oeste</option>
+				<option value="Nordeste">Nordeste</option>
+				<option value="Norte">Norte</option>
+				<option value="Sul">Sul</option>
+				<option value="Sudeste">Sudeste</option>
 			</select>
 			</p>
 
@@ -37,15 +39,7 @@
 		</div>
 
 		<!-- Início: Referências -->
-		<div class="rre">
-			
-			<h2>Refer&ecirc;ncias Bibliogr&aacute;ficas:</h2>
-
-					<p>Barth, O. M., & Barbosa, A. F. (1972). Catálogo sistemático dos pólens das plantas arbóreas do Brasil meridional XV. Myrtaceae. Memórias do Instituto Oswaldo Cruz, 70(4), 467-496.</p>
-
-					<p>Evaldt, A. C. P., Bauermann, S. G., Fuchs, S. C. B., Diesel, S., & Cancelli, R. R. (2009). Grãos de pólen e esporos do Vale do Rio Caí, nordeste do Rio Grande do Sul, Brasil: descrições morfológicas e implicações paleoecológicas. Gaea-Journal of Geoscience, 5(2), 86-106.</p>
-
-		</div>
+		<interaction-references pollinator="{{pollinator}}"></interaction-references>
 		<!-- Final: Referências -->
   </template>
 </dom-module>
@@ -54,16 +48,21 @@
     is: "interaction-profile",    
     properties:{    
         pollinator: String,    
-        interactions: Array
+        interactions: Array,
+        references: Array,
+        region: {
+            type: String,
+            observer: 'changeRegion'
+        }
     },
     ready: function(){        
-        var self = this;        
-        self.load();
+        var self = this;    
+        self.region = "Brasil"                      
+        // self.load();
     },
     load: function(){
-        var self = this;        
-        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator, function( interactions ) {                                         
-            // self.interactions = data
+        var self = this;                        
+        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator+"&region="+self.region, function( interactions ) {                                                     
             // IN
             var json = {nodes: [], links:[]};
             var data = interactions.response.map(function(item){
@@ -124,11 +123,12 @@
                 var link = {"source": s, "target": t, "value": v};
                 json.links.push(link);        
             });
-            
+            $("#chart").html("");
             var chart = d3.select("#chart").append("svg").chart("Sankey.Path");        
             // chart.colorLinks(function(link) { return  '#F9C6A7'; }).draw(json);            
-            console.log(json);
             chart.draw(json);
+            if(data.length==0)
+                $("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
         });        
     },
     index: function(data, value){        
@@ -137,7 +137,10 @@
             return i;
         }
         return -1;        
-      }    
+      },
+      changeRegion: function(v){
+        this.load();
+      }
   });
 
 </script>

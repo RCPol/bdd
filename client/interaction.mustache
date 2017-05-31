@@ -8,6 +8,8 @@
     <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>	
     <link rel="import" href="/elements/interaction-list/main.html"></script>	
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<!-- Css Documento -->
 	<link rel="stylesheet" href="/css/eco_fichas.css">
 
@@ -17,6 +19,8 @@
 	<script type="text/javascript">	
 	var internacionalization;
 	$(document).ready(function(){
+		console.log("teste");
+		$( document ).tooltip();  
 		internacionalization = new Internacionalization();
 		translate();
 	});
