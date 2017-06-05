@@ -119,7 +119,7 @@ module.exports = function(Collection) {
     return this;
   };
 
-  Collection.inputFromURL = function(url,language,cb) {
+  Collection.inputFromURL = function(url,language,sheetIndex,cb) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"? Yes, if it comes from GoogleDocs. If it comes from other source no changes (replace) will be done (of course, if there isn't "open" in the URL).
     var name = defineName(url);
     if(name==null)
@@ -129,7 +129,7 @@ module.exports = function(Collection) {
     saveDataset(name,url,path);
 
     var w = fs.createWriteStream(path).on("close",function (argument) {
-      var data = xlsx.parse(path)[0].data;
+      var data = xlsx.parse(path)[sheetIndex].data;
       var dataOnly =  data.slice(4,data.length);
 
       var rs = {};
@@ -216,7 +216,8 @@ module.exports = function(Collection) {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
         {arg: 'url', type: 'string', required:true},
-        {arg: 'language', type:'string', required:true, description:'en-US, pt-BR or es-ES'}
+        {arg: 'language', type:'string', required:true, description:'en-US, pt-BR or es-ES'},
+        {arg: 'sheetIndex', type:'string', required:true}        
       ],
       returns: {arg: 'response', type: 'object'}
     }
