@@ -77,13 +77,15 @@ module.exports = function(Identification) {
     });
   } 
   Identification.populate = function(filter, callback){
-    Identification.getApp(function(err, app){
-      if (err) throw new Error(err);
-      var Species = app.models.Species;
-      var Schema = app.models.Schema;
-      var BDD = app.dataSources.BDD;
-      getIdentificationItems(filter, Identification, Species, Schema, BDD, callback);
-    });
+    Identification.destroyAll(function(e,d){
+      Identification.getApp(function(err, app){
+        if (err) throw new Error(err);
+        var Species = app.models.Species;
+        var Schema = app.models.Schema;
+        var BDD = app.dataSources.BDD;
+        getIdentificationItems(filter, Identification, Species, Schema, BDD, callback);
+      });
+    });    
   };
 
   Identification.identify = function(param, callback) {

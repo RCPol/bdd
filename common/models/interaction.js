@@ -196,7 +196,7 @@ module.exports = function(Interaction) {
               callback();
               return false;
             }
-            var imageId = "interaction-"+img[1].split("?id=")[1];            
+            var imageId = "interaction-"+img[1].split("?id=")[1];
             if(img[1].split("?id=").length==1) 
               imageId = "interaction-"+hash.MD5(img[1]);            
             var image = {

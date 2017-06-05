@@ -83,63 +83,63 @@ module.exports = function(Specimen) {
     saveDataset(name,url,path); //salva os dados
     //ler o arquivo da planilha
     var w = fs.createWriteStream(path).on("close",function (argument) {
-      console.log("2",path);
-      var data = xlsx.parse(path)[0].data; //recebe os dados
-      console.log("3",data);
-      var schema = data[0]; //define o schema
-      var class_ = data[1]; //define a classe
-      var terms = data[2]; //define o termo
-      // var category = data[3];
-      var label = data[4]; //define o rotulo      
-      data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
-      var response = {}; //resposta de execução
-      response.count = 0;      
-      var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
-          var line = rec.line;          
-          async.parallel([
-            function(callbackSave) {
-              // console.log("start en-US",line);
-              //para salvar em  inglês
-              saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
-                // console.log("finish en-US");
-                callbackSave();
-              });
-            },
-            function(callbackSave) {
-              // console.log("start pt-BR", line);
-              //para salvar em português
-              saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
-                // console.log("finish pt-BR");
-                callbackSave();
-              });
-            },
-            function(callbackSave) {
-              // console.log("start es-ES",line);
-              //para salvar em espanhol
-              saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
-                // console.log("finish es-ES");
-                callbackSave();
-              });
-            }
-          ],function done() {
-            console.log("COUTING: ",response.count++);
-            callback(); //retorno da função
-          });             
-      },1);
-      queue.drain(function() {
-        //executa o download das image
-       // downloadImages(downloadQueue, redownload);
-        console.log("Done.");
-        for (var key in logs) {
-          console.log(logs[key]);
-        }
-        cb(null, response);
-      });
-      console.log("SIZE: ",data.length);
-      data.forEach(function(line) {
-        if(line[1] && line[2] && line[3]){          
-          queue.push({line:line});          
-        }          
+      Specimen.destroyAll({base:base},function(err,d){
+        var data = xlsx.parse(path)[0].data; //recebe os dados      
+        var schema = data[0]; //define o schema
+        var class_ = data[1]; //define a classe
+        var terms = data[2]; //define o termo
+        // var category = data[3];
+        var label = data[4]; //define o rotulo      
+        data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
+        var response = {}; //resposta de execução
+        response.count = 0;      
+        var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
+            var line = rec.line;          
+            async.parallel([
+              function(callbackSave) {
+                // console.log("start en-US",line);
+                //para salvar em  inglês
+                saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
+                  // console.log("finish en-US");
+                  callbackSave();
+                });
+              },
+              function(callbackSave) {
+                // console.log("start pt-BR", line);
+                //para salvar em português
+                saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
+                  // console.log("finish pt-BR");
+                  callbackSave();
+                });
+              },
+              function(callbackSave) {
+                // console.log("start es-ES",line);
+                //para salvar em espanhol
+                saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
+                  // console.log("finish es-ES");
+                  callbackSave();
+                });
+              }
+            ],function done() {
+              console.log("COUTING: ",response.count++);
+              callback(); //retorno da função
+            });             
+        },1);
+        queue.drain(function() {
+          //executa o download das image
+        // downloadImages(downloadQueue, redownload);
+          console.log("Done.");
+          for (var key in logs) {
+            console.log(logs[key]);
+          }
+          cb(null, response);
+        });
+        console.log("SIZE: ",data.length);
+        data.forEach(function(line) {
+          if(line[1] && line[2] && line[3]){          
+            queue.push({line:line});          
+          }          
+        });
       });
     });    
     request(url).pipe(w);
@@ -248,17 +248,18 @@ module.exports = function(Specimen) {
                     //recebe um vetor de images
                     record[schema.id].images = [];
                     record[schema.id].value.split("|").forEach(function(img,i){
-                        var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
-                        // console.log("IMG: ",imageId)
-                        var image = {
-                          id: imageId,
-                          // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
-                          original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
-                          local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                          resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                          thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
-                        }
-                        record[schemaId].images.push(image);
+                      var imageId = base+"-"+img[1].split("?id=")[1];
+                      // var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                      // console.log("IMG: ",imageId)
+                      var image = {
+                        id: imageId,
+                        // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
+                        original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
+                        local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                        resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                        thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                      }
+                      record[schemaId].images.push(image);
                     });
 
                     //Função antiga
