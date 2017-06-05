@@ -279,7 +279,7 @@ module.exports = function(Schema) {
                 record.images = [];
                 toString(line[8]).trim().split("|").forEach(function (img,i) {
                   // var imageId = record.id.split(":").slice(1).join(":")+":"+i;
-                  var imageId = base+"-"+img[1].split("?id=")[1];
+                  var imageId = base+"-"+img.split("?id=")[1];
                   var image = {
                     id: imageId,
                     original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
