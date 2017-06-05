@@ -232,85 +232,88 @@ module.exports = function(Schema) {
 
       //Passa o diretorio da planilha a ser lida
       var w = fs.createWriteStream(path).on("close",function (argument) {
-        console.log(path, sheetNumber);
-        var data = xlsx.parse(path)[sheetNumber || 0].data; //recebe os dados de uma planilha
-        var header = data[0]; //primeira linha da planilha
-        data =  data.slice(1,data.length); //slice = retorna a quantidade de dados
-        var response = {}; //array de resposta
-        response.count = 0;
-        async.each(data, function iterator(line, callback){
-          //line é o campo da tabela
-          var record = {};
-          record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
-          record.order = response.count;
-          record.base = base;
-          if(record.id){
-            response.count++;
-            record.schema = toString(line[0]).trim();
-            record.class = toString(line[1]).trim();
-            record.term = toString(line[2]).trim();
-            if (toString(line[3]).trim().length>0) {
-              record.category = titleCase(toString(line[3]).trim());
-            }
-            if (toString(line[4]).trim().length>0) {
-              record.field = titleCase(toString(line[4]).trim());
-            }
-            if (toString(line[5]).trim().length>0) {
-              record.state = titleCase(toString(line[5]).trim());
-            }
-            if (toString(line[6]).trim().length>0) {
-              record.definition = toString(line[6]).trim();
-            }
-            if (toString(line[7]).trim().length>0) {
-              record.references = [];
-              toString(line[7]).trim().split("|").forEach(function (ref) {
-                record.references.push(ref.trim());
-              });
-            }
-            if (toString(line[9]).trim().length>0) {
-              record.credits = [];
-              toString(line[9]).trim().split("|").forEach(function (ref) {
-                record.credits.push(ref.trim());
-              });
-            }
-            //ler o campo das imagens
-            if (toString(line[8]).trim().length>0) {
-              record.images = [];
-              toString(line[8]).trim().split("|").forEach(function (img,i) {
-                var imageId = record.id.split(":").slice(1).join(":")+":"+i;
-                var image = {
-                  id: imageId,
-                  original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
-                  local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                  resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                  thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
-                }
-                record.images.push(image); //coloca as imagens no vetor
-              });
-              // record.image = record.images[0]; // so pega a primeira imagem
-            }
-            // record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
-            // if (record.image != undefined){ //se a imagem tiver definida
-            // record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-            //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
-            // }
-            record.language = language;
-            //save record in database
-            Schema.upsert(record, function(err, instance){
-              if(err){
-                console.log(err);
+        // Delete all
+        Schema.destroyAll({base:base},function(err,d){
+          var data = xlsx.parse(path)[sheetNumber || 0].data; //recebe os dados de uma planilha
+          var header = data[0]; //primeira linha da planilha
+          data =  data.slice(1,data.length); //slice = retorna a quantidade de dados
+          var response = {}; //array de resposta
+          response.count = 0;
+          async.each(data, function iterator(line, callback){
+            //line é o campo da tabela
+            var record = {};
+            record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
+            record.order = response.count;
+            record.base = base;
+            if(record.id){
+              response.count++;
+              record.schema = toString(line[0]).trim();
+              record.class = toString(line[1]).trim();
+              record.term = toString(line[2]).trim();
+              if (toString(line[3]).trim().length>0) {
+                record.category = titleCase(toString(line[3]).trim());
               }
+              if (toString(line[4]).trim().length>0) {
+                record.field = titleCase(toString(line[4]).trim());
+              }
+              if (toString(line[5]).trim().length>0) {
+                record.state = titleCase(toString(line[5]).trim());
+              }
+              if (toString(line[6]).trim().length>0) {
+                record.definition = toString(line[6]).trim();
+              }
+              if (toString(line[7]).trim().length>0) {
+                record.references = [];
+                toString(line[7]).trim().split("|").forEach(function (ref) {
+                  record.references.push(ref.trim());
+                });
+              }
+              if (toString(line[9]).trim().length>0) {
+                record.credits = [];
+                toString(line[9]).trim().split("|").forEach(function (ref) {
+                  record.credits.push(ref.trim());
+                });
+              }
+              //ler o campo das imagens
+              if (toString(line[8]).trim().length>0) {
+                record.images = [];
+                toString(line[8]).trim().split("|").forEach(function (img,i) {
+                  // var imageId = record.id.split(":").slice(1).join(":")+":"+i;
+                  var imageId = base+"-"+img[1].split("?id=")[1];
+                  var image = {
+                    id: imageId,
+                    original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
+                    local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                    resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                    thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                  }
+                  record.images.push(image); //coloca as imagens no vetor
+                });
+                // record.image = record.images[0]; // so pega a primeira imagem
+              }
+              // record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
+              // if (record.image != undefined){ //se a imagem tiver definida
+              // record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+              //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
+              // }
+              record.language = language;
+              //save record in database
+              Schema.upsert(record, function(err, instance){
+                if(err){
+                  console.log(err);
+                }
+                callback();
+              });
+            } else {
+              console.error("record id could not be generated: ".concat(line[0], " ", line[1], " ", line[2]));
               callback();
-            });
-          } else {
-            console.error("record id could not be generated: ".concat(line[0], " ", line[1], " ", line[2]));
-            callback();
-          }
-        }, function done(){
-          //downloadImages(downloadQueue, redownload); //download das imagens
-          console.log("Done.");
-          cb(null, response);
-        });
+            }
+          }, function done(){
+            //downloadImages(downloadQueue, redownload); //download das imagens
+            console.log("Done.");
+            cb(null, response);
+          });
+        });        
       });
       request(url).pipe(w);
     } else {

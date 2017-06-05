@@ -37,31 +37,33 @@ module.exports = function(Species) {
     }
   );
   Species.fromSpecimensAggregation = function(base,filter,cb) {
-    async.parallel([
-      function en(callback) {
-        selectScientificNames(base,"en-US",filter,function (scientificNames) {
-          generateSpecies(base,"en-US",scientificNames,function(species) {
-            callback();
+    Species.destroyAll({base:base},function(e,d){
+      async.parallel([
+        function en(callback) {
+          selectScientificNames(base,"en-US",filter,function (scientificNames) {
+            generateSpecies(base,"en-US",scientificNames,function(species) {
+              callback();
+            });
           });
-        });
-      },
-      function pt(callback) {
-        selectScientificNames(base,"pt-BR",filter,function (scientificNames) {
-          generateSpecies(base,"pt-BR",scientificNames,function(species) {
-            callback();
+        },
+        function pt(callback) {
+          selectScientificNames(base,"pt-BR",filter,function (scientificNames) {
+            generateSpecies(base,"pt-BR",scientificNames,function(species) {
+              callback();
+            });
           });
-        });
-      },
-      function es(callback) {
-        selectScientificNames(base,"es-ES",filter,function (scientificNames) {
-          generateSpecies(base,"es-ES",scientificNames,function(species) {
-            callback();
+        },
+        function es(callback) {
+          selectScientificNames(base,"es-ES",filter,function (scientificNames) {
+            generateSpecies(base,"es-ES",scientificNames,function(species) {
+              callback();
+            });
           });
-        });
-      }
-    ],function done() {
-      cb(null,"done");
-    });
+        }
+      ],function done() {
+        cb(null,"done");
+      });
+    });    
   };
   Species.remoteMethod(
     'fromSpecimensAggregation',
