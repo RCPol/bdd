@@ -83,7 +83,9 @@ module.exports = function(Specimen) {
     saveDataset(name,url,path); //salva os dados
     //ler o arquivo da planilha
     var w = fs.createWriteStream(path).on("close",function (argument) {
+      console.log("Apagando...")
       Specimen.destroyAll({base:base},function(err,d){
+        console.log("Apagado!")
         var data = xlsx.parse(path)[0].data; //recebe os dados      
         var schema = data[0]; //define o schema
         var class_ = data[1]; //define a classe
@@ -131,8 +133,7 @@ module.exports = function(Specimen) {
           console.log("Done.");
           for (var key in logs) {
             console.log(logs[key]);
-          }
-          cb(null, response);
+          }          
         });
         console.log("SIZE: ",data.length);
         data.forEach(function(line) {
@@ -140,6 +141,7 @@ module.exports = function(Specimen) {
             queue.push({line:line});          
           }          
         });
+        cb(null, "Loading");
       });
     });    
     request(url).pipe(w);
@@ -247,19 +249,21 @@ module.exports = function(Specimen) {
                   if(schema["class"]=="Image"){ //se encontrar a classe da imagem
                     //recebe um vetor de images
                     record[schema.id].images = [];
-                    record[schema.id].value.split("|").forEach(function(img,i){
-                      var imageId = base+"-"+img[1].split("?id=")[1];
-                      // var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
-                      // console.log("IMG: ",imageId)
-                      var image = {
-                        id: imageId,
-                        // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
-                        original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
-                        local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                        resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                        thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
-                      }
-                      record[schemaId].images.push(image);
+                    record[schema.id].value.split("|").forEach(function(img,i){   
+                      if(img && img.length>0){
+                        var imageId = base+"-"+img.split("?id=")[1];
+                        // var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                        // console.log("IMG: ",imageId)
+                        var image = {
+                          id: imageId,
+                          // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
+                          original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
+                          local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                          resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                          thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                        }
+                        record[schemaId].images.push(image);
+                      }                      
                     });
 
                     //Função antiga

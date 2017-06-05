@@ -77,7 +77,9 @@ module.exports = function(Identification) {
     });
   } 
   Identification.populate = function(filter, callback){
+    console.log("Apagando...");
     Identification.destroyAll(function(e,d){
+      console.log("Apagado!!!");
       Identification.getApp(function(err, app){
         if (err) throw new Error(err);
         var Species = app.models.Species;
@@ -344,7 +346,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             callback2();
           } else if (key == 'specimens'){            
             species.specimens.forEach(function(specimen) {
-              Object.keys(specimen.collection).forEach(function(subkey) {                
+              if(specimen.collection)
+              Object.keys(specimen.collection).forEach(function(subkey) {
                 if(specimen.collection[subkey].term == 'institutionName' || specimen.collection[subkey].term == 'collectionName' || specimen.collection[subkey].term == 'laboratory'){                     
                   identification_item["filter"][subkey] = identification_item["filter"][subkey]?identification_item["filter"][subkey]:[];
                   identification_item["filter"][subkey].push(specimen.collection[subkey].value);            
