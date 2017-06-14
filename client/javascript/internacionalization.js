@@ -14,7 +14,7 @@ Internacionalization.prototype.setLanguage = function(language){
 }
 Internacionalization.prototype.updateLogo = function(){  
   var self = this;
-  $('.logo > img').attr('src','/img/logo_'+self.base+'_'+self.language+'.png');
+  $('.logo > img').attr('src','/img/logo_'+(self.base=="interaction"?"eco":self.base)+'_'+self.language+'.png');
   return this;
 }
 Internacionalization.prototype.siteTranslator = function(){

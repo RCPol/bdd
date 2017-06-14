@@ -157,7 +157,7 @@ module.exports = function(Specimen) {
         c++;
         //se existe o termo e a linha existe da amostra
         if(term && toString(line[c]) != ""){
-          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema
+          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema          
           record.language = language; //recebe a linguagem
           record.originalLanguage = originalLanguage;  //linguagem original
           record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
@@ -341,8 +341,10 @@ module.exports = function(Specimen) {
           record.collection = collection;
           
           Specimen.upsert(record,function (err,instance) {
-            if(err)
-              console.log(err);
+            if(err){
+              console.log("ERROR: ",err);              
+              console.log("RECORD: ",record);
+            }              
             callback();
           });
         });        

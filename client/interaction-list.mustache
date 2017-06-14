@@ -16,18 +16,17 @@
 	<title>RCPol - {{plant}}</title>
 
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
-	<script type="text/javascript">	
-	var internacionalization;
-	$(document).ready(function(){
-		console.log("teste");
+	<script type="text/javascript">			
+	$(document).ready(function(){		
 		$( document ).tooltip();  
-		internacionalization = new Internacionalization();
-		translate();
+		var internacionalization = new Internacionalization();			
+	  	internacionalization.base = 'interaction';	  			
+		internacionalization.updateLogo();
 	});
-	function translate(lang) {
-		if (typeof lang != "undefined")
-				internacionalization.setLanguage(lang);
-		internacionalization.siteTranslator().interactionTranslator();
+	function setLanguage(language){
+		// alert(id + " - "+base);
+		localStorage.language = language;
+		window.location = "/interaction/{{plant}}";
 	}
 	</script>
 </head>
@@ -39,13 +38,15 @@
 		<!-- Menu: início -->
 		<nav>
 			<ul>
-				<li> <!-- inserir link para o portal --> <a href="#" id="rcpol-SiteLabel-siteHome">Home</a></li>
-				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
-        <li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
+				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 				<li>
-					<img onclick="translate('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
-					<img onclick="translate('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
-					<img onclick="translate('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+					<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
+							<img onclick="setLanguage('en-US')"  src="/img/en_GB.png">
+							<img onclick="setLanguage('es-ES')"  src="/img/es_ES.png">
+						</span>
 				</li>
 			</ul>
 		</nav>
