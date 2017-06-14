@@ -34,7 +34,7 @@
 		<!-- Gráfico -->
 		<div class="graf">
 
-		<div style="height:900px" id="chart"></div>
+		<div style="height:1500px" id="chart"></div>
 
 		</div>
 
@@ -105,7 +105,16 @@
                 var t = self.index(json.nodes, item.species);
                 var v = item.value;
                 var link = {"source": s, "target":t, "value": v};
-                json.links.push(link);
+                var add = true;
+                json.links.forEach(function(l){                    
+                    if(l.source==link.source && l.target==link.target){                        
+                        l.value = l.value + v;
+                        add=false;
+                        return false;
+                    }
+                });
+                if(add)
+                    json.links.push(link);
             });
             // Link Cidade - Estado
             data.forEach(function(item){
@@ -113,7 +122,16 @@
                 var t = self.index(json.nodes, item.municipality);
                 var v = item.value;
                 var link = {"source": s, "target": t, "value": v};
-                json.links.push(link);
+                var add = true;
+                json.links.forEach(function(l){                    
+                    if(l.source==link.source && l.target==link.target){                        
+                        l.value = l.value + v;
+                        add=false;
+                        return false;
+                    }
+                });
+                if(add)
+                    json.links.push(link);
             });
             // Link Estado - Região
             data.forEach(function(item){
@@ -121,12 +139,26 @@
                 var t = self.index(json.nodes, item.state);
                 var v = item.value;
                 var link = {"source": s, "target": t, "value": v};
-                json.links.push(link);        
+                var add = true;
+                json.links.forEach(function(l){                    
+                    if(l.source==link.source && l.target==link.target){                        
+                        l.value = l.value + v;
+                        add=false;
+                        return false;
+                    }
+                });
+                if(add)
+                    json.links.push(link);
             });
             $("#chart").html("");
             var chart = d3.select("#chart").append("svg").chart("Sankey.Path");        
-            // chart.colorLinks(function(link) { return  '#F9C6A7'; }).draw(json);            
-            chart.draw(json);
+            // chart.colorLinks(function(link) { return  '#F9C6A7'; }).draw(json);                        
+            // chart.nodeWidth(70);
+            // chart.name(function(n) { return n.name+" ("+n.value+")"; console.log(n); })  
+            // chart.nodePadding(.50);
+            
+            chart.draw(json);      
+            chart.nodePadding(10);                              
             if(data.length==0)
                 $("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
         });        

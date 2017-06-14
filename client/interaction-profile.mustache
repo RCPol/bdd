@@ -20,7 +20,7 @@
         font: 13px sans-serif;
       }
       .node rect {
-        fill-opacity: .9;
+        fill-opacity: 1;
         shape-rendering: crispEdges;
         stroke-width: 0;
       }
@@ -29,8 +29,8 @@
       }
       .link {
         fill: none;
-        stroke: #abc;
-        stroke-opacity: .2;
+        stroke: #F9C6A7;
+        stroke-opacity: .85;
       }
     </style>
 	<title>RCPol</title>
@@ -39,14 +39,14 @@
 	<script type="text/javascript">
 	var internacionalization;
 	$(document).ready(function(){		    
-		internacionalization = new Internacionalization();
-		translate();
+		// internacionalization = new Internacionalization();
+		// internacionalization.translate();
 	});
-	function translate(lang) {
-		if (typeof lang != "undefined")
-				internacionalization.setLanguage(lang);
-		internacionalization.siteTranslator().interactionTranslator();
-	}
+	function setLanguage(language){
+			// alert(id + " - "+base);
+			localStorage.language = language;
+			// window.location = "/profile/species/"+base+"/"+id.split(":")[0]+":"+localStorage.language+":"+id.split(":")[2];
+		}
 	</script>
 </head>
 <body>
@@ -61,9 +61,9 @@
 				<li> <!-- inserir link para a ferramenta --> <a href="/" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
         <li> <!-- inserir link para o portal --> <a href="/profile/glossary" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
 				<li>
-					<img onclick="translate('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
-					<img onclick="translate('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
-					<img onclick="translate('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
+					<img onclick="setLanguage('en-US')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/United-Kingdom-flag-icon.png"></a>
+					<img onclick="setLanguage('es-ES')" style="height:28px;margin-right:5px" src="http://icons.iconarchive.com/icons/custom-icon-design/all-country-flag/128/Spain-Flag-icon.png">
+					<img onclick="setLanguage('pt-BR')" style="height:28px;" src="http://icons.iconarchive.com/icons/custom-icon-design/flag-3/128/Brazil-Flag-icon.png">
 				</li>
 			</ul>
 		</nav>
