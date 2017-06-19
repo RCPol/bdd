@@ -43,7 +43,7 @@ module.exports = function(Collection) {
     this.language = language;
     return this;
   };
-  CollectionHelper.prototype.defineLine = function(line) {
+  CollectionHelper.prototype.defineLine = function(line) {    
     this.line = line;
     return this;
   };
@@ -67,14 +67,14 @@ module.exports = function(Collection) {
       if(term!="TERM"){
         c++;
         if(term && toString(self.line[c]).length != 0){
-          var schemaId = Collection.app.defineSchemaID(self.language,self.schema[c],self.class_[c],self.term[c]);
-          // console.log("ID "+c+": ", schemaId);
+          var schemaId = Collection.app.defineSchemaID("eco",self.language,self.schema[c],self.class_[c],self.term[c]);                    
           self.record[schemaId] = {value:toString(self.line[c])};
           Schema.findById(schemaId,function(err,schema) {
             if(err){
               console.log("ERROR "+c+": ", schemaId);
               callbackCell();
             } else if(schema){
+              console.log(schema);
               var aux = self.record[schema.id].value;
               self.record[schema.id] = schema;
               self.record[schema.id].value = aux;
@@ -108,7 +108,7 @@ module.exports = function(Collection) {
     });
     return this;
   };
-  CollectionHelper.prototype.saveRecord = function() {
+  CollectionHelper.prototype.saveRecord = function() {    
     var self = this;
     Collection.upsert(self.record,function (err,instance) {
       if(err)
