@@ -43,6 +43,10 @@ module.exports = function(Collection) {
     this.language = language;
     return this;
   };
+  CollectionHelper.prototype.defineBase = function(base) {
+    this.base = base;
+    return this;
+  };
   CollectionHelper.prototype.defineLine = function(line) {    
     this.line = line;
     return this;
@@ -67,7 +71,7 @@ module.exports = function(Collection) {
       if(term!="TERM"){
         c++;
         if(term && toString(self.line[c]).length != 0){
-          var schemaId = Collection.app.defineSchemaID("paleo",self.language,self.schema[c],self.class_[c],self.term[c]);                    
+          var schemaId = Collection.app.defineSchemaID(self.base,self.language,self.schema[c],self.class_[c],self.term[c]);                    
           self.record[schemaId] = {value:toString(self.line[c])};
           Schema.findById(schemaId,function(err,schema) {
             if(err){
@@ -118,7 +122,7 @@ module.exports = function(Collection) {
     return this;
   };
 
-  Collection.inputFromURL = function(url,language,sheetIndex,cb) {
+  Collection.inputFromURL = function(url,language,base,sheetIndex,cb) {
     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"? Yes, if it comes from GoogleDocs. If it comes from other source no changes (replace) will be done (of course, if there isn't "open" in the URL).
     var name = defineName(url);
     if(name==null)
@@ -141,6 +145,7 @@ module.exports = function(Collection) {
             helper.defineSchema(data[0])
                   .defineClass(data[1])
                   .defineTerm(data[2])
+                  .defineBase(base)
                   .defineOriginalLanguage(language)
                   .defineLanguage("en-US")
                   .defineLine(line)
@@ -162,6 +167,7 @@ module.exports = function(Collection) {
             helper.defineSchema(data[0])
                   .defineClass(data[1])
                   .defineTerm(data[2])
+                  .defineBase(base)
                   .defineOriginalLanguage(language)
                   .defineLanguage("pt-BR")
                   .defineLine(line)
@@ -183,6 +189,7 @@ module.exports = function(Collection) {
             helper.defineSchema(data[0])
                   .defineClass(data[1])
                   .defineTerm(data[2])
+                  .defineBase(base)
                   .defineOriginalLanguage(language)
                   .defineLanguage("es-ES")
                   .defineLine(line)
@@ -216,6 +223,7 @@ module.exports = function(Collection) {
       accepts: [
         {arg: 'url', type: 'string', required:true},
         {arg: 'language', type:'string', required:true, description:'en-US, pt-BR or es-ES'},
+        {arg: 'base', type: 'string', required:true},
         {arg: 'sheetIndex', type:'string', required:true}        
       ],
       returns: {arg: 'response', type: 'object'}
