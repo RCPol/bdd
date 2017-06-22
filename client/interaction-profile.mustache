@@ -37,11 +37,11 @@
 
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 	<script type="text/javascript">
-	var internacionalization;
+	var internacionalization = new Internacionalization();			
 	$(document).ready(function(){		    
-		// internacionalization = new Internacionalization();
-		// internacionalization.base = "interaction";
-		// internacionalization.siteTranslator();
+		internacionalization.base = 'interaction';	  					  
+		internacionalization.siteTranslator();		
+		internacionalization.updateLogo();
 	});
 	function setLanguage(language){
 			// alert(id + " - "+base);
