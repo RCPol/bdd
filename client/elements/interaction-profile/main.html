@@ -13,12 +13,12 @@
 <dom-module id="interaction-profile">  
   <template>       
       <!-- Título da Página -->
-		<h1 class="pal">Espécies de plantas visitadas por <i>{{pollinator}}</i> Determinador</h1>
+		<h1 class="pal"><span id="rcpol-InteractionLabel-plantVisitedBy">Espécies de plantas visitadas por</span> <i>{{pollinator}}</i></h1>
 
 		<!-- Seletor do gráfico -->
 		<div class="graf-e">
 
-			<p> Selecionar Região:
+			<p><span id="rcpol-InteractionLabel-selectRegion">Selecionar Região</span>: 
 			<select value = "{{region::change}}" class="opcoes-select">
 				<option value="Brasil">Brasil</option>
 				<option value="Centro-Oeste">Centro-Oeste</option>
@@ -62,7 +62,7 @@
     },
     load: function(){
         var self = this;                        
-        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator+"&region="+self.region, function( interactions ) {                                                     
+        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator+"&region="+self.region, function( interactions ) {
             // IN
             var json = {nodes: [], links:[]};
             var data = interactions.response.map(function(item){
@@ -161,6 +161,8 @@
             chart.nodePadding(10);
             if(data.length==0)
                 $("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
+
+            internacionalization.interactionTranslator();
         });        
     },
     index: function(data, value){        
@@ -172,7 +174,7 @@
       },
       changeRegion: function(v){
         this.load();
-      }
+      }      
   });
 
 </script>
