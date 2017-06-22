@@ -62,14 +62,12 @@ Internacionalization.prototype.profileTranslator = function(){
 }
 Internacionalization.prototype.interactionTranslator = function(){
   var self = this;
-  $.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22InteractionLabel%22%2C%22language%22%3A%22"+self.language+"%22%2C%22base%22%3A%22"+self.base+"%22%7D%7D", function(data){
-    console.log("LOG: ",data);
+  $.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22InteractionLabel%22%2C%22language%22%3A%22"+self.language+"%22%2C%22base%22%3A%22"+self.base+"%22%7D%7D", function(data){    
     data.forEach(function(label) {
       if($("#"+label.schema+"-"+label["class"]+"-"+label.term).html())
         $("#"+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
       else
-        $("."+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);
-      console.log(label.field, "."+label.schema+"-"+label["class"]+"-"+label.term);
+        $("."+label.schema+"-"+label["class"]+"-"+label.term).html(label.field);    
     });
   });
   return this;

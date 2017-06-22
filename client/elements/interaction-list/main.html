@@ -56,8 +56,7 @@
         },
         ready: function(){
             var self = this;                 
-            $.getJSON( "/api/Interactions/pollinators?plant="+self.plant, function( data ) {   
-                console.log("data",data)                                                                           
+            $.getJSON( "/api/Interactions/pollinators?plant="+self.plant, function( data ) {                                                                                       
                 $.getJSON( "/api/Interactions?filter=%7B%22where%22%3A%7B%22plant%22%3A%22"+self.plant+"%22%2C%20%22image%22%3A%7B%22exists%22%3Atrue%7D%7D%2C%22fields%22%3A%7B%22image%22%3Atrue%2C%22pollinator%22%3Atrue%7D%7D", function( imgs ) {
                     self.interactions = data.response.map(function(item){
                         var rs = item._id;   
