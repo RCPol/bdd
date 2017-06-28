@@ -3,6 +3,7 @@ version: '2'
 services:
   web:
     build: .
+    privileged: true
     volumes:
       - .:/var/www/bdd
     links:

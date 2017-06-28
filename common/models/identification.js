@@ -77,13 +77,17 @@ module.exports = function(Identification) {
     });
   } 
   Identification.populate = function(filter, callback){
-    Identification.getApp(function(err, app){
-      if (err) throw new Error(err);
-      var Species = app.models.Species;
-      var Schema = app.models.Schema;
-      var BDD = app.dataSources.BDD;
-      getIdentificationItems(filter, Identification, Species, Schema, BDD, callback);
-    });
+    console.log("Apagando...");
+    Identification.destroyAll(function(e,d){
+      console.log("Apagado!!!");
+      Identification.getApp(function(err, app){
+        if (err) throw new Error(err);
+        var Species = app.models.Species;
+        var Schema = app.models.Schema;
+        var BDD = app.dataSources.BDD;
+        getIdentificationItems(filter, Identification, Species, Schema, BDD, callback);
+      });
+    });    
   };
 
   Identification.identify = function(param, callback) {
@@ -342,7 +346,8 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             callback2();
           } else if (key == 'specimens'){            
             species.specimens.forEach(function(specimen) {
-              Object.keys(specimen.collection).forEach(function(subkey) {                
+              if(specimen.collection)
+              Object.keys(specimen.collection).forEach(function(subkey) {
                 if(specimen.collection[subkey].term == 'institutionName' || specimen.collection[subkey].term == 'collectionName' || specimen.collection[subkey].term == 'laboratory'){                     
                   identification_item["filter"][subkey] = identification_item["filter"][subkey]?identification_item["filter"][subkey]:[];
                   identification_item["filter"][subkey].push(specimen.collection[subkey].value);            

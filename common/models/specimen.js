@@ -1,3 +1,4 @@
+var google = require('googleapis');
 var readChunk = require('read-chunk'); 
 var imageType = require('image-type');  
 var xlsx = require('node-xlsx');
@@ -65,9 +66,6 @@ module.exports = function(Specimen) {
     }
   );
 
-
-
-
   var logs = {};
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -75,74 +73,173 @@ module.exports = function(Specimen) {
   
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
-  Specimen.inputFromURL = function(url,language, base, cb) {
+  Specimen.inputFromURL = function(id,language, base, cb) {
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
+    var key = require('key.json');    
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+            auth: jwtClient,
+            spreadsheetId: id,
+            range: 'specimen.'+language+'!A:BU'        
+          }, function(err, d) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              cb('The API returned an error: ' + err,null)
+              return;          
+            }                   
+            Specimen.destroyAll({base:base},function(err,d_){
+              console.log("Apagado!")
+              var data = d.values;  
+              var schema = data[0]; //define o schema
+              var class_ = data[1]; //define a classe
+              var terms = data[2]; //define o termo
+              // var category = data[3];
+              var label = data[4]; //define o rotulo      
+              data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
+              var response = {}; //resposta de execução
+              response.count = 0;      
+              var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
+                  var line = rec.line;          
+                  async.parallel([
+                    function(callbackSave) {
+                      // console.log("start en-US",line);
+                      //para salvar em  inglês
+                      saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
+                        // console.log("finish en-US");
+                        callbackSave();
+                      });
+                    },
+                    function(callbackSave) {
+                      // console.log("start pt-BR", line);
+                      //para salvar em português
+                      saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
+                        // console.log("finish pt-BR");
+                        callbackSave();
+                      });
+                    },
+                    function(callbackSave) {
+                      // console.log("start es-ES",line);
+                      //para salvar em espanhol
+                      saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
+                        // console.log("finish es-ES");
+                        callbackSave();
+                      });
+                    }
+                  ],function done() {
+                    console.log("COUTING: ",response.count++);
+                    callback(); //retorno da função
+                  });             
+              },3);
+              queue.drain(function() {
+                //executa o download das image
+              // downloadImages(downloadQueue, redownload);
+                console.log("Done.");
+                for (var key in logs) {
+                  console.log(logs[key]);
+                }          
+              });
+              console.log("SIZE: ",data.length);
+              data.forEach(function(line) {
+                if(line[1] && line[2] && line[3]){          
+                  queue.push({line:line});          
+                }          
+              });
+              cb(null, "Loading");
+            });
+          });
+    });
+
+
+
+
+
+
+
     //substitui a url da imagem
-    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-    var name = defineName(url); //define o nome da url
-    if(name==null)
-    cb("Invalid XLSX file.",null);
-    var path = __dirname +"/../../uploads/"+name+".xlsx"; //define o caminho do arquivo
-    saveDataset(name,url,path); //salva os dados
-    //ler o arquivo da planilha
-    var w = fs.createWriteStream(path).on("close",function (argument) {
-      var data = xlsx.parse(path)[0].data; //recebe os dados
-      var schema = data[0]; //define o schema
-      var class_ = data[1]; //define a classe
-      var terms = data[2]; //define o termo
-      // var category = data[3];
-      var label = data[4]; //define o rotulo      
-      data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
-      var response = {}; //resposta de execução
-      response.count = 0;      
-      var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
-          var line = rec.line;          
-          async.parallel([
-            function(callbackSave) {
-              // console.log("start en-US",line);
-              //para salvar em  inglês
-              saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
-                // console.log("finish en-US");
-                callbackSave();
-              });
-            },
-            function(callbackSave) {
-              // console.log("start pt-BR", line);
-              //para salvar em português
-              saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
-                // console.log("finish pt-BR");
-                callbackSave();
-              });
-            },
-            function(callbackSave) {
-              // console.log("start es-ES",line);
-              //para salvar em espanhol
-              saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
-                // console.log("finish es-ES");
-                callbackSave();
-              });
-            }
-          ],function done() {
-            console.log("COUTING: ",response.count++);
-            callback(); //retorno da função
-          });             
-      },1);
-      queue.drain(function() {
-        //executa o download das image
-       // downloadImages(downloadQueue, redownload);
-        console.log("Done.");
-        for (var key in logs) {
-          console.log(logs[key]);
-        }
-        cb(null, response);
-      });
-      console.log("SIZE: ",data.length);
-      data.forEach(function(line) {
-        if(line[1] && line[2] && line[3]){          
-          queue.push({line:line});          
-        }          
-      });
-    });    
-    request(url).pipe(w);
+    // url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+    // var name = defineName(url); //define o nome da url
+    // if(name==null)
+    //   cb("Invalid XLSX file.",null);
+    // var path = __dirname +"/../../uploads/"+name+".xlsx"; //define o caminho do arquivo
+    // console.log("1",path);
+    // saveDataset(name,url,path); //salva os dados
+    // //ler o arquivo da planilha
+    // var w = fs.createWriteStream(path).on("close",function (argument) {
+    //   console.log("Apagando...")
+    //   Specimen.destroyAll({base:base},function(err,d){
+    //     console.log("Apagado!")
+    //     var data = xlsx.parse(path)[0].data; //recebe os dados      
+    //     var schema = data[0]; //define o schema
+    //     var class_ = data[1]; //define a classe
+    //     var terms = data[2]; //define o termo
+    //     // var category = data[3];
+    //     var label = data[4]; //define o rotulo      
+    //     data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
+    //     var response = {}; //resposta de execução
+    //     response.count = 0;      
+    //     var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
+    //         var line = rec.line;          
+    //         async.parallel([
+    //           function(callbackSave) {
+    //             // console.log("start en-US",line);
+    //             //para salvar em  inglês
+    //             saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
+    //               // console.log("finish en-US");
+    //               callbackSave();
+    //             });
+    //           },
+    //           function(callbackSave) {
+    //             // console.log("start pt-BR", line);
+    //             //para salvar em português
+    //             saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
+    //               // console.log("finish pt-BR");
+    //               callbackSave();
+    //             });
+    //           },
+    //           function(callbackSave) {
+    //             // console.log("start es-ES",line);
+    //             //para salvar em espanhol
+    //             saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
+    //               // console.log("finish es-ES");
+    //               callbackSave();
+    //             });
+    //           }
+    //         ],function done() {
+    //           console.log("COUTING: ",response.count++);
+    //           callback(); //retorno da função
+    //         });             
+    //     },1);
+    //     queue.drain(function() {
+    //       //executa o download das image
+    //     // downloadImages(downloadQueue, redownload);
+    //       console.log("Done.");
+    //       for (var key in logs) {
+    //         console.log(logs[key]);
+    //       }          
+    //     });
+    //     console.log("SIZE: ",data.length);
+    //     data.forEach(function(line) {
+    //       if(line[1] && line[2] && line[3]){          
+    //         queue.push({line:line});          
+    //       }          
+    //     });
+    //     cb(null, "Loading");
+    //   });
+    // });    
+    // request(url).pipe(w);
   };
   function saveRecord(base, originalLanguage,language,line, schema, class_, terms, callback) {
     var Schema = Specimen.app.models.Schema; //usando o schema
@@ -155,7 +252,7 @@ module.exports = function(Specimen) {
         c++;
         //se existe o termo e a linha existe da amostra
         if(term && toString(line[c]) != ""){
-          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema
+          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema          
           record.language = language; //recebe a linguagem
           record.originalLanguage = originalLanguage;  //linguagem original
           record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
@@ -247,8 +344,10 @@ module.exports = function(Specimen) {
                   if(schema["class"]=="Image"){ //se encontrar a classe da imagem
                     //recebe um vetor de images
                     record[schema.id].images = [];
-                    record[schema.id].value.split("|").forEach(function(img,i){
-                        var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
+                    record[schema.id].value.split("|").forEach(function(img,i){   
+                      if(img && img.length>0){
+                        var imageId = base+"-"+img.split("?id=")[1];
+                        // var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
                         // console.log("IMG: ",imageId)
                         var image = {
                           id: imageId,
@@ -259,6 +358,7 @@ module.exports = function(Specimen) {
                           thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
                         }
                         record[schemaId].images.push(image);
+                      }                      
                     });
 
                     //Função antiga
@@ -330,14 +430,17 @@ module.exports = function(Specimen) {
         var Collection = Specimen.app.models.Collection;
         var sID = record.id.split(":");
         var cID = sID[0]+":"+sID[1]+":"+sID[2];   
+        console.log(sID);
         console.log(cID);             
         Collection.findById(cID, function(err,collection) {          
           if(err) console.log("ERROR FIND COLLECTION: ",err);          
           record.collection = collection;
           
           Specimen.upsert(record,function (err,instance) {
-            if(err)
-              console.log(err);
+            if(err){
+              console.log("ERROR: ",err);              
+              console.log("RECORD: ",record);
+            }              
             callback();
           });
         });        
@@ -656,7 +759,7 @@ module.exports = function(Specimen) {
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
-        {arg: 'url', type: 'string', required:true, description: 'link para tabela de espécimes'},
+        {arg: 'id', type: 'string', required:true, description: 'link para tabela de espécimes'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR ou es-ES'},
         {arg: 'base', type: 'string', required:true, description: 'eco ou taxon'}
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}

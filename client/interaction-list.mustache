@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+    <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>	
+    <link rel="import" href="/elements/interaction-list/main.html"></script>	
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/eco_fichas.css">
+
+	<title>RCPol - {{plant}}</title>
+
+	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript">			
+	var internacionalization = new Internacionalization();			
+	$(document).ready(function(){		
+		$( document ).tooltip();  		
+	  	internacionalization.base = 'interaction';	  					  
+		internacionalization.siteTranslator();		
+		internacionalization.updateLogo();
+	});
+	function setLanguage(language){
+		// alert(id + " - "+base);
+		localStorage.language = language;
+		window.location = "/interaction/{{plant}}";
+	}
+	</script>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
+				<li>
+					<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
+							<img onclick="setLanguage('en-US')"  src="/img/en_GB.png">
+							<img onclick="setLanguage('es-ES')"  src="/img/es_ES.png">
+						</span>
+				</li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="423px" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<!-- Início das informações da Página -->
+	<article>
+        <interaction-list plant="{{plant}}"></interaction-list>
+	<!-- Final: Imagens de Abelhas -->
+
+	</article>
+	<!-- Final das informações da Página -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p id="rcpol-SiteLabel-siteCopyright">Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

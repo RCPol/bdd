@@ -1,3 +1,4 @@
+var google = require('googleapis');
 var xlsx = require('node-xlsx');
 var hash = require('object-hash');
 var request = require('request');
@@ -43,7 +44,11 @@ module.exports = function(Collection) {
     this.language = language;
     return this;
   };
-  CollectionHelper.prototype.defineLine = function(line) {
+  CollectionHelper.prototype.defineBase = function(base) {
+    this.base = base;
+    return this;
+  };
+  CollectionHelper.prototype.defineLine = function(line) {    
     this.line = line;
     return this;
   };
@@ -67,14 +72,13 @@ module.exports = function(Collection) {
       if(term!="TERM"){
         c++;
         if(term && toString(self.line[c]).length != 0){
-          var schemaId = Collection.app.defineSchemaID(self.language,self.schema[c],self.class_[c],self.term[c]);
-          // console.log("ID "+c+": ", schemaId);
+          var schemaId = Collection.app.defineSchemaID(self.base,self.language,self.schema[c],self.class_[c],self.term[c]);                    
           self.record[schemaId] = {value:toString(self.line[c])};
           Schema.findById(schemaId,function(err,schema) {
             if(err){
               console.log("ERROR "+c+": ", schemaId);
               callbackCell();
-            } else if(schema){
+            } else if(schema){              
               var aux = self.record[schema.id].value;
               self.record[schema.id] = schema;
               self.record[schema.id].value = aux;
@@ -108,7 +112,7 @@ module.exports = function(Collection) {
     });
     return this;
   };
-  CollectionHelper.prototype.saveRecord = function() {
+  CollectionHelper.prototype.saveRecord = function() {    
     var self = this;
     Collection.upsert(self.record,function (err,instance) {
       if(err)
@@ -119,104 +123,220 @@ module.exports = function(Collection) {
     return this;
   };
 
-  Collection.inputFromURL = function(url,language,cb) {
-    url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"? Yes, if it comes from GoogleDocs. If it comes from other source no changes (replace) will be done (of course, if there isn't "open" in the URL).
-    var name = defineName(url);
-    if(name==null)
-      cb("Invalid XLSX file.",null);
+  Collection.inputFromURL = function(id,language,base,cb) {
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
+    var key = require('key.json');    
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+            auth: jwtClient,
+            spreadsheetId: id,
+            range: 'institution.'+language+'!A:P'        
+          }, function(err, d) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              cb('The API returned an error: ' + err,null)
+              return;          
+            }       
+            var data = d.values;       
+            var dataOnly =  data.slice(4,data.length);
 
-    var path = __dirname +"/../../uploads/"+name+".xlsx";
-    saveDataset(name,url,path);
-
-    var w = fs.createWriteStream(path).on("close",function (argument) {
-      var data = xlsx.parse(path)[0].data;
-      var dataOnly =  data.slice(4,data.length);
-
-      var rs = {};
-      rs.count = 0;
-      async.each(dataOnly, function iterator(line, callback){
-        rs.count ++;
-        async.parallel([
-          function(callbackSave) {
-            var helper = new CollectionHelper();
-            helper.defineSchema(data[0])
-                  .defineClass(data[1])
-                  .defineTerm(data[2])
-                  .defineOriginalLanguage(language)
-                  .defineLanguage("en-US")
-                  .defineLine(line)
-                  .defineId("en-US",line[1],line[2])
-                  .mapping().on("done",function() {
-                    helper.saveRecord()
-                          .on("success",function() {
-                            callbackSave();
-                          })
-                          .on("error",function(err) {
-                            console.log("ID: ",helper.id);
-                            console.log(err);
-                            callbackSave();
-                          });
-                  });
-          },
-          function(callbackSave) {
-            var helper = new CollectionHelper();
-            helper.defineSchema(data[0])
-                  .defineClass(data[1])
-                  .defineTerm(data[2])
-                  .defineOriginalLanguage(language)
-                  .defineLanguage("pt-BR")
-                  .defineLine(line)
-                  .defineId("pt-BR",line[1],line[2])
-                  .mapping().on("done",function() {
-                    helper.saveRecord()
-                          .on("success",function() {
-                            callbackSave();
-                          })
-                          .on("error",function(err) {
-                            console.log("ID: ",helper.id);
-                            console.log(err);
-                            callbackSave();
-                          });
-                  });
-          },
-          function(callbackSave) {
-            var helper = new CollectionHelper();
-            helper.defineSchema(data[0])
-                  .defineClass(data[1])
-                  .defineTerm(data[2])
-                  .defineOriginalLanguage(language)
-                  .defineLanguage("es-ES")
-                  .defineLine(line)
-                  .defineId("es-ES",line[1],line[2])
-                  .mapping().on("done",function() {
-                    helper.saveRecord()
-                          .on("success",function() {
-                            callbackSave();
-                          })
-                          .on("error",function(err) {
-                            console.log("ID: ",helper.id);
-                            console.log(err);
-                            callbackSave();
-                          });
-                  });
-          }
-        ],function done() {
-          callback();
-        });
-      }, function done(){
-        console.log(log);
-        cb(null, rs);
+            var rs = {};
+            rs.count = 0;
+            async.each(dataOnly, function iterator(line, callback){
+              rs.count ++;
+              async.parallel([
+                function(callbackSave) {
+                  var helper = new CollectionHelper();
+                  helper.defineSchema(data[0])
+                        .defineClass(data[1])
+                        .defineTerm(data[2])
+                        .defineBase(base)
+                        .defineOriginalLanguage(language)
+                        .defineLanguage("en-US")
+                        .defineLine(line)
+                        .defineId("en-US",line[1],line[2])
+                        .mapping().on("done",function() {
+                          helper.saveRecord()
+                                .on("success",function() {
+                                  callbackSave();
+                                })
+                                .on("error",function(err) {
+                                  console.log("ID: ",helper.id);
+                                  console.log(err);
+                                  callbackSave();
+                                });
+                        });
+                },
+                function(callbackSave) {
+                  var helper = new CollectionHelper();
+                  helper.defineSchema(data[0])
+                        .defineClass(data[1])
+                        .defineTerm(data[2])
+                        .defineBase(base)
+                        .defineOriginalLanguage(language)
+                        .defineLanguage("pt-BR")
+                        .defineLine(line)
+                        .defineId("pt-BR",line[1],line[2])
+                        .mapping().on("done",function() {
+                          helper.saveRecord()
+                                .on("success",function() {
+                                  callbackSave();
+                                })
+                                .on("error",function(err) {
+                                  console.log("ID: ",helper.id);
+                                  console.log(err);
+                                  callbackSave();
+                                });
+                        });
+                },
+                function(callbackSave) {
+                  var helper = new CollectionHelper();
+                  helper.defineSchema(data[0])
+                        .defineClass(data[1])
+                        .defineTerm(data[2])
+                        .defineBase(base)
+                        .defineOriginalLanguage(language)
+                        .defineLanguage("es-ES")
+                        .defineLine(line)
+                        .defineId("es-ES",line[1],line[2])
+                        .mapping().on("done",function() {
+                          helper.saveRecord()
+                                .on("success",function() {
+                                  callbackSave();
+                                })
+                                .on("error",function(err) {
+                                  console.log("ID: ",helper.id);
+                                  console.log(err);
+                                  callbackSave();
+                                });
+                        });
+                }
+              ],function done() {
+                callback();
+              });
+            }, function done(){
+              console.log(log);
+              cb(null, rs);
+            });   
       });
     });
-    request(url).pipe(w);
+
+
+
+    // url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="); // input will always be this way with "open"? Yes, if it comes from GoogleDocs. If it comes from other source no changes (replace) will be done (of course, if there isn't "open" in the URL).
+    // var name = defineName(url);
+    // if(name==null)
+    //   cb("Invalid XLSX file.",null);
+
+    // var path = __dirname +"/../../uploads/"+name+".xlsx";
+    // saveDataset(name,url,path);
+
+    // var w = fs.createWriteStream(path).on("close",function (argument) {
+    //   var data = xlsx.parse(path)[sheetIndex].data;
+    //   var dataOnly =  data.slice(4,data.length);
+
+    //   var rs = {};
+    //   rs.count = 0;
+    //   async.each(dataOnly, function iterator(line, callback){
+    //     rs.count ++;
+    //     async.parallel([
+    //       function(callbackSave) {
+    //         var helper = new CollectionHelper();
+    //         helper.defineSchema(data[0])
+    //               .defineClass(data[1])
+    //               .defineTerm(data[2])
+    //               .defineBase(base)
+    //               .defineOriginalLanguage(language)
+    //               .defineLanguage("en-US")
+    //               .defineLine(line)
+    //               .defineId("en-US",line[1],line[2])
+    //               .mapping().on("done",function() {
+    //                 helper.saveRecord()
+    //                       .on("success",function() {
+    //                         callbackSave();
+    //                       })
+    //                       .on("error",function(err) {
+    //                         console.log("ID: ",helper.id);
+    //                         console.log(err);
+    //                         callbackSave();
+    //                       });
+    //               });
+    //       },
+    //       function(callbackSave) {
+    //         var helper = new CollectionHelper();
+    //         helper.defineSchema(data[0])
+    //               .defineClass(data[1])
+    //               .defineTerm(data[2])
+    //               .defineBase(base)
+    //               .defineOriginalLanguage(language)
+    //               .defineLanguage("pt-BR")
+    //               .defineLine(line)
+    //               .defineId("pt-BR",line[1],line[2])
+    //               .mapping().on("done",function() {
+    //                 helper.saveRecord()
+    //                       .on("success",function() {
+    //                         callbackSave();
+    //                       })
+    //                       .on("error",function(err) {
+    //                         console.log("ID: ",helper.id);
+    //                         console.log(err);
+    //                         callbackSave();
+    //                       });
+    //               });
+    //       },
+    //       function(callbackSave) {
+    //         var helper = new CollectionHelper();
+    //         helper.defineSchema(data[0])
+    //               .defineClass(data[1])
+    //               .defineTerm(data[2])
+    //               .defineBase(base)
+    //               .defineOriginalLanguage(language)
+    //               .defineLanguage("es-ES")
+    //               .defineLine(line)
+    //               .defineId("es-ES",line[1],line[2])
+    //               .mapping().on("done",function() {
+    //                 helper.saveRecord()
+    //                       .on("success",function() {
+    //                         callbackSave();
+    //                       })
+    //                       .on("error",function(err) {
+    //                         console.log("ID: ",helper.id);
+    //                         console.log(err);
+    //                         callbackSave();
+    //                       });
+    //               });
+    //       }
+    //     ],function done() {
+    //       callback();
+    //     });
+    //   }, function done(){
+    //     console.log(log);
+    //     cb(null, rs);
+    //   });
+    // });
+    // request(url).pipe(w);
   };
   Collection.remoteMethod(
     'inputFromURL',
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
-        {arg: 'url', type: 'string', required:true},
-        {arg: 'language', type:'string', required:true, description:'en-US, pt-BR or es-ES'}
+        {arg: 'id', type: 'string', required:true},
+        {arg: 'language', type:'string', required:true, description:'en-US, pt-BR or es-ES'},
+        {arg: 'base', type: 'string', required:true}        
       ],
       returns: {arg: 'response', type: 'object'}
     }

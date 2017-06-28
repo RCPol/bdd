@@ -27,3 +27,5 @@ uploads/*
 storage/*
 
 *.xlsx
+
+client/resized/

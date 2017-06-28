@@ -64,6 +64,11 @@ app.get('/eco', function(req, res) {
   var params = {base: "eco"};
   res.send(mustache.render(template, params));
 });
+app.get('/interaction/:plant', function(req, res) {
+  var template = fs.readFileSync('./client/interaction-list.mustache', 'utf8');  
+  var params = {base: "eco",plant:req.params.plant};
+  res.send(mustache.render(template, params));
+});
 app.get('/taxon', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "taxon"};
@@ -74,7 +79,12 @@ app.get('/paleo', function(req, res) {
   var params = {base: "paleo"};
   res.send(mustache.render(template, params));
 });
-
+app.get('/interaction-profile/:pollinator', function(req, res) {
+  var template = fs.readFileSync('./client/interaction-profile.mustache', 'utf8');
+  var params = {pollinator: req.params.pollinator};
+  // console.log("LOG: ",req.params);
+  res.send(mustache.render(template, params));
+});
 app.get('/profile/species/:base/:id', function(req, res) {
   var template = fs.readFileSync('./client/species.mustache', 'utf8');
   var params = {id: req.params.id,base: req.params.base?req.params.base:"eco"};
@@ -97,13 +107,14 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
     },
     function(callback) {
       var parsedId = params.id.split(":");
+      console.log([parsedId[0],parsedId[1],parsedId[2]].join(":"),params)
       collection([parsedId[0],parsedId[1],parsedId[2]].join(":"),params,callback);      
     },
     function specimen(callback) {
       Specimen.findById(params.id,function(err,specimen) {
         Object.keys(specimen.toJSON()).forEach(function(key) {
           var parsedId = key.split(":");
-          if(parsedId.length){
+          if(parsedId.length>1){            
             // console.log("LOG: ",parsedId);
             var domIdLabel = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":label";
             var domIdValue = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":value";
@@ -265,18 +276,18 @@ app.get('/profile/palinoteca/:base/:id', function(req, res) {
 });
 function collection(id, params, callback) {
   params.value = params.value?params.value:{};
-  var Collection = app.models.Collection;
+  var Collection = app.models.Collection;  
   Collection.findById(id,function(err,collection) {
     Object.keys(collection.toJSON()).forEach(function(key) {
       var parsedId = key.split(":");
       if(parsedId.length){
-        var domIdLabel = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":label";
-        var domIdValue = parsedId[1]+":"+parsedId[2]+":"+parsedId[3]+":value";
+        var domIdLabel = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":label";
+        var domIdValue = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":value";        
         if(collection[key].field && collection[key].value)
           params.label[domIdLabel] = collection[key].field;
         if(collection[key].value){
           params.value[domIdValue] = collection[key].value;
-          if(parsedId[2]=="Image"){
+          if(parsedId[3]=="Image"){
             if(collection[key].value && collection[key].value.length>0)
               params.value[domIdValue] = collection[key].value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
             else

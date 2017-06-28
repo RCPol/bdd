@@ -219,103 +219,218 @@ module.exports = function(Schema) {
   function titleCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
-  Schema.inputFromURL = function(url, language, base, sheetNumber, cb) {
-    if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
-      //definição da url
-      url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-      var name = defineName(url); //nome da url
-      if(name==null)
-      cb("Invalid XLSX file.",null);
-      var path = __dirname +"/../../uploads/"+name+".xlsx"; //diretorio da planilha
-      saveDataset(name,url,path); //salva dados com a url, nome e diretorio da planilha
-      //var downloadQueue = []; //vetor de imagens
-
-      //Passa o diretorio da planilha a ser lida
-      var w = fs.createWriteStream(path).on("close",function (argument) {
-        var data = xlsx.parse(path)[sheetNumber || 0].data; //recebe os dados de uma planilha
-        var header = data[0]; //primeira linha da planilha
-        data =  data.slice(1,data.length); //slice = retorna a quantidade de dados
-        var response = {}; //array de resposta
-        response.count = 0;
-        async.each(data, function iterator(line, callback){
-          //line é o campo da tabela
-          var record = {};
-          record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
-          record.order = response.count;
-          record.base = base;
-          if(record.id){
-            response.count++;
-            record.schema = toString(line[0]).trim();
-            record.class = toString(line[1]).trim();
-            record.term = toString(line[2]).trim();
-            if (toString(line[3]).trim().length>0) {
-              record.category = titleCase(toString(line[3]).trim());
-            }
-            if (toString(line[4]).trim().length>0) {
-              record.field = titleCase(toString(line[4]).trim());
-            }
-            if (toString(line[5]).trim().length>0) {
-              record.state = titleCase(toString(line[5]).trim());
-            }
-            if (toString(line[6]).trim().length>0) {
-              record.definition = toString(line[6]).trim();
-            }
-            if (toString(line[7]).trim().length>0) {
-              record.references = [];
-              toString(line[7]).trim().split("|").forEach(function (ref) {
-                record.references.push(ref.trim());
-              });
-            }
-            if (toString(line[9]).trim().length>0) {
-              record.credits = [];
-              toString(line[9]).trim().split("|").forEach(function (ref) {
-                record.credits.push(ref.trim());
-              });
-            }
-            //ler o campo das imagens
-            if (toString(line[8]).trim().length>0) {
-              record.images = [];
-              toString(line[8]).trim().split("|").forEach(function (img,i) {
-                var imageId = record.id.split(":").slice(1).join(":")+":"+i;
-                var image = {
-                  id: imageId,
-                  original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
-                  local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                  resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                  thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+  Schema.inputFromURL = function(id, language, base, cb) {
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
+    var key = require('key.json');    
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+            auth: jwtClient,
+            spreadsheetId: id,
+            range: 'glossary.'+language+'!A:J'        
+          }, function(err, rs) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              return;          
+            }                    
+            rs.values.shift();
+            Schema.destroyAll({base:base, language:language},function(err,d){     
+              var response = {};     
+              response.count = 0;
+              async.each(rs.values, function iterator(line, callback){            
+                //line é o campo da tabela
+                var record = {};
+                record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
+                record.order = response.count;
+                record.base = base;
+                if(record.id){
+                  response.count++;
+                  record.schema = toString(line[0]).trim();
+                  record.class = toString(line[1]).trim();
+                  record.term = toString(line[2]).trim();
+                  if (toString(line[3]).trim().length>0) {
+                    record.category = titleCase(toString(line[3]).trim());
+                  }
+                  if (toString(line[4]).trim().length>0) {
+                    record.field = titleCase(toString(line[4]).trim());
+                  }
+                  if (toString(line[5]).trim().length>0) {
+                    record.state = titleCase(toString(line[5]).trim());
+                  }
+                  if (toString(line[6]).trim().length>0) {
+                    record.definition = toString(line[6]).trim();
+                  }
+                  if (toString(line[7]).trim().length>0) {
+                    record.references = [];
+                    toString(line[7]).trim().split("|").forEach(function (ref) {
+                      record.references.push(ref.trim());
+                    });
+                  }
+                  if (toString(line[9]).trim().length>0) {
+                    record.credits = [];
+                    toString(line[9]).trim().split("|").forEach(function (ref) {
+                      record.credits.push(ref.trim());
+                    });
+                  }
+                  //ler o campo das imagens
+                  if (toString(line[8]).trim().length>0) {
+                    record.images = [];
+                    toString(line[8]).trim().split("|").forEach(function (img,i) {
+                      // var imageId = record.id.split(":").slice(1).join(":")+":"+i;
+                      var imageId = base+"-"+img.split("?id=")[1];
+                      var image = {
+                        id: imageId,
+                        original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
+                        local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                        resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                        thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                      }
+                      record.images.push(image); //coloca as imagens no vetor
+                    });
+                    // record.image = record.images[0]; // so pega a primeira imagem
+                  }
+                  // record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
+                  // if (record.image != undefined){ //se a imagem tiver definida
+                  // record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+                  //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
+                  // }
+                  record.language = language;
+                  //save record in database
+                  Schema.upsert(record, function(err, instance){
+                    if(err){
+                      console.log(err);
+                    }
+                    callback();
+                  });
+                } else {
+                  console.error("record id could not be generated: ".concat(line[0], " ", line[1], " ", line[2]));
+                  callback();
                 }
-                record.images.push(image); //coloca as imagens no vetor
+              }, function done(){
+                //downloadImages(downloadQueue, redownload); //download das imagens
+                console.log("Done.");
+                cb(null, response);
               });
-              // record.image = record.images[0]; // so pega a primeira imagem
-            }
-            // record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
-            // if (record.image != undefined){ //se a imagem tiver definida
-            // record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-            //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
-            // }
-            record.language = language;
-            //save record in database
-            Schema.upsert(record, function(err, instance){
-              if(err){
-                console.log(err);
-              }
-              callback();
-            });
-          } else {
-            console.error("record id could not be generated: ".concat(line[0], " ", line[1], " ", line[2]));
-            callback();
-          }
-        }, function done(){
-          //downloadImages(downloadQueue, redownload); //download das imagens
-          console.log("Done.");
-          cb(null, response);
-        });
+            });            
       });
-      request(url).pipe(w);
-    } else {
-      cb("invalid language",language);
-    }
+    });
   };  
+
+  // Schema.inputFromURL = function(url, language, base, sheetNumber, cb) {
+  //   if(language=="en-US" || language=="pt-BR" || language=="es-ES"){
+  //     //definição da url
+  //     url = url.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+  //     var name = defineName(url); //nome da url
+  //     if(name==null)
+  //     cb("Invalid XLSX file.",null);
+  //     var path = __dirname +"/../../uploads/"+name+".xlsx"; //diretorio da planilha
+  //     saveDataset(name,url,path); //salva dados com a url, nome e diretorio da planilha
+  //     //var downloadQueue = []; //vetor de imagens
+
+  //     //Passa o diretorio da planilha a ser lida
+  //     var w = fs.createWriteStream(path).on("close",function (argument) {
+  //       // Delete all
+  //       Schema.destroyAll({base:base, language:language},function(err,d){          
+  //         var data = xlsx.parse(path)[sheetNumber || 0].data; //recebe os dados de uma planilha
+          
+  //         var header = data[0]; //primeira linha da planilha
+  //         data =  data.slice(1,data.length); //slice = retorna a quantidade de dados
+  //         var response = {}; //array de resposta
+  //         response.count = 0;
+  //         async.each(data, function iterator(line, callback){            
+  //           //line é o campo da tabela
+  //           var record = {};
+  //           record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
+  //           record.order = response.count;
+  //           record.base = base;
+  //           if(record.id){
+  //             response.count++;
+  //             record.schema = toString(line[0]).trim();
+  //             record.class = toString(line[1]).trim();
+  //             record.term = toString(line[2]).trim();
+  //             if (toString(line[3]).trim().length>0) {
+  //               record.category = titleCase(toString(line[3]).trim());
+  //             }
+  //             if (toString(line[4]).trim().length>0) {
+  //               record.field = titleCase(toString(line[4]).trim());
+  //             }
+  //             if (toString(line[5]).trim().length>0) {
+  //               record.state = titleCase(toString(line[5]).trim());
+  //             }
+  //             if (toString(line[6]).trim().length>0) {
+  //               record.definition = toString(line[6]).trim();
+  //             }
+  //             if (toString(line[7]).trim().length>0) {
+  //               record.references = [];
+  //               toString(line[7]).trim().split("|").forEach(function (ref) {
+  //                 record.references.push(ref.trim());
+  //               });
+  //             }
+  //             if (toString(line[9]).trim().length>0) {
+  //               record.credits = [];
+  //               toString(line[9]).trim().split("|").forEach(function (ref) {
+  //                 record.credits.push(ref.trim());
+  //               });
+  //             }
+  //             //ler o campo das imagens
+  //             if (toString(line[8]).trim().length>0) {
+  //               record.images = [];
+  //               toString(line[8]).trim().split("|").forEach(function (img,i) {
+  //                 // var imageId = record.id.split(":").slice(1).join(":")+":"+i;
+  //                 var imageId = base+"-"+img.split("?id=")[1];
+  //                 var image = {
+  //                   id: imageId,
+  //                   original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
+  //                   local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+  //                   resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+  //                   thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+  //                 }
+  //                 record.images.push(image); //coloca as imagens no vetor
+  //               });
+  //               // record.image = record.images[0]; // so pega a primeira imagem
+  //             }
+  //             // record.url = "/images/" + record.id + ".jpeg"; //atribui a url onde vai ser salva a imagem
+  //             // if (record.image != undefined){ //se a imagem tiver definida
+  //             // record.image = record.image.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
+  //             //downloadQueue.push({url:record.image, name:record.id}); //vetor vai receber a url da imagem e o id
+  //             // }
+  //             record.language = language;
+  //             //save record in database
+  //             Schema.upsert(record, function(err, instance){
+  //               if(err){
+  //                 console.log(err);
+  //               }
+  //               callback();
+  //             });
+  //           } else {
+  //             console.error("record id could not be generated: ".concat(line[0], " ", line[1], " ", line[2]));
+  //             callback();
+  //           }
+  //         }, function done(){
+  //           //downloadImages(downloadQueue, redownload); //download das imagens
+  //           console.log("Done.");
+  //           cb(null, response);
+  //         });
+  //       });        
+  //     });
+  //     request(url).pipe(w);
+  //   } else {
+  //     cb("invalid language",language);
+  //   }
+  // };  
+
   //Método by Raquel
   Schema.downloadImages = function (cb) {
     //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
@@ -749,10 +864,9 @@ module.exports = function(Schema) {
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
-        {arg: 'url', type: 'string', required:true, description: 'link para tabela do glossário'},
+        {arg: 'id', type: 'string', required:true, description: 'id data tabela do glossário'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR or es-ES'},
-        {arg: 'base', type: 'string', required:true, description: 'eco or taxon'},
-        {arg: 'sheetNumber', type: 'number', required:false, description: 'Sheet number. Default: 0'},
+        {arg: 'base', type: 'string', required:true, description: 'eco or taxon'},        
         //  {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
