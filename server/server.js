@@ -239,7 +239,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
     }
   ],function done() {
     var template = fs.readFileSync('./client/specimen.mustache', 'utf8');
-    params.base = req.params.base?req.params.base:"eco";
+    params.base = req.params.base?req.params.base:"eco";    
     res.send(mustache.render(template, params));
   });
 });
