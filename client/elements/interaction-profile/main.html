@@ -12,6 +12,7 @@
 
 <dom-module id="interaction-profile">  
   <template>       
+  
       <!-- Título da Página -->
 		<h1 class="pal"><span id="rcpol-InteractionLabel-plantVisitedBy">Espécies de plantas visitadas por</span> <i>{{pollinator}}</i></h1>
 
@@ -91,20 +92,20 @@
             // data.push({species:"Citrus limonia", value:40, region:"Norte", state:"Pará", municipality:"Belém"});            
             data.forEach(function(item){
                 if(self.index(json.nodes,item.species)==-1)
-                json.nodes.push({name:item.species});
+                    json.nodes.push({name:item.species, type:"species"});
                 if(self.index(json.nodes,item.municipality)==-1)
-                json.nodes.push({name:item.municipality});
+                    json.nodes.push({name:item.municipality});
                 if(self.index(json.nodes,item.state)==-1)
-                json.nodes.push({name:item.state});
+                    json.nodes.push({name:item.state});
                 if(self.index(json.nodes,item.region)==-1)
-                json.nodes.push({name:item.region});
+                    json.nodes.push({name:item.region});
             });
             // Link Specie - Cidade
             data.forEach(function(item){
                 var s = self.index(json.nodes, item.municipality);
                 var t = self.index(json.nodes, item.species);
                 var v = item.value;
-                var link = {"source": s, "target":t, "value": v};
+                var link = {"source": s, "target":t, "value": v, "OUTRO":"CONTEUDO"};
                 var add = true;
                 json.links.forEach(function(l){                    
                     if(l.source==link.source && l.target==link.target){                        
@@ -150,15 +151,20 @@
                 if(add)
                     json.links.push(link);
             });
-            $("#chart").html("");
-            var chart = d3.select("#chart").append("svg").chart("Sankey.Path");        
-            // chart.colorLinks(function(link) { return  '#F9C6A7'; }).draw(json);                        
-            // chart.nodeWidth(70);
-            // chart.name(function(n) { return n.name+" ("+n.value+")"; console.log(n); })  
-            // chart.nodePadding(.50);
+            $("#chart").html("");                        
+            var chart = d3.select("#chart").append("svg")
+                .chart("Sankey.Path");                                        
             
-            chart.draw(json);      
-            chart.nodePadding(10);
+            chart.draw(json);                        
+            d3.select("#chart").selectAll(".node")[0].forEach(function(g){                
+                if(g.__data__.type=="species"){
+                    g.onclick = function(){
+                        window.open("/profile/species/eco/eco:"+localStorage.language+":"+g.__data__.name, '_blank');
+                    }
+                    $(g).css("font-style","italic");
+                }                    
+            });
+            chart.nodePadding(10);            
             if(data.length==0)
                 $("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
 
