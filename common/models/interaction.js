@@ -18,15 +18,26 @@ var google = require('googleapis');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Interaction) {
   
-  Interaction.plants = function(pollinator,region,cb) {        
+  Interaction.plants = function(pollinator,region,vegetalForm,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
+    var q = {};
+    q.pollinator = pollinator;
+    if(region!="Brasil"){      
+      q.region = region;
+    }    
+    if(vegetalForm!="Todas"){      
+      q.vegetalForm = vegetalForm;
+    }    
+
+    // region=="Brasil" || String(region).trim().length==0?{pollinator:pollinator}:{pollinator:pollinator,region:region}
+    
     var url = 'mongodb://localhost:27017/bdd';
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
-      var q = [
-          { $match: region=="Brasil" || String(region).trim().length==0?{pollinator:pollinator}:{pollinator:pollinator,region:region}},                 
+      var q_ = [
+          { $match: q},                 
           {
             $group: {
               _id: {
@@ -40,7 +51,7 @@ module.exports = function(Interaction) {
             }
           }
         ];
-      collection.aggregate(q).toArray(function(err, docs) {        
+      collection.aggregate(q_).toArray(function(err, docs) {        
         cb(err,docs);
         db.close();
         
@@ -92,7 +103,8 @@ module.exports = function(Interaction) {
       http: {path: '/plants', verb: 'get'},
       accepts: [
         {arg: 'pollinator', type: 'string', required:true, description: 'Pollinator name'},
-        {arg: 'region', type: 'string', required:false, description: 'Region'}        
+        {arg: 'region', type: 'string', required:false, description: 'Region'},
+        {arg: 'vegetalForm', type: 'string', required:false, description: 'Vegetal form'}
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}

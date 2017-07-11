@@ -3,7 +3,7 @@
     {    
     "name"        : "bdd",
     "script"      : ".",    
-    // "watch"       : true,    
+    "watch"       : true,    
     "watch"       : ["common","server"],    
     // "ignore_watch": ["uploads","client","node_modules"],
     "merge_logs"  : true,

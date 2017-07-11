@@ -9,8 +9,8 @@ services:
     links:
       - mongo
     ports:
-      - "3030:3030" 
-    container_name: rcpol_node   
+      - "80:3030" 
+    container_name: rcpol_node    
   mongo:
     image: mongo
     ports:
