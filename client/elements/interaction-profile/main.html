@@ -19,23 +19,34 @@
 		<!-- Seletor do gráfico -->
 		<div class="graf-e">
 
-			<p><span id="rcpol-InteractionLabel-selectRegion">Selecionar Região</span>: 
-			<select value = "{{region::change}}" class="opcoes-select">
-				<option value="Brasil">Brasil</option>
-				<option value="Centro-Oeste">Centro-Oeste</option>
-				<option value="Nordeste">Nordeste</option>
-				<option value="Norte">Norte</option>
-				<option value="Sul">Sul</option>
-				<option value="Sudeste">Sudeste</option>
-			</select>
-			</p>
+			<div style="width:50%;display: inline-block">
+                <span id="rcpol-InteractionLabel-selectRegion">Selecione Região</span>:<br>
+                <select value = "{{region::change}}" class="opcoes-select" style="width:30%">
+                    <option value="Brasil">Brasil</option>
+                    <option value="Centro-Oeste">Centro-Oeste</option>
+                    <option value="Nordeste">Nordeste</option>
+                    <option value="Norte">Norte</option>
+                    <option value="Sul">Sul</option>
+                    <option value="Sudeste">Sudeste</option>
+                </select>
+            </div>
+            <div style=" width:40%; display: inline-block">
+                <span id="rcpol-InteractionLabel-selectVegetalForm">Selecione Formação Vegetal</span>: <br>
+                <select value = "{{vegetalForm::change}}" class="opcoes-select" >
+                    <option value="Todas">Todas</option>
+                    <option value="Área urbana">Área urbana</option>
+                    <option value="Mata Atlântica">Mata Atlântica</option>
+                    <option value="Vegetação de dunas">Vegetação de dunas</option>
+                    <option value="Cultivo">Cultivo</option>                    
+                </select>
+			</div>
 
 		</div>
 
 		<!-- Gráfico -->
 		<div class="graf">
 
-		<div style="height:1500px" id="chart"></div>
+		<div style="height:1200px" id="chart"></div>
 
 		</div>
 
@@ -53,24 +64,29 @@
         references: Array,
         region: {
             type: String,
-            observer: 'changeRegion'
+            observer: 'changeSelector'
+        },
+        vegetalForm: {
+            type: String,
+            observer: 'changeSelector'
         }
     },
     ready: function(){        
         var self = this;    
-        self.region = "Brasil"                      
+        self.region = "Brasil"  
+        self.vegetalForm = "Todas"                      
         // self.load();
     },
     load: function(){
         var self = this;                        
-        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator+"&region="+self.region, function( interactions ) {
+        $.getJSON( "/api/Interactions/plants?pollinator="+self.pollinator+"&region="+self.region+"&vegetalForm="+self.vegetalForm, function( interactions ) {
             // IN
             var json = {nodes: [], links:[]};
             var data = interactions.response.map(function(item){
                 var d = {
                     species: item._id.plant?item._id.plant:"", 
                     value: item.avgQuantity?item.avgQuantity:0, 
-                    region: item._id.region?item._id.region:"", 
+                    region: item._id.region?item._id.region:"",                     
                     state: item._id.state?item._id.state:"", 
                     municipality: item._id.municipality?item._id.municipality:""};                
                 return d;
@@ -98,7 +114,7 @@
                 if(self.index(json.nodes,item.state)==-1)
                     json.nodes.push({name:item.state});
                 if(self.index(json.nodes,item.region)==-1)
-                    json.nodes.push({name:item.region});
+                    json.nodes.push({name:item.region});                
             });
             // Link Specie - Cidade
             data.forEach(function(item){
@@ -178,7 +194,7 @@
         }
         return -1;        
       },
-      changeRegion: function(v){
+      changeSelector: function(v){
         this.load();
       }      
   });
