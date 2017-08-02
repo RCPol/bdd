@@ -120,7 +120,13 @@
 
 		</div>
 		<!-- Final: Imagens de Abelhas -->
+		<div class="rre">
+			
+			<h2><span id="rcpol-InteractionLabel-bibliographicReferences">Refer&ecirc;ncias Bibliogr&aacute;ficas</span>:</h2>
+                <div id="vis">   								                
+                </div>
 
+		</div>
 	</article>
 	<!-- Final das informações da Página -->
 
@@ -249,19 +255,15 @@
 				internacionalization.interactionTranslator();
 		});   	
 		}
-		load();		   
+		load();		  
+		$.getJSON( "/api/Interactions/findOne?pollinator="+pollinator, function( interaction ) {
+				var aux = [];
+				if(interaction.reference)
+						aux.push(interaction.reference.split("|"));  
+				aux.forEach(function(item){
+					$("#vis").append(`<p>${item}</p>`);
+				});
+		});     
 	});
 </script>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
