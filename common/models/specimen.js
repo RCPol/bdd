@@ -265,35 +265,41 @@ module.exports = function(Specimen) {
                 var value = toString(record[schema.id].value); //pega o valor do schema
                 record[schema.id] = schema;
                 // CATEGORICAL DESCRIPTOR
-                if(schema["class"]=="CategoricalDescriptor"){
+                if(schema["class"]=="CategoricalDescriptor" || schema["term"] == "vegetalFormationType"){                  
                   record[schema.id].value = value;
                   record[schema.id].states = [];
                   async.each(value.split("|"), function(sValue, callbackState) {
                     var stateValue = titleCase(sValue.trim());
-                    if(language==originalLanguage){
-                    //  SAME LANGUAGE
-                      if(stateValue.length>0){
-                        Schema.findOne({where:{base:base,language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
-                          if(state){
-                            record[schema.id].states.push(state.toJSON());
-                          }else {
-                            logs[hash.MD5("STATE NOT FOUND Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
-                          }
-                          callbackState();
-                        });
-                      } else {
-                        logs[hash.MD5("EMPTY STATE Field: "+schema.field)] = "STATE NOT FOUND\tField: "+schema.field;
-                        callbackState();
-                      }
-                    } else {
+                    if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("stateValue: ",stateValue)
+                    // if(language==originalLanguage){
+                    // //  SAME LANGUAGE
+                    //   if(stateValue.length>0){
+                    //     Schema.findOne({where:{base:base,language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
+                    //       if(state){
+                    //         record[schema.id].states.push(state.toJSON());
+                    //       }else {
+                    //         logs[hash.MD5("STATE NOT FOUND Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
+                    //       }
+                    //       callbackState();
+                    //     });
+                    //   } else {
+                    //     logs[hash.MD5("EMPTY STATE Field: "+schema.field)] = "STATE NOT FOUND\tField: "+schema.field;
+                    //     callbackState();
+                    //   }
+                    // } else {
                     // DIFFERENT LANGUAGES
                       var schemaIdOriginal = Specimen.app.defineSchemaID(base, originalLanguage,schema.schema,schema["class"],schema.term);
-                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) {                        
+                      if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("schemaIdOriginal: ",schemaIdOriginal)
+                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) { 
+                        if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("schemaOriginal: ",schemaOriginal)                       
                         if(schemaOriginal){
 
-                          Schema.findOne({where:{base:base, language:originalLanguage,class:"State",field:schemaOriginal.field,state:stateValue}}, function(err,state) {
+                          Schema.findOne({where:{base:base, language:originalLanguage, field:schemaOriginal.field,state:stateValue}}, function(err,state) {                            
                             if(state){                              
-                              Schema.findById(Schema.app.defineSchemaID(base,language, state.schema, state.class, state.term),function(err,translatedState) {
+                              var id = Schema.app.defineSchemaID(base,language, state.schema, state.class, state.term);
+                              if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("id: ",id);
+                              Schema.findById(id,function(err,translatedState) {
+                                if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("translatedState: ",translatedState)
                                 if(translatedState){
                                   record[schema.id].states.push(translatedState.toJSON());
                                 } else{
@@ -311,7 +317,7 @@ module.exports = function(Specimen) {
                           callbackState();
                         }
                       });
-                    }
+                    // }
                   },function doneState() {
                     callbackCell();
                   });

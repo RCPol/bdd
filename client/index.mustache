@@ -155,9 +155,9 @@
 	}	
 	$(document).ready(function(){		
 		identification.internacionalization.base = '{{base}}';
-		identification.internacionalization.updateLogo();			
-		setTimeout(updateActiveUser, 1500);	
-		setTimeout(updateAccessCount, 1500);					
+		identification.internacionalization.updateLogo().searchBox();
+		setTimeout(updateActiveUser, 5000);	
+		setTimeout(updateAccessCount, 5000);					
 		identification.startup();
 		$("#base_selector").val('{{base}}');
 		$("#base_selector").change(function() {			
@@ -371,18 +371,18 @@
 		<div >
 
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-			<h1>Filtros:</h1>
+			<h1><span id="rcpol-KeyLabel-filters">Filtros</span>:</h1>
 			<!-- <div style="text-align: center; ">
 				<input id="filterField" class="fbfilter" type="text" placeholder="Pesquisar"></input>								
 			</div>			 -->
 			<div class="sidecontent-c">
 
-				<p class="sidecontent-sub">Você pode filtrar a base de dados por um ou mais dos seguintes campos:</p>
+				<p class="sidecontent-sub"><span id="rcpol-KeyLabel-filtersInstructions">Você pode filtrar a base de dados por um ou mais dos seguintes campos</span>:</p>
 
 			<table class="sidecontent-select">
 
 			<tr>
-				<td class="side-p"><p>Bioma / Tipo de vegetação:</p></td>
+				<td class="side-p"><p><span id="rcpol-Sample-vegetalFormationType">Bioma / Tipo de vegetação</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-rcpol-Sample-vegetalFormationType">
 						<option value=""></option>
@@ -390,7 +390,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Município:</p></td>
+				<td class="side-p"><p><span id="dwc-Location-municipality">Município</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-dwc-Location-municipality">
 						<option value=""></option>
@@ -398,7 +398,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Estado:</p></td>
+				<td class="side-p"><p><span id="dwc-Location-stateProvince">Estado</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-dwc-Location-stateProvince">
 						<option value=""></option>
@@ -406,7 +406,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>País:</p></td>
+				<td class="side-p"><p><span id="dwc-Location-country">País</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-dwc-Location-country">
 						<option value=""></option>
@@ -414,7 +414,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Região:</p></td>
+				<td class="side-p"><p><span id="rcpol-Sample-region">Região</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-rcpol-Sample-region">
 						<option value=""></option>
@@ -422,7 +422,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Continente:</p></td>
+				<td class="side-p"><p><span id="dwc-Location-continent">Continente</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-dwc-Location-continent">
 						<option value=""></option>
@@ -430,7 +430,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Nome da Coleção:</p></td>
+				<td class="side-p"><p><span id="rcpol-Collection-collectionName">Nome da Coleção</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-rcpol-Collection-collectionName">
 						<option value=""></option>
@@ -438,7 +438,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Código da Coleção:</p></td>
+				<td class="side-p"><p><span id="dwc-RecordLevel-collectionCode">Código da Coleção</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-dwc-RecordLevel-collectionCode">
 						<option value=""></option>
@@ -446,7 +446,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Nome da Instituição:</p></td>
+				<td class="side-p"><p><span id="rcpol-Collection-institutionName">Nome da Instituição</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-rcpol-Collection-institutionName">
 						<option value=""></option>
@@ -454,7 +454,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Código da Instituição:</p></td>
+				<td class="side-p"><p><span id="dwc-RecordLevel-institutionCode">Código da Instituição</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-dwc-RecordLevel-institutionCode">
 						<option value=""></option>
@@ -462,7 +462,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="side-p"><p>Nome do Laboratório:</p></td>
+				<td class="side-p"><p><span id="rcpol-Collection-laboratory">Nome do Laboratório</span>:</p></td>
 				<td class="side-d">
 					<select class="opcoes-select" id="selected-rcpol-Collection-laboratory">
 						<option value=""></option>

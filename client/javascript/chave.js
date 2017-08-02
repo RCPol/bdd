@@ -1,6 +1,6 @@
 function Identification() {
   this.internacionalization = new Internacionalization();
-  this.internacionalization.siteTranslator().keyTranslator()
+  this.internacionalization.siteTranslator().keyTranslator();
   this.internacionalization.base = 'eco';
   this.species = {};
   this.descriptors = {};
@@ -81,7 +81,7 @@ Identification.prototype.startup = function() {
 }
 Identification.prototype.translate = function(language) {
   var self = this;
-  self.internacionalization.setLanguage(language).siteTranslator().keyTranslator();  
+  self.internacionalization.setLanguage(language).siteTranslator().keyTranslator().searchBox();  
   self.startup();
   return this;
 }
@@ -143,7 +143,7 @@ Identification.prototype.createDescriptors = function(callback) {
     states.forEach(function(state) {
       var stateImg  = typeof state.images != "undefined" && state.images.length && state.images.length>0 && state.images[0].thumbnail ?state.images[0].thumbnail:"img/lspm.jpg";
       // CATEGORY
-      if(typeof self.descriptors[state.category] == "undefined"){
+      if(typeof self.descriptors[state.category] == "undefined"){        
         self.descriptors[state.category] = self.descriptors[state.category]?self.descriptors[state.category]:{};
         self.descriptors[state.category].htmlId = "category_"+state.category.htmlId();
         self.descriptors[state.category].value = state.category;

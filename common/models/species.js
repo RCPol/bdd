@@ -117,8 +117,11 @@ module.exports = function(Species) {
                   species[key] = sp[key];
                 }
               } else if(sp[key].class=="Sample" || sp[key].schema=="dwc"){
-                if(species[key]){                                 
-                  species[key].values.concat(sp[key].values);
+                if(species[key]){
+                  if(species[key].values)                  
+                    species[key].values.concat(sp[key].values);
+                  else 
+                    species[key].states.concat(sp[key].states);
                 }else{
                   species[key] = sp[key];
                 }
