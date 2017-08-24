@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+	<!-- POLYMER e CUSTUM COMPONENTS -->
+	<script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>	
+	<link rel="import" href="bower_components/google-analytics/google-analytics.html">	
+
+	<link rel="import" href="/elements/autocomplete-species.html"></script>	
+	<link rel="import" href="/elements/autocomplete-descriptors.html"></script>	
+
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+	<script src="javascript/md5.min.js"></script>
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/{{base}}_chave.css">
+	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+
+	<!-- JQuery -->
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+
+
+	<!-- JQuery Rolagem -->
+	<link rel="stylesheet" href="/javascript/jquery.mCustomScrollbar.css">
+	<script src="/javascript/jquery.mCustomScrollbar.concat.min.js"></script>
+
+	<script type="text/javascript" src="/javascript/chave.js"></script>
+	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/filter.js"></script>
+
+	<style>
+		.ui-state-active,
+		.ui-widget-content .ui-state-active,
+		.ui-widget-header .ui-state-active,
+		a.ui-button:active,
+		.ui-button:active,
+		.ui-button.ui-state-active:hover {
+			border: 0px solid #dddddd;
+			/*text-shadow: 1px 1px #A8A080;*/
+			background-color: #FBE0D2;
+			/*font-weight: bold;*/
+			color: black;
+		}
+	}
+</style>
+<!-- Campos de busca, scrollbar e botões  -->
+<script type="text/javascript">	
+
+	/* Open the sidenav */
+	function openNav() {
+		document.getElementById("mySidenav").style.width = "100%";
+	}
+
+	/* Close/hide the sidenav */
+	function closeNav() {
+		document.getElementById("mySidenav").style.width = "0";
+	}
+
+
+	$(document).on('keyup', '.numnum', function(event) {
+		var v = this.value;
+		if($.isNumeric(v) === false) {
+        //chop off the last char entered
+        this.value = this.value.slice(0,-1);
+    }
+});
+	window.onload = function(){		
+        //Barras de Rolagem das caixas
+        // $(".roxinho").mCustomScrollbar({
+        // 	scrollButtons:{ enable: true },
+        // 	theme: "dark",
+        // });
+        // $(".roxinhodesc").mCustomScrollbar({
+        // 	scrollButtons:{ enable: true },
+        // 	theme: "dark",
+        // });
+
+		        //Toggle Descritores
+		        $(".accordion").on("click", ".toggle", function(e){
+		        	var $this = $(this);
+		        	if ($this.next().hasClass('show')) {
+		        		$this.next().removeClass('show');
+		        		$this.next().slideUp(350);
+		        		$this.children('span').html('+');
+		        	} else {
+		        		$this.parent().parent().find('li .inner').removeClass('show');
+		        		$this.parent().parent().find('li .inner').slideUp(350);
+		        		$this.next().toggleClass('show');
+		        		$this.next().slideToggle(350);
+		        		$this.children('span').html('&minus;');
+		        	}
+		        });
+		//Botão Mostrar todos
+		$('.open').click(function(){
+			$('.inner').addClass('show');
+			$('li .inner').slideUp(350);
+			$('li .inner').slideToggle(350);
+			$('.accordion').find('span .toggle').html('&minus;');
+		});
+		//Botão Ocultar todos
+		$('.close').click(function(){
+			$('.inner').removeClass('show');
+			$('li .inner').slideUp(350);
+			$('.accordion').find('span .toggle').html('+');
+		});
+		//Ao clicar adiciona a classe selecionado à div vimagens
+		$(".accordion").on("click", ".vimagens", function(){
+			if ($(this).hasClass('selecionado')) {
+				$(this).removeClass('selecionado');
+			} else {
+				$(this).addClass('selecionado');
+			}
+		});
+		$("#base_selector").val('{{base}}');
+	}	
+	var identification = new Identification();
+	identification.base = '{{base}}';
+	function updateActiveUser() {		
+		$.get("/api/Identification/activeUsers",function(rs) {
+			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");			
+			setTimeout(updateActiveUser, 300000);
+		});
+	}
+	function updateAccessCount() {		
+		$.get("/api/Identification/accessCount",function(rs) {
+			$('#count').html("#"+rs.response+" acessos");
+			setTimeout(updateAccessCount, 1200000);
+		});		
+	}
+	function setFilter() {				
+		var filter = new Filter(identification);		
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:vegetalFormationType","Bioma / Tipo de vegetação");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:municipality","Município");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:stateProvince","Estado");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:country","País");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":rcpol:Sample:region","Região");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:Location:continent","Continente");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:collectionCode","Código da Coleção");
+		var filter = new Filter(identification);
+		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:institutionCode","Código da Instituição");
+		var filter = new Filter(identification);
+		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:collectionName","Nome da Coleção");
+		var filter = new Filter(identification);
+		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:institutionName","Nome da Institutição");
+		var filter = new Filter(identification);
+		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório");
+	}	
+	$(document).ready(function(){		
+		identification.internacionalization.base = '{{base}}';
+		identification.internacionalization.updateLogo().searchBox();
+		setTimeout(updateActiveUser, 5000);	
+		setTimeout(updateAccessCount, 5000);					
+		identification.startup();
+		$("#base_selector").val('{{base}}');
+		$("#base_selector").change(function() {			
+			window.location = "/"+$("#base_selector").val();			
+		});
+		var msg  = $( "#msg" ).dialog({
+			title:"Comunicado Importante!",
+			autoOpen: false,
+			minWidth: 500,
+			modal: true	      
+		});
+		if(localStorage){
+			if(typeof localStorage.showCommunication=="undefined" || localStorage.showCommunication=='true'){
+				localStorage.showCommunication = false;
+				msg.dialog('open');
+			}			
+		} else {
+			msg.dialog('open');
+		}	
+		setFilter();	
+});		
+</script>
+
+
+
+<title>RCPol - Chave de Identifica&ccedil;&atilde;o de Esp&eacute;cies</title>
+</head>
+<body>	
+	<google-analytics code="UA-83157202-1"></google-analytics>		
+	<div id="msg" style="" >	
+		<h2>Verifique a versão de seu navegador de Internet.</h2>
+		<br>
+		<p>
+			Recomendamos utilizar o navegador web <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Google Chrome</a>. Disponível para Windows, MacOS e Linux, o <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Google Chrome</a> é o navegador que oferece melhor desempenho e suporte aos recursos do sistema RCPol. <a target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html">Clique aqui para baixar e instalar gratuitamente em seu computador</a>.
+		</p>
+		<br>
+		<p>
+			As últimas versões dos navegadores Safari e Firefox também suportam os recursos do sistema, porém com um menor desempenho e sujeito a instabilidades. Não recomendamos utilizar o Microsoft Internet Explorer.
+
+			Para garantir o correto funcionamento de todos os recursos do sistema, <strong>recomendamos fortemente utilizar um navegador de Internet moderno e atualizado</strong>, capaz de suportar as tecnlogias utilizadas pela chave interativa da RCPol.
+		</p>
+		<br>
+		<p>
+			O sistema de chaves interativas da RCPol utiliza tecnologias modernas de aplicações web para proporcionar uma melhor experiência aos seus usuários.
+		</p>
+		<br>
+		<p>
+			Para garantir o correto funcionamento de todos os recursos do sistema, <strong>recomendamos fortemente utilizar um navegador de Internet moderno e atualizado</strong>, capaz de suportar as tecnologias utilizadas pela chave interativa da RCPol.
+		</p>
+		<br>
+	</div>
+	<div class="contem">
+		<!-- Início Header: Menu e Logotipo -->
+		<header>		
+
+			<!-- Menu: início -->
+			<nav>
+				<ul>
+					<li>
+						<!-- inserir link para o portal --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a>
+						<!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a>
+					</li>
+					<li>
+						<div class="wrap-label-select-menu">
+							<span class="label-select-menu">Base: </span>
+							<select id="base_selector">
+								<!-- <option value="eco">Palinoecologia</option> -->
+								<!-- <option value="taxon">Palinotaxonomia</option> -->
+							</select>
+						</div>
+					</li>
+					<li>
+						<span class="t-lang">
+							<img onclick="identification.translate('pt-BR');setFilter();"  src="/img/pt_BR.png">
+							<img onclick="identification.translate('en-US');setFilter();"  src="/img/en_GB.png">
+							<img onclick="identification.translate('es-ES');setFilter();"  src="/img/es_ES.png">
+						</span>
+					</li>
+					<li>						
+						<span id="count" ></span>	
+						<span id="activeUsers"></span>					
+					</li>					
+				</ul>
+			</nav>
+			<!-- Menu: fim -->
+
+			<!-- logotipo -->
+			<div class="logo">
+				<img src="/img/logo_{{base}}_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
+			</div>
+			<!-- logotipo -->
+
+		</header>
+		<!-- Fim Header: Menu e Logotipo -->
+
+		<!-- Início do quadrado branco de fundo -->
+		<div class="qbranco">
+			<!-- Início: Caixa da esquerda -->
+			<div class="cesquerda">
+
+				<!-- Título -->
+				<h1 id="rcpol-KeyLabel-keyDescriptores">Descritores</h1>
+
+				<!-- Início: Busca Descritores -->
+				<form class="formbusca">
+				<a class="opcoes-de-busca" onclick="openNav()" id="rcpol-KeyLabel-searchOptions">Opções de Busca</a>
+					<input type="text" is="autocomplete-descriptors" source="identification.descriptors" placeholder="Pesquisar"></input>					
+				</form>
+
+				<div class="tfclear"></div>
+				<!-- Final: Busca Descritores -->
+
+				<!-- Início: Descritores disponíveis -->
+				<div class="roxinhobtn">
+					<!-- Botões de Expandir/Ocultar -->
+					<div class="divaeh">						
+						<button type="button" class="open expocu" id="rcpol-KeyLabel-keySeeAll">Ver todos</button>
+						<button type="button" class="close expocu" id="rcpol-KeyLabel-keyHideAll">Ocultar todos</button>
+						<!-- <button type="button" class="btnident" onclick="identification.identify()"><span id="rcpol-KeyLabel-keyIdentify">Identificar</span> &#9654;</button> -->
+					</div>
+				</div>
+
+				<div class="roxinhodesc">
+					<!-- Início: Div descritores superiores -->
+					<div class="agregadordescritores">
+
+						<ul id="category" class="accordion">
+                    <!-- <li><a id="category_Planta" class="toggle" href="javascript:void(0);"><span>+</span> Planta </a><ul id="desc_for_Planta" class="descritor inner"></ul></li>
+                    <li><a id="category_Flor" class="toggle" href="javascript:void(0);"><span>+</span> Flor </a><ul id="desc_for_Flor" class="descritor inner"></ul></li>
+                    <li><a id="category_Pólen" class="toggle" href="javascript:void(0);"><span>+</span> Pólen </a><ul id="desc_for_Pólen" class="descritor inner"></ul></li> -->
+                </ul>
+
+            </div>
+            <!-- Final: Div Descritor superior -->
+        </div>
+        <!-- Final: Descritores disponíveis -->
+
+        <!-- Título -->
+        <h2 id="rcpol-KeyLabel-keySelectedDescriptores">Descritores selecionados</h2>
+
+        <!-- Início: Descritores selecionados -->
+        <div class="roxinho">
+
+        	<!-- Botões de Expandir/Ocultar -->
+        	<div class="divaeh">
+        		<button type="button" class="expocu" onclick="identification.removeAll()" id="rcpol-KeyLabel-keyRemoveAll">Remover todos</button>
+        		<!-- <button type="button" class="expocu" onclick="removeSelected()">Remover Selecionados</button> -->
+        	</div>
+
+        	<div id="descritoresSelecionados" class="descel">
+        	</div>
+
+        </div>
+        <!-- Final: Descritores selecionados -->
+
+    </div>
+    <!-- Final: Caixa da esquerda -->
+
+    <!-- Início: Caixa da direita -->
+    <div class="cdireita">
+
+    	<!-- Título -->
+    	<h1 id="rcpol-KeyLabel-keySpecies">Espécies</h1>
+
+    	<!-- Início: Busca Espécies -->
+    	<form class="formbusca" >
+    		<input type="text" is="autocomplete-species" source="identification.species" placeholder="Pesquisar"></input>
+    	</form>
+    	<div class="tfclear"></div>
+    	<!-- Final: Busca Espécies -->
+    	<!-- Início: Espécies disponíveis -->
+    	<div class="roxinho">
+    		<div class="count-species">
+    			<!-- #<span id="speciesCount">...</span></span> -->
+    		</div>
+    		<div id="especiesElegiveis"></div>
+    	</div>
+    	<!-- Final: Espécies disponíveis -->
+
+    	<!-- Título -->
+    	<h2 id="rcpol-KeyLabel-keyDisregardedSpecies">Espécies descartadas</h2>
+
+    	<!-- Início: Espécies descartadas -->
+    	<div class="roxinho">
+
+    		<div id="especiesDescartadas">
+    		</div>
+
+    	</div>
+    	<!-- Final: Espécies descartadas -->
+
+    </div>
+    <!-- Final: Caixa da direita -->
+
+</div>
+<!-- Final do quadrado branco de fundo -->
+
+<!-- Início do Rodapé -->
+<footer>
+	<p id="rcpol-SiteLabel-siteCopyright">Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+</footer>
+<!-- Final do Rodapé -->
+
+</div>
+
+<!-- Barra lateral de filtros -->
+<div id="mySidenav" class="sidenav">
+
+	<div class="sidecontent">
+
+		<div >
+
+			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+			<h1><span id="rcpol-KeyLabel-filters">Filtros</span>:</h1>
+			<!-- <div style="text-align: center; ">
+				<input id="filterField" class="fbfilter" type="text" placeholder="Pesquisar"></input>								
+			</div>			 -->
+			<div class="sidecontent-c">
+
+				<p class="sidecontent-sub"><span id="rcpol-KeyLabel-filtersInstructions">Você pode filtrar a base de dados por um ou mais dos seguintes campos</span>:</p>
+
+			<table class="sidecontent-select">
+
+			<tr>
+				<td class="side-p"><p><span id="rcpol-Sample-vegetalFormationType">Bioma / Tipo de vegetação</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Sample-vegetalFormationType">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="dwc-Location-municipality">Município</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-municipality">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="dwc-Location-stateProvince">Estado</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-stateProvince">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="dwc-Location-country">País</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-country">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="rcpol-Sample-region">Região</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Sample-region">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="dwc-Location-continent">Continente</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-Location-continent">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="rcpol-Collection-collectionName">Nome da Coleção</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Collection-collectionName">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="dwc-RecordLevel-collectionCode">Código da Coleção</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-RecordLevel-collectionCode">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="rcpol-Collection-institutionName">Nome da Instituição</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Collection-institutionName">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="dwc-RecordLevel-institutionCode">Código da Instituição</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-dwc-RecordLevel-institutionCode">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="side-p"><p><span id="rcpol-Collection-laboratory">Nome do Laboratório</span>:</p></td>
+				<td class="side-d">
+					<select class="opcoes-select" id="selected-rcpol-Collection-laboratory">
+						<option value=""></option>
+					</select>
+				</td>
+			</tr>
+
+			</table>
+
+			</div>			
+		</div>		
+		<div>
+
+		</div>
+
+	</body>
+	</html>

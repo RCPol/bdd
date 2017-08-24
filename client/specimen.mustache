@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{{#label}}
+<head>
+	<meta charset="UTF-8">
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/{{base}}_fichas.css">
+
+	<!-- Arquivos Leaflet Map -->
+	<link rel="stylesheet" href="/javascript/leaflet/leaflet.css" />
+	<script src="/javascript/leaflet/leaflet.js"></script>
+
+	<!-- Arquivos Grid Tabela de Amostras -->
+	<link rel="stylesheet" type="text/css" href="http://w2ui.com/src/w2ui-1.4.min.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://w2ui.com/src/w2ui-1.4.min.js"></script>
+
+	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+
+	<!-- Arquivos Galeria - Fotorama -->
+	<link  href="/javascript/fotorama/{{base}}_fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+	<script src="/javascript/fotorama/fotorama.js"></script> <!-- 16 KB -->
+
+	<!-- Javascript Documento -->
+	<script type="text/javascript" src="/javascript/especime.js"></script>
+	<script type="text/javascript">
+		var specimenDb = {};
+		var marker = null;
+		var id = "{{id}}";
+		var language = "pt-BR";
+		var base = "{{base}}";
+		function setLanguage(language){
+			localStorage.language = language;
+			window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
+		}
+		$(document).ready(function(){
+			loadHerbariumInfo();
+			var internacionalization = new Internacionalization();
+			internacionalization.base = '{{base}}';
+	  		internacionalization.updateLogo().siteTranslator();	  		
+
+			$("#rcpol-ProfilesLabel-profilesDepositedInCollection").html($("#rcpol-ProfilesLabel-profilesDepositedInCollection").html().toLowerCase());
+			$(".fotorama").fotorama();
+			$("#foto_planta img").attr("style", "max-width:500px; max-height:400px;");
+			if(localStorage && localStorage.language)
+				language = localStorage.language;
+			if (typeof(Storage) !== "undefined") {
+				localStorage.language = localStorage.language?localStorage.language:"pt-BR";
+				if(id.split(":")[0]!=localStorage.language)
+					window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
+			} else {
+				alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
+			}
+			{{#value}}
+			var map = L.map('map',{scrollWheelZoom:false}).setView([-15.096511,-48.351517], 4);
+			map.on("layeradd",function (e) {
+				if(marker == null){
+					var p = [{{dwc:Location:decimalLatitude:value}}?{{dwc:Location:decimalLatitude:value}}:0, {{dwc:Location:decimalLongitude:value}}?{{dwc:Location:decimalLongitude:value}}:0];
+					marker = "Not null";
+					L.marker(p,{opacity:0.9}).addTo(map);
+					map.setView(p, 17);
+				}
+			})
+			mapLink = '';
+			L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: mapLink, maxZoom: 17}).addTo(map);
+		});
+		function loadHerbariumInfo() {					
+			$.getJSON("/api/Collections?filter=%7B%22where%22%3A%7B%22"+language+"%3Adwc%3ARecordLevel%3AinstitutionCode.value%22%3A%22{{dwc:RecordLevel:institutionCode:value}}%22%2C%22"+language+"%3Adwc%3ARecordLevel%3AcollectionCode.value%22%3A%22{{rcpol:Sample:collectionCodeHerbarium:value}}%22%2C%22language%22%3A%22"+language+"%22%7D%7D", function(data){				
+    			if(data[0]){    				
+    				$("#rcpol-ProfilesLabel-profilesHerbarium-value").html(data[0][language+":rcpol:Collection:collectionName"].value+" ({{rcpol:Sample:collectionCodeHerbarium:value}}) - {{dwc:RecordLevel:institutionCode:value}}");
+    			}else {
+    				$("#rcpol-ProfilesLabel-profilesHerbarium-value").html("{{rcpol:Sample:collectionCodeHerbarium:value}} - {{dwc:RecordLevel:institutionCode:value}}");
+    				
+    			}    			
+    		});			
+		}
+		{{/value}}
+	</script>
+	<title>RCPol</title>
+</head>
+<body>
+	<div class="contem">
+		<!-- Início Header: Menu e Logotipo -->
+		<header>
+			<!-- Menu: início -->
+			<nav>
+				<ul>
+					<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br">{{rcpol:SiteLabel:siteHome}}</a></li>
+					<li><a href="/{{base}}">{{rcpol:SiteLabel:siteIdentificationKey}}</a></li>
+					<li><a href="/profile/glossary/{{base}}">{{rcpol:SiteLabel:siteGlossary}}</a></li>
+					<li>						
+						<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="/img/pt_BR.png">
+							<img onclick="setLanguage('en-US')"  src="/img/en_GB.png">
+							<img onclick="setLanguage('es-ES')"  src="/img/es_ES.png">
+						</span>
+					</li>
+				</ul>
+			</nav>
+			<!-- Menu: fim -->
+			<!-- logotipo -->
+			<div class="logo">
+				<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
+			</div>
+			<!-- logotipo -->
+		</header>
+		<!-- Fim Header: Menu e Logotipo -->
+		<!-- Início das informações do especieme -->
+		<article>
+			{{#value}}
+			<h2 class="famesp" id="dwc-Taxon-family-value"></h2>
+			<!-- Nome da espécie e onde se encontra o espécime -->
+			<h1 class="spm"><span id="rcpol-ProfilesLabel-profilesSpecimenOf">{{rcpol:ProfilesLabel:profilesSpecimenOf}}</span> <i><span id="dwc-Taxon-scientificName-value">{{dwc:Taxon:scientificName:value}}</span></i> <span id="dwc-Taxon-scientificNameAuthorship-value">{{dwc:Taxon:scientificNameAuthorship:value}}</span> <span id="rcpol-ProfilesLabel-profilesDepositedInCollection"> {{rcpol:ProfilesLabel:profilesDepositedInCollection}} </span><span id="laboratorio">{{rcpol:Collection:collectionName:value}}</span> (<span id="instituicao">{{rcpol:Collection:institutionName:value}}</span> - <span id="codigoDaInstituicao">{{dwc:RecordLevel:institutionCode:value}}</span>)</h1>
+			<h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
+			<!-- Início: Embrulho Informações e Logo -->
+			<div class="cspm">
+				<!-- Início: Informações Palinoteca -->
+				<div class="info-spal">
+					<p><b>{{rcpol:Collection:collectionName:label}}:</b> <span id="colecao">{{rcpol:Collection:collectionName:value}}</span></p>
+					<p><b>{{rcpol:Collection:responsible:label}}:</b> <span id="responsavel">{{rcpol:Collection:responsible:value}}</span></p>
+					<p><b>{{rcpol:Collection:address:label}}:</b> <span id="endereco">{{rcpol:Collection:address:value}}</span></p>
+					<p><b>{{rcpol:Collection:telephone:label}}:</b> <span id="telefone">{{rcpol:Collection:telephone:value}}</span></p>
+					<p><b>{{rcpol:Collection:email:label}}:</b> <span id="email">{{rcpol:Collection:email:value}}</span></p>
+					<!-- Link para homepage da palinoteca -->
+					<p><b>{{rcpol:Collection:homepage:label}}:</b> <a id="homepage_link" href="{{rcpol:Collection:homepage:value}}" target="_blank"><span id="homepage">{{rcpol:Collection:homepage:value}}:</span></a></p>
+					<p>&nbsp;</p>
+					<!-- Link para página da Palinoteca -->
+					<p><a target="_blank" href="/profile/palinoteca/{{base}}/{{language}}:{{dwc:RecordLevel:institutionCode:value}}:{{dwc:RecordLevel:collectionCode:value}}" id="rcpol-ProfilesLabel-profilesSeeSpecimensOfThisCollection">{{rcpol:ProfilesLabel:profilesSeeSpecimensOfThisCollection}}</a></p>
+					<!-- Link para página da Espécie -->
+					<p><a target="_blank" href="/profile/species/{{base}}/{{base}}:{{language}}:{{dwc:Taxon:scientificName:value}}" id="rcpol-ProfilesLabel-profilesSeeSpeciesProfile">{{rcpol:ProfilesLabel:profilesSeeSpeciesProfile}}</a></p>
+				</div>
+				<!-- Final: Informações Palinoteca -->
+				<!-- Início: Logotipo da Palinoteca -->
+				<div class="img-spal">
+					<img id="logo" width="100%" src="{{rcpol:Image:logotipo:value}}">
+				</div>
+				<!-- Final: Logotipo da Palinoteca -->
+			</div>
+			<!-- Final: Embrulho Informações e Logo -->
+			<!-- Início: Textos -->
+			<div class="infos-txt">
+				<!-- Início: Informações da Coleta -->
+				<div class="info-col">
+					<h2><span id="rcpol-ProfilesLabel-profilesCollectionInformation">{{rcpol:ProfilesLabel:profilesCollectionInformation}}</span>:</h2>
+					<p><b id="dwc-Occurrence-recordedBy-label"></b> <span id="dwc-Occurrence-recordedBy-value"></span></p>
+					<!-- <p><b>N&uacute;mero do Coletor:</b> 0671</p>  -->
+					<!-- TODO: *** HERBARIUM *** -->															
+
+					<p><b id="dwc-RecordLevel-catalogNumber-label">{{dwc:RecordLevel:catalogNumber:label}}</b> <span id="dwc-RecordLevel-catalogNumber-value">{{dwc:RecordLevel:catalogNumber:value}}</span></p>
+					
+					<p><b id="rcpol-ProfilesLabel-profilesHerbarium">{{rcpol:ProfilesLabel:profilesHerbarium}}:</b> <span id="rcpol-ProfilesLabel-profilesHerbarium-value"></span></p>
+
+					<p><b id="rcpol-Sample-catalogNumberHerbarium-label">{{rcpol:Sample:catalogNumberHerbarium:label}}</b> <span id="rcpol-Sample-catalogNumberHerbarium-value">{{rcpol:Sample:catalogNumberHerbarium:value}}</span></p>
+					<p><b id="dwc-Event-eventDate-label">{{dwc:Event:eventDate:label}}</b> <span id="dwc-Event-eventDate-value">{{dwc:Event:eventDate:value}}</span></p>
+					<p><b id="dwc-Location-country-label">{{dwc:Location:country:label}}</b> <span id="dwc-Location-country-value">{{dwc:Location:country:value}}</span></p>
+					<p><b id="dwc-Location-stateProvince-label">{{dwc:Location:stateProvince:label}}</b> <span id="dwc-Location-stateProvince-value">{{dwc:Location:stateProvince:value}}</span></p>
+					<p><b id="dwc-Location-municipality-label">{{dwc:Location:municipality:label}}</b> <span id="dwc-Location-municipality-value">{{dwc:Location:municipality:value}}</span></p>
+					<p><b id="rcpol-Sample-vegetalFormationType-label">{{rcpol:Sample:vegetalFormationType:label}}</b> <span id="rcpol-Sample-vegetalFormationType-value">{{rcpol:Sample:vegetalFormationType:value}}</span></p>
+					<p><b id="dwc-Location-decimalLatitude-label">{{dwc:Location:decimalLatitude:label}}</b> <span id="dwc-Location-decimalLatitude-value">{{dwc:Location:decimalLatitude:value}}</span></p>
+					<p><b id="dwc-Location-decimalLongitude-label">{{dwc:Location:decimalLongitude:label}}</b> <span id="dwc-Location-decimalLongitude-value">{{dwc:Location:decimalLongitude:value}}</span></p>
+					<!-- <h2>Informa&ccedil;&otilde;es Adicionais</h2> -->
+					<!--<p>Foi coletada em &aacute;reas de Cerrado, Floresta Estacional Semidecidual, Caatinga e pr&oacute;xima a Mata de Arauc&aacute;rias. Possui ampla distribui&ccedil;&atilde;o no Brasil e &eacute; nativa.</p>-->
+				</div>
+				<!-- Final: Informações da Coleta -->
+				<!-- Início: Características da Planta -->
+				<div class="info-planta">
+					<h2>
+						<span id="rcpol-ProfilesLabel-profilesPlantFeatures">{{rcpol:ProfilesLabel:profilesPlantFeatures}}</span>:
+					</h2>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-habit-label">{{rcpol:CategoricalDescriptor:habit:label}}</span>
+						</b>
+						<span id="rcpol-CategoricalDescriptor-habit-value">{{rcpol:CategoricalDescriptor:habit:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="dwc-Occurrence-establishmentMean-label">{{dwc:Occurrence:establishmentMean:label}}</span>
+						</b>
+						<span id="dwc-Occurrence-establishmentMean-value">{{dwc:Occurrence:establishmentMean:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-Sample-floweringPeriod-label">{{rcpol:Sample:floweringPeriod:label}}</span>
+						</b>
+						<span id="rcpol-Sample-floweringPeriod-value">{{rcpol:Sample:floweringPeriod:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollinationSyndrome-label"/>{{rcpol:CategoricalDescriptor:pollinationSyndrome:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollinationSyndrome-value"/>{{rcpol:CategoricalDescriptor:pollinationSyndrome:value}}
+					</p>
+				</div>
+				<!-- Final: Informações da Planta -->
+				<!-- Início: Características da Flor -->
+				<div class="info-flor">
+					<h2>
+						<span id="rcpol-ProfilesLabel-profilesFlowerFeatures">{{rcpol:ProfilesLabel:profilesFlowerFeatures}}</span>:
+					</h2>					
+					<p><b><span id="rcpol-CategoricalDescriptor-attractionUnit-label"/>{{rcpol:CategoricalDescriptor:attractionUnit:label}}</b> <span id="rcpol-CategoricalDescriptor-attractionUnit-value"/>{{rcpol:CategoricalDescriptor:attractionUnit:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-flowerSexuality-label"/>{{rcpol:CategoricalDescriptor:flowerSexuality:label}}</b> <span id="rcpol-CategoricalDescriptor-flowerSexuality-value"/>{{rcpol:CategoricalDescriptor:flowerSexuality:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-flowerForm-label"/>{{rcpol:CategoricalDescriptor:flowerForm:label}}</b> <span id="rcpol-CategoricalDescriptor-flowerForm-value"/>{{rcpol:CategoricalDescriptor:flowerForm:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-flowerSymmetry-label"/>{{rcpol:CategoricalDescriptor:flowerSymmetry:label}}</b> <span id="rcpol-CategoricalDescriptor-flowerSymmetry-value"/>{{rcpol:CategoricalDescriptor:flowerSymmetry:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-flowerColor-label"/>{{rcpol:CategoricalDescriptor:flowerColor:label}}</b> <span id="rcpol-CategoricalDescriptor-flowerColor-value"/>{{rcpol:CategoricalDescriptor:flowerColor:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-numberOfCarpelsInOvary-label"/>{{rcpol:CategoricalDescriptor:numberOfCarpelsInOvary:label}}</b> <span id="rcpol-CategoricalDescriptor-numberOfCarpelsInOvary-value"/>{{rcpol:CategoricalDescriptor:numberOfCarpelsInOvary:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-numberOfLoculesInTheOvary-label"/>{{rcpol:CategoricalDescriptor:numberOfLoculesInTheOvary:label}}</b> <span id="rcpol-CategoricalDescriptor-numberOfLoculesInTheOvary-value"/>{{rcpol:CategoricalDescriptor:numberOfLoculesInTheOvary:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-placentation-label"/>{{rcpol:CategoricalDescriptor:placentation:label}}</b> <span id="rcpol-CategoricalDescriptor-placentation-value"/>{{rcpol:CategoricalDescriptor:placentation:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-style-label"/>{{rcpol:CategoricalDescriptor:style:label}}</b> <span id="rcpol-CategoricalDescriptor-style-value"/>{{rcpol:CategoricalDescriptor:style:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-stigma-label"/>{{rcpol:CategoricalDescriptor:stigma:label}}</b> <span id="rcpol-CategoricalDescriptor-stigma-value"/>{{rcpol:CategoricalDescriptor:stigma:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-whorls-label"/>{{rcpol:CategoricalDescriptor:whorls:label}}</b> <span id="rcpol-CategoricalDescriptor-whorls-value"/>{{rcpol:CategoricalDescriptor:whorls:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-calyx-label"/>{{rcpol:CategoricalDescriptor:calyx:label}}</b> <span id="rcpol-CategoricalDescriptor-calyx-value"/>{{rcpol:CategoricalDescriptor:calyx:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-corolla-label"/>{{rcpol:CategoricalDescriptor:corolla:label}}</b> <span id="rcpol-CategoricalDescriptor-corolla-value"/>{{rcpol:CategoricalDescriptor:corolla:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-petalsxStamen-label"/>{{rcpol:CategoricalDescriptor:petalsxStamen:label}}</b> <span id="rcpol-CategoricalDescriptor-petalsxStamen-value"/>{{rcpol:CategoricalDescriptor:petalsxStamen:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-ovaryPosition-label"/>{{rcpol:CategoricalDescriptor:ovaryPosition:label}}</b> <span id="rcpol-CategoricalDescriptor-ovaryPosition-value"/>{{rcpol:CategoricalDescriptor:ovaryPosition:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-flowerOpeningTime-label"/>{{rcpol:CategoricalDescriptor:flowerOpeningTime:label}}</b> <span id="rcpol-CategoricalDescriptor-flowerOpeningTime-value"/>{{rcpol:CategoricalDescriptor:flowerOpeningTime:value}}</p>
+					<p><b><span id="rcpol-CategoricalDescriptor-antherDehiscence-label"/>{{rcpol:CategoricalDescriptor:antherDehiscence:label}}</b> <span id="rcpol-CategoricalDescriptor-antherDehiscence-value"/>{{rcpol:CategoricalDescriptor:antherDehiscence:value}}</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-odorPresence-label"/>{{rcpol:CategoricalDescriptor:odorPresence:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-odorPresence-value"/>{{rcpol:CategoricalDescriptor:odorPresence:value}}
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-label"/>{{rcpol:CategoricalDescriptor:mainFloralResourceCollectedByVisitors:label}}
+						</b> 
+						<span id="rcpol-CategoricalDescriptor-mainFloralResourceCollectedByVisitors-value"/>
+						{{rcpol:CategoricalDescriptor:mainFloralResourceCollectedByVisitors:value}}
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-flowerSize-label"/>
+							{{rcpol:CategoricalDescriptor:flowerSize:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-flowerSize-value"/>
+						{{rcpol:CategoricalDescriptor:flowerSize:value}}
+					</p>
+				</div>
+				<!-- Final: Características da Flor -->
+				<!-- Início: Descrição Polínica -->
+				<div class="info-polen">
+					<h2><span id="rcpol-ProfilesLabel-profilesPollenDescription">{{rcpol:ProfilesLabel:profilesPollenDescription}}</span><span id="rcpol-ProfilesLabel-profilesPalynomorphDescription">{{rcpol:ProfilesLabel:profilesPalynomorphDescription}}</span>:
+					</h2>				
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/>{{rcpol:CategoricalDescriptor:pollenDispersalUnit:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-value">{{rcpol:CategoricalDescriptor:pollenDispersalUnit:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenSymmetry-label"/>{{rcpol:CategoricalDescriptor:pollenSymmetry:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenSymmetry-value">{{rcpol:CategoricalDescriptor:pollenSymmetry:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenPolarity-label"/>
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenPolarity-value"></span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenAmbit-label"/>{{rcpol:CategoricalDescriptor:pollenAmbit:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenAmbit-value">{{rcpol:CategoricalDescriptor:pollenAmbit:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenAperture-label"/>{{rcpol:CategoricalDescriptor:pollenAperture:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenAperture-value">{{rcpol:CategoricalDescriptor:pollenAperture:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-colpeFeature-label"/>{{rcpol:CategoricalDescriptor:colpeFeature:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-colpeFeature-value">{{rcpol:CategoricalDescriptor:colpeFeature:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-poreFeature-label"/>{{rcpol:CategoricalDescriptor:poreFeature:label}}
+						</b>				
+						<span id="rcpol-CategoricalDescriptor-poreFeature-value">{{rcpol:CategoricalDescriptor:poreFeature:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-numberOfApertures-label"/>{{rcpol:CategoricalDescriptor:numberOfApertures:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-numberOfApertures-value">{{rcpol:CategoricalDescriptor:numberOfApertures:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-exineOrnamentation-label"/>{{rcpol:CategoricalDescriptor:exineOrnamentation:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-exineOrnamentation-value">{{rcpol:CategoricalDescriptor:exineOrnamentation:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenShape-label"/>{{rcpol:CategoricalDescriptor:pollenShape:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenShape-value">{{rcpol:CategoricalDescriptor:pollenShape:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-pollenSize-label"/>{{rcpol:CategoricalDescriptor:pollenSize:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-pollenSize-value">{{rcpol:CategoricalDescriptor:pollenSize:value}}</span>
+					</p>
+
+					<br>
+
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-pollenShape-label"/>{{rcpol:NumericalDescriptor:pollenShape:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-pollenShape-value">{{rcpol:NumericalDescriptor:pollenShape:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-pollenShapePE-label"/>{{rcpol:NumericalDescriptor:pollenShapePE:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-pollenShapePE-value">{{rcpol:NumericalDescriptor:pollenShapePE:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-polarAxis-label"/>{{rcpol:NumericalDescriptor:polarAxis:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-polarAxis-value">{{rcpol:NumericalDescriptor:polarAxis:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-equatorialAxis-label"/>{{rcpol:NumericalDescriptor:equatorialAxis:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-equatorialAxis-value">{{rcpol:NumericalDescriptor:equatorialAxis:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-smallerPollenDiameter-label"/>{{rcpol:NumericalDescriptor:smallerPollenDiameter:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-smallerPollenDiameter-value">{{rcpol:NumericalDescriptor:smallerPollenDiameter:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-pollenDiameter-label"/>{{rcpol:NumericalDescriptor:pollenDiameter:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-pollenDiameter-value">{{rcpol:NumericalDescriptor:pollenDiameter:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-largerPollenDiameter-label"/>{{rcpol:NumericalDescriptor:largerPollenDiameter:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-largerPollenDiameter-value">{{rcpol:NumericalDescriptor:largerPollenDiameter:value}}</span>
+					</p>					
+					<p>
+						<b>
+							<span id="rcpol-NumericalDescriptor-espexi-label"/>{{rcpol:NumericalDescriptor:espexi:label}}
+						</b>
+						<span id="rcpol-NumericalDescriptor-espexi-value">{{rcpol:NumericalDescriptor:espexi:value}}</span>
+					</p>
+					<br>	
+					<p>
+						<b>
+							<span id="rcpol-Sample-palynomorphAdditionalInformation-label"/>{{rcpol:Sample:palynomorphAdditionalInformation:label}}
+						</b>
+						<span id="rcpol-Sample-palynomorphAdditionalInformation-value">{{rcpol:Sample:palynomorphAdditionalInformation:value}}</span>
+					</p>			
+				</div>					
+				<!-- Final: Descrição Polínica -->
+			</div>
+			<!-- Final: Texto -->	
+			<!-- Início: Mapa e Imagens -->
+			<div class="infos-img">				
+				<!-- Início: Mapa -->
+				<div class="mspm">
+					<h2>
+						<span id="rcpol-ProfilesLabel-profilesLocalityOfSpecimen">{{rcpol:ProfilesLabel:profilesLocalityOfSpecimen}}</span>:
+					</h2>
+					<!-- Início Código Leaflet -->
+					<div id="map" class="msize"></div>
+					<!-- Final Código Leaflet -->
+				</div>
+				<!-- Final: Mapa -->	
+				<!-- </div>	 -->
+				<!-- Final: Mapa e Imagens -->	
+				<!-- Início: Slideshow com as imagens da planta -->
+				<div class="img-planta-me">
+					<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPlantFlowerFruit">{{rcpol:ProfilesLabel:profilesImagesOfPlantFlowerFruit}}</span>:</h2>
+					<div id="foto_planta" class="fotorama" data-allowfullscreen="native" data-width="425" data-maxheight="638">
+						{{#rcpol:Image:plantImage:value}}
+						<img style='max-width:500px;' src="{{value}}">
+						{{/rcpol:Image:plantImage:value}}
+						{{#rcpol:Image:flowerImage:value}}
+						<img style='max-width:500px;' src="{{value}}">
+						{{/rcpol:Image:flowerImage:value}}
+						{{#rcpol:Image:beeImage:value}}
+						<img style='max-width:500px;' src="{{value}}">
+						{{/rcpol:Image:beeImage:value}}
+					</div>
+				</div>	
+				<!-- Início: Fotos do Grão de Pólen -->
+				<div class="img-polen">
+					<p class="clique-full">Clique em <img src="/img/{{base}}_full.png"> para ver as imagens em tela cheia</p>
+					
+					<h2> <span id="rcpol-ProfilesLabel-profilesImagesOfPollen">{{rcpol:ProfilesLabel:profilesImagesOfPollen}}</span>:</h2>
+					<div id="foto_polen" class="fotorama" data-allowfullscreen="native" data-width="425" data-maxheight="425">
+						{{#rcpol:Image:allPollenImage:value}}
+						<img style='max-width:500px;' src="{{value}}">
+						{{/rcpol:Image:allPollenImage:value}}
+						{{#rcpol:Image:pollenImage:value}}
+						<img style='max-width:500px;' src="{{value}}">
+						{{/rcpol:Image:pollenImage:value}}
+					</div>
+				</div>
+				<!-- Final: Fotos do Grão de Pólen -->
+			</div>
+			<!-- Final: Imagens -->
+			<!-- Início: Referências relacionadas ao espécime -->
+			<div class="rre" id="referencias">
+				<h2> <span id="rcpol-ProfilesLabel-profilesReferencesOfSpecimens">{{rcpol:ProfilesLabel:profilesReferencesOfSpecimens}}</span>:</h2>
+				{{#rcpol:Reference:flowerBibliographicCitation:value}}
+				<p>{{value}}</p>
+				{{/rcpol:Reference:flowerBibliographicCitation:value}}
+				{{#rcpol:Reference:pollenBibliographicCitation:value}}
+				<p>{{value}}</p>
+				{{/rcpol:Reference:pollenBibliographicCitation:value}}
+			</div>
+			<!-- Final: Referências relacionadas ao espécime -->
+			
+			<!-- Final: Embrulho Informações da Coleta e Mapa -->		
+			
+			<!-- Final: Slideshow com as imagens da planta -->
+			<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">Como citar:</h2>
+		<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.gov.br">http://chave.rcpol.gov.br/</a> >. Date of access: </p>
+			{{/value}}			
+		</article>
+		<!-- Final das informações do espécime -->
+		<!-- Início do Rodapé -->
+		<footer>
+			<p id="rcpol-SiteLabel-siteCopyright">{{rcpol:SiteLabel:siteCopyright}}</p>
+		</footer>
+		<!-- Final do Rodapé -->
+	</div>
+</body>
+{{/label}}
+</html>
