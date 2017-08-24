@@ -503,27 +503,27 @@ module.exports = function(Specimen) {
       },5);
 
       results.forEach(function (result){
-        if(result[base+":pt-BR:rcpol:Image:allPollenImage"]){
+        if(result[base+":pt-BR:rcpol:Image:allPollenImage"] && result[base+":pt-BR:rcpol:Image:allPollenImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:flowerImage"]){
+        if(result[base+":pt-BR:rcpol:Image:flowerImage"] && result[base+":pt-BR:rcpol:Image:flowerImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:plantImage"]){
+        if(result[base+":pt-BR:rcpol:Image:plantImage"] && result[base+":pt-BR:rcpol:Image:plantImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:beeImage"]){
+        if(result[base+":pt-BR:rcpol:Image:beeImage"] && result[base+":pt-BR:rcpol:Image:beeImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:pollenImage"]){
+        if(result[base+":pt-BR:rcpol:Image:pollenImage"] &&result[base+":pt-BR:rcpol:Image:pollenImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
               queue.push(img);
             });
