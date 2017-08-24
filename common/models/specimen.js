@@ -503,27 +503,27 @@ module.exports = function(Specimen) {
       },5);
 
       results.forEach(function (result){
-        if(result[base+":pt-BR:rcpol:Image:allPollenImage"] && result[base+":pt-BR:rcpol:Image:allPollenImage"].images.length>0){
+        if(result[base+":pt-BR:rcpol:Image:allPollenImage"] && result[base+":pt-BR:rcpol:Image:allPollenImage"].images && result[base+":pt-BR:rcpol:Image:allPollenImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:allPollenImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:flowerImage"] && result[base+":pt-BR:rcpol:Image:flowerImage"].images.length>0){
+        if(result[base+":pt-BR:rcpol:Image:flowerImage"] && result[base+":pt-BR:rcpol:Image:flowerImage"].images && result[base+":pt-BR:rcpol:Image:flowerImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:plantImage"] && result[base+":pt-BR:rcpol:Image:plantImage"].images.length>0){
+        if(result[base+":pt-BR:rcpol:Image:plantImage"] && result[base+":pt-BR:rcpol:Image:plantImage"].images && result[base+":pt-BR:rcpol:Image:plantImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:plantImage"].images.forEach(function (img){
               queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:beeImage"] && result[base+":pt-BR:rcpol:Image:beeImage"].images.length>0){
+        if(result[base+":pt-BR:rcpol:Image:beeImage"] && result[base+":pt-BR:rcpol:Image:beeImage"].images && result[base+":pt-BR:rcpol:Image:beeImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:beeImage"].images.forEach(function (img){
              queue.push(img);
             });
         }
-        if(result[base+":pt-BR:rcpol:Image:pollenImage"] &&result[base+":pt-BR:rcpol:Image:pollenImage"].images.length>0){
+        if(result[base+":pt-BR:rcpol:Image:pollenImage"] && result[base+":pt-BR:rcpol:Image:pollenImage"].images && result[base+":pt-BR:rcpol:Image:pollenImage"].images.length>0){
             result[base+":pt-BR:rcpol:Image:pollenImage"].images.forEach(function (img){
               queue.push(img);
             });
