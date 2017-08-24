@@ -373,10 +373,18 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
       if (err) throw new Error(err);
       mongoDs.automigrate('Identification', function(err){
         if (err) throw new Error(err);
-        Identification.upsert(list_of_items, function(err, results){
-          if (err) throw new Error(err);
+        var q = async.queue(function(task, callback_) {
+          Identification.upsert(task, function(err, results){
+            if (err) throw new Error(err);
+            callback_();
+          });
+        }, 2);        
+        // assign a callback
+        q.drain = function() {
           callback(null, list_of_items.length);
-        });
+        };        
+        // add some items to the queue
+        q.push(list_of_items, function(err) {});        
       });
 
     });
