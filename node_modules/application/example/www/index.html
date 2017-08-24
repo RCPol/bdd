@@ -1,0 +1,27 @@
+<html>
+<head>
+  <script>
+    window.onerror = function (errorMsg, url, lineNumber) {
+      console.log(arguments)
+      return false
+    }
+  </script>
+  <title>Realtime Dnode & Http Application Server</title>
+</head>
+<body>
+  <span id='about'>?</span>
+  <span id='comments'>?</span>
+  <span id='comment_get'>?</span>
+  <span id='comment_put'>?</span>
+  <span id='comment_post'>?</span>
+  <span id='comment_delete'>?</span>
+  <span id='error'>?</span>
+  <span id='users'>?</span>
+  <span id='user_get'>?</span>
+  <span id='user_put'>?</span>
+  <span id='user_post'>?</span>
+  <span id='user_delete'>?</span>
+<script src='/js/dnode.js' type='text/javascript'></script>
+<script src='/js/client.js'></script>
+</body>
+</html>

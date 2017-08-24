@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get -y install curl && \
     apt-get -y install git && \
     apt-get -y install wget && \
-    curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && \
     apt-get install --yes nodejs && \
     apt-get -y install build-essential && \
     apt-get -y install imagemagick && \
@@ -28,13 +28,14 @@ RUN mkdir -p /var/www/bdd
 # Define working directory
 WORKDIR /var/www/bdd
 
-# ADD . /var/www/bdd
+ADD . /var/www/bdd
 
 # Expose port
 EXPOSE 3030
 
-RUN npm install
-RUN bower install
+# RUN npm install
+# RUN bower install
 
 # Run app
-CMD pm2 start ecosystem.json && pm2 logs 0 
+CMD ["pm2-docker", "/var/www/bdd/ecosystem.json"]
+# CMD pm2 start ecosystem.json && pm2 logs 0 

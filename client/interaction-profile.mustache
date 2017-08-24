@@ -4,12 +4,14 @@
 	<meta charset="UTF-8">
 
 	<!-- Google fonts -->
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
-    <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>	
-    <link rel="import" href="/elements/interaction-profile/main.html"></script>	
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>    
     <script src="/bower_components/jquery/dist/jquery.min.js"></script>
 		<script src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
 		<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/base.css">
+		<script src="/bower_components/d3/d3.js"></script>
+		<script src="/bower_components/d3-plugins-sankey/sankey.js"></script>
+		<script src="/bower_components/d3.chart/d3.chart.js"></script>
+		<script src="/javascript/d3.chart.sankey.js"></script>
 	<!-- Css Documento -->
 	
 	<link rel="stylesheet" href="/css/eco_fichas.css">
@@ -81,9 +83,50 @@
 
 	<!-- Início das informações da Página -->
 	<article>
-        <interaction-profile pollinator="{{pollinator}}"></interaction-profile>
-		<!-- Final: Imagens de Abelhas -->
+				<!-- Título da Página -->
+		<h1 class="pal"><span id="rcpol-InteractionLabel-plantVisitedBy">Espécies de plantas visitadas por</span> <i>{{pollinator}}</i></h1>
 
+		<!-- Seletor do gráfico -->
+		<div class="graf-e">
+
+			<div style="width:50%;display: inline-block">
+                <span id="rcpol-InteractionLabel-selectRegion">Selecione Região</span>:<br>
+                <select id ="region" class="opcoes-select" style="width:30%">
+                    <option value="Brasil">Brasil</option>
+                    <option value="Centro-Oeste">Centro-Oeste</option>
+                    <option value="Nordeste">Nordeste</option>
+                    <option value="Norte">Norte</option>
+                    <option value="Sul">Sul</option>
+                    <option value="Sudeste">Sudeste</option>
+                </select>
+            </div>
+            <div style=" width:40%; display: inline-block">
+                <span id="rcpol-InteractionLabel-selectVegetalForm">Selecione Formação Vegetal</span>: <br>
+                <select id="vegetalForm" class="opcoes-select" >
+                    <option value="Todas">Todas</option>
+                    <option value="Área urbana">Área urbana</option>
+                    <option value="Mata Atlântica">Mata Atlântica</option>
+                    <option value="Vegetação de dunas">Vegetação de dunas</option>
+                    <option value="Cultivo">Cultivo</option>                    
+                </select>
+			</div>
+
+		</div>
+
+		<!-- Gráfico -->
+		<div class="graf">
+
+		<div style="height:1200px" id="chart"></div>
+
+		</div>
+		<!-- Final: Imagens de Abelhas -->
+		<div class="rre">
+			
+			<h2><span id="rcpol-InteractionLabel-bibliographicReferences">Refer&ecirc;ncias Bibliogr&aacute;ficas</span>:</h2>
+                <div id="vis">   								                
+                </div>
+
+		</div>
 	</article>
 	<!-- Final das informações da Página -->
 
@@ -95,16 +138,132 @@
 
 </div>
 </body>
+<script>
+	$(document).ready(function(){		  
+		var pollinator = "{{pollinator}}";
+		var region = "Brasil";
+		var vegetalForm = "Todas";
+
+		$('#region').on('change', function() {			
+			region = this.value
+			load();
+		});
+		$('#vegetalForm').on('change', function() {			
+			vegetalForm = this.value
+			load();
+		});
+
+		function index(data, value){        
+        for(var i = 0; i < data.length; i++){
+				if(data[i].name == value)
+					return i;
+			}
+			return -1;        
+		}		
+		function load(){
+			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {
+				// IN				
+				var json = {nodes: [], links:[]};
+				console.log(interactions);
+				var data = interactions.response.map(function(item){
+						var d = {
+								species: item._id.plant?item._id.plant:"", 
+								value: item.avgQuantity?item.avgQuantity:0, 
+								region: item._id.region?item._id.region:"",                     
+								state: item._id.state?item._id.state:"", 
+								municipality: item._id.municipality?item._id.municipality:""};                
+						return d;
+				});            
+				data.forEach(function(item){
+						if(index(json.nodes,item.species)==-1)
+								json.nodes.push({name:item.species, type:"species"});
+						if(index(json.nodes,item.municipality)==-1)
+								json.nodes.push({name:item.municipality});
+						if(index(json.nodes,item.state)==-1)
+								json.nodes.push({name:item.state});
+						if(index(json.nodes,item.region)==-1)
+								json.nodes.push({name:item.region});                
+				});
+				// Link Specie - Cidade
+				data.forEach(function(item){
+						var s = index(json.nodes, item.municipality);
+						var t = index(json.nodes, item.species);
+						var v = item.value;
+						var link = {"source": s, "target":t, "value": v, "OUTRO":"CONTEUDO"};
+						var add = true;
+						json.links.forEach(function(l){                    
+								if(l.source==link.source && l.target==link.target){                        
+										l.value = l.value + v;
+										add=false;
+										return false;
+								}
+						});
+						if(add)
+								json.links.push(link);
+				});
+				// Link Cidade - Estado
+				data.forEach(function(item){
+						var s = index(json.nodes, item.state);
+						var t = index(json.nodes, item.municipality);
+						var v = item.value;
+						var link = {"source": s, "target": t, "value": v};
+						var add = true;
+						json.links.forEach(function(l){                    
+								if(l.source==link.source && l.target==link.target){                        
+										l.value = l.value + v;
+										add=false;
+										return false;
+								}
+						});
+						if(add)
+								json.links.push(link);
+				});
+				// Link Estado - Região
+				data.forEach(function(item){
+						var s = index(json.nodes, item.region);
+						var t = index(json.nodes, item.state);
+						var v = item.value;
+						var link = {"source": s, "target": t, "value": v};
+						var add = true;
+						json.links.forEach(function(l){                    
+								if(l.source==link.source && l.target==link.target){                        
+										l.value = l.value + v;
+										add=false;
+										return false;
+								}
+						});
+						if(add)
+								json.links.push(link);
+				});
+				$("#chart").html("");                        
+				var chart = d3.select("#chart").append("svg")
+						.chart("Sankey.Path");                                        
+				
+				chart.draw(json);                        
+				d3.select("#chart").selectAll(".node")[0].forEach(function(g){                
+						if(g.__data__.type=="species"){
+								g.onclick = function(){
+										window.open("/profile/species/eco/eco:"+localStorage.language+":"+g.__data__.name, '_blank');
+								}
+								$(g).css("font-style","italic");
+						}                    
+				});
+				chart.nodePadding(10);            
+				if(data.length==0)
+						$("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
+
+				internacionalization.interactionTranslator();
+		});   	
+		}
+		load();		  
+		$.getJSON( "/api/Interactions/findOne?pollinator="+pollinator, function( interaction ) {
+				var aux = [];
+				if(interaction.reference)
+						aux.push(interaction.reference.split("|"));  
+				aux.forEach(function(item){
+					$("#vis").append(`<p>${item}</p>`);
+				});
+		});     
+	});
+</script>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
