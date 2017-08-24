@@ -239,7 +239,7 @@ module.exports = function(Schema) {
       service.spreadsheets.values.get({
             auth: jwtClient,
             spreadsheetId: id,
-            range: 'glossary.'+language+'!A:J'        
+            range: 'glossary.'+language+'!A:K'        
           }, function(err, rs) {
             if (err){
               console.log('The API returned an error: ' + err);    
@@ -282,6 +282,12 @@ module.exports = function(Schema) {
                     record.credits = [];
                     toString(line[9]).trim().split("|").forEach(function (ref) {
                       record.credits.push(ref.trim());
+                    });
+                  }                  
+                  if (toString(line[10]).trim().length>0) {
+                    record.contexts = [];
+                    toString(line[10]).trim().split("|").forEach(function (context) {
+                      record.contexts.push(context.trim());
                     });
                   }
                   //ler o campo das imagens

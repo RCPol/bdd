@@ -2,11 +2,9 @@
 <html lang="pt-br">
 <head>
 	<meta charset="UTF-8">
-
 	<!-- Google fonts -->
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
-    <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>	
-    <link rel="import" href="/elements/interaction-list/main.html"></script>	
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>    
+	
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -64,7 +62,14 @@
 
 	<!-- Início das informações da Página -->
 	<article>
-        <interaction-list plant="{{plant}}"></interaction-list>
+		<div id="main"></div>
+		<h1 id="title" class="pal"><span id="rcpol-InteractionLabel-flowerVisitors">Visitantes florais de</span> <i>{{plant}}</i></h1>
+        <h1 id="msg" class="pal"><span id="content-msg"></span> <i>{{plant}}</i></h1>
+        <!-- Início: Imagens de Abelhas -->        
+        <div class="cspm"> 
+		<div id="list"></div>
+
+
 	<!-- Final: Imagens de Abelhas -->
 
 	</article>
@@ -77,17 +82,51 @@
 	<!-- Final do Rodapé -->
 
 </div>
+<script>
+	$(document).ready(function(){
+		var msg = "Mssage";
+		var interactions = [];
+		var self = this;                 
+		$.getJSON( "/api/Interactions/pollinators?plant={{plant}}", function( data ) {
+			$.getJSON( "/api/Interactions?filter=%7B%22where%22%3A%7B%22plant%22%3A%22{{plant}}%22%2C%20%22image%22%3A%7B%22exists%22%3Atrue%7D%7D%2C%22fields%22%3A%7B%22image%22%3Atrue%2C%22pollinator%22%3Atrue%7D%7D", function( imgs ) {
+				interactions = data.response.map(function(item){
+					var rs = item._id;   
+					rs.image = "/img/filler-200px.png";                                         
+					imgs.forEach(function(img){
+						if(img.pollinator==rs.pollinator){                            
+							rs.image = img.image.resized;
+							rs.credits = img.image.credits;                                
+							return false;
+						}
+					});       
+					var content = $(`<div class="visitante">                    
+										<img id="img-${rs.pollinator}" src="${rs.image}" class="visit-img">                        
+										<p class="div-visitante">                    
+										<a href="/interaction-profile/${rs.pollinator}">                    
+										<i>${rs.pollinator}</i>
+										</a></p>                    
+										<p class="legenda-int-p" ><span class="rcpol-InteractionLabel-typeOfVisit">Tipo de visita registrada</span>: ${rs.type}</p>
+										<p class="div-visitante">                    
+										<img src="/img/eco_ref.png" title="${rs.reference}" class="popsref">                    
+										<img src="/img/eco_copyr.png" title="${rs.credits}" class="popsref">
+										</p>                        
+									</div>`);     
+					$("#list").append(content);                            
+					return rs;                    
+				});
+				internacionalization.interactionTranslator();
+		});        
+		if(data.response.length==0){
+			$("#content-msg").html("Não há registros de interação para ");
+			$("#title").hide()
+		} else {
+			$("#msg").hide()
+		}
+	});
+	});
+</script>
 </body>
 </html>
 
 
-
-
-
-
-
-
-
-
-
-
+                
