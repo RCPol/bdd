@@ -33,8 +33,8 @@ WORKDIR /var/www/bdd
 # Expose port
 EXPOSE 3030
 
-RUN npm install
-RUN bower install
+# RUN npm install
+# RUN bower install
 
 # Run app
 CMD pm2 start ecosystem.json && pm2 logs 0 
