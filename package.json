@@ -36,6 +36,7 @@
     "requestretry": "^1.6.0",
     "serve-favicon": "^2.0.1",
     "sntp": "^2.0.2",
+    "strong-error-handler": "^2.2.0",
     "underscore": "^1.8.3",
     "validator": "^4.4.0"
   },
