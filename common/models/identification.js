@@ -108,6 +108,7 @@ module.exports = function(Identification) {
 
       // console.log("******** QUERY ********\n",JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
+        console.log("LENGTH",items.length)
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName,{strict:true,j:false,w:'majority'});
         console.log("AGGRAGATE: ",
@@ -407,6 +408,8 @@ function composeQuery(param, callback){
       Object.keys(param.filter).forEach(function(key) {
         var filter  = {};
         filter['filter.'+key] = param.filter[key];
+        // filter[key+".value"] = param.filter[key];
+        console.log("FILTER",filter)
         query.and.push(filter);
         queryMongo.$and.push(filter);
       });

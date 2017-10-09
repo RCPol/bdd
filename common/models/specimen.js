@@ -265,7 +265,7 @@ module.exports = function(Specimen) {
                 var value = toString(record[schema.id].value); //pega o valor do schema
                 record[schema.id] = schema;
                 // CATEGORICAL DESCRIPTOR
-                if(schema["class"]=="CategoricalDescriptor" || schema["term"] == "vegetalFormationType"){                  
+                if(schema["class"]=="CategoricalDescriptor" ){                  
                   record[schema.id].value = value;
                   record[schema.id].states = [];
                   async.each(value.split("|"), function(sValue, callbackState) {
