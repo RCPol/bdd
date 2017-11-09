@@ -10,6 +10,8 @@ services:
       - mongo
     ports:
       - "80:3030" 
+    environment:    
+      - ENVIRONMENT=docker      
     container_name: rcpol_node    
   mongo:
     image: mongo
