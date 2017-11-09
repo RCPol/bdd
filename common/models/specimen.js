@@ -493,11 +493,9 @@ module.exports = function(Specimen) {
   
     Specimen.find(query, function(err,results){         
       
-      var i = 0;
-      console.time("download");
+      var i = 0;      
       var queue = async.queue(function(img,callback) {
-        console.log("PROCESSED: ",i++);
-        console.timeEnd("download");
+        console.log("PROCESSED: ",i++);        
         var downloader = new ImageDownloader(); 
         downloader.download(img,callback);
       },5);
@@ -543,7 +541,10 @@ module.exports = function(Specimen) {
     var image = new Image(img);     
     image.checkIfExist(image.localPath,function(exists) {      
       if(exists) image.emit("exists"); 
-      else image.emit("doesNotExist");
+      else{
+        image.emit("doesNotExist");
+        callback(); 
+      }
     });
     image.on("exists", function() {
         console.log("Existe original "+image.local);        
@@ -556,10 +557,12 @@ module.exports = function(Specimen) {
                 console.log("Existe resized "+image.thumbnailPath); 
                 callback();                 
               }
-              else image.emit("localFileWrote");
+              else {
+                image.emit("localFileWrote");
+              }
             });
           } else {
-            image.emit("localFileWrote");
+            image.emit("localFileWrote");            
           }
         });            
       })

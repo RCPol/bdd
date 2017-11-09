@@ -478,7 +478,10 @@ module.exports = function(Schema) {
     var image = new Image(img);     
     image.checkIfExist(image.localPath,function(exists) {      
       if(exists) image.emit("exists"); 
-      else image.emit("doesNotExist");
+      else{
+        image.emit("doesNotExist");
+        callback(); 
+      }
     });
     image.on("exists", function() {
         console.log("Existe original "+image.local);        
