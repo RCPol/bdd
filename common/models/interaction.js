@@ -61,8 +61,7 @@ module.exports = function(Interaction) {
   }
     Interaction.pollinators = function(plant,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
-    // Connection URL 
-    console.log(process.env, process.env.ENVIRONMENT)
+    // Connection URL     
     if(process.env.ENVIRONMENT == "docker")
       var url = 'mongodb://mongo:27017/bdd';
     else 
