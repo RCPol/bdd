@@ -22,7 +22,10 @@ module.exports = function(Interaction) {
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
     
-    var url = 'mongodb://mongo:27017/bdd';
+    if(process.env.ENVIRONMENT == "docker")
+      var url = 'mongodb://mongo:27017/bdd';
+    else 
+      var url = 'mongodb://127.0.0.1:27017/bdd';
     var q = {};
     q.pollinator = pollinator;
     if(region!="Brasil"){      
