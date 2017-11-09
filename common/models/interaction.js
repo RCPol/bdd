@@ -144,6 +144,9 @@ module.exports = function(Interaction) {
             }        
             var data = [];
             rs.values.shift();
+            rs.values.shift();
+            rs.values.shift();
+            rs.values.shift();
             rs.values.forEach(function(item){
               var i = {};
               i.dataset = id;
