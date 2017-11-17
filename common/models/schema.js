@@ -589,17 +589,17 @@ module.exports = function(Schema) {
       var error = function(err){
         console.log(err)
         if(err.img){                            
-          fs.unlink(__dirname + "/../../client"+err.img.local,function(err){            
-            if(err) console.log(err);
+          fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
+            if(err_) console.log("original não apagado");
             else console.log('original file deleted successfully');                
             reject(err);
           });
-          fs.unlink(__dirname + "/../../client"+err.img.resized,function(err){            
-            if(err) console.log(err);
+          fs.unlink(__dirname + "/../../client"+err.img.resized,function(err_){            
+            if(err_) console.log("resized não apagado");
             else console.log('resized file deleted successfully');                            
           });
-          fs.unlink(__dirname + "/../../client"+err.img.thumbnail,function(err){            
-            if(err) console.log(err);
+          fs.unlink(__dirname + "/../../client"+err.img.thumbnail,function(err_){            
+            if(err_) console.log("thumbnail não apagado");
             else console.log('thumbnail file deleted successfully');                            
           });
         }        
