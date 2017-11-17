@@ -299,7 +299,7 @@ module.exports = function(Schema) {
 
                       var image = {
                         id: imageId,
-                        original: "https://docs.google.com/uc?id="+imageId.trim(),
+                        original: "https://docs.google.com/uc?id="+imageId.trim().split("-")[1],
                         local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
