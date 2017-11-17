@@ -439,21 +439,32 @@ module.exports = function(Schema) {
 
   //Método by Raquel
   Schema.downloadImages = function (cb) {
-    //Schema aqui vai realizar uma consulta no banco de dados pegando os valores chave e valor do registro.
-    //Pelo record.image (que vai conter a url de download da image) e record.id (identificador do documento)
-    //Onde a imagem vai ser salva na pasta do cliente
-    var startTime = new Date();
-    Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
-      var queue = async.queue(function(img,callback) {
-        var downloader = new ImageDownloader();        
-        downloader.download(img,callback);
-      },5);
+    function error (err){cb(err,null)}
+    console.log("serviço chamado");
+    var manager = new ImageDownloadManager();
+    // define query de consulta de imagens
+    var query  = manager.defineQuery();    
+    // consulta imagens
+    manager.getData(query)    
+        // define uma fila com todas as imagens
+        .then(manager.defineQueue).catch(error)
+        // processa todas as imagens da fila
+        .then(manager.processQueue).catch(error)
+        // término do processo
+        .then(function(){cb(null,"done")}).catch(error);   
 
-      results.forEach(function(rec) {
-        rec.images.forEach(function(img) {
-          queue.push(img);
-        });
-      });
+    
+    // Schema.find({where:{images:{exists:true}},fields:{id:true,images:true}}, function(err, results) {
+    //   var queue = async.queue(function(img,callback) {
+    //     var downloader = new ImageDownloader();        
+    //     downloader.download(img,callback);
+    //   },5);
+
+    //   results.forEach(function(rec) {
+    //     rec.images.forEach(function(img) {
+    //       queue.push(img);
+    //     });
+    //   });
       // var downloader = new ImageDownloader();
       // downloader.download(queue).on("done",
       //   function() {
@@ -463,72 +474,202 @@ module.exports = function(Schema) {
       //     cb(null, downloader.log);
       //   }
       // );
-    });
+    // });
 
   };
-  function ImageDownloader() {
-    EventEmitter.call(this);
-    this.log = [];
-    this.count = 0;    
-    this.requestErrorCount = 0;
-  }
-  util.inherits(ImageDownloader, EventEmitter);
-  ImageDownloader.prototype.download = function(img,callback) {    
-    var self = this;    
-    var image = new Image(img);     
-    image.checkIfExist(image.localPath,function(exists) {      
-      if(exists) image.emit("exists"); 
-      else{
-        image.emit("doesNotExist");
-        callback(); 
-      }
-    });
-    image.on("exists", function() {
-        console.log("Existe original "+image.local);        
-        self.count++;        
-        image.checkIfExist(image.thumbnailPath,function(exists) {
-          if(exists){      
-            console.log("Existe thumbnail "+image.thumbnailPath);              
-            image.checkIfExist(image.resizedPath,function(exists) {
-              if(exists) {
-                console.log("Existe resized "+image.thumbnailPath); 
-                callback();                 
-              }
-              else image.emit("localFileWrote");
-            });
-          } else {
-            image.emit("localFileWrote");
+
+  function ImageDownloadManager() {}  
+  ImageDownloadManager.prototype.processQueue = function(queue) {
+    var self = this;
+    console.log("processando fila")
+    return new Promise(function(resolve, reject){
+      var processing;
+      var processImage = function (img,cb){        
+        var downloader = new ImageDownloader();         
+        downloader.download(img).then(function(){
+          console.log("download realizado com sucesso");
+          cb();
+        }).catch(function(error){
+          console.log("erro ao fazer download de imagem");          
+          if(error.img) {
+            console.log("adicionou imagem no final da fila")
+            processing.push(img);
           }
-        });            
-      })
-    .on("doesNotExist",image.requestFromURL)
-    .on("endDownload", function() {
-          image.writeLocalFile();
-          self.count++;            
-      })
-    .on("localFileWrote",
-      function() {        
-        image.convertResized().on("resizedFileWrote",function() {
-          image.convertThumbnail().on("thumbnailFileWrote",function() {
-            callback();
-          });          
-        });        
-        // self.log = self.log.concat(image.log)
-      })
-    .on("writeError",function() {
-      callback();
+          cb();
+        });
+      }
+      processing = async.queue(processImage,5);      
+      processing.push(queue);
+      processing.drain = function() {
+        resolve()        
+      };
+    });    
+  }  
+  ImageDownloadManager.prototype.defineQueue = function(data) {
+    var self = this;
+    console.log("definindo fila")
+    return new Promise(function(resolve, reject){
+      var queue = [];
+      data.forEach(function(rec) {
+        rec.images.forEach(function(img) {
+          queue.push(img);
+        });
+      });  
+      resolve(queue);
+    });    
+  }      
+  ImageDownloadManager.prototype.getData = function(query) {    
+    var self = this;
+    return new Promise(function(resolve, reject){
+      Schema.find(query, function(err,data){
+        if(err) reject(err)        
+        else{          
+          resolve(data);
+        }
+      });
+    });  
+  }  
+  ImageDownloadManager.prototype.defineQuery = function() {
+    var self = this;
+    return {where:{images:{exists:true}},fields:{id:true,images:true}}
+  }
+  function ImageDownloader() {}    
+  ImageDownloader.prototype.imageExists = function() {
+    var self =  this;
+    return new Promise(function(resolve, reject){   
+      console.log("imagem existe")   
+      resolve();      
     });
-    return this;
+  }
+  ImageDownloader.prototype.downloadImage = function(img) {
+    var self =  this;    
+    return new Promise(function(resolve, reject){      
+      console.log("imagem nao existe");            
+      request(img.original, {encoding: 'binary'}, function(err, response, body){
+        if (err){          
+            console.log("Error to download "+img.original);                        
+            reject({img:img.raw});
+        } else {
+          console.log("imagem baixada")
+          img.downloadedContent = body;
+          resolve(img);          
+        }
+      });
+    });
+  }
+  ImageDownloader.prototype.transformImage = function(img, source, target, size) {
+    var self =  this;    
+    return new Promise(function(resolve, reject){             
+      var param = { src: source, dst: target, width: size.width}
+      if(size.height) param.height = size.height;
+      qt.convert(param, function(err, filename) {
+        if(err){
+          reject({img: img.raw})          
+        } else {        
+          resolve(img);
+        }
+      });
+    });
+  }
+  ImageDownloader.prototype.writeOriginalImage = function(img) {
+    var self =  this;        
+    return new Promise(function(resolve, reject){
+      fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
+        if(err){          
+          reject({img:img.raw});
+        } else {
+          resolve(img);
+        }
+      });
+    });
+  }
+  ImageDownloader.prototype.download = function(img) {    
+    var self = this;        
+    return new Promise(function(resolve, reject){      
+      var error = function(err){
+        console.log(err)
+        if(err.img){                            
+          fs.unlink(err.img.localPath,function(err){            
+            if(err) console.log(err);
+            else console.log('original file deleted successfully');                
+            reject(err);
+          });
+          fs.unlink(err.img.resizedPath,function(err){            
+            if(err) console.log(err);
+            else console.log('resized file deleted successfully');                            
+          });
+          fs.unlink(err.img.thumbnailPath,function(err){            
+            if(err) console.log(err);
+            else console.log('thumbnail file deleted successfully');                            
+          });
+        }        
+      }
+      var done = function(){
+        resolve();
+      }      
+      // cria um modelo manipulação da imagem
+      self.img = new Image(img);      
+      // ORIGINAL
+      var isOriginalExists = function(){
+        return self.img.checkIfExist(self.img.localPath);
+      }      
+      var downloadImage = function() {        
+        return self.downloadImage(self.img);        
+      }      
+      var handleOriginal = function(exists){
+        console.log("original")
+        if(exists){
+          console.log("existe")
+          return new Promise(function(resolve, reject){      
+            resolve();          
+          });
+        }          
+        else return downloadImage().then(self.writeOriginalImage);
+      }
+      // RESIZED
+      var isResizedExists = function(){
+        return self.img.checkIfExist(self.img.resizedPath);
+      }   
+      var transformResizedImage = function() {
+        return self.transformImage(self.img, self.img.localPath, self.img.resizedPath, { width: 1500 });
+      }   
+      var handleResized = function(exists){
+        console.log("resized")
+        if(exists){
+          console.log("existe")
+          return new Promise(function(resolve, reject){      
+            resolve();
+          });
+        } else return transformResizedImage();  
+      }
+      // THUMBNAIL
+      var isThumbnailExists = function(){
+        return self.img.checkIfExist(self.img.thumbnailPath);
+      }
+      var transformThumbnailImage = function() {
+        return self.transformImage(self.img, self.img.resizedPath, self.img.thumbnailPath, { width: 100, height: 100 });
+      }
+      var handleThumbnail = function(exists) {
+        console.log("thumbnail")
+        if(exists){
+          console.log("existe")
+          return new Promise(function(resolve, reject){      
+            resolve();          
+          });
+        } else return transformThumbnailImage();          
+      }      
+
+      isOriginalExists()
+        .then(handleOriginal).catch(error)        
+        .then(isResizedExists).catch(error)
+        .then(handleResized).catch(error)  
+        .then(isThumbnailExists).catch(error)      
+        .then(handleThumbnail).catch(error)
+        .then(done).catch(error);          
+    });    
   };
-  function Image(img) {    
-    EventEmitter.call(this);
-    this.log = [];
-    this.count = 0;
-    this.img = img;
-    this.requestErrorCount = 0;
-    this.writeLocalErrorCount = 0;
-    this.writeResizedErrorCount = 0;
-    this.writeThumbnailErrorCount = 0;
+  function Image(img) {            
+    this.raw = img;    
     this.original = img.original;
     this.local = img.local;
     this.resized = img.resized;
@@ -536,281 +677,16 @@ module.exports = function(Schema) {
     this.localPath = __dirname + "/../../client"+this.local;
     this.thumbnailPath = __dirname + "/../../client"+this.thumbnail;
     this.resizedPath = __dirname + "/../../client"+this.resized;
-  }
-  util.inherits(Image, EventEmitter);
-  Image.prototype.checkIfExist = function(path,cb) {
+  }  
+
+  Image.prototype.checkIfExist = function(path) {
     var self = this;
-    fs.exists(path, function(exists){
-      cb(exists);        
+    return new Promise(function(resolve, reject){
+      fs.exists(path, function(exists){
+        resolve(exists);        
+      });
     });
-    // return this;
-  };
-  Image.prototype.requestFromURL = function() {
-    var self = this;
-    request(self.original, {encoding: 'binary'}, function(err, response, body){
-      if (err){
-        if (self.requestErrorCount==10) {
-          console.log("Error to download "+self.original);
-          self.requestErrorCount == 0;
-          self.log.push("Error no download de "+self.original);
-          return self.emit("endDownload");
-        } else {
-          self.requestErrorCount++;
-          self.requestFromURL();
-        }
-      } else {
-        self.downloadedContent = body;
-        return self.emit("endDownload");
-      }
-    });
-    return this;
   }
-  Image.prototype.writeLocalFile = function() {    
-    var self = this;
-    fs.writeFile("client"+self.local, self.downloadedContent, 'binary', function(err){
-        if(err){
-          if(self.writeLocalErrorCount==10){
-            console.log("******** Local: "+self.local);
-            console.log('Ops, um erro ocorreu!');
-            console.log("URL: ",self.original);
-            console.log("********");
-            self.log.push("Write Local File: "+self.local+"   URL: "+self.original);
-            self.writeLocalErrorCount = 0;
-          } else {
-            self.writeLocalErrorCount++
-            self.writeLocalFile();
-          }
-        } else {
-          var buffer = readChunk.sync("client"+self.local, 0, 120);  
-          //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
-          if (imageType(buffer)==null){
-            if(self.writeLocalErrorCount==10){              
-              console.log("******** Local: "+self.local);
-              console.log('Ops, um erro ocorreu!');
-              console.log("URL: ",self.original);
-              console.log("********");
-              self.log.push("Write Local File: "+self.local+"   URL: "+self.original);
-              self.writeLocalErrorCount = 0;
-              self.emit("writeError");
-            } else {
-              self.writeLocalErrorCount++
-              self.writeLocalFile();
-            }
-          }else{            
-            self.emit("localFileWrote");
-          }  
-        }
-    });
-    return this;
-  }
-  Image.prototype.convertResized = function() {
-    var self = this;
-    qt.convert({src:self.localPath, dst: self.resizedPath, width:1500}, function(err, filename){
-      if(err){
-        if(self.writeResizedErrorCount==3){
-          console.log("******** RESIZED: "+self.resized);
-          console.log('Ops, um erro ocorreu!');
-          console.log("******** Local: "+self.local);
-          console.log("URL: ",self.original);
-          console.log("********");
-          self.log.push("Write Resized File: "+self.resized+"   Local: "+self.local+"   URL: "+self.original);
-          self.writeResizedErrorCount = 0;
-          self.emit("writeError");
-        } else {
-          self.writeResizedErrorCount++
-          self.convertResized();
-        }
-      } else {        
-        self.emit("resizedFileWrote");
-      }
-    });
-    return this; 
-  }
-  Image.prototype.convertThumbnail = function() {
-    var self = this;
-    qt.convert({src:self.resizedPath, dst: self.thumbnailPath, width:100, height:100}, function(err, filename){
-      if(err){
-        if(self.writeThumbnailErrorCount==3){
-          console.log("******** THUMBNAIL: "+self.thumbnail);
-          console.log('Ops, um erro ocorreu!');
-          console.log("******** Local: "+self.local);
-          console.log("URL: ",self.original);
-          console.log("********");
-          self.log.push("Write Thumbnail File: "+self.thumbnail+"   Local: "+self.local+"   URL: "+self.original);
-          self.writeThumbnailErrorCount = 0;
-          self.emit("writeError");
-        } else {
-          self.writeThumbnailErrorCount++
-          self.convertThumbnail();
-        }
-      } else {        
-        self.emit("thumbnailFileWrote");
-      }
-    });
-    return this;
-  }
-  // write local file
-  // fs.writeFile("client"+local, body, 'binary', function(err){
-  //   try{
-  //     console.log("Escrevendo o arquivo...");
-  //     if(err){
-  //       console.log("******** ORIGINAL: "+local);
-  //       console.log('Ops, um erro ocorreu!');
-  //       console.log("URL: ",original);
-  //       console.log("********");
-  //       callback();
-  //       i++;
-  //
-  //     }else{
-  //       callback();
-  //     }
-  //   }catch(err){
-  //     if(err) throw new Error(err);
-  //   }
-  // });
-  // function downloadImage(queue){
-  //   var i = 0;
-  //   var end = queue.length;
-  //   var erro = [];
-  //   var count = 0;
-  //   var countErr = 0;
-  //   async.whilst(function(){
-  //     return i < end;
-  //   }, function(callback){
-  //     var local = queue[i].local; //local da imagem salva
-  //     var original = queue[i].original; //url original da imagem
-  //     var resized = queue[i].resized; //local da imagem salva
-  //     var thumbnail = queue[i].thumbnail; //local da imagem salva
-  //     var file = __dirname + "/../../client"+local; //arquivo da imagem salva
-  //     var file2 = __dirname + "/../../client"+thumbnail;
-  //     console.log(i + " of "+end+" images");
-  //     fs.exists(file, function(exists){
-  //       // check if exist localy
-  //       if (exists) {
-  //         fs.exists(file2, function(exists){
-  //           if(exists){
-  //             console.log("image alreadly exists");
-  //             i++;
-  //             callback();
-  //           }else{
-  //             fs.unlink(file);
-  //             callback();
-  //           }
-  //         });
-  //       } else {
-  //         console.log("making request to " + original);
-  //         async.series([
-  //           // Dowload da internet a partir e orginial gravando em local
-  //           function fileRequest(callback){
-  //             if(count < 3){ // Q: Porque isso?
-  //               requestFile(original,local,callback);
-  //             }
-  //           },
-  //           // Depois de ter gravado o original no local,
-  //           function test(callback){
-  //             var readChunk = require('read-chunk'); // npm install read-chunk
-  //             var imageType = require('image-type');
-  //             var buffer = readChunk.sync(__dirname + "/../../client"+local, 0, 120);
-  //
-  //             console.log(imageType(buffer));
-  //             //Checar se a imagem salva é um arquivo jpeg, caso não seja requisitar o endereço da imagem novamente
-  //             if (imageType(buffer)==null){
-  //               console.log("Arquivo inválido");
-  //               count++;
-  //               if(count == 3){
-  //                 erro[countErr] = "Ocorreu um erro na URL: " + original;
-  //                 countErr++;
-  //                 count = 0;
-  //                 i++;
-  //               }
-  //               callback();
-  //             }else{
-  //               console.log("Arquivo válido");
-  //               async.parallel([
-  //                 function resizedConverting(callback) {
-  //                   // write resized
-  //                   convertResized(local,resized,callback);
-  //                 },
-  //                 function thumbnailConverting(callback) {
-  //                   // write thumbnail
-  //                   convertThumbnail(local,thumbnail,callback);
-  //                 },
-  //               ],function done() {
-  //                 i++;
-  //                 count = 0;
-  //                 callback();
-  //               });
-  //             }
-  //           }
-  //         ],function done(){
-  //           callback();
-  //         });
-  //       }
-  //
-  //     });
-  //   }, function(err){
-  //     if (err) throw new Error(err);
-  //     for(var t=0;t < countErr;t++){
-  //       console.log(erro[t]);
-  //     }
-  //     console.log("done.");
-  //   });
-  // }
-  //
-  // //faz requisição de arquivo para download
-  // function requestFile(original,local,callback){
-  //   request(original, {encoding: 'binary'}, function(err, response, body){
-  //     if (err) throw new Error(err);
-  //     // write local file
-  //     fs.writeFile("client"+local, body, 'binary', function(err){
-  //       try{
-  //         console.log("Escrevendo o arquivo...");
-  //         if(err){
-  //           console.log("******** ORIGINAL: "+local);
-  //           console.log('Ops, um erro ocorreu!');
-  //           console.log("URL: ",original);
-  //           console.log("********");
-  //           callback();
-  //           i++;
-  //
-  //         }else{
-  //           callback();
-  //         }
-  //
-  //       }catch(err){
-  //         if(err) throw new Error(err);
-  //       }
-  //     });
-  //
-  //   });
-  //
-  // }
-  //
-  // function convertResized(local,resized,callback) {
-  //   qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+resized, width:1500}, function(err, filename){
-  //     if(err){
-  //       console.log("******** RESIZED ERROR: "+local+" >> Trying again...");
-  //       // try again
-  //       convertResized(local,resized,callback);
-  //     } else {
-  //       console.log("Converting to resized: OK");
-  //       callback();
-  //     }
-  //   });
-  // }
-  // function convertThumbnail(local,thumbnail,callback) {
-  //   qt.convert({src:__dirname + "/../../client"+local, dst: __dirname + "/../../client"+thumbnail, width:100, height:100}, function(err, filename){
-  //     if(err){
-  //       console.log("******** THUMBNAIL ERROR: "+local+" >> Trying again...");
-  //       console.log(err);
-  //       // try again
-  //       convertThumbnail(local,thumbnail,callback);
-  //     } else {
-  //       console.log("Converting to thumbnail: OK");
-  //       callback();
-  //     }
-  //   });
-  // }
   Schema.remoteMethod(
     'downloadImages',
     {
