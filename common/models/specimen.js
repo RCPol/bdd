@@ -637,16 +637,16 @@ module.exports = function(Specimen) {
       var error = function(err){
         console.log(err)
         if(err.img){                            
-          fs.unlink(err.img.localPath,function(err){            
+          fs.unlink(__dirname + "/../../client"+err.img.local,function(err){            
             if(err) console.log(err);
             else console.log('original file deleted successfully');                
             reject(err);
           });
-          fs.unlink(err.img.resizedPath,function(err){            
+          fs.unlink(__dirname + "/../../client"+err.img.resized,function(err){            
             if(err) console.log(err);
             else console.log('resized file deleted successfully');                            
           });
-          fs.unlink(err.img.thumbnailPath,function(err){            
+          fs.unlink(__dirname + "/../../client"+err.img.thumbnail,function(err){            
             if(err) console.log(err);
             else console.log('thumbnail file deleted successfully');                            
           });
