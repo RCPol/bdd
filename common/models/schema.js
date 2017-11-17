@@ -299,7 +299,7 @@ module.exports = function(Schema) {
 
                       var image = {
                         id: imageId,
-                        original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
+                        original: "https://docs.google.com/uc?id="+imageId.trim(),
                         local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
