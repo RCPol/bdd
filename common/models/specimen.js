@@ -350,38 +350,22 @@ module.exports = function(Specimen) {
                   if(schema["class"]=="Image"){ //se encontrar a classe da imagem
                     //recebe um vetor de images
                     record[schema.id].images = [];
-                    record[schema.id].value.split("|").forEach(function(img,i){   
+                    toString(record[schema.id].value).trim().split("|").forEach(function(img,i){   
                       if(img && img.length>0){
                         var imageId = base+"-"+img.split("?id=")[1];
-                        // var imageId = "pt-BR:"+schema.id.split(":").slice(2).join(":")+":"+record.id.split(":").slice(1).join(":")+":"+i;
-                        // console.log("IMG: ",imageId)
+                        if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
+                        
                         var image = {
-                          id: imageId,
-                          // name: "specimen_" + img.replace("https://drive.google.com/open?id=", ""),
+                          id: imageId,                          
                           original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
                           local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                           resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                           thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
                         }
-                        record[schemaId].images.push(image);
-                      }                      
+                        if(imageId)
+                          record[schemaId].images.push(image);
+                      }
                     });
-
-                    //Função antiga
-                    // record[schema.id].value.split("|").forEach(function(value){
-                    //   recebe o nome da imagem
-                    //   record[schema.id].name = schema.category + value.replace("https://drive.google.com/open?id=", "");
-                    //   recebe o valor da imagem
-                    //   if(typeof value === "string"){
-                    //     record[schema.id].url = value.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=");
-                    //   }
-                    //    save images
-                    //   var image = {url: record[schema.id].url, term:schema.term ,name: record[schema.id].name};
-                    //   if(language==originalLanguage){
-                    //     downloadQueue.push(image); //recebe as imagens
-                    //   }
-                    // });
-
                   } else
                   // REFERENCE
                   if(schema["class"]=="Reference"){

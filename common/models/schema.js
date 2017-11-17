@@ -294,8 +294,9 @@ module.exports = function(Schema) {
                   if (toString(line[8]).trim().length>0) {
                     record.images = [];
                     toString(line[8]).trim().split("|").forEach(function (img,i) {
-                      // var imageId = record.id.split(":").slice(1).join(":")+":"+i;
                       var imageId = base+"-"+img.split("?id=")[1];
+                      if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
+
                       var image = {
                         id: imageId,
                         original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id=").trim(),
@@ -303,7 +304,8 @@ module.exports = function(Schema) {
                         resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
                       }
-                      record.images.push(image); //coloca as imagens no vetor
+                      if(imageId)
+                        record.images.push(image); //coloca as imagens no vetor
                     });
                     // record.image = record.images[0]; // so pega a primeira imagem
                   }
