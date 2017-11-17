@@ -354,10 +354,10 @@ module.exports = function(Specimen) {
                       if(img && img.length>0){
                         var imageId = base+"-"+img.split("?id=")[1];
                         if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
-                        
+
                         var image = {
                           id: imageId,                          
-                          original: img.replace("https://drive.google.com/open?id=","https://docs.google.com/uc?id="),
+                          original: "https://docs.google.com/uc?id="+imageId.trim(),
                           local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                           resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                           thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
