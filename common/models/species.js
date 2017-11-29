@@ -108,12 +108,12 @@ module.exports = function(Species) {
           specimen.id = sp.id;
           specimen.collection = sp.collection;
           species.specimens.push(specimen);          
-          Object.keys(sp).forEach(function(key,index) {
-            if(key!='__cachedRelations'&&key!='__data'&&key!='__dataSource'&&key!='__strict'&&key!='__persisted'&&key!='collection'){
+          Object.keys(sp.toJSON()).forEach(function(key,index) {
+            if(key!='collection'){
               if(sp[key].class=="CategoricalDescriptor"){
-                if(species[key]){
+                if ( species[key] ) {                  
                   species[key].states.concat(sp[key].states);
-                }else{
+                } else {
                   species[key] = sp[key];
                 }
               } else if(sp[key].class=="Sample" || sp[key].schema=="dwc"){

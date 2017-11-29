@@ -9,12 +9,17 @@ require('compression');
 var app = module.exports = loopback();
 
 app.start = function() {
-  app.defineSchemaID = function(base,language, schema, class_, term) {    
+  app.defineSchemaID = function(base,language, schema, class_, term, state) {    
     schema = (typeof schema == 'undefined')?'':String(schema).trim();
     class_ = (typeof class_ == 'undefined')?'':String(class_).trim();
     term = (typeof term == 'undefined')?'':String(term).trim();
-    if(base && base.trim().length>0 && language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0)
-      return base.trim().concat(":").concat(language.trim()).concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
+    state = (typeof state == 'undefined' || state == null)?'':String(state).trim();
+    if(base && base.trim().length>0 && language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0){
+      var id = base.trim().concat(":").concat(language.trim()).concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
+      if(state.trim().length>0)
+        id = id+":"+state.trim();
+      return id;
+    }             
     else
       return null;
   }
@@ -405,7 +410,7 @@ app.model(container);
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {
-  if (err) throw err;
+  // if (err) throw err;
 
   // start the server if `$ node server.js`
   if (require.main === module)

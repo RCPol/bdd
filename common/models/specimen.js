@@ -14,11 +14,11 @@ var util = require('util');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
 
-  Specimen.aggregationByField = function(prefix, base, lang, field, cb) {        
-    
+  Specimen.aggregationByField = function(prefix, base, lang, field, cb) {            
     var queryMongo = { 'language':lang, base:base }        
     var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
-    Specimen.getDataSource().connector.safe = false;    
+    Specimen.getDataSource().connector.safe = false;     
+    
     SpecimenCollection.aggregate([
       { $match: queryMongo},
       { $group: {
@@ -71,6 +71,288 @@ module.exports = function(Specimen) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   }
   
+  function SpecimenHandler(base, originalLanguage, table) {
+    this.count = 0;
+    this.base = base;
+    this.originalLanguage = originalLanguage;
+    this.table = table;
+  }
+  SpecimenHandler.prototype.setSchemas = function(){
+    var self = this;
+    self.schemas = self.table[0];    
+    return this;
+  }
+  SpecimenHandler.prototype.setClasses = function(){
+    var self = this;
+    self.classes = self.table[1];    
+    return this;
+  }
+  SpecimenHandler.prototype.setTerms = function(){
+    var self = this;
+    self.terms = self.table[2];    
+    return this;
+  }
+  SpecimenHandler.prototype.setData = function(){
+    var self = this;
+    self.data = self.table.slice(5,self.table.length);
+    return this;
+  }
+  SpecimenHandler.prototype.processData = function(){
+    var self = this;
+    console.log("2 - PROCESSING DATA!");
+    return new Promise(function(resolve, reject){  
+      function processLine(line,callback){
+        // console.log("3 - PUSHING LINE!");
+        self.processLine(line.line,callback);
+      }    
+      var queue = async.queue(processLine,3);
+      queue.drain(function() {        
+        resolve();
+      });
+      self.data.forEach(function(line) {
+        if(line[1] && line[2] && line[3]){          
+          queue.push({line:line});          
+        }          
+      });
+    });
+  }
+  function SpecimenRecord(base, language, originalLanguage, line){
+    this.base = base;
+    this.language = language;    
+    this.originalLanguage = originalLanguage;    
+    this.line = line;    
+    this.record = {};
+  }
+  SpecimenRecord.prototype.defineId = function(){
+    var self = this;
+    self.id = Specimen.app.defineSpecimenID(self.language,self.line[1],self.line[2],self.line[3]); //definição do id do specimen
+    self.record.id = self.id;
+    return self.id;
+  }
+  SpecimenRecord.prototype.processField = function(term, index, callback){
+    var self = this;    
+    // console.log("7 - PROCESS FIELD!");
+    var Schema = Specimen.app.models.Schema;
+    var base = self.base;
+    var language = self.language;
+    var originalLanguage = self.originalLanguage;
+    var value = toString(self.line[index]).trim();
+    var schema = self.schemas[index];
+    var class_ = self.classes[index];    
+    // Process only if there is value
+    if(term && value != ""){      
+      var fieldId = Specimen.app.defineSchemaID(self.base, self.language, schema, class_, term, null); //define o id do esquema                      
+      if(fieldId){ //se existe id definido no esquema
+        Schema.findById(fieldId,function(err,field) { //busca o id que está no schema
+          if(err){ //se existe erro na busca
+            console.log(err);
+            callback();
+          } else if(field){ //se existe schema
+            self.record.base = base;
+            self.record.language = language; //recebe a linguagem      
+            self.record[fieldId] = field;
+            self.record[fieldId].value = value;
+            self.record[fieldId].values = value.split("|").map(function(item) {
+              return item.trim();
+            });
+            function processStates(cb){
+              var statesValues = value.split("|");
+              self.record[fieldId].states = [];
+              async.each(statesValues, function(stateVal, callbackState) {
+                var stateValue = titleCase(stateVal.trim());                                                                                                       
+                // RETRIEVE THE ORIGINAL STATE                    
+                Schema.findOne({ where:{ base:self.base, language:self.originalLanguage, term:term, vocabulary:stateValue}}, function(err,originalState) {
+                  if(err) console.log(err)
+                  if(originalState){
+                    // NAO PRECISA DE TRADUÇÃO
+                    if(self.originalLanguage == self.language){                      
+                      self.record[fieldId].states.push(originalState.toJSON());
+                      callbackState();
+                    } else {
+                      // RETRIEVE THE TRANSLATED STATE                      
+                      var translatedStateId = Schema.app.defineSchemaID(self.base,self.language, schema, "State", originalState.term, originalState.state);                      
+                      Schema.findById(translatedStateId,function(err,translatedState) {                      
+                        if(translatedState){
+                          self.record[fieldId].states.push(translatedState.toJSON());
+                        } else{
+                          console.log("ERR-001", translatedStateId)
+                        }
+                        callbackState();
+                      });
+                    }                    
+                  } else {                    
+                    callbackState();
+                  }
+                });                                    
+              },function doneState() {                                
+                cb()
+              });
+            }
+            function processRegularFields(){
+              var Collection = Specimen.app.models.Collection;
+              var sID = self.record.id.split(":");
+              var cID = sID[0]+":"+sID[1]+":"+sID[2];                        
+              Collection.findById(cID, function(err,collection) {                
+                if(err) console.log("ERROR FIND COLLECTION: ",err);          
+                if(collection) {                  
+                  self.record.collection = collection.toJSON();                                    
+                } else console.log("ERR-002")
+                callback();              
+              });
+              // EVENT DATE
+              if(field.term=="eventDate"){
+                var parsedDate = value.split("-");
+                if(parsedDate.length==3){
+                    self.record[fieldId].day = {value:parsedDate[2].trim()=="00"||parsedDate[0].trim()=="0"?null:parsedDate[0].trim()};
+                    self.record[fieldId].month = {value:parsedDate[1].trim()=="00"||parsedDate[1].trim()=="0"?null:parsedDate[1].trim()};
+                    self.record[fieldId].year = {value:parsedDate[0].trim()=="0000"||parsedDate[2].trim()=="00"?null:parsedDate[2].trim()};
+                } else {
+                  // TODO: Lógica para pegar valores parcialmente completos
+                  self.record[fieldId].day = {};
+                  self.record[fieldId].month = {};
+                  self.record[fieldId].year = {};                
+                }
+              // IMAGE
+              } else if(field["class"]=="Image"){
+                  self.record[fieldId].images = [];
+                  toString(self.record[fieldId].value).trim().split("|").forEach(function(img,i){   
+                    if(img && img.length>0){
+                      var imageId = base+"-"+img.split("?id=")[1];
+                      if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
+                      var image = {
+                        id: imageId,                          
+                        original: "https://docs.google.com/uc?id="+imageId.trim().split("-")[1],
+                        local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                        resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
+                        thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
+                      }
+                      if(imageId) self.record[fieldId].images.push(image);
+                    }
+                  });
+              // REFERENCE
+              } else if(field["class"]=="Reference"){
+                  self.record[fieldId].references = [];
+                  self.record[fieldId].value.split("|").forEach(function (ref) {
+                    self.record[fieldId].references.push(ref.trim());
+                  });
+              // INTERACTION
+              } else if(field["class"]=="Interaction"){
+                  self.record[fieldId].species = [];
+                  self.record[fieldId].value.split("|").forEach(function (sp) {
+                    self.record[fieldId].species.push(sp.trim());
+                  });
+              // FLOWERING PERIOD
+              } else if(field.term=="floweringPeriod"){
+                  self.record[fieldId].months = [];
+                  self.record[fieldId].value.split("|").forEach(function (month) {
+                    self.record[fieldId].months.push(month.trim());
+                  });
+              // LATITUDE
+              } else if(field.term=="decimalLatitude"){
+                  var converted = convertDMSCoordinatesToDecimal(self.record[fieldId].value.toUpperCase().replace("O","W").replace("L","E"));
+                  if(converted!=self.record[fieldId].value){
+                    self.record[fieldId].rawValue = self.record[fieldId].value;
+                    self.record[fieldId].value = converted;
+                  }
+              // LONGITUDE
+              } else if(field.term=="decimalLongitude"){                            
+                  var converted = convertDMSCoordinatesToDecimal(self.record[fieldId].value.toUpperCase().replace("O","W").replace("L","E"));
+                  if(converted!=self.record[fieldId].value){
+                    self.record[fieldId].rawValue = self.record[fieldId].value;
+                    self.record[fieldId].value = converted;
+                  }
+              }              
+            }
+            // CATEGORICAL DESCRIPTOR
+            if(field["class"]=="CategoricalDescriptor" ){
+              processStates(function(){
+                processRegularFields();
+              })              
+            } else {
+              processRegularFields();
+            }                       
+          } else {
+            // console.log("field does not exist")
+            callback();
+          }        
+        });
+      } else {
+        callback();
+      }
+    } else {
+      callback();
+    }
+  }
+  SpecimenRecord.prototype.processRecord = function(){
+    var self = this;
+    // console.log("6 - PROCESS RECORD!");
+    return new Promise(function(resolve, reject){
+      function processField(term, index, callback){        
+        self.processField(term, index, callback);
+      }
+      async.forEachOf(self.terms, processField, 
+        function done(){
+          // console.log("7 - FIELDS PROCESSED!");
+          resolve();          
+      });      
+    });
+  }
+  SpecimenRecord.prototype.save = function(){
+    // console.log("9 - SAVE!");
+    var self = this;
+    return new Promise(function(resolve, reject){
+      Specimen.upsert(self.record,function(err,data){
+        if(err) reject(err);
+        else resolve();
+      });
+    });
+  }
+  SpecimenHandler.prototype.saveRecord = function(language,line){
+    // console.log("4 - SAVE RECORD!");
+    var self = this;
+    return new Promise(function(resolve, reject){
+      var Schema = Specimen.app.models.Schema;      
+      var record = new SpecimenRecord(self.base,language,self.originalLanguage,line);
+      record.schemas = self.schemas;
+      record.classes = self.classes;
+      record.terms = self.terms;
+      if(record.defineId()){
+        // console.log("5 - ID DEFINED!");
+        record.processRecord().then(function(){
+          // console.log("8 - SAVING")
+          record.save().then(function(){
+            // console.log("10 - SAVED!");
+            resolve();
+          }).catch(function(e){reject(e)});
+        }).catch(function(e){reject(e)});        
+      } else {
+        reject("ID could not be defined");
+      }          
+    });
+  }
+  SpecimenHandler.prototype.processLine = function(line,callback){
+    var self = this;    
+    Promise.all([
+      new Promise(function(resolve, reject){
+        self.saveRecord("en-US",line).then(function(){resolve()}).catch(function(e){reject(e)})
+      }),
+      new Promise(function(resolve, reject){
+        self.saveRecord("pt-BR",line).then(function(){resolve()}).catch(function(e){reject(e)})
+      }),
+      new Promise(function(resolve, reject){
+        self.saveRecord("es-ES",line).then(function(){resolve()}).catch(function(e){reject(e)})
+      })
+    ]).then(function() {
+      console.log(self.count++);
+      // console.log("11 - LINE PROCESSED!");
+        callback();
+      })
+      .catch(function(error){
+        console.log("ERR-003", error)
+        callback();
+      });    
+  }  
+  
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
   Specimen.inputFromURL = function(id,language, base, cb) {
@@ -82,7 +364,8 @@ module.exports = function(Specimen) {
       key.private_key,
       [SCOPES],
       null
-    );    
+    );
+    
     jwtClient.authorize(function (err, tokens) {
       if (err) {
         console.log(err.errorDescription,err.error_description,tokens);
@@ -101,266 +384,29 @@ module.exports = function(Specimen) {
               return;          
             }                   
             Specimen.destroyAll({base:base},function(err,d_){
-              console.log("Apagado!")
-              var data = d.values;  
-              var schema = data[0]; //define o schema
-              var class_ = data[1]; //define a classe
-              var terms = data[2]; //define o termo
-              // var category = data[3];
-              var label = data[4]; //define o rotulo      
-              data =  data.slice(5,data.length); //recebe a quantidade de dados da planilha      
-              var response = {}; //resposta de execução
-              response.count = 0;      
-              var queue = async.queue(function(rec, callback){ //para cada linha lida salve os dados        
-                  var line = rec.line;          
-                  async.parallel([
-                    function(callbackSave) {
-                      // console.log("start en-US",line);
-                      //para salvar em  inglês
-                      saveRecord(base, language,"en-US",line, schema, class_, terms, function() {
-                        // console.log("finish en-US");
-                        callbackSave();
-                      });
-                    },
-                    function(callbackSave) {
-                      // console.log("start pt-BR", line);
-                      //para salvar em português
-                      saveRecord(base, language,"pt-BR",line, schema, class_, terms, function() {
-                        // console.log("finish pt-BR");
-                        callbackSave();
-                      });
-                    },
-                    function(callbackSave) {
-                      // console.log("start es-ES",line);
-                      //para salvar em espanhol
-                      saveRecord(base, language,"es-ES",line, schema, class_, terms, function() {
-                        // console.log("finish es-ES");
-                        callbackSave();
-                      });
-                    }
-                  ],function done() {
-                    console.log("COUTING: ",response.count++);
-                    callback(); //retorno da função
-                  });             
-              },3);
-              queue.drain(function() {
-                //executa o download das image
-              // downloadImages(downloadQueue, redownload);
-                console.log("Done.");
-                for (var key in logs) {
-                  console.log(logs[key]);
-                }          
-              });
-              console.log("SIZE: ",data.length);
-              data.forEach(function(line) {
-                if(line[1] && line[2] && line[3]){          
-                  queue.push({line:line});          
-                }          
-              });
-              cb(null, "Loading");
+              console.log("1 - Apagado!");
+              var start = new Date();
+              var data = d.values;
+              var handler = new SpecimenHandler(base, language, data);
+              handler.setSchemas().setClasses().setTerms().setData();
+              handler.processData()
+                .then(function(){
+                  var speciesTime = new Date();
+                  console.log("TERMINADO SPECIMEN",speciesTime-start);
+                  var Species = Specimen.app.models.Species;                  
+                  Species.fromSpecimensAggregation(base, {}, function(err,data){
+                    console.log("TERMINADO SPECIES",new Date()-speciesTime);
+                    cb(null,new Date()-start);
+                  });                  
+                })
+                .catch(function(error){
+                  console.log("processData error", error);
+                  cb(error,null);
+                });              
             });
           });
     });
-  };
-  function saveRecord(base, originalLanguage,language,line, schema, class_, terms, callback) {
-    var Schema = Specimen.app.models.Schema; //usando o schema
-    var c = 0;
-    var record = {}; //dados as serem gravados no banco    
-    record.id = Specimen.app.defineSpecimenID(language,line[1],line[2],line[3]); //definição do id do specimen
-    if(record.id){   //se o id existir execute
-      //para termo da planilha
-      async.each(terms, function(term, callbackCell){
-        c++;
-        //se existe o termo e a linha existe da amostra
-        if(term && toString(line[c]) != ""){
-          var schemaId = Specimen.app.defineSchemaID(base, language,schema[c],class_[c],terms[c]); //define o id do esquema          
-          record.language = language; //recebe a linguagem
-          record.originalLanguage = originalLanguage;  //linguagem original
-          record[schemaId] = {value:toString(line[c])}; //recebe o valor da linha que esta sendo lida
-          record.base = base;
-          if(schemaId){ //se existe id definido no esquema
-            Schema.findById(schemaId,function(err,schema) { //busca o id que está no schema
-              if(err) //se existe erro na busca
-                console.log(err);
-              if(schema){ //se existe schema
-                var value = toString(record[schema.id].value); //pega o valor do schema
-                record[schema.id] = schema;
-                // CATEGORICAL DESCRIPTOR
-                if(schema["class"]=="CategoricalDescriptor" ){                  
-                  record[schema.id].value = value;
-                  record[schema.id].states = [];
-                  async.each(value.split("|"), function(sValue, callbackState) {
-                    var stateValue = titleCase(sValue.trim());
-                    if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("stateValue: ",stateValue)
-                    // if(language==originalLanguage){
-                    // //  SAME LANGUAGE
-                    //   if(stateValue.length>0){
-                    //     Schema.findOne({where:{base:base,language:originalLanguage,class:"State",field:schema.field,state:stateValue}}, function(err,state) {
-                    //       if(state){
-                    //         record[schema.id].states.push(state.toJSON());
-                    //       }else {
-                    //         logs[hash.MD5("STATE NOT FOUND Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
-                    //       }
-                    //       callbackState();
-                    //     });
-                    //   } else {
-                    //     logs[hash.MD5("EMPTY STATE Field: "+schema.field)] = "STATE NOT FOUND\tField: "+schema.field;
-                    //     callbackState();
-                    //   }
-                    // } else {
-                    // DIFFERENT LANGUAGES
-                      var schemaIdOriginal = Specimen.app.defineSchemaID(base, originalLanguage,schema.schema,schema["class"],schema.term);
-                      if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("schemaIdOriginal: ",schemaIdOriginal)
-                      Schema.findById(schemaIdOriginal,function(err,schemaOriginal) { 
-                        if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("schemaOriginal: ",schemaOriginal)                       
-                        if(schemaOriginal){
-
-                          Schema.findOne({where:{base:base, language:originalLanguage, field:schemaOriginal.field,state:stateValue}}, function(err,state) {                            
-                            if(state){                              
-                              var id = Schema.app.defineSchemaID(base,language, state.schema, state.class, state.term);
-                              if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("id: ",id);
-                              Schema.findById(id,function(err,translatedState) {
-                                if(schema["term"] == "vegetalFormationType" && stateValue == "Cerrado") console.log("translatedState: ",translatedState)
-                                if(translatedState){
-                                  record[schema.id].states.push(translatedState.toJSON());
-                                } else{
-                                  logs[hash.MD5("STATE NOT FOUND "+"Field: "+schema.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schema.field+"\tState: "+stateValue;
-                                }
-                                callbackState();
-                              });
-                            } else {
-                              logs[hash.MD5("STATE NOT FOUND Field: "+schemaOriginal.field+"State: "+stateValue)] = "STATE NOT FOUND\tField: "+schemaOriginal.field+"\tState: "+stateValue;
-                              callbackState();
-                            }
-                          });
-                        } else {
-                          console.log("NOT FOUND: ",schemaIdOriginal);
-                          callbackState();
-                        }
-                      });
-                    // }
-                  },function doneState() {
-                    callbackCell();
-                  });
-                // OTHER FIELDS
-                } else {
-                record[schema.id].value = value;
-                if(value.split("|").length>1){
-                  record[schema.id].values = value.split("|").map(function(item) {
-                    return item.trim();
-                  });                  
-                } else {
-                  record[schema.id].values = [value];
-                }
-                // EVENT DATE
-                if(schema.term=="eventDate"){
-                  var parsedDate = record[schema.id].value.split("-");
-                  if(parsedDate.length==3){
-                      record[schema.id].day = {value:parsedDate[2].trim()=="00"||parsedDate[0].trim()=="0"?null:parsedDate[0].trim()};
-                      record[schema.id].month = {value:parsedDate[1].trim()=="00"||parsedDate[1].trim()=="0"?null:parsedDate[1].trim()};
-                      record[schema.id].year = {value:parsedDate[0].trim()=="0000"||parsedDate[2].trim()=="00"?null:parsedDate[2].trim()};
-                  } else {
-                    record[schema.id].day = {};
-                    record[schema.id].month = {};
-                    record[schema.id].year = {};
-                    logs[hash.MD5("INVALID FORMAT OF DATE Field: "+schema.field+"State: "+record[schema.id].value)] = "INVALID FORMAT OF DATE\tField: "+schema.field+"\tState: "+record[schema.id].value;
-                  }
-                } else
-                  // IMAGE
-                  //encontra class image no schema
-                  if(schema["class"]=="Image"){ //se encontrar a classe da imagem
-                    //recebe um vetor de images
-                    record[schema.id].images = [];
-                    toString(record[schema.id].value).trim().split("|").forEach(function(img,i){   
-                      if(img && img.length>0){
-                        var imageId = base+"-"+img.split("?id=")[1];
-                        if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
-
-                        var image = {
-                          id: imageId,                          
-                          original: "https://docs.google.com/uc?id="+imageId.trim().split("-")[1],
-                          local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                          resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
-                          thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
-                        }
-                        if(imageId)
-                          record[schemaId].images.push(image);
-                      }
-                    });
-                  } else
-                  // REFERENCE
-                  if(schema["class"]=="Reference"){
-                    record[schema.id].references = [];
-                    record[schema.id].value.split("|").forEach(function (ref) {
-                      record[schema.id].references.push(ref.trim());
-                    });
-                  } else
-                  // INTERACTION
-                  if(schema["class"]=="Interaction"){
-                    record[schema.id].species = [];
-                    record[schema.id].value.split("|").forEach(function (sp) {
-                      record[schema.id].species.push(sp.trim());
-                    });
-                  } else
-                  // FLOWERING PERIOD
-                  if(schema.term=="floweringPeriod"){
-                    record[schema.id].months = [];
-                    record[schema.id].value.split("|").forEach(function (month) {
-                      record[schema.id].months.push(month.trim());
-                    });
-                  } else
-                  // LATITUDE
-                  if(schema.term=="decimalLatitude"){
-                    var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
-                    if(converted!=record[schema.id].value){
-                      record[schema.id].rawValue = record[schema.id].value;
-                      record[schema.id].value = converted;
-                    }
-                  } else
-                  // LONGITUDE
-                  if(schema.term=="decimalLongitude"){
-                    var converted = convertDMSCoordinatesToDecimal(record[schema.id].value.toUpperCase().replace("O","W").replace("L","E"));
-                    if(converted!=record[schema.id].value){
-                      record[schema.id].rawValue = record[schema.id].value;
-                      record[schema.id].value = converted;
-                    }
-                  }
-                  callbackCell();
-              }
-            } else {
-                callbackCell();
-              }
-            });
-          } else {
-            callbackCell();
-          }
-        } else {
-          callbackCell();
-        }
-      },function done() {
-        var Collection = Specimen.app.models.Collection;
-        var sID = record.id.split(":");
-        var cID = sID[0]+":"+sID[1]+":"+sID[2];   
-        console.log(sID);
-        console.log(cID);             
-        Collection.findById(cID, function(err,collection) {          
-          if(err) console.log("ERROR FIND COLLECTION: ",err);          
-          record.collection = collection;
-          
-          Specimen.upsert(record,function (err,instance) {
-            if(err){
-              console.log("ERROR: ",err);              
-              console.log("RECORD: ",record);
-            }              
-            callback();
-          });
-        });        
-      });
-    } else {
-      console.log("Cannot define an ID for specimen: ",language,line[1],line[2],line[3]);
-      callback();
-    }
-  }
+  };  
 
   Specimen.downloadImages = function (base,cb) {
     function error (err){cb(err,null)}

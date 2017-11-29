@@ -147,11 +147,11 @@
 		var filter = new Filter(identification);
 		filter.getVocabulary("","{{base}}:"+identification.internacionalization.language+":dwc:RecordLevel:institutionCode","Código da Instituição");
 		var filter = new Filter(identification);
-		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:collectionName","Nome da Coleção");
+		filter.getVocabulary("collection.","{{base}}:"+identification.internacionalization.language+":rcpol:Collection:collectionName","Nome da Coleção");
 		var filter = new Filter(identification);
-		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:institutionName","Nome da Institutição");
+		filter.getVocabulary("collection.","{{base}}:"+identification.internacionalization.language+":rcpol:Collection:institutionName","Nome da Institutição");
 		var filter = new Filter(identification);
-		filter.getVocabulary("collection.",identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório");
+		filter.getVocabulary("collection.","{{base}}:"+identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório");
 	}	
 	$(document).ready(function(){		
 		identification.internacionalization.base = '{{base}}';

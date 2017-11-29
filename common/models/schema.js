@@ -252,7 +252,7 @@ module.exports = function(Schema) {
               async.each(rs.values, function iterator(line, callback){            
                 //line é o campo da tabela
                 var record = {};
-                record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2]);
+                record.id = Schema.app.defineSchemaID(base,language,line[0],line[1],line[2],line[3]);
                 record.order = response.count;
                 record.base = base;
                 if(record.id){
@@ -261,39 +261,42 @@ module.exports = function(Schema) {
                   record.class = toString(line[1]).trim();
                   record.term = toString(line[2]).trim();
                   if (toString(line[3]).trim().length>0) {
-                    record.category = titleCase(toString(line[3]).trim());
+                    record.state = toString(line[3]).trim();
                   }
                   if (toString(line[4]).trim().length>0) {
-                    record.field = titleCase(toString(line[4]).trim());
+                    record.category = titleCase(toString(line[4]).trim());
                   }
                   if (toString(line[5]).trim().length>0) {
-                    record.state = titleCase(toString(line[5]).trim());
+                    record.field = titleCase(toString(line[5]).trim());
                   }
                   if (toString(line[6]).trim().length>0) {
-                    record.definition = toString(line[6]).trim();
+                    record.vocabulary = titleCase(toString(line[6]).trim());
                   }
                   if (toString(line[7]).trim().length>0) {
+                    record.definition = toString(line[7]).trim();
+                  }
+                  if (toString(line[8]).trim().length>0) {
                     record.references = [];
-                    toString(line[7]).trim().split("|").forEach(function (ref) {
+                    toString(line[8]).trim().split("|").forEach(function (ref) {
                       record.references.push(ref.trim());
                     });
                   }
-                  if (toString(line[9]).trim().length>0) {
+                  if (toString(line[10]).trim().length>0) {
                     record.credits = [];
-                    toString(line[9]).trim().split("|").forEach(function (ref) {
+                    toString(line[10]).trim().split("|").forEach(function (ref) {
                       record.credits.push(ref.trim());
                     });
                   }                  
-                  if (toString(line[10]).trim().length>0) {
-                    record.contexts = [];
-                    toString(line[10]).trim().split("|").forEach(function (context) {
-                      record.contexts.push(context.trim());
-                    });
-                  }
+                  // if (toString(line[10]).trim().length>0) {
+                  //   record.images = [];
+                  //   toString(line[10]).trim().split("|").forEach(function (context) {
+                  //     record.images.push(context.trim());
+                  //   });
+                  // }
                   //ler o campo das imagens
-                  if (toString(line[8]).trim().length>0) {
+                  if (toString(line[9]).trim().length>0) {
                     record.images = [];
-                    toString(line[8]).trim().split("|").forEach(function (img,i) {
+                    toString(line[9]).trim().split("|").forEach(function (img,i) {
                       var imageId = base+"-"+img.split("?id=")[1];
                       if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
 
