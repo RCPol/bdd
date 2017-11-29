@@ -106,9 +106,9 @@ module.exports = function(Specimen) {
         self.processLine(line.line,callback);
       }    
       var queue = async.queue(processLine,3);
-      queue.drain(function() {        
+      queue.drain = function() {        
         resolve();
-      });
+      };
       self.data.forEach(function(line) {
         if(line[1] && line[2] && line[3]){          
           queue.push({line:line});          

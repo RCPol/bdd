@@ -11,13 +11,12 @@ Filter.prototype.getVocabulary = function(prefix,field,label){
       $('#selected-'+selector).append('<option value="'+item._id+'">'+item._id+'</option>');      
     });    
     $('#selected-'+selector).unbind('change')
-    $('#selected-'+selector).on('change', function(e) {      
+    $('#selected-'+selector).on('change', function(e) {
       self.identification.filter = self.identification.filter?self.identification.filter:{};
-      console.log("FILTER: ",self.identification.filter)
+      
       if(this.value == '')
         delete self.identification.filter[field];  
-      else {
-        console.log("VALUE**** : ",this.value);
+      else {        
         self.identification.filter[field] = this.value;
       }
       self.identification.identify();
