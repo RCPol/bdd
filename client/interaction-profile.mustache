@@ -155,11 +155,11 @@
 			return -1;        
 		}		
 		function load(){
-			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {
+			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {				
 				// IN				
-				var json = {nodes: [], links:[]};
-				console.log(interactions);
+				var json = {nodes: [], links:[]};				
 				var data = interactions.response.map(function(item){
+					console.log(item);
 						var d = {
 								species: item._id.plant?item._id.plant:"", 
 								value: item.avgQuantity?item.avgQuantity:0, 
