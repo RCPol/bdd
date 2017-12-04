@@ -149,14 +149,14 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
               // NORMAL CATEGORICAL DESCRIPTOR
               params.value[domIdValue] = "";
               specimen[key].states.forEach(function(state) {
-                params.value[domIdValue] += state.state+", ";
+                params.value[domIdValue] += state.vocabulary+", ";
               });
               params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
 
               // POLLEN SIZE
               if(specimen[key].term=="pollenSize"){
                 if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].state;
+                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
                 } else {            
                   var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
                   var lowestIndex = Infinity;
@@ -167,11 +167,11 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       var position  = order.indexOf(state.term);
                       if(position < lowestIndex) {
                         lowestIndex = position;
-                        lowestValue = state.state;
+                        lowestValue = state.vocabulary;
                       }
                       if(position > highestIndex) {
                         highestIndex = position;
-                        highestValue = state.state;
+                        highestValue = state.vocabulary;
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
@@ -181,7 +181,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
               // POLLEN SHAPE
               if(specimen[key].term=="pollenShape"){
                 if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].state;
+                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
                 } else {            
                   var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
                   var lowestIndex = Infinity;
@@ -192,11 +192,11 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       var position  = order.indexOf(state.term);
                       if(position < lowestIndex) {
                         lowestIndex = position;
-                        lowestValue = state.state;
+                        lowestValue = state.vocabulary;
                       }
                       if(position > highestIndex) {
                         highestIndex = position;
-                        highestValue = state.state;
+                        highestValue = state.vocabulary;
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
@@ -206,7 +206,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
               // FLOWER SIZE
               if(specimen[key].term=="flowerSize"){
                 if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].state;
+                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
                 } else {            
                   var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];
                   var lowestIndex = Infinity;
@@ -217,11 +217,11 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       var position  = order.indexOf(state.term);
                       if(position < lowestIndex) {
                         lowestIndex = position;
-                        lowestValue = state.state;
+                        lowestValue = state.vocabulary;
                       }
                       if(position > highestIndex) {
                         highestIndex = position;
-                        highestValue = state.state;
+                        highestValue = state.vocabulary;
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
