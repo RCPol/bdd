@@ -154,7 +154,9 @@ module.exports = function(Interaction) {
             rs.values.shift();
             rs.values.shift();            
             rs.values.forEach(function(line){
-              if(Number(line[4])>0){
+              var val = Number(new String(line[4]).replace(",","."));
+              console.log(val)
+              if(val > 0){
                 var i = {};
                 i.dataset = id;
                 i.modified = new Date();
@@ -162,7 +164,7 @@ module.exports = function(Interaction) {
                 i.plant = line[1];
                 i.type = line[2];
                 i.pollinator = line[3];              
-                i.percentual = Number(line[4]);
+                i.percentual = val;
                 i.author = line[5];
                 i.municipality = line[6];
                 i.state = line[7];
