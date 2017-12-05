@@ -556,7 +556,7 @@ module.exports = function(Specimen) {
     var self =  this;    
     return new Promise(function(resolve, reject){      
       console.log("imagem nao existe");            
-      request(img.original, {encoding: 'binary'}, function(err, response, body){
+      request(img.original, {encoding: 'binary', timeout: 10000}, function(err, response, body){
         if (err){          
             console.log("Error to download "+img.original);                        
             reject({img:img.raw});
