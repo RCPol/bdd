@@ -447,7 +447,7 @@ module.exports = function(Specimen) {
           console.log("download realizado com sucesso");
           cb();
         }).catch(function(error){
-          console.log("erro ao fazer download de imagem");          
+          console.log("erro ao fazer download de imagem", error);          
           if(error.img) {
             console.log("adicionou imagem no final da fila")
             processing.push(img);
