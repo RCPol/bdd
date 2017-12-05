@@ -561,7 +561,7 @@ module.exports = function(Specimen) {
             console.log("Error to download "+img.original);                        
             reject({img:img.raw});
         } else {
-          console.log("imagem baixada")
+          console.log("imagem baixada",body);          
           img.downloadedContent = body;
           resolve(img);          
         }
@@ -583,7 +583,8 @@ module.exports = function(Specimen) {
     });
   }
   ImageDownloader.prototype.writeOriginalImage = function(img) {
-    var self =  this;        
+    var self =  this;
+    console.log("writeOriginalImage")
     return new Promise(function(resolve, reject){
       fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
         if(err){
@@ -598,7 +599,8 @@ module.exports = function(Specimen) {
   ImageDownloader.prototype.download = function(img) {    
     var self = this;        
     return new Promise(function(resolve, reject){      
-      var error = function(err){      
+      var error = function(err){   
+        console.log(err)   
         if(err.img){                            
           fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
             if(err_) console.log("original não apagado");
@@ -637,7 +639,7 @@ module.exports = function(Specimen) {
             resolve();          
           });
         }          
-        else return downloadImage().then(self.writeOriginalImage);
+        else return downloadImage().then(self.writeOriginalImage).catch(function(err){console.log("err em downloadImage",err)});
       }
       // RESIZED
       var isResizedExists = function(){
