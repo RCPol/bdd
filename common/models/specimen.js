@@ -588,7 +588,7 @@ module.exports = function(Specimen) {
     return new Promise(function(resolve, reject){
       fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
         if(err){
-          console.log("erro para gravar", err, img.downloadedContent);
+          console.log("erro para gravar", err);
           reject({img:img.raw});
         } else {
           resolve(img);
