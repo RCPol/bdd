@@ -17,7 +17,7 @@ function readGlossary(base,id){
     } else if(data["class"]=="Category"){
       name = data.category;
     } else if(data["class"]=="State"){
-      name = data.state;
+      name = data.vocabulary;
     }
     var description = "Não disponível";
     if(data.definition)

@@ -154,8 +154,7 @@ module.exports = function(Interaction) {
             rs.values.shift();
             rs.values.shift();            
             rs.values.forEach(function(line){
-              var val = Number(new String(line[4]).replace(",","."));
-              console.log(val)
+              var val = Number(new String(line[4]).replace(",","."));              
               if(val > 0){
                 var i = {};
                 i.dataset = id;

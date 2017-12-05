@@ -22,7 +22,7 @@ Identification.prototype.tooltipConfig = function() {
       var element = $( this );
       if ( element.is( ".vglos" )) {
         var id = element.attr( "alt" );
-        $.get("/profile/glossary/individual/"+self.base+"/"+id,function(data) {         
+        $.get("/profile/glossary/individual/"+self.base+"/"+id,function(data) {
           callback(data);
         });
       } 
@@ -161,7 +161,7 @@ Identification.prototype.createDescriptors = function(callback) {
       if(typeof self.descriptors[state.category][state.field][state.state] == "undefined"){
         self.descriptors[state.category][state.field][state.state] = self.descriptors[state.category][state.field][state.state]?self.descriptors[state.category][state.field][state.state]:{};
         self.descriptors[state.category][state.field][state.state].htmlId = "state_"+(state.category+state.field+state.state).htmlId();
-        self.descriptors[state.category][state.field][state.state].value = state.state;
+        self.descriptors[state.category][state.field][state.state].value = state.vocabulary;
         self.descriptors[state.category][state.field][state.state].id = state.id;
         self.descriptors[state.category][state.field][state.state].html = $('<div onclick="identification.selectState(\''+state.id+'\').identify();" class="vimagens" id="'+self.descriptors[state.category][state.field][state.state].htmlId+'" name="'+state.id+'"><p><img src="'+stateImg+'" onerror=\'imageError(this)\' class="vimg mCS_img_loaded" id="desc_for_Planta_img_19ec1de76b8f8798054c5bdc3a74abb6"><a href="/profile/glossary/'+self.base+'/19ec1de76b8f8798054c5bdc3a74abb6" target="_blank"><img alt="'+self.descriptors[state.category][state.field][state.state].id+'" src="/img/'+self.base+'_glo.png" class="lala vglos mCS_img_loaded"></a>  '+self.descriptors[state.category][state.field][state.state].value+' <span id="count_'+self.descriptors[state.category][state.field][state.state].htmlId+'"></span></p></div>');
       }
