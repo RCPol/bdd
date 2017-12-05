@@ -447,7 +447,7 @@ module.exports = function(Specimen) {
           console.log("download realizado com sucesso");
           cb();
         }).catch(function(error){
-          console.log("erro ao fazer download de imagem", error);          
+          console.log("erro ao fazer download de imagem");          
           if(error.img) {
             console.log("adicionou imagem no final da fila")
             processing.push(img);
@@ -586,7 +586,8 @@ module.exports = function(Specimen) {
     var self =  this;        
     return new Promise(function(resolve, reject){
       fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
-        if(err){          
+        if(err){
+          console.log("erro para gravar", err, img.downloadedContent);
           reject({img:img.raw});
         } else {
           resolve(img);
@@ -597,8 +598,7 @@ module.exports = function(Specimen) {
   ImageDownloader.prototype.download = function(img) {    
     var self = this;        
     return new Promise(function(resolve, reject){      
-      var error = function(err){
-        console.log(err)
+      var error = function(err){      
         if(err.img){                            
           fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
             if(err_) console.log("original não apagado");
