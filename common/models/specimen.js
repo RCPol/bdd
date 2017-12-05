@@ -226,10 +226,12 @@ module.exports = function(Specimen) {
                   toString(self.record[fieldId].value).trim().split("|").forEach(function(img,i){   
                     if(img && img.length>0){
                       var imageId = base+"-"+img.split("?id=")[1];
-                      if(typeof img.split("?id=")[1] == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
+                      if(typeof img.split("?id=")[1] == "undefined") imageId = base+"-"+img.split("file/d/")[1];  
+                      var googleImageId = imageId.trim().split("-");
+                      googleImageId.shift();                      
                       var image = {
                         id: imageId,                          
-                        original: "https://docs.google.com/uc?id="+imageId.trim().split("-")[1],
+                        original: "https://docs.google.com/uc?id="+googleImageId.join("-"),
                         local: "/images/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         resized: "/resized/" + imageId + ".jpeg", //atribui a url onde vai ser salva a imagem
                         thumbnail: "/thumbnails/" + imageId + ".jpeg" //atribui a url onde vai ser salva a imagem
