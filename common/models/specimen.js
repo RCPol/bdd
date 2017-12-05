@@ -561,7 +561,7 @@ module.exports = function(Specimen) {
             console.log("Error to download "+img.original);                        
             reject({img:img.raw});
         } else {
-          console.log("imagem baixada",body);          
+          console.log("imagem baixada");          
           img.downloadedContent = body;
           resolve(img);          
         }
