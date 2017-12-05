@@ -23,12 +23,13 @@ app.start = function() {
     else
       return null;
   }
-  app.defineSpecimenID = function(language, institutionCode, collectionCode, catalogNumber) {
+  app.defineSpecimenID = function(base, language, institutionCode, collectionCode, catalogNumber) {    
     catalogNumber = (typeof catalogNumber == 'undefined')?'':String(catalogNumber).trim();
     collectionCode = (typeof collectionCode == 'undefined')?'':String(collectionCode).trim();
-    institutionCode = (typeof institutionCode == 'undefined')?'':String(institutionCode).trim();
-    if(language && language.trim().length>0 && institutionCode.trim().length>0 && collectionCode.trim().length>0 && catalogNumber.trim().length>0)
-      return language.trim().concat(":").concat(institutionCode.trim()).concat(":").concat(collectionCode.trim()).concat(":").concat(catalogNumber.trim());
+    institutionCode = (typeof institutionCode == 'undefined')?'':String(institutionCode).trim();    
+    if(base && base.trim().length>0 && language && language.trim().length>0 && institutionCode.trim().length>0 && collectionCode.trim().length>0 && catalogNumber.trim().length>0){      
+      return base.trim().concat(":").concat(language.trim()).concat(":").concat(institutionCode.trim()).concat(":").concat(collectionCode.trim()).concat(":").concat(catalogNumber.trim());
+    }      
     else
       return null;
   }
@@ -101,7 +102,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
   var Specimen = app.models.Specimen;
   var params = {};
   params.id =req.params.id;
-  params.language = req.params.id.split(":")[0];
+  params.language = req.params.id.split(":")[1];
   params.value = {};
   async.parallel([
     function(callback) {
@@ -111,9 +112,8 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
       profilesLabel(params,callback);
     },
     function(callback) {
-      var parsedId = params.id.split(":");
-      console.log([parsedId[0],parsedId[1],parsedId[2]].join(":"),params)
-      collection([parsedId[0],parsedId[1],parsedId[2]].join(":"),params,callback);      
+      var parsedId = params.id.split(":");      
+      collection([parsedId[1],parsedId[2],parsedId[3]].join(":"),params,callback);      
     },
     function specimen(callback) {
       Specimen.findById(params.id,function(err,specimen) {

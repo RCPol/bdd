@@ -3,7 +3,8 @@ function Filter(identification) {
 }
 Filter.prototype.getVocabulary = function(prefix,field,label){
   var self = this;  
-  $.get("/api/Specimens/aggregationByField?prefix="+prefix+"&base="+self.identification.base+"&lang="+self.identification.internacionalization.language+"&field="+field,function(rs) {     
+  // console.log("/api/Specimens/aggregationByField?prefix="+prefix+"&base="+self.identification.base+"&lang="+self.identification.internacionalization.language+"&field="+field)
+  $.get("/api/Specimens/aggregationByField?prefix="+prefix+"&base="+self.identification.base+"&lang="+self.identification.internacionalization.language+"&field="+field,function(rs) {    
     var selector = field.split(":").slice(-3).join("-");      
     $('#selected-'+selector).html('<option value=""></option>');
     

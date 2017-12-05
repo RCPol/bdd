@@ -18,7 +18,14 @@ module.exports = function(Specimen) {
     var queryMongo = { 'language':lang, base:base }        
     var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
     Specimen.getDataSource().connector.safe = false;     
-    
+    console.log(JSON.stringify([
+      { $match: queryMongo},
+      { $group: {
+        _id: '$'+prefix+field+'.value',
+        count: {$sum:1}
+        }
+      }
+    ]));    
     SpecimenCollection.aggregate([
       { $match: queryMongo},
       { $group: {
@@ -26,7 +33,8 @@ module.exports = function(Specimen) {
         count: {$sum:1}
         }
       }
-    ], function (err, states) {          
+    ], function (err, states) { 
+      console.log("ESTADO/ERROR",err,states)         
       // var results = {values: states};
       console.log("ERROR: ",err);
       var results = {values: []};
@@ -124,9 +132,9 @@ module.exports = function(Specimen) {
     this.record = {};
   }
   SpecimenRecord.prototype.defineId = function(){
-    var self = this;
-    self.id = Specimen.app.defineSpecimenID(self.language,self.line[1],self.line[2],self.line[3]); //definição do id do specimen
-    self.record.id = self.id;
+    var self = this;    
+    self.id = Specimen.app.defineSpecimenID(self.base, self.language,self.line[1],self.line[2],self.line[3]); //definição do id do specimen
+    self.record.id = self.id;    
     return self.id;
   }
   SpecimenRecord.prototype.processField = function(term, index, callback){
@@ -191,7 +199,7 @@ module.exports = function(Specimen) {
             function processRegularFields(){
               var Collection = Specimen.app.models.Collection;
               var sID = self.record.id.split(":");
-              var cID = sID[0]+":"+sID[1]+":"+sID[2];                        
+              var cID = sID[1]+":"+sID[2]+":"+sID[3];                        
               Collection.findById(cID, function(err,collection) {                
                 if(err) console.log("ERROR FIND COLLECTION: ",err);          
                 if(collection) {                  
@@ -316,6 +324,7 @@ module.exports = function(Specimen) {
       record.schemas = self.schemas;
       record.classes = self.classes;
       record.terms = self.terms;
+      record.base = self.base;
       if(record.defineId()){
         // console.log("5 - ID DEFINED!");
         record.processRecord().then(function(){
@@ -396,6 +405,7 @@ module.exports = function(Specimen) {
                   var Species = Specimen.app.models.Species;                  
                   Species.fromSpecimensAggregation(base, {}, function(err,data){
                     console.log("TERMINADO SPECIES",new Date()-speciesTime);
+                    console.log("TERMINADO",new Date()-start);
                     cb(null,new Date()-start);
                   });                  
                 })
