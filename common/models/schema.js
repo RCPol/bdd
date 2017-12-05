@@ -298,7 +298,7 @@ module.exports = function(Schema) {
                     record.images = [];
                     toString(line[9]).trim().split("|").forEach(function (img,i) {
                       var imageId = base+"-"+img.split("?id=")[1];
-                      if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
+                      if(typeof img.split("?id=")[1] == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
 
                       var image = {
                         id: imageId,

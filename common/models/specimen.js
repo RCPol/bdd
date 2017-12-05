@@ -226,7 +226,7 @@ module.exports = function(Specimen) {
                   toString(self.record[fieldId].value).trim().split("|").forEach(function(img,i){   
                     if(img && img.length>0){
                       var imageId = base+"-"+img.split("?id=")[1];
-                      if(typeof imageId == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
+                      if(typeof img.split("?id=")[1] == "undefined") imageId = base+"-"+img.split("file/d/")[1];                        
                       var image = {
                         id: imageId,                          
                         original: "https://docs.google.com/uc?id="+imageId.trim().split("-")[1],
