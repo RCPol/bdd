@@ -548,20 +548,20 @@ module.exports = function(Specimen) {
   ImageDownloader.prototype.imageExists = function() {
     var self =  this;
     return new Promise(function(resolve, reject){   
-      console.log("imagem existe")   
+      // console.log("imagem existe")   
       resolve();      
     });
   }
   ImageDownloader.prototype.downloadImage = function(img) {
     var self =  this;    
     return new Promise(function(resolve, reject){      
-      console.log("imagem nao existe");            
+      // console.log("imagem nao existe");            
       request(img.original, {encoding: 'binary', timeout: 10000}, function(err, response, body){
         if (err){          
             console.log("Error to download "+img.original);                        
             reject({img:img.raw});
         } else {
-          console.log("imagem baixada");          
+          // console.log("imagem baixada");          
           img.downloadedContent = body;
           resolve(img);          
         }
@@ -584,7 +584,7 @@ module.exports = function(Specimen) {
   }
   ImageDownloader.prototype.writeOriginalImage = function(img) {
     var self =  this;
-    console.log("writeOriginalImage")
+    // console.log("writeOriginalImage")
     return new Promise(function(resolve, reject){
       fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
         if(err){
@@ -599,9 +599,9 @@ module.exports = function(Specimen) {
   ImageDownloader.prototype.download = function(img) {    
     var self = this;        
     return new Promise(function(resolve, reject){      
-      var error = function(err){   
-        console.log(err)   
-        if(err.img){                            
+      var error = function(err){           
+        if(err.img){               
+          console.log(err.img.original)             
           fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
             if(err_) console.log("original não apagado");
             else console.log('original file deleted successfully');                
@@ -632,9 +632,9 @@ module.exports = function(Specimen) {
         return self.downloadImage(self.img);        
       }      
       var handleOriginal = function(exists){
-        console.log("original")
+        // console.log("original")
         if(exists){
-          console.log("existe")
+          // console.log("existe")
           return new Promise(function(resolve, reject){      
             resolve();          
           });
@@ -649,9 +649,9 @@ module.exports = function(Specimen) {
         return self.transformImage(self.img, self.img.localPath, self.img.resizedPath, { width: 1500 });
       }   
       var handleResized = function(exists){
-        console.log("resized")
+        // console.log("resized")
         if(exists){
-          console.log("existe")
+          // console.log("existe")
           return new Promise(function(resolve, reject){      
             resolve();
           });
@@ -665,9 +665,9 @@ module.exports = function(Specimen) {
         return self.transformImage(self.img, self.img.resizedPath, self.img.thumbnailPath, { width: 100, height: 100 });
       }
       var handleThumbnail = function(exists) {
-        console.log("thumbnail")
+        // console.log("thumbnail")
         if(exists){
-          console.log("existe")
+          // console.log("existe")
           return new Promise(function(resolve, reject){      
             resolve();          
           });
