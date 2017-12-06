@@ -72,7 +72,14 @@ function readSpecies(id, base_, map){
                   }
               });
               var sep = data.language=='en-US'?' to ':' a ';
-              $("#"+base+"-value").append(lowestValue+sep+highestValue);
+              // $("#"+base+"-value").append(lowestValue+sep+highestValue);
+              if(lowestValue=="?"){
+                $("#"+base+"-value").html(highestValue);
+              } else if(highestValue=="?"){
+                $("#"+base+"-value").html(lowestValue);
+              } else {
+                $("#"+base+"-value").html(lowestValue+sep+highestValue);
+              }
             }
           }
         } else if(term=="flowerSize"){        
@@ -98,7 +105,14 @@ function readSpecies(id, base_, map){
                   }
               });
               var sep = data.language=='en-US'?' to ':' a ';
-              $("#"+base+"-value").append(lowestValue+sep+highestValue);           
+              // $("#"+base+"-value").append(lowestValue+sep+highestValue);           
+              if(lowestValue=="?"){
+                $("#"+base+"-value").html(highestValue);
+              } else if(highestValue=="?"){
+                $("#"+base+"-value").html(lowestValue);
+              } else {
+                $("#"+base+"-value").html(lowestValue+sep+highestValue);
+              }
             }            
           }
         } else if(parsedId.length==5 && class_!="NumericalDescriptor"){        

@@ -175,7 +175,17 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
-                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                  // params.value[domIdValue] = lowestValue+sep+highestValue;
+                  if(lowestValue=="?"){
+                    // $("#"+base+"-value").html(highestValue);
+                    params.value[domIdValue] = highestValue;
+                  } else if(highestValue=="?"){
+                    // $("#"+base+"-value").html(lowestValue);
+                    params.value[domIdValue] = lowestValue;
+                  } else {                    
+                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                    params.value[domIdValue] = lowestValue+sep+highestValue;
+                  }
                 } 
               }
               // POLLEN SHAPE
@@ -200,7 +210,17 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
-                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                  // params.value[domIdValue] = lowestValue+sep+highestValue;                  
+                  if(lowestValue=="?"){
+                    // $("#"+base+"-value").html(highestValue);
+                    params.value[domIdValue] = highestValue;
+                  } else if(highestValue=="?"){
+                    // $("#"+base+"-value").html(lowestValue);
+                    params.value[domIdValue] = lowestValue;
+                  } else {                    
+                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                    params.value[domIdValue] = lowestValue+sep+highestValue;
+                  }
                 } 
               }
               // FLOWER SIZE
@@ -225,7 +245,17 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
-                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                  // params.value[domIdValue] = lowestValue+sep+highestValue;                  
+                  if(lowestValue=="?"){
+                    // $("#"+base+"-value").html(highestValue);
+                    params.value[domIdValue] = highestValue;
+                  } else if(highestValue=="?"){
+                    // $("#"+base+"-value").html(lowestValue);
+                    params.value[domIdValue] = lowestValue;
+                  } else {                    
+                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                    params.value[domIdValue] = lowestValue+sep+highestValue;
+                  }
                 } 
               }
             } else if(specimen[key].months){
