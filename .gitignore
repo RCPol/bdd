@@ -31,3 +31,4 @@ storage/*
 client/resized/
 
 node_modules/
+!node_modules/key.json
