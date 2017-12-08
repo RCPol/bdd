@@ -29,3 +29,5 @@ storage/*
 *.xlsx
 
 client/resized/
+
+node_modules/
