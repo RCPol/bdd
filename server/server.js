@@ -9,21 +9,27 @@ require('compression');
 var app = module.exports = loopback();
 
 app.start = function() {
-  app.defineSchemaID = function(base,language, schema, class_, term) {    
+  app.defineSchemaID = function(base,language, schema, class_, term, state) {    
     schema = (typeof schema == 'undefined')?'':String(schema).trim();
     class_ = (typeof class_ == 'undefined')?'':String(class_).trim();
     term = (typeof term == 'undefined')?'':String(term).trim();
-    if(base && base.trim().length>0 && language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0)
-      return base.trim().concat(":").concat(language.trim()).concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
+    state = (typeof state == 'undefined' || state == null)?'':String(state).trim();
+    if(base && base.trim().length>0 && language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0){
+      var id = base.trim().concat(":").concat(language.trim()).concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
+      if(state.trim().length>0)
+        id = id+":"+state.trim();
+      return id;
+    }             
     else
       return null;
   }
-  app.defineSpecimenID = function(language, institutionCode, collectionCode, catalogNumber) {
+  app.defineSpecimenID = function(base, language, institutionCode, collectionCode, catalogNumber) {    
     catalogNumber = (typeof catalogNumber == 'undefined')?'':String(catalogNumber).trim();
     collectionCode = (typeof collectionCode == 'undefined')?'':String(collectionCode).trim();
-    institutionCode = (typeof institutionCode == 'undefined')?'':String(institutionCode).trim();
-    if(language && language.trim().length>0 && institutionCode.trim().length>0 && collectionCode.trim().length>0 && catalogNumber.trim().length>0)
-      return language.trim().concat(":").concat(institutionCode.trim()).concat(":").concat(collectionCode.trim()).concat(":").concat(catalogNumber.trim());
+    institutionCode = (typeof institutionCode == 'undefined')?'':String(institutionCode).trim();    
+    if(base && base.trim().length>0 && language && language.trim().length>0 && institutionCode.trim().length>0 && collectionCode.trim().length>0 && catalogNumber.trim().length>0){      
+      return base.trim().concat(":").concat(language.trim()).concat(":").concat(institutionCode.trim()).concat(":").concat(collectionCode.trim()).concat(":").concat(catalogNumber.trim());
+    }      
     else
       return null;
   }
@@ -96,7 +102,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
   var Specimen = app.models.Specimen;
   var params = {};
   params.id =req.params.id;
-  params.language = req.params.id.split(":")[0];
+  params.language = req.params.id.split(":")[1];
   params.value = {};
   async.parallel([
     function(callback) {
@@ -106,9 +112,8 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
       profilesLabel(params,callback);
     },
     function(callback) {
-      var parsedId = params.id.split(":");
-      console.log([parsedId[0],parsedId[1],parsedId[2]].join(":"),params)
-      collection([parsedId[0],parsedId[1],parsedId[2]].join(":"),params,callback);      
+      var parsedId = params.id.split(":");      
+      collection([parsedId[1],parsedId[2],parsedId[3]].join(":"),params,callback);      
     },
     function specimen(callback) {
       Specimen.findById(params.id,function(err,specimen) {
@@ -144,14 +149,14 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
               // NORMAL CATEGORICAL DESCRIPTOR
               params.value[domIdValue] = "";
               specimen[key].states.forEach(function(state) {
-                params.value[domIdValue] += state.state+", ";
+                params.value[domIdValue] += state.vocabulary+", ";
               });
               params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
 
               // POLLEN SIZE
               if(specimen[key].term=="pollenSize"){
                 if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].state;
+                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
                 } else {            
                   var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
                   var lowestIndex = Infinity;
@@ -162,21 +167,31 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       var position  = order.indexOf(state.term);
                       if(position < lowestIndex) {
                         lowestIndex = position;
-                        lowestValue = state.state;
+                        lowestValue = state.vocabulary;
                       }
                       if(position > highestIndex) {
                         highestIndex = position;
-                        highestValue = state.state;
+                        highestValue = state.vocabulary;
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
-                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                  // params.value[domIdValue] = lowestValue+sep+highestValue;
+                  if(lowestValue=="?"){
+                    // $("#"+base+"-value").html(highestValue);
+                    params.value[domIdValue] = highestValue;
+                  } else if(highestValue=="?"){
+                    // $("#"+base+"-value").html(lowestValue);
+                    params.value[domIdValue] = lowestValue;
+                  } else {                    
+                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                    params.value[domIdValue] = lowestValue+sep+highestValue;
+                  }
                 } 
               }
               // POLLEN SHAPE
               if(specimen[key].term=="pollenShape"){
                 if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].state;
+                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
                 } else {            
                   var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
                   var lowestIndex = Infinity;
@@ -187,21 +202,31 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       var position  = order.indexOf(state.term);
                       if(position < lowestIndex) {
                         lowestIndex = position;
-                        lowestValue = state.state;
+                        lowestValue = state.vocabulary;
                       }
                       if(position > highestIndex) {
                         highestIndex = position;
-                        highestValue = state.state;
+                        highestValue = state.vocabulary;
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
-                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                  // params.value[domIdValue] = lowestValue+sep+highestValue;                  
+                  if(lowestValue=="?"){
+                    // $("#"+base+"-value").html(highestValue);
+                    params.value[domIdValue] = highestValue;
+                  } else if(highestValue=="?"){
+                    // $("#"+base+"-value").html(lowestValue);
+                    params.value[domIdValue] = lowestValue;
+                  } else {                    
+                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                    params.value[domIdValue] = lowestValue+sep+highestValue;
+                  }
                 } 
               }
               // FLOWER SIZE
               if(specimen[key].term=="flowerSize"){
                 if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].state;
+                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
                 } else {            
                   var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];
                   var lowestIndex = Infinity;
@@ -212,15 +237,25 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
                       var position  = order.indexOf(state.term);
                       if(position < lowestIndex) {
                         lowestIndex = position;
-                        lowestValue = state.state;
+                        lowestValue = state.vocabulary;
                       }
                       if(position > highestIndex) {
                         highestIndex = position;
-                        highestValue = state.state;
+                        highestValue = state.vocabulary;
                       }
                   });
                   var sep = specimen.language=='en-US'?' to ':' a ';
-                  params.value[domIdValue] = lowestValue+sep+highestValue;
+                  // params.value[domIdValue] = lowestValue+sep+highestValue;                  
+                  if(lowestValue=="?"){
+                    // $("#"+base+"-value").html(highestValue);
+                    params.value[domIdValue] = highestValue;
+                  } else if(highestValue=="?"){
+                    // $("#"+base+"-value").html(lowestValue);
+                    params.value[domIdValue] = lowestValue;
+                  } else {                    
+                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                    params.value[domIdValue] = lowestValue+sep+highestValue;
+                  }
                 } 
               }
             } else if(specimen[key].months){
@@ -405,7 +440,7 @@ app.model(container);
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {
-  if (err) throw err;
+  // if (err) throw err;
 
   // start the server if `$ node server.js`
   if (require.main === module)

@@ -2,8 +2,9 @@ function Filter(identification) {
   this.identification = identification;  
 }
 Filter.prototype.getVocabulary = function(prefix,field,label){
-  var self = this;
-  $.get("/api/Specimens/aggregationByField?prefix="+prefix+"&base="+self.identification.base+"&lang="+self.identification.internacionalization.language+"&field="+field,function(rs) {      
+  var self = this;  
+  // console.log("/api/Specimens/aggregationByField?prefix="+prefix+"&base="+self.identification.base+"&lang="+self.identification.internacionalization.language+"&field="+field)
+  $.get("/api/Specimens/aggregationByField?prefix="+prefix+"&base="+self.identification.base+"&lang="+self.identification.internacionalization.language+"&field="+field,function(rs) {    
     var selector = field.split(":").slice(-3).join("-");      
     $('#selected-'+selector).html('<option value=""></option>');
     
@@ -11,13 +12,12 @@ Filter.prototype.getVocabulary = function(prefix,field,label){
       $('#selected-'+selector).append('<option value="'+item._id+'">'+item._id+'</option>');      
     });    
     $('#selected-'+selector).unbind('change')
-    $('#selected-'+selector).on('change', function(e) {      
+    $('#selected-'+selector).on('change', function(e) {
       self.identification.filter = self.identification.filter?self.identification.filter:{};
-      console.log("FILTER: ",self.identification.filter)
+      
       if(this.value == '')
         delete self.identification.filter[field];  
-      else {
-        console.log("VALUE**** : ",this.value);
+      else {        
         self.identification.filter[field] = this.value;
       }
       self.identification.identify();

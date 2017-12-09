@@ -108,6 +108,7 @@ module.exports = function(Identification) {
 
       // console.log("******** QUERY ********\n",JSON.stringify(queryMongo));
       Identification.find({where: queryMongo, fields: 'id'}, function (err, items) {
+        console.log("LENGTH",items.length)
         if (err) throw new Error(err);
         var IdentificationCollection = Identification.getDataSource().connector.collection(Identification.modelName,{strict:true,j:false,w:'majority'});
         console.log("AGGRAGATE: ",
@@ -307,12 +308,22 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
     async.eachSeries(all_species, function(species, callback1){
       var identification_item = {};
       identification_item.id = species.id; 
-      identification_item.base = species.base; 
-      // identification_item.base = base;      
+      identification_item.base = species.base;       
       identification_item["states"] = [];
       identification_item["filter"] = {};
       async.forEachOfSeries(species, function(item, key, callback2){
-        if (species.hasOwnProperty(key) && species[key] && (species[key].class == "CategoricalDescriptor" || species[key].class == "NumericalDescriptor" || species[key].class == "Sample" || species[key].schema == "dwc" || key == 'specimens') && species[key].term != "espexi"){
+        if (
+            species.hasOwnProperty(key) && 
+            species[key] && 
+            (
+              species[key].class == "CategoricalDescriptor" || 
+              species[key].class == "NumericalDescriptor" || 
+              species[key].class == "Sample" || 
+              species[key].schema == "dwc" || 
+              key == 'specimens'
+            ) && 
+            species[key].term != "espexi")
+        {
           //TODO: handle pollenShape and espexi
           // we only want entries with classes CategoricalDescriptor or NumericalDescriptor
           // we can have multiple states
@@ -347,19 +358,27 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
           } else if (key == 'specimens'){            
             species.specimens.forEach(function(specimen) {
               if(specimen.collection)
-              Object.keys(specimen.collection).forEach(function(subkey) {
-                if(specimen.collection[subkey].term == 'institutionName' || specimen.collection[subkey].term == 'collectionName' || specimen.collection[subkey].term == 'laboratory'){                     
-                  identification_item["filter"][subkey] = identification_item["filter"][subkey]?identification_item["filter"][subkey]:[];
-                  identification_item["filter"][subkey].push(specimen.collection[subkey].value);            
-                }
-              });              
+                Object.keys(specimen.collection).forEach(function(collectionKey) {
+                  if(
+                    specimen.collection[collectionKey].term == 'institutionName' || 
+                    specimen.collection[collectionKey].term == 'institutionCode' || 
+                    specimen.collection[collectionKey].term == 'collectionCode' || 
+                    specimen.collection[collectionKey].term == 'collectionName' || 
+                    specimen.collection[collectionKey].term == 'laboratory')
+                  {                     
+                    identification_item["filter"][collectionKey] = identification_item["filter"][collectionKey]?identification_item["filter"][collectionKey]:[];
+                    identification_item["filter"][collectionKey].push(specimen.collection[collectionKey].value);                    
+                  } 
+                });
+              else 
+                console.log("Coleção não existe")              
             });
             callback2();
           } else if (species[key].values){
-            identification_item["filter"][key] = species[key].values;            
+            // identification_item["filter"][key] = species[key].values;            
             callback2();
           } else {
-            identification_item["states"].push(entry);
+            // identification_item["states"].push(entry);
             callback2();
           }
 
@@ -415,6 +434,8 @@ function composeQuery(param, callback){
       Object.keys(param.filter).forEach(function(key) {
         var filter  = {};
         filter['filter.'+key] = param.filter[key];
+        // filter[key+".value"] = param.filter[key];
+        console.log("FILTER",filter)
         query.and.push(filter);
         queryMongo.$and.push(filter);
       });
