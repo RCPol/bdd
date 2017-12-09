@@ -22,7 +22,10 @@ module.exports = function(Interaction) {
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
     
-    var url = 'mongodb://mongo:27017/bdd';
+    if(process.env.ENVIRONMENT == "docker")
+      var url = 'mongodb://mongo:27017/bdd';
+    else 
+      var url = 'mongodb://127.0.0.1:27017/bdd';
     var q = {};
     q.pollinator = pollinator;
     if(region!="Brasil"){      
@@ -61,8 +64,11 @@ module.exports = function(Interaction) {
   }
     Interaction.pollinators = function(plant,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
-    // Connection URL 
-    var url = 'mongodb://mongo:27017/bdd';
+    // Connection URL     
+    if(process.env.ENVIRONMENT == "docker")
+      var url = 'mongodb://mongo:27017/bdd';
+    else 
+      var url = 'mongodb://127.0.0.1:27017/bdd';
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
@@ -144,22 +150,28 @@ module.exports = function(Interaction) {
             }        
             var data = [];
             rs.values.shift();
-            rs.values.forEach(function(item){
-              var i = {};
-              i.dataset = id;
-              i.modified = new Date();
-              i.collection = item[0];
-              i.plant = item[1];
-              i.type = item[2];
-              i.pollinator = item[3];
-              i.percentual = Number(item[4]);
-              i.author = item[5];
-              i.municipality = item[6];
-              i.state = item[7];
-              i.region = item[8];
-              i.vegetalForm = item[9];
-              i.reference = item[10];
-              data.push(i);  
+            rs.values.shift();
+            rs.values.shift();
+            rs.values.shift();            
+            rs.values.forEach(function(line){
+              var val = Number(new String(line[4]).replace(",","."));              
+              if(val > 0){
+                var i = {};
+                i.dataset = id;
+                i.modified = new Date();
+                i.collection = line[0];
+                i.plant = line[1];
+                i.type = line[2];
+                i.pollinator = line[3];              
+                i.percentual = val;
+                i.author = line[5];
+                i.municipality = line[6];
+                i.state = line[7];
+                i.region = line[8];
+                i.vegetalForm = line[9];
+                i.reference = line[10];
+                data.push(i); 
+              }               
             });            
             Interaction.create(data,function(err,saved){
               if (err) {

@@ -34,7 +34,9 @@
 		var base = "{{base}}";
 		function setLanguage(language){
 			localStorage.language = language;
-			window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
+			var parsed = id.split(":")
+			parsed[1] = language;
+			window.location = "/profile/specimen/{{base}}/"+parsed.join(":");
 		}
 		$(document).ready(function(){
 			loadHerbariumInfo();
@@ -49,8 +51,9 @@
 				language = localStorage.language;
 			if (typeof(Storage) !== "undefined") {
 				localStorage.language = localStorage.language?localStorage.language:"pt-BR";
-				if(id.split(":")[0]!=localStorage.language)
-					window.location = "/profile/specimen/{{base}}/"+language+id.substring(5,id.length);
+				if(id.split(":")[1]!=localStorage.language){
+					setLanguage(localStorage.language);
+				}					
 			} else {
 				alert("O seu browswer não suporta alguns recursos utilizados pelo sistema.\nRecomenda-se atualizar browser ou utilizar outro.");
 			}

@@ -10,8 +10,9 @@ services:
       - mongo
     ports:
       - "80:3030" 
-    container_name: rcpol_node 
-    command: bash -c "echo 'Começando.... ' && cat /var/www/bdd/ecosystem.json && pm2 start /var/www/bdd/ecosystem.json && pm2 logs 0"    
+    environment:    
+      - ENVIRONMENT=docker      
+    container_name: rcpol_node    
   mongo:
     image: mongo
     ports:
