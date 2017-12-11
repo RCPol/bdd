@@ -374,8 +374,17 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
                 console.log("Coleção não existe")              
             });
             callback2();
-          } else if (species[key].values){
-            // identification_item["filter"][key] = species[key].values;            
+          } else if (
+            species[key].term == 'vegetalFormationType' || 
+            species[key].term == 'municipality' || 
+            species[key].term == 'stateProvince' || 
+            species[key].term == 'country' || 
+            species[key].term == 'region' || 
+            species[key].term == 'continent'            
+          ){     
+            // identification_item["filter"][key] = identification_item["filter"][key]?identification_item["filter"][key]:[];
+            // identification_item["filter"][key].push(species[key].values);                           
+            identification_item["filter"][key] = species[key].values;            
             callback2();
           } else {
             // identification_item["states"].push(entry);
