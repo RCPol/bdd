@@ -598,7 +598,7 @@ textarea { height: 80px; resize: none; }
 		// An error happened.
 		});
 	}
-	function sendFeedback(){		
+	function sendFeedback(e){		
 		var data = {
 			user: {
 				uid: user.uid?user.uid:"",
@@ -624,8 +624,7 @@ textarea { height: 80px; resize: none; }
 			});
 		} else {
 			alert("É necessário preencher todos os campos.")
-		}
-		
+		}		
 
 	}
 	$(function() {
@@ -648,7 +647,7 @@ textarea { height: 80px; resize: none; }
 				$("#auth").hide();
 			}
 		});
-		$("#google-login").click(function(){
+		$("#google-login").click(function(e){
 			firebase.auth().signInWithPopup(provider).then(function(result) {
 				// This gives you a Google Access Token. You can use it to access the Google API.
 				var token = result.credential.accessToken;
@@ -701,6 +700,7 @@ textarea { height: 80px; resize: none; }
 				});
 			// ...
 			});
+			e.preventDefault();
 		});	
 	});
 	function toggle_visibility() {
