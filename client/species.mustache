@@ -566,7 +566,7 @@ textarea { height: 80px; resize: none; }
 		</button>
 	</div>
 	<div id="auth">
-		<input onclick="sendFeedback()" class="formBtn" type="reset" value="Enviar"/>
+		<input onclick="sendFeedback()" class="formBtn" type="submit" value="Enviar"/>
 		<input onclick="exitFeedback();" class="formBtn" type="reset" value="Sair"/>
 	</div>
   </form>
@@ -614,6 +614,8 @@ textarea { height: 80px; resize: none; }
 			db.collection("feedback").doc(data.page).collection(data.category).add(data)
 			.then(function(docRef) {
 				alert("Obrigado pela colaboração. \nEntraremos em contato informando sobre a correção do problema.")
+				$("#feedback-msg").val("");
+				$("#feedback-category").val("")
 			})
 			.catch(function(error) {
 				console.error("Error adding document: ", error);
@@ -628,7 +630,6 @@ textarea { height: 80px; resize: none; }
 		$("#auth").hide();
 		$(document).mouseup(function (e) {
 			var container = $("#contactForm");
-
 			if (!container.is(e.target) // if the target of the click isn't the container...
 				&& container.has(e.target).length === 0) // ... nor a descendant of the container
 			{
@@ -661,6 +662,41 @@ textarea { height: 80px; resize: none; }
 				var email = error.email;
 				// The firebase.auth.AuthCredential type that was used.
 				var credential = error.credential;
+				firebase.auth().signInWithPopup(provider).then(function(result) {
+					// This gives you a Google Access Token. You can use it to access the Google API.
+					var token = result.credential.accessToken;
+					// The signed-in user info.
+					var user = result.user;
+					console.log(result)
+					// ...
+				}).catch(function(error) {
+					// Handle Errors here.
+					var errorCode = error.code;
+					var errorMessage = error.message;
+					// The email of the user's account used.
+					var email = error.email;
+					// The firebase.auth.AuthCredential type that was used.
+					var credential = error.credential;
+					firebase.auth().signInWithPopup(provider).then(function(result) {
+						// This gives you a Google Access Token. You can use it to access the Google API.
+						var token = result.credential.accessToken;
+						// The signed-in user info.
+						var user = result.user;
+						console.log(result)
+						// ...
+					}).catch(function(error) {
+						// Handle Errors here.
+						var errorCode = error.code;
+						var errorMessage = error.message;
+						// The email of the user's account used.
+						var email = error.email;
+						// The firebase.auth.AuthCredential type that was used.
+						var credential = error.credential;
+						
+					// ...
+					});
+				// ...
+				});
 			// ...
 			});
 		});	
