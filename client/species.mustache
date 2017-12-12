@@ -612,7 +612,7 @@ textarea { height: 80px; resize: none; }
 			msg: $("#feedback-msg").val()		
 		}		
 		if(data.category!=""){
-			db.collection("feedback").doc(data.page).collection(data.category).add(data)
+			db.collection("feedback").add(data)
 			.then(function(docRef) {
 				alert("Obrigado pela colaboração. \nEntraremos em contato informando sobre a correção do problema.")
 				$("#feedback-msg").val("");
@@ -625,7 +625,7 @@ textarea { height: 80px; resize: none; }
 		} else {
 			alert("É necessário preencher todos os campos.")
 		}		
-
+		e.preventDefault();
 	}
 	$(function() {
 		$("#auth").hide();
