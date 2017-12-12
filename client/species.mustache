@@ -616,6 +616,7 @@ textarea { height: 80px; resize: none; }
 				alert("Obrigado pela colaboração. \nEntraremos em contato informando sobre a correção do problema.")
 				$("#feedback-msg").val("");
 				$("#feedback-category").val("")
+				$('#contactForm').fadeOut();
 			})
 			.catch(function(error) {
 				console.error("Error adding document: ", error);
