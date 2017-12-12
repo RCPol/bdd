@@ -566,7 +566,7 @@ textarea { height: 80px; resize: none; }
 		</button>
 	</div>
 	<div id="auth">
-		<input onclick="sendFeedback()" class="formBtn" type="submit" value="Enviar"/>
+		<input onclick="sendFeedback()" class="formBtn" value="Enviar"/>
 		<input onclick="exitFeedback();" class="formBtn" type="reset" value="Sair"/>
 	</div>
   </form>
@@ -609,7 +609,8 @@ textarea { height: 80px; resize: none; }
 			env: window.location.host,
 			url: window.location.href,
 			category: $("#feedback-category").val(),
-			msg: $("#feedback-msg").val()		
+			msg: $("#feedback-msg").val(),
+			timestamp: new Date()		
 		}		
 		if(data.category!=""){
 			db.collection("feedback").add(data)
