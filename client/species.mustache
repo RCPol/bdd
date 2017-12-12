@@ -546,7 +546,7 @@ textarea { height: 80px; resize: none; }
   <h1 style="margin-bottom:1em">Encontrou algum problema?</h1>
   <small>Comunique-nos sobre qualquer mau funcionamento no sistema ou problema nos dados ou imagens.</small>
   
-  <form action="#">
+  
 	<div style="margin:1em">
 		<label style="margin:1em">
 			Onde está o problema?
@@ -566,10 +566,10 @@ textarea { height: 80px; resize: none; }
 		</button>
 	</div>
 	<div id="auth">
-		<button onclick="sendFeedback()" class="formBtn">Enviar</button>
+		<button id="send-feedback" class="formBtn">Enviar</button>
 		<input onclick="exitFeedback();" class="formBtn" type="reset" value="Sair"/>
 	</div>
-  </form>
+  
 </div>
 
 <button id="popup" class="feedback-button" onclick="toggle_visibility()">Reportar</button>
@@ -597,37 +597,7 @@ textarea { height: 80px; resize: none; }
 		}).catch(function(error) {
 		// An error happened.
 		});
-	}
-	function sendFeedback(e){		
-		var data = {
-			user: {
-				uid: user.uid?user.uid:"",
-				name: user.displayName?user.displayName:"",
-				email: user.email?user.email:""
-			},
-			page: "species",
-			env: window.location.host,
-			url: window.location.href,
-			category: $("#feedback-category").val(),
-			msg: $("#feedback-msg").val(),
-			timestamp: new Date()		
-		}		
-		if(data.category!=""){
-			db.collection("feedback").add(data)
-			.then(function(docRef) {
-				alert("Obrigado pela colaboração. \nEntraremos em contato informando sobre a correção do problema.")
-				$("#feedback-msg").val("");
-				$("#feedback-category").val("")
-				$('#contactForm').fadeOut();
-			})
-			.catch(function(error) {
-				console.error("Error adding document: ", error);
-			});
-		} else {
-			alert("É necessário preencher todos os campos.")
-		}		
-		e.preventDefault();
-	}
+	}	
 	$(function() {
 		$("#auth").hide();
 		$(document).mouseup(function (e) {
@@ -703,6 +673,37 @@ textarea { height: 80px; resize: none; }
 			});
 			e.preventDefault();
 		});	
+		
+		$("#send-feedback").click(function(e){		
+			var data = {
+				user: {
+					uid: user.uid?user.uid:"",
+					name: user.displayName?user.displayName:"",
+					email: user.email?user.email:""
+				},
+				page: "species",
+				env: window.location.host,
+				url: window.location.href,
+				category: $("#feedback-category").val(),
+				msg: $("#feedback-msg").val(),
+				timestamp: new Date()		
+			}		
+			if(data.category!=""){
+				db.collection("feedback").add(data)
+				.then(function(docRef) {
+					alert("Obrigado pela colaboração. \nEntraremos em contato informando sobre a correção do problema.")
+					$("#feedback-msg").val("");
+					$("#feedback-category").val("")
+					$('#contactForm').fadeOut();
+				})
+				.catch(function(error) {
+					console.error("Error adding document: ", error);
+				});
+			} else {
+				alert("É necessário preencher todos os campos.")
+			}		
+			e.preventDefault();
+		});
 	});
 	function toggle_visibility() {
 		$('#contactForm').fadeToggle();       
