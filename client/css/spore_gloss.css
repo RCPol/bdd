@@ -1,0 +1,74 @@
+body {
+	background-color: #d3bf73;
+	font-family: 'Roboto', sans-serif;
+	font-size: 14px;
+	line-height: 21px;
+}
+
+/* Formatações específicas necessárias */
+div.glossario {
+	width: 600px;
+	background-color: white;
+	padding: 20px;
+	overflow: auto;
+	margin: 0 auto;
+}
+
+div.glossario h2 {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 25px;
+	color: #4b0200;
+	font-weight: normal;
+	margin: 0;
+}
+
+div.glossario h3.subtitulo {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 16px;
+	color: #a5807f;
+	font-weight: normal;
+	margin: 0 0 13px 0;
+}
+
+div.glossario h3 {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 14px;
+	color: #4b0200;
+	font-weight: normal;
+	margin: 13px 0 0 0;
+}
+
+div.glossario p {
+	font-size: 14px;
+	line-height: 21px;
+	color: black;
+	padding: 0 0 12px 0;
+	margin: 0;
+}
+
+div.glossario img {
+	float: right;
+	width: 200px;
+	height: 200px;
+	max-width: 200px;
+	max-height: 200px;
+	margin: 0 0 25px 25px;
+}
+
+div.ref-glossario {
+	width: 100%;
+	display: table-row;
+}
+
+div.ref-glossario p {
+	padding: 7px 0 0 0;
+	margin: 0;
+	font-size: 12px;
+	line-height: 18px;
+}
+.ui-tooltip {
+  box-shadow: 0 0 7px black;
+  }
+	div.ui-tooltip {
+    max-width: 640px;
+	}
