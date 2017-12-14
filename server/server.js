@@ -117,159 +117,164 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
     },
     function specimen(callback) {
       Specimen.findById(params.id,function(err,specimen) {
-        Object.keys(specimen.toJSON()).forEach(function(key) {
-          var parsedId = key.split(":");
-          if(parsedId.length>1){            
-            // console.log("LOG: ",parsedId);
-            var domIdLabel = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":label";
-            var domIdValue = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":value";
-            if(specimen[key].field)
-              params.label[domIdLabel] = specimen[key].field+": ";
-            if(specimen[key].value && !specimen[key].states && !specimen[key].months){
-              // NORMAL VALUE
-              params.value[domIdValue] = specimen[key].value;                            
-              // COORDINATES
-              if(parsedId[4]=="decimalLatitude" || parsedId[4]=="decimalLongitude")
-                params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
-              // IMAGE
-              if(parsedId[3]=="Image"){
-                params.value[domIdValue] = [];
-                specimen[key].images.forEach(function(image){
-                 params.value[domIdValue].push({value:image.resized});
+        try{
+          Object.keys(specimen.toJSON()).forEach(function(key) {
+            var parsedId = key.split(":");
+            if(parsedId.length>1){            
+              // console.log("LOG: ",parsedId);
+              var domIdLabel = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":label";
+              var domIdValue = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]+":value";
+              if(specimen[key].field)
+                params.label[domIdLabel] = specimen[key].field+": ";
+              if(specimen[key].value && !specimen[key].states && !specimen[key].months){
+                // NORMAL VALUE
+                params.value[domIdValue] = specimen[key].value;                            
+                // COORDINATES
+                if(parsedId[4]=="decimalLatitude" || parsedId[4]=="decimalLongitude")
+                  params.value[domIdValue] = specimen[key] && specimen[key].value && Number(specimen[key].value)!="NaN"?Number(specimen[key].value).toFixed(5):""
+                // IMAGE
+                if(parsedId[3]=="Image"){
+                  params.value[domIdValue] = [];
+                  specimen[key].images.forEach(function(image){
+                   params.value[domIdValue].push({value:image.resized});
+                  });
+                }
+                // REFERENCES
+                if(parsedId[3]=="Reference"){
+                  params.value[domIdValue] = [];
+                  specimen[key].value.split("|").forEach(function(referencia){
+                   params.value[domIdValue].push({value:referencia});
+                  });
+                }
+              } else if(specimen[key].states){
+                // NORMAL CATEGORICAL DESCRIPTOR
+                params.value[domIdValue] = "";
+                specimen[key].states.forEach(function(state) {
+                  params.value[domIdValue] += state.vocabulary+", ";
                 });
-              }
-              // REFERENCES
-              if(parsedId[3]=="Reference"){
-                params.value[domIdValue] = [];
-                specimen[key].value.split("|").forEach(function(referencia){
-                 params.value[domIdValue].push({value:referencia});
+                params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+  
+                // POLLEN SIZE
+                if(specimen[key].term=="pollenSize"){
+                  if(specimen[key].states.length==1){
+                    params.value[domIdValue] = specimen[key].states[0].vocabulary;
+                  } else {            
+                    var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
+                    var lowestIndex = Infinity;
+                    var highestIndex = -1;                        
+                    var lowestValue = "?";
+                    var highestValue = "?";                        
+                    specimen[key].states.forEach(function(state) {              
+                        var position  = order.indexOf(state.term);
+                        if(position < lowestIndex) {
+                          lowestIndex = position;
+                          lowestValue = state.vocabulary;
+                        }
+                        if(position > highestIndex) {
+                          highestIndex = position;
+                          highestValue = state.vocabulary;
+                        }
+                    });
+                    var sep = specimen.language=='en-US'?' to ':' a ';
+                    // params.value[domIdValue] = lowestValue+sep+highestValue;
+                    if(lowestValue=="?"){
+                      // $("#"+base+"-value").html(highestValue);
+                      params.value[domIdValue] = highestValue;
+                    } else if(highestValue=="?"){
+                      // $("#"+base+"-value").html(lowestValue);
+                      params.value[domIdValue] = lowestValue;
+                    } else {                    
+                      // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                      params.value[domIdValue] = lowestValue+sep+highestValue;
+                    }
+                  } 
+                }
+                // POLLEN SHAPE
+                if(specimen[key].term=="pollenShape"){
+                  if(specimen[key].states.length==1){
+                    params.value[domIdValue] = specimen[key].states[0].vocabulary;
+                  } else {            
+                    var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
+                    var lowestIndex = Infinity;
+                    var highestIndex = -1;                        
+                    var lowestValue = "?";
+                    var highestValue = "?";                        
+                    specimen[key].states.forEach(function(state) {              
+                        var position  = order.indexOf(state.term);
+                        if(position < lowestIndex) {
+                          lowestIndex = position;
+                          lowestValue = state.vocabulary;
+                        }
+                        if(position > highestIndex) {
+                          highestIndex = position;
+                          highestValue = state.vocabulary;
+                        }
+                    });
+                    var sep = specimen.language=='en-US'?' to ':' a ';
+                    // params.value[domIdValue] = lowestValue+sep+highestValue;                  
+                    if(lowestValue=="?"){
+                      // $("#"+base+"-value").html(highestValue);
+                      params.value[domIdValue] = highestValue;
+                    } else if(highestValue=="?"){
+                      // $("#"+base+"-value").html(lowestValue);
+                      params.value[domIdValue] = lowestValue;
+                    } else {                    
+                      // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                      params.value[domIdValue] = lowestValue+sep+highestValue;
+                    }
+                  } 
+                }
+                // FLOWER SIZE
+                if(specimen[key].term=="flowerSize"){
+                  if(specimen[key].states.length==1){
+                    params.value[domIdValue] = specimen[key].states[0].vocabulary;
+                  } else {            
+                    var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];
+                    var lowestIndex = Infinity;
+                    var highestIndex = -1;                        
+                    var lowestValue = "?";
+                    var highestValue = "?";                        
+                    specimen[key].states.forEach(function(state) {              
+                        var position  = order.indexOf(state.term);
+                        if(position < lowestIndex) {
+                          lowestIndex = position;
+                          lowestValue = state.vocabulary;
+                        }
+                        if(position > highestIndex) {
+                          highestIndex = position;
+                          highestValue = state.vocabulary;
+                        }
+                    });
+                    var sep = specimen.language=='en-US'?' to ':' a ';
+                    // params.value[domIdValue] = lowestValue+sep+highestValue;                  
+                    if(lowestValue=="?"){
+                      // $("#"+base+"-value").html(highestValue);
+                      params.value[domIdValue] = highestValue;
+                    } else if(highestValue=="?"){
+                      // $("#"+base+"-value").html(lowestValue);
+                      params.value[domIdValue] = lowestValue;
+                    } else {                    
+                      // $("#"+base+"-value").html(lowestValue+sep+highestValue);
+                      params.value[domIdValue] = lowestValue+sep+highestValue;
+                    }
+                  } 
+                }
+              } else if(specimen[key].months){
+                params.value[domIdValue] = "";
+                specimen[key].months.forEach(function(month) {
+                  params.value[domIdValue] += month+", ";
                 });
+                params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
+              } else if(specimen[key]["class"] == "NumericalDescriptor"){
+                params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
               }
-            } else if(specimen[key].states){
-              // NORMAL CATEGORICAL DESCRIPTOR
-              params.value[domIdValue] = "";
-              specimen[key].states.forEach(function(state) {
-                params.value[domIdValue] += state.vocabulary+", ";
-              });
-              params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
-
-              // POLLEN SIZE
-              if(specimen[key].term=="pollenSize"){
-                if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
-                } else {            
-                  var order = ["pollenSizeVerySmall","pollenSizeSmall","pollenSizeMedium","pollenSizeLarge","pollenSizeVeryLarge","pollenSizeGiant"];
-                  var lowestIndex = Infinity;
-                  var highestIndex = -1;                        
-                  var lowestValue = "?";
-                  var highestValue = "?";                        
-                  specimen[key].states.forEach(function(state) {              
-                      var position  = order.indexOf(state.term);
-                      if(position < lowestIndex) {
-                        lowestIndex = position;
-                        lowestValue = state.vocabulary;
-                      }
-                      if(position > highestIndex) {
-                        highestIndex = position;
-                        highestValue = state.vocabulary;
-                      }
-                  });
-                  var sep = specimen.language=='en-US'?' to ':' a ';
-                  // params.value[domIdValue] = lowestValue+sep+highestValue;
-                  if(lowestValue=="?"){
-                    // $("#"+base+"-value").html(highestValue);
-                    params.value[domIdValue] = highestValue;
-                  } else if(highestValue=="?"){
-                    // $("#"+base+"-value").html(lowestValue);
-                    params.value[domIdValue] = lowestValue;
-                  } else {                    
-                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
-                    params.value[domIdValue] = lowestValue+sep+highestValue;
-                  }
-                } 
-              }
-              // POLLEN SHAPE
-              if(specimen[key].term=="pollenShape"){
-                if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
-                } else {            
-                  var order = ["pollenShapePeroblate","pollenShapeOblate","pollenShapeSuboblate","pollenShapeOblateSpheroidal","pollenShapeSpheroidal","pollenShapeProlateSpheroidal","pollenShapeSubprolate", "pollenShapeProlate", "pollenShapePerprolate"];
-                  var lowestIndex = Infinity;
-                  var highestIndex = -1;                        
-                  var lowestValue = "?";
-                  var highestValue = "?";                        
-                  specimen[key].states.forEach(function(state) {              
-                      var position  = order.indexOf(state.term);
-                      if(position < lowestIndex) {
-                        lowestIndex = position;
-                        lowestValue = state.vocabulary;
-                      }
-                      if(position > highestIndex) {
-                        highestIndex = position;
-                        highestValue = state.vocabulary;
-                      }
-                  });
-                  var sep = specimen.language=='en-US'?' to ':' a ';
-                  // params.value[domIdValue] = lowestValue+sep+highestValue;                  
-                  if(lowestValue=="?"){
-                    // $("#"+base+"-value").html(highestValue);
-                    params.value[domIdValue] = highestValue;
-                  } else if(highestValue=="?"){
-                    // $("#"+base+"-value").html(lowestValue);
-                    params.value[domIdValue] = lowestValue;
-                  } else {                    
-                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
-                    params.value[domIdValue] = lowestValue+sep+highestValue;
-                  }
-                } 
-              }
-              // FLOWER SIZE
-              if(specimen[key].term=="flowerSize"){
-                if(specimen[key].states.length==1){
-                  params.value[domIdValue] = specimen[key].states[0].vocabulary;
-                } else {            
-                  var order = ["flowerSizeVerySmall","flowerSizeSmall","flowerSizeMedium","flowerSizeLarge","flowerSizeVeryLarge"];
-                  var lowestIndex = Infinity;
-                  var highestIndex = -1;                        
-                  var lowestValue = "?";
-                  var highestValue = "?";                        
-                  specimen[key].states.forEach(function(state) {              
-                      var position  = order.indexOf(state.term);
-                      if(position < lowestIndex) {
-                        lowestIndex = position;
-                        lowestValue = state.vocabulary;
-                      }
-                      if(position > highestIndex) {
-                        highestIndex = position;
-                        highestValue = state.vocabulary;
-                      }
-                  });
-                  var sep = specimen.language=='en-US'?' to ':' a ';
-                  // params.value[domIdValue] = lowestValue+sep+highestValue;                  
-                  if(lowestValue=="?"){
-                    // $("#"+base+"-value").html(highestValue);
-                    params.value[domIdValue] = highestValue;
-                  } else if(highestValue=="?"){
-                    // $("#"+base+"-value").html(lowestValue);
-                    params.value[domIdValue] = lowestValue;
-                  } else {                    
-                    // $("#"+base+"-value").html(lowestValue+sep+highestValue);
-                    params.value[domIdValue] = lowestValue+sep+highestValue;
-                  }
-                } 
-              }
-            } else if(specimen[key].months){
-              params.value[domIdValue] = "";
-              specimen[key].months.forEach(function(month) {
-                params.value[domIdValue] += month+", ";
-              });
-              params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
-            } else if(specimen[key]["class"] == "NumericalDescriptor"){
-              params.value[domIdValue] = params.value[domIdValue].substring(0,params.value[domIdValue].length-2)
             }
-          }
-        });
-        callback();
+          });
+          callback();
+        } catch (e) {
+          console.log("ID:", params.id, e);
+          callback();
+        }        
       });
     }
   ],function done() {
