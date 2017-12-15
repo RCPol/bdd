@@ -525,6 +525,11 @@ module.exports = function(Specimen) {
              queue.push(img);
             });
         }
+        if(result[base+":pt-BR:rcpol:Image:allSporeImage"]){
+          result[base+":pt-BR:rcpol:Image:allSporeImage"].images.forEach(function (img){
+           queue.push(img);
+          });
+      }
         if(result[base+":pt-BR:rcpol:Image:flowerImage"]){
             result[base+":pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
               queue.push(img);
