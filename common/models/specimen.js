@@ -505,7 +505,7 @@ module.exports = function(Specimen) {
           cb();
         });
       }
-      processing = async.queue(processImage,5);      
+      processing = async.queue(processImage,1);      
       processing.push(queue);
       processing.drain = function() {
         resolve()        
@@ -617,17 +617,21 @@ module.exports = function(Specimen) {
   ImageDownloader.prototype.downloadImage = function(img) {
     var self =  this;    
     return new Promise(function(resolve, reject){      
-      // console.log("imagem nao existe");            
-      request(img.original, {encoding: 'binary', timeout: 10000}, function(err, response, body){
-        if (err){          
-            console.log("Error to download "+img.original);                        
-            reject({img:img.raw});
-        } else {
-          // console.log("imagem baixada");          
-          img.downloadedContent = body;
-          resolve(img);          
-        }
-      });
+      console.log("imagem nao existe",img.original);  
+      try{
+        request(img.original, {encoding: 'binary'}, function(err, response, body){          
+          if (err){          
+              console.log("Error to download "+img.original);                        
+              reject({img:img.raw});
+          } else {
+            // console.log("imagem baixada");          
+            img.downloadedContent = body;
+            resolve(img);          
+          }
+        });
+      } catch(e){
+        console.log("ERROR: ", e)
+      }               
     });
   }
   ImageDownloader.prototype.transformImage = function(img, source, target, size) {
@@ -663,7 +667,7 @@ module.exports = function(Specimen) {
     return new Promise(function(resolve, reject){      
       var error = function(err){           
         if(err.img){               
-          console.log(err.img.original)             
+          console.log(err.img.original)
           fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
             if(err_) console.log("original não apagado");
             else console.log('original file deleted successfully');                
@@ -759,9 +763,13 @@ module.exports = function(Specimen) {
   Image.prototype.checkIfExist = function(path) {
     var self = this;
     return new Promise(function(resolve, reject){
-      fs.exists(path, function(exists){
-        resolve(exists);        
-      });
+      try{                
+        fs.exists(path, function(exists){
+          resolve(exists);        
+        });
+      } catch(e){
+        console.log("erroooooooooo",e)
+      }      
     });
   }
   Specimen.remoteMethod(

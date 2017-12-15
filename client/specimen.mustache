@@ -39,6 +39,11 @@
 			window.location = "/profile/specimen/{{base}}/"+parsed.join(":");
 		}
 		$(document).ready(function(){
+			if(base=="spore") {        
+				$("#rcpol-ProfilesLabel-profilesPollenDescription").hide();
+				$(".info-flor").hide();
+				$(".info-planta").hide();
+			}
 			loadHerbariumInfo();
 			var internacionalization = new Internacionalization();
 			internacionalization.base = '{{base}}';
@@ -247,7 +252,54 @@
 				<!-- Início: Descrição Polínica -->
 				<div class="info-polen">
 					<h2><span id="rcpol-ProfilesLabel-profilesPollenDescription">{{rcpol:ProfilesLabel:profilesPollenDescription}}</span><span id="rcpol-ProfilesLabel-profilesPalynomorphDescription">{{rcpol:ProfilesLabel:profilesPalynomorphDescription}}</span>:
-					</h2>				
+					</h2>	
+
+						
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-sporePlantHabit-label"/>{{rcpol:CategoricalDescriptor:sporePlantHabit:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-sporePlantHabit-value">{{rcpol:CategoricalDescriptor:sporePlantHabit:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-sporeSize-label"/>{{rcpol:CategoricalDescriptor:sporeSize:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-sporeSize-value">{{rcpol:CategoricalDescriptor:sporeSize:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-sporeLaesura-label"/>{{rcpol:CategoricalDescriptor:sporeLaesura:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-sporeLaesura-value">{{rcpol:CategoricalDescriptor:sporeLaesura:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-sporeType-label"/>{{rcpol:CategoricalDescriptor:sporeType:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-sporeType-value">{{rcpol:CategoricalDescriptor:sporeType:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-sporeAmbit-label"/>{{rcpol:CategoricalDescriptor:sporeAmbit:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-sporeAmbit-value">{{rcpol:CategoricalDescriptor:sporeAmbit:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-sporeSymmetry-label"/>{{rcpol:CategoricalDescriptor:sporeSymmetry:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-sporeSymmetry-value">{{rcpol:CategoricalDescriptor:sporeSymmetry:value}}</span>
+					</p>
+					<p>
+						<b>
+							<span id="rcpol-CategoricalDescriptor-exineOrnamentation-label"/>{{rcpol:CategoricalDescriptor:exineOrnamentation:label}}
+						</b>
+						<span id="rcpol-CategoricalDescriptor-exineOrnamentation-value">{{rcpol:CategoricalDescriptor:exineOrnamentation:value}}</span>
+					</p>
+
+
+
 					<p>
 						<b>
 							<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/>{{rcpol:CategoricalDescriptor:pollenDispersalUnit:label}}
