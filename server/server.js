@@ -85,6 +85,11 @@ app.get('/paleo', function(req, res) {
   var params = {base: "paleo"};
   res.send(mustache.render(template, params));
 });
+app.get('/spore', function(req, res) {
+  var template = fs.readFileSync('./client/index.mustache', 'utf8');  
+  var params = {base: "spore"};
+  res.send(mustache.render(template, params));
+});
 app.get('/interaction-profile/:pollinator', function(req, res) {
   var template = fs.readFileSync('./client/interaction-profile.mustache', 'utf8');
   var params = {pollinator: req.params.pollinator};
