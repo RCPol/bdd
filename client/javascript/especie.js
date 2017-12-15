@@ -186,6 +186,10 @@ function readSpecies(id, base_, map) {
       data[scope+":rcpol:Image:allPollenImage"].images.forEach(function(media){
           $("#foto_polen").append("<img src='" +media.resized+"'/>");
       });
+    if(data[scope+':rcpol:Image:allSporeImage'] && data[scope+':rcpol:Image:allSporeImage'].images && data[scope+':rcpol:Image:allSporeImage'].images.length>0)
+      data[scope+":rcpol:Image:allSporeImage"].images.forEach(function(media){
+          $("#foto_polen").append("<img src='" +media.resized+"'/>");
+      });
     $(".fotorama").fotorama();
     // mapa
     map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
