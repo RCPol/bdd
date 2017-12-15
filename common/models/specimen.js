@@ -571,7 +571,7 @@ module.exports = function(Specimen) {
       fields:{}
     };
     console.log("define filtro para pegar apenas imagens que tenham pelo menos uma imagem")
-    var allPollen =  {};
+    var allPollen =  {};    
     allPollen[base+":pt-BR:rcpol:Image:allPollenImage"] = {exists:true};
     var plant =  {};
     plant[base+":pt-BR:rcpol:Image:plantImage"] = {exists:true};
@@ -581,13 +581,20 @@ module.exports = function(Specimen) {
     bee[base+":pt-BR:rcpol:Image:beeImage"] = {exists:true};
     var pollen =  {};
     pollen[base+":pt-BR:rcpol:Image:pollenImage"] = {exists:true};
+
+    var allSporeImage =  {};    
+    allSporeImage[base+":pt-BR:rcpol:Image:allSporeImage"] = {exists:true};
+    
+
     query.where.or.push(allPollen);
+    query.where.or.push(allSporeImage);
     query.where.or.push(plant);
     query.where.or.push(flower);
     query.where.or.push(bee);
     query.where.or.push(pollen);    
     console.log("traz apenas os campos de imagens")
     query.fields[base+":pt-BR:rcpol:Image:allPollenImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:allSporeImage"] = true;
     query.fields[base+":pt-BR:rcpol:Image:plantImage"] = true;
     query.fields[base+":pt-BR:rcpol:Image:flowerImage"] = true; 
     query.fields[base+":pt-BR:rcpol:Image:beeImage"] = true;
