@@ -126,7 +126,15 @@ Identification.prototype.createSpecies = function(callback) {
       self.species[sp.id].scientificNameAuthorship = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:scientificNameAuthorship"].value;
       self.species[sp.id].vernacularName = sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName"]?sp[self.base+":"+self.internacionalization.language+":dwc:Taxon:vernacularName"].value:"";
       self.species[sp.id].html = $("<div class='especies' id = " + self.species[sp.id].htmlId + "></div>");
-      self.species[sp.id].thumbnail = sp[self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage"]?sp[self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage"].images[0].thumbnail:sp[self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage"]?sp[self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage"].images[0].thumbnail:sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage"]?sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage"].images[0].thumbnail:"img/lspm.jpg"
+      self.species[sp.id].thumbnail = 
+              sp[self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage"]?
+                sp[self.base+":"+self.internacionalization.language+":rcpol:Image:flowerImage"].images[0].thumbnail:
+              sp[self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage"]?
+                sp[self.base+":"+self.internacionalization.language+":rcpol:Image:plantImage"].images[0].thumbnail:
+              sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage"]?
+                sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allPollenImage"].images[0].thumbnail:
+              sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allSporeImage"]?
+                sp[self.base+":"+self.internacionalization.language+":rcpol:Image:allSporeImage"].images[0].thumbnail:"img/lspm.jpg";
       self.species[sp.id].html.append("<a href='/profile/species/"+self.base+"/" + sp.id + "' target='_blank' ><img id='_img_"+self.species[sp.id].htmlId+"' src='"+self.species[sp.id].thumbnail+"' onerror='imageError(this)'/></a>");
       self.species[sp.id].html.append("<div class='nsp'></div>");
       self.species[sp.id].html.find(".nsp").append("<a href='/profile/species/"+self.base+"/" + sp.id + "' target='_blank' ><p class='famisp'>" + self.species[sp.id].family + "</p></a>");
