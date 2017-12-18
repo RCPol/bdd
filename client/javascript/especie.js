@@ -5,6 +5,7 @@ function readSpecies(id, base_, map) {
     $("#rcpol-ProfilesLabel-profilesPollenDescription").hide();
     $(".info-flor").hide();
     $(".info-planta").hide();
+    $("#interaction-url").hide();
   }
   $.getJSON("/api/Species/"+id, function(data){    
     // titulo        
