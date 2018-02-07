@@ -11,12 +11,87 @@ var qt = require('quickthumb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
-var admin = require('firebase-admin');
+// var admin = require('firebase-admin');
 var serviceAccount = require("key.json");
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
 
+  Specimen.getSpreadsheetInfo = function(id, cb) {            
+    var key = require('key.json');
+    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');
+      service.spreadsheets.get({
+            auth: jwtClient,
+            spreadsheetId: id,            
+          }, function(err, d) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              cb('The API returned an error: ' + err,null)
+              return;          
+            }
+            cb(null,d);
+          });
+        });
+      //   service.spreadsheets.values.get({
+      //     auth: jwtClient,
+      //     spreadsheetId: id,
+      //     range: 'specimen.pt-BR!A:BU'        
+      //   }, function(err, d) {
+      //     if (err){
+      //       console.log('The API returned an error: ' + err);    
+      //       cb('The API returned an error: ' + err,null)
+      //       return;          
+      //     }
+      //     cb(null,d.values);
+      //   });
+      // });
+  }
+  Specimen.completeness = function(id, language, cb) {            
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!A:BU'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          cb(null,d.values);
+        });
+      });
+  }
   Specimen.aggregationByField = function(prefix, base, lang, field, cb) {            
     var queryMongo = { 'language':lang, base:base }        
     var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
@@ -62,6 +137,28 @@ module.exports = function(Specimen) {
       cb(null, results);      
     });   
   }
+  
+  Specimen.remoteMethod(     
+    'completeness',
+    {
+      http: {path: '/completeness', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+  Specimen.remoteMethod(     
+    'getSpreadsheetInfo',
+    {
+      http: {path: '/getSpreadsheetInfo', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
 
   Specimen.remoteMethod(     
     'aggregationByField',
@@ -106,10 +203,10 @@ module.exports = function(Specimen) {
   SpecimenHandler.prototype.setData = function(){
     var self = this;
     self.data = self.table.slice(5,self.table.length);
-    self.db.collection('monitoring').doc(self.base).set({
-      startProcess: new Date(),
-      totalSpecimens: self.data.length,                  
-    },{merge: true});
+    // self.db.collection('monitoring').doc(self.base).set({
+    //   startProcess: new Date(),
+    //   totalSpecimens: self.data.length,                  
+    // },{merge: true});
 
     return this;
   }
@@ -177,6 +274,17 @@ module.exports = function(Specimen) {
               return item.trim();
             });
             function processStates(cb){
+              if(String(value).trim().length == 0) {
+                // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+self.base+":"+self.originalLanguage+":"+term+":"+index).set({
+                //       type: "state",
+                //       target: self.base+":"+self.originalLanguage+":"+term+":"+index,
+                //       message: "State is not complete",
+                //       timestamp: new Date()
+                // });                 
+                callbackState();
+                return false;
+              }
+
               var statesValues = value.split("|");
               self.record[fieldId].states = [];
               async.each(statesValues, function(stateVal, callbackState) {
@@ -196,23 +304,23 @@ module.exports = function(Specimen) {
                         if(translatedState){
                           self.record[fieldId].states.push(translatedState.toJSON());
                         } else {
-                          self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+translatedStateId).set({
-                            type: "state",
-                            target: translatedStateId,
-                            message: "State not found in the glossary",
-                            timestamp: new Date()
-                          });
+                          // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+translatedStateId).set({
+                          //   type: "state",
+                          //   target: translatedStateId,
+                          //   message: "State not found in the glossary",
+                          //   timestamp: new Date()
+                          // });
                         }
                         callbackState();
                       });
                     }                    
                   } else {   
-                    self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+self.base+":"+self.originalLanguage+":"+term+":"+stateValue).set({
-                      type: "state",
-                      target: self.base+":"+self.originalLanguage+":"+term+":"+stateValue,
-                      message: "State not found in the glossary",
-                      timestamp: new Date()
-                    });                 
+                    // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+self.base+":"+self.originalLanguage+":"+term+":"+stateValue).set({
+                    //   type: "state",
+                    //   target: self.base+":"+self.originalLanguage+":"+term+":"+stateValue,
+                    //   message: "State not found in the glossary",
+                    //   timestamp: new Date()
+                    // });                 
                     callbackState();
                   }
                 });                                    
@@ -229,12 +337,12 @@ module.exports = function(Specimen) {
                 if(collection) {                  
                   self.record.collection = collection.toJSON();                                    
                 } else {                  
-                  self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+cID).set({
-                    type: "collection",
-                    target: cID,
-                    message: "Collection not found in the insitutions sheet",
-                    timestamp: new Date()
-                  });
+                  // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+cID).set({
+                  //   type: "collection",
+                  //   target: cID,
+                  //   message: "Collection not found in the insitutions sheet",
+                  //   timestamp: new Date()
+                  // });
                 }
                 callback();              
               });
@@ -314,12 +422,12 @@ module.exports = function(Specimen) {
             }                       
           } else {
             // console.log("field does not exist")
-            self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+fieldId).set({
-              type: "field",
-              target: fieldId,
-              message: "Field not found in the glossary",
-              timestamp: new Date()
-            });
+            // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+fieldId).set({
+            //   type: "field",
+            //   target: fieldId,
+            //   message: "Field not found in the glossary",
+            //   timestamp: new Date()
+            // });
             callback();
           }        
         });
@@ -353,14 +461,14 @@ module.exports = function(Specimen) {
         else resolve();
       });
     });
-  }
+  }  
   SpecimenHandler.prototype.saveRecord = function(language,line){
     // console.log("4 - SAVE RECORD!");
     var self = this;
     return new Promise(function(resolve, reject){
       var Schema = Specimen.app.models.Schema;      
       var record = new SpecimenRecord(self.base,language,self.originalLanguage,line);
-      record.db = self.db;
+      // record.db = self.db;
       record.schemas = self.schemas;
       record.classes = self.classes;
       record.terms = self.terms;
@@ -406,9 +514,7 @@ module.exports = function(Specimen) {
   //função que recebe a planilha
   Specimen.inputFromURL = function(id,language, base, cb) {
     var key = require('key.json');
-    // 
     
-
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
       key.client_email,
@@ -425,12 +531,12 @@ module.exports = function(Specimen) {
         cb(err,tokens)
         return;
       }      
-      key.private_key_id = "AIzaSyBSZPz37axCH9r50s7TdrgGdTi0Tt32Vtc"
-      if(!admin.apps.length)
-        admin.initializeApp({
-          credential: admin.credential.cert(key)
-        });    
-      var db = admin.firestore();
+    //   key.private_key_id = "AIzaSyBSZPz37axCH9r50s7TdrgGdTi0Tt32Vtc"
+    //   if(!admin.apps.length)
+    //     admin.initializeApp({
+    //       credential: admin.credential.cert(key)
+    //     });    
+    //   var db = admin.firestore();
        
       var service = google.sheets('v4');
       service.spreadsheets.values.get({
@@ -448,7 +554,7 @@ module.exports = function(Specimen) {
               var start = new Date();
               var data = d.values;
               var handler = new SpecimenHandler(base, language, data);              
-              handler.db = db;
+              // handler.db = db;
               handler.setSchemas().setClasses().setTerms().setData();                                          
               handler.processData()
                 .then(function(){

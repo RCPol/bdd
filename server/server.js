@@ -289,8 +289,8 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
   });
 });
 
-app.get('/admin/update', function(req, res) {
-  var template = fs.readFileSync('./client/update.mustache', 'utf8');
+app.get('/admin/data-quality', function(req, res) {
+  var template = fs.readFileSync('./client/data-quality.mustache', 'utf8');
   var params = {base: "eco"};
 
   res.send(mustache.render(template, params));
