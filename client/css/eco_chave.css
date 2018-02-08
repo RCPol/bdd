@@ -92,6 +92,11 @@ nav ul li a:hover {
 	background-color: #F27224;
 }
 
+a.int-btn {
+	background-color: #F27224;
+	color: white;
+}
+
 div.wrap-label-select-menu {
 	display: block;
 	float: right;
@@ -117,8 +122,10 @@ select {
 /* Bandeiras de troca de língua */
 span.t-lang {
 	display: block;
+	float: right;
 	background-color: rgba(255, 240, 196, 0.6);
 	padding: 14px 8px;
+	margin-bottom: -12px;
 	height: 25px;
 }
 
