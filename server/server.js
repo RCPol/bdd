@@ -75,6 +75,11 @@ app.get('/interaction/:plant', function(req, res) {
   var params = {base: "eco",plant:req.params.plant};
   res.send(mustache.render(template, params));
 });
+app.get('/interactions', function(req, res) {
+  var template = fs.readFileSync('./client/interaction-all.mustache', 'utf8');  
+  var params = {base: "eco"};
+  res.send(mustache.render(template, params));
+});
 app.get('/taxon', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "taxon"};

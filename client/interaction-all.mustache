@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="css/interaction-all.css">
+
+	<title>RCPol</title>
+</head>
+<body>
+<div class="contem">
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+
+		<!-- Menu: início -->
+		<nav>
+			<ul>
+				<li> <!-- inserir link para o portal --> <a href="http://rcpol.org.br" id="rcpol-SiteLabel-siteHome">Home</a></li>
+				<li> <!-- inserir link para a ferramenta --> <a href="/{{base}}" id="rcpol-SiteLabel-siteIdentificationKey">Chave de Identifica&ccedil;&atilde;o de esp&eacute;cies</a></li>
+        <li> <!-- inserir link para o glossário --> <a href="/profile/glossary/{{base}}" id="rcpol-SiteLabel-siteGlossary">Gloss&aacute;rio</a></li>
+				<li>
+					<span class="t-lang">
+							<img onclick="setLanguage('pt-BR')"  src="img/pt_BR.png">
+							<img onclick="setLanguage('en-US')"  src="img/en_GB.png">
+							<img onclick="setLanguage('es-ES')"  src="img/es_ES.png">
+						</span>
+				</li>
+			</ul>
+		</nav>
+		<!-- Menu: fim -->
+
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="img/logo_eco_pt-BR.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" width="430px" height="194px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+
+	<!-- Início das informações da Página -->
+	<article>
+
+		<!-- Título da Página -->
+		<h1 class="int-tit">Interação Abelha-Planta</h1>
+
+		<!-- Formulário de Busca -->
+		<form class="formbusca" onreset="busca(true)" onsubmit="busca(false); return false;">
+			<input type="text" id="buscaglossario" class="fbcampo" size="21" maxlength="120" value="Pesquisar"><input type="submit" value="&#9654;" class="fbbotao">
+			<input class="fbbotao" type="reset" value="Limpar">
+		</form>
+		<div class="tfclear"></div>
+
+		<!-- Início: Imagens de Abelhas -->
+		<div class="cspm">			
+		</div>
+		<!-- Final: Imagens de Abelhas -->
+
+	</article>
+	<!-- Final das informações da Página -->
+
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2016 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->
+
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/sha1.js"></script>
+<script>
+	$(document).ready(function(){
+		$(".cspm").html("Loading...");
+		$.getJSON( "/api/Interactions/pollinators", function( data ) {
+			$(".cspm").html("");
+			var cache = {};
+			data.response.forEach(function(item){
+				if(cache[item._id.pollinator]) return false;
+				else cache[item._id.pollinator] = true;
+				var el = `
+					<div class="visitante">
+						<img id="${CryptoJS.SHA1(item._id.pollinator)}" src="img/filler-200px.png" class="visit-img">
+						<p class="infos-spc1">${item._id.family}</p>
+						<p class="infos-spc">${item._id.subfamily}</p>
+						<p class="infos-spc">${item._id.tribe}</p>
+						<p class="div-visitante">
+							<a href="/interaction-profile/${item._id.pollinator}">
+								<i>${item._id.pollinator}</i>
+							</a>
+						</p>
+						<p class="legenda-int-p">
+							${item._id.vernacularName}
+						</p>
+						<p class="div-visitante">				
+							<img id="${CryptoJS.SHA1(item._id.pollinator+"-ref")}" src="img/eco_ref.png" title="teste" class="popsref"/>
+							<img id="${CryptoJS.SHA1(item._id.pollinator+"-cred")}" src="img/eco_copyr.png" title="teste" class="popsref"/>
+						</p>					
+					</div>
+				`;
+				$(".cspm").append(el);
+				
+				$.getJSON(`/api/Interactions/findOne?filter=%7B%22where%22%3A%7B%22pollinator%22%3A%22${item._id.pollinator}%22%7D%2C%20%22fields%22%3A%7B%22image%22%3Atrue%2C%22beeBibliographicCitation%22%3Atrue%7D%7D`, function( data ) {
+					$(`#${CryptoJS.SHA1(item._id.pollinator)}`).attr('src', data.image.resized);					
+					var contentCred = $(`#${CryptoJS.SHA1(item._id.pollinator+"-cred")}`);					
+					contentCred.tooltip({
+						content: function() {
+						return `								
+								<div class="popsreft">
+									<h4>Credits:</h4>
+									<p><span class="popsrefp">${data.image.credits}</span></p>
+								</div>`;
+						}
+					});
+					var contentRef = $(`#${CryptoJS.SHA1(item._id.pollinator+"-ref")}`);					
+					contentRef.tooltip({
+						content: function() {
+						return `								
+								<div class="popsreft">
+									<h4>References:	</h4><br>							
+									<p><span class="popsrefp">${data.beeBibliographicCitation.split("|").join("<br><br>")}</span></p><br>
+								</div>`;
+						}
+					});
+				});
+			});						
+		});
+	});
+</script>
+</body>
+</html>

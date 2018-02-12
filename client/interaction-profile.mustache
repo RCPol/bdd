@@ -115,7 +115,13 @@
                     <option value="Área urbana">Área urbana</option>
                     <option value="Mata Atlântica">Mata Atlântica</option>
                     <option value="Vegetação de dunas">Vegetação de dunas</option>
-                    <option value="Cultivo">Cultivo</option>                    
+                    <option value="Cultivo">Cultivo</option> 
+					<option value="Cerrado">Cerrado</option> 
+					<option value="Caatinga">Caatinga</option> 
+					<option value="Floresta Amazônica">Floresta Amazônica</option> 
+					
+					                
+					
                 </select>
 			</div>
 
@@ -170,16 +176,49 @@
 		}		
 		function load(){
 			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {				
+				// console.log(interactions);
+				// // if(interactions.response.length>30){
+				// 	// interactions.response.sort(function(a, b){
+				// 		// return a.avgQuantity - b.avgQuantity;
+				// 	// });
+				// 	// interactions.response = interactions.response.slice(0,29)					
+				// // }				
+				// var problem = interactions.response.pop();
+				// console.log("problem",problem)
+				// var other = interactions.response[0];
+				// other._id.plant = "Ricinus communis";
+				// other._id.state = "São Paulo";
+				// other._id.municipality = "São Paulo ";
+				// console.log("other",other)				
+				// // problem._id.state = "São Paulo";
+				// interactions.response.push(other)
+
+				// var sum = 0;
+				// interactions.response.forEach(function(item){
+				// 	sum = sum + item.avgQuantity;
+				// });
+				// console.log(sum)
+
+				// console.log("ordered",interactions);				
+				// interactions.response = interactions.response.map(function(item){
+				// 	item.avgQuantity = item.avgQuantity;
+				// 	return item;
+				// })
+				// // .filter(function(item){
+				// 	// return item.avgQuantity < 7
+				// // })
+				
+				
 				// IN				
 				var json = {nodes: [], links:[]};				
 				var data = interactions.response.map(function(item){
-					console.log(item);
+					
 						var d = {
 								species: item._id.plant?item._id.plant:"", 
 								value: item.avgQuantity?item.avgQuantity:0, 
 								region: item._id.region?item._id.region:"",                     
 								state: item._id.state?item._id.state:"", 
-								municipality: item._id.municipality?item._id.municipality:""};                
+								municipality: item._id.municipality?item._id.municipality+" ":""}; // problema com nome de cidade e estado igual               
 						return d;
 				});            
 				data.forEach(function(item){
@@ -197,7 +236,7 @@
 						var s = index(json.nodes, item.municipality);
 						var t = index(json.nodes, item.species);
 						var v = item.value;
-						var link = {"source": s, "target":t, "value": v, "OUTRO":"CONTEUDO"};
+						var link = {"source": s, "target":t, "value": v};
 						var add = true;
 						json.links.forEach(function(l){                    
 								if(l.source==link.source && l.target==link.target){                        
@@ -246,8 +285,9 @@
 				$("#chart").html("");                        
 				var chart = d3.select("#chart").append("svg")
 						.chart("Sankey.Path");                                        
+				console.log(json)
+				chart.draw(json);
 				
-				chart.draw(json);                        
 				d3.select("#chart").selectAll(".node")[0].forEach(function(g){                
 						if(g.__data__.type=="species"){
 								g.onclick = function(){
@@ -256,9 +296,9 @@
 								$(g).css("font-style","italic");
 						}                    
 				});
-				chart.nodePadding(10);            
+				chart.nodePadding(10);
 				if(data.length==0)
-						$("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
+					$("#chart").html("<h2>Não há registros de interação para esta espécie nesta região.</h2>");
 
 				internacionalization.interactionTranslator();
 		});   	
