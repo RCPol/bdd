@@ -29,6 +29,7 @@
 	<script type="text/javascript" src="/javascript/chave.js"></script>
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
 	<script type="text/javascript" src="/javascript/filter.js"></script>
+	<script type="text/javascript" src="/javascript/trans.js"></script>
 
 	<style>
 		.ui-state-active,
@@ -47,7 +48,11 @@
 </style>
 <!-- Campos de busca, scrollbar e botões  -->
 <script type="text/javascript">	
-
+	var translate = function(){
+		Object.keys(labels).forEach(function(term){
+			$(`.trans-${term}`).html(labels[term][identification.internacionalization.language]);
+		});
+	}	
 	/* Open the sidenav */
 	function openNav() {
 		document.getElementById("mySidenav").style.width = "100%";
@@ -117,6 +122,7 @@
 	}	
 	var identification = new Identification();
 	identification.base = '{{base}}';
+	identification.trans = translate;
 	function updateActiveUser() {		
 		$.get("/api/Identification/activeUsers",function(rs) {
 			$('#activeUsers').html("#"+(rs.response=='0'||rs.response==0?1:rs.response)+" usuários online");			
@@ -153,7 +159,8 @@
 		var filter = new Filter(identification);
 		filter.getVocabulary("collection.","{{base}}:"+identification.internacionalization.language+":rcpol:Collection:laboratory","Laboratório");
 	}	
-	$(document).ready(function(){		
+	
+	$(document).ready(function() {		
 		identification.internacionalization.base = '{{base}}';
 		identification.internacionalization.updateLogo().searchBox();
 		setTimeout(updateActiveUser, 5000);	
@@ -177,8 +184,8 @@
 		} else {
 			msg.dialog('open');
 		}	
-		setFilter();	
-});		
+		setFilter();
+	});		
 </script>
 
 
@@ -222,7 +229,7 @@
 					</li>
 					<li>
 						<div class="wrap-label-select-menu">
-							<span class="label-select-menu">Base: </span>
+							<span class="label-select-menu"><span class="trans-key">Base</span>: </span>
 							<select id="base_selector">
 								<!-- <option value="eco">Palinoecologia</option> -->
 								<!-- <option value="taxon">Palinotaxonomia</option> -->
@@ -230,7 +237,7 @@
 						</div>
 					</li>
 					<li>
-						<!-- inserir link para a lista de abelhas --> <a class="int-btn" href="/interactions">Interação Abelha-Planta</a>
+						<!-- inserir link para a lista de abelhas --> <a class="int-btn trans-interaction-bee-plant" href="/interactions">Interação Abelha-Planta</a>
 					</li>
 					<li>						
 						<span id="count" ></span>	

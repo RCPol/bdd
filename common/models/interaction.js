@@ -62,7 +62,7 @@ module.exports = function(Interaction) {
       });
     });
   }
-    Interaction.pollinators = function(plant,cb) {        
+    Interaction.pollinators = function(plant,query,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL     
     if(process.env.ENVIRONMENT == "docker")
@@ -75,7 +75,18 @@ module.exports = function(Interaction) {
       var q = [];
       if(plant)
         q.push({ $match: {plant:plant}});
-
+      else if(query) {
+        q.push({ $match: {
+          $or: [
+            {pollinator:new RegExp(query,"i")},
+            {family:new RegExp(query,"i")},
+            {subfamily:new RegExp(query,"i")},
+            {tribe:new RegExp(query,"i")},
+            {vernacularName:new RegExp(query,"i")}
+          ]
+        }
+        });
+      }
       q.push({
         $group: {
           _id: {
@@ -83,7 +94,7 @@ module.exports = function(Interaction) {
             "family":"$family",
             "subfamily":"$subfamily",
             "tribe":"$tribe",
-            "vernacularName":"$vernacularName",            
+            "vernacularName":"$vernacularName",
             "reference":"$reference",
             "type":"$type"
           },                   
@@ -104,7 +115,8 @@ module.exports = function(Interaction) {
     {
       http: {path: '/pollinators', verb: 'get'},
       accepts: [
-        {arg: 'plant', type: 'string', required:false, description: 'Plant name'}        
+        {arg: 'plant', type: 'string', required:false, description: 'Plant name'},      
+        {arg: 'query', type: 'string', required:false, description: 'Query'}        
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}

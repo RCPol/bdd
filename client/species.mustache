@@ -241,7 +241,11 @@ textarea { height: 80px; resize: none; }
 			            });
 						//Final do Código da Tabela-Grid
 			        readSpecies(id, base, map);
-					});     
+					});  
+				$.getJSON(`/api/Interactions/pollinators?plant=${id.split(":")[2]}`, function( data ) {					
+					if(data.response.length==0)
+						$("#interaction-url").hide();
+				});				
 			});		  		   
 		    
 		  

@@ -77,12 +77,14 @@ Identification.prototype.startup = function() {
     });
     self.printDescriptors();
     self.identify();
+    self.trans();
   });
 }
 Identification.prototype.translate = function(language) {
-  var self = this;
+  var self = this;  
   self.internacionalization.setLanguage(language).siteTranslator().keyTranslator().searchBox();  
   self.startup();
+  self.trans();
   return this;
 }
 Identification.prototype.selectState = function(id) {

@@ -77,7 +77,7 @@ app.get('/interaction/:plant', function(req, res) {
 });
 app.get('/interactions', function(req, res) {
   var template = fs.readFileSync('./client/interaction-all.mustache', 'utf8');  
-  var params = {base: "eco"};
+  var params = {base: "interaction"};
   res.send(mustache.render(template, params));
 });
 app.get('/taxon', function(req, res) {

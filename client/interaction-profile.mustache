@@ -175,6 +175,16 @@
 			return -1;        
 		}		
 		function load(){
+			console.log("/api/Interactions/findOne?pollinator="+pollinator)	  
+			$.getJSON("/api/Interactions/findOne?pollinator="+pollinator, function( interaction ) {
+				console.log(interaction)
+					var aux = [];
+					if(interaction.reference)
+							aux.push(interaction.reference.split("|"));  
+					aux.forEach(function(item){
+						$("#vis").append(`<p>${item}</p>`);
+					});
+			});
 			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {				
 				// console.log(interactions);
 				// // if(interactions.response.length>30){
@@ -284,8 +294,7 @@
 				});
 				$("#chart").html("");                        
 				var chart = d3.select("#chart").append("svg")
-						.chart("Sankey.Path");                                        
-				console.log(json)
+						.chart("Sankey.Path");                                        				
 				chart.draw(json);
 				
 				d3.select("#chart").selectAll(".node")[0].forEach(function(g){                
@@ -303,15 +312,7 @@
 				internacionalization.interactionTranslator();
 		});   	
 		}
-		load();		  
-		$.getJSON( "/api/Interactions/findOne?pollinator="+pollinator, function( interaction ) {
-				var aux = [];
-				if(interaction.reference)
-						aux.push(interaction.reference.split("|"));  
-				aux.forEach(function(item){
-					$("#vis").append(`<p>${item}</p>`);
-				});
-		});     
+		load();			
 	});
 </script>
 </html>
