@@ -603,7 +603,7 @@ textarea { height: 80px; resize: none; }
 		<button id="send-feedback" class="formBtn">Enviar</button>
 		<input onclick="exitFeedback();" class="formBtn" type="reset" value="Sair"/>
 	</div>
-  
+	<div id="result"></div>
 </div>
 
 <button id="popup" class="feedback-button" onclick="toggle_visibility()">Reportar</button>
@@ -632,7 +632,7 @@ textarea { height: 80px; resize: none; }
 		// An error happened.
 		});
 	}	
-	$(function() {
+	$(function() {		
 		$("#auth").hide();
 		$(document).mouseup(function (e) {
 			var container = $("#contactForm");
