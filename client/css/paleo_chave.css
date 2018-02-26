@@ -965,7 +965,7 @@ div.sidecontent-d {
 }
 
 .show-only-eco {
-	display: none;
+	display: none!important;
 }
 
 .hide-only-eco {
