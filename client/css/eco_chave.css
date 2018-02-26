@@ -970,3 +970,11 @@ div.sidecontent-d {
 	border:1px solid #FFAD60;
 	width: 415px;
 }
+
+.show-only-eco {
+	display: inherit;
+}
+
+.hide-only-eco {
+	display: none;
+}

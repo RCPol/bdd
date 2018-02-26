@@ -236,17 +236,21 @@
 							</select>
 						</div>
 					</li>
-					<li>
+					<li class="show-only-eco">
 						<!-- inserir link para a lista de abelhas --> <a class="int-btn trans-interaction-bee-plant" href="/interactions">Interação Abelha-Planta</a>
 					</li>
 					<li>						
-						<span id="count" ></span>	
-						<span id="activeUsers"></span>
+						<span class="show-only-eco" id="count" ></span>	
+						<span class="show-only-eco" id="activeUsers"></span>
 						<span class="t-lang">
 							<img onclick="identification.translate('pt-BR');setFilter();"  src="/img/pt_BR.png">
 							<img onclick="identification.translate('en-US');setFilter();"  src="/img/en_GB.png">
 							<img onclick="identification.translate('es-ES');setFilter();"  src="/img/es_ES.png">
 						</span>					
+					</li>
+					<li>
+						<span class="hide-only-eco" id="count" ></span>	
+						<span class="hide-only-eco" id="activeUsers"></span>	
 					</li>					
 				</ul>
 			</nav>

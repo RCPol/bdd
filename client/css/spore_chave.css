@@ -963,3 +963,11 @@ div.sidecontent-d {
 	border:1px solid #d3bf73;
 	width: 415px;
 }
+
+.show-only-eco {
+	display: none;
+}
+
+.hide-only-eco {
+	display: inherit;
+}
