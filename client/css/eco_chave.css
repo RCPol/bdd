@@ -92,6 +92,11 @@ nav ul li a:hover {
 	background-color: #F27224;
 }
 
+a.int-btn {
+	background-color: #F27224;
+	color: white;
+}
+
 div.wrap-label-select-menu {
 	display: block;
 	float: right;
@@ -117,8 +122,10 @@ select {
 /* Bandeiras de troca de língua */
 span.t-lang {
 	display: block;
+	float: right;
 	background-color: rgba(255, 240, 196, 0.6);
 	padding: 14px 8px;
+	margin-bottom: -12px;
 	height: 25px;
 }
 
@@ -130,7 +137,7 @@ span.t-lang img {
 
 /* Contador */
 
-#count {
+.count {
 	color: #470054;
 	display: block;
 	float: right;
@@ -141,7 +148,7 @@ span.t-lang img {
 	font-family: 'Roboto Condensed', sans-serif;
 }
 
-#activeUsers {
+.activeUsers {
 	color: #470054;
 	display: block;
 	float: right;
@@ -962,4 +969,12 @@ div.sidecontent-d {
 	color: #F27224;
 	border:1px solid #FFAD60;
 	width: 415px;
+}
+
+.show-only-eco {
+	display: inherit;
+}
+
+.hide-only-eco {
+	display: none!important;
 }

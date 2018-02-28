@@ -7,6 +7,7 @@ module.exports = function(Species) {
     Species.findById(id, function (err, data) {
       if(err) throw new Error(err);
       var url = "";
+      console.log(data)
       if(data["dwc:associatedMedia"]){
         // ensure it is an array
         var associatedMedia = data["dwc:associatedMedia"];
@@ -103,6 +104,7 @@ module.exports = function(Species) {
         species[base+":"+language+":rcpol:Image:beeImage"] = specimens[0][base+":"+language+":rcpol:Image:beeImage"];
         species[base+":"+language+":rcpol:Image:pollenImage"] = specimens[0][base+":"+language+":rcpol:Image:pollenImage"];
         species[base+":"+language+":rcpol:Image:allPollenImage"] = specimens[0][base+":"+language+":rcpol:Image:allPollenImage"];
+        species[base+":"+language+":rcpol:Image:allSporeImage"] = specimens[0][base+":"+language+":rcpol:Image:allSporeImage"];
         specimens.forEach(function (sp) {
           var specimen = {};
           specimen.id = sp.id;

@@ -55,14 +55,14 @@ module.exports = function(Interaction) {
             }
           }
         ];
-      collection.aggregate(q_).toArray(function(err, docs) {        
+      collection.aggregate(q_).toArray(function(err, docs) {
         cb(err,docs);
         db.close();
         
       });
     });
   }
-    Interaction.pollinators = function(plant,cb) {        
+    Interaction.pollinators = function(plant,query,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL     
     if(process.env.ENVIRONMENT == "docker")
@@ -72,20 +72,37 @@ module.exports = function(Interaction) {
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
-      var q = [
-          { $match: {plant:plant}},                 
-          {
-            $group: {
-              _id: {
-                "pollinator":"$pollinator",
-                "reference":"$reference",
-                "type":"$type"
-              },                   
-              // count: {$sum:1}
-              // avgQuantity: { $avg: "$percentual" }
-            }
-          }
-        ];
+      var q = [];
+      if(plant)
+        q.push({ $match: {plant:plant}});
+      else if(query) {
+        q.push({ $match: {
+          $or: [
+            {pollinator:new RegExp(query,"i")},
+            {family:new RegExp(query,"i")},
+            {subfamily:new RegExp(query,"i")},
+            {tribe:new RegExp(query,"i")},
+            {vernacularName:new RegExp(query,"i")}
+          ]
+        }
+        });
+      }
+      q.push({
+        $group: {
+          _id: {
+            "pollinator":"$pollinator",
+            "family":"$family",
+            "subfamily":"$subfamily",
+            "tribe":"$tribe",
+            "vernacularName":"$vernacularName",
+            "reference":"$reference",
+            "type":"$type"
+          },                   
+          // count: {$sum:1}
+          // avgQuantity: { $avg: "$percentual" }
+        }
+      });
+      
       collection.aggregate(q).toArray(function(err, docs) {        
         cb(err,docs);
         db.close();
@@ -98,7 +115,8 @@ module.exports = function(Interaction) {
     {
       http: {path: '/pollinators', verb: 'get'},
       accepts: [
-        {arg: 'plant', type: 'string', required:false, description: 'Plant name'}        
+        {arg: 'plant', type: 'string', required:false, description: 'Plant name'},      
+        {arg: 'query', type: 'string', required:false, description: 'Query'}        
        // {arg: 'redownload', type: 'boolean', required:false, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: false}
       ],
       returns: {arg: 'response', type: 'object'}
@@ -142,7 +160,7 @@ module.exports = function(Interaction) {
         service.spreadsheets.values.get({
             auth: jwtClient,
             spreadsheetId: id,
-            range: 'A:K'        
+            range: 'A:P'        
           }, function(err, rs) {
             if (err){
               console.log('The API returned an error: ' + err);    
@@ -154,34 +172,39 @@ module.exports = function(Interaction) {
             rs.values.shift();
             rs.values.shift();            
             rs.values.forEach(function(line){
-              var val = Number(new String(line[4]).replace(",","."));              
+              var val = Number(new String(line[9]).replace(",","."));              
               if(val > 0){
                 var i = {};
                 i.dataset = id;
                 i.modified = new Date();
-                i.collection = line[0];
+                i.collection = [0];
                 i.plant = line[1];
                 i.type = line[2];
-                i.pollinator = line[3];              
+                i.family = line[3];
+                i.subfamily = line[4];
+                i.tribe = line[5];
+                i.vernacularName = line[6];
+                i.beeBibliographicCitation = line[7];
+                i.pollinator = line[8];
                 i.percentual = val;
-                i.author = line[5];
-                i.municipality = line[6];
-                i.state = line[7];
-                i.region = line[8];
-                i.vegetalForm = line[9];
-                i.reference = line[10];
+                i.author = line[10];
+                i.municipality = line[11];
+                i.state = line[12];
+                i.region = line[13];
+                i.vegetalForm = line[14];
+                i.reference = line[15];                
                 data.push(i); 
               }               
             });            
             Interaction.create(data,function(err,saved){
               if (err) {
                 console.log('The API returned an error: ' + err);    
-                cb(err,saved);
+                cb(err,"error");
               }            
               Interaction.downloadImages(id,function(){
                 console.log("Images downloaded.");
               });              
-              cb(err,saved);
+              cb(err,"Done: "+saved.length);
             });                                 
         });
       });

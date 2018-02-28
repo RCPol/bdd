@@ -10,10 +10,88 @@ var fs = require('fs');
 var qt = require('quickthumb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+
+// var admin = require('firebase-admin');
+var serviceAccount = require("key.json");
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
 
+  Specimen.getSpreadsheetInfo = function(id, cb) {            
+    var key = require('key.json');
+    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');
+      service.spreadsheets.get({
+            auth: jwtClient,
+            spreadsheetId: id,            
+          }, function(err, d) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              cb('The API returned an error: ' + err,null)
+              return;          
+            }
+            cb(null,d);
+          });
+        });
+      //   service.spreadsheets.values.get({
+      //     auth: jwtClient,
+      //     spreadsheetId: id,
+      //     range: 'specimen.pt-BR!A:BU'        
+      //   }, function(err, d) {
+      //     if (err){
+      //       console.log('The API returned an error: ' + err);    
+      //       cb('The API returned an error: ' + err,null)
+      //       return;          
+      //     }
+      //     cb(null,d.values);
+      //   });
+      // });
+  }
+  Specimen.completeness = function(id, language, cb) {            
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!A:BU'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          cb(null,d.values);
+        });
+      });
+  }
   Specimen.aggregationByField = function(prefix, base, lang, field, cb) {            
     var queryMongo = { 'language':lang, base:base }        
     var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
@@ -59,6 +137,28 @@ module.exports = function(Specimen) {
       cb(null, results);      
     });   
   }
+  
+  Specimen.remoteMethod(     
+    'completeness',
+    {
+      http: {path: '/completeness', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+  Specimen.remoteMethod(     
+    'getSpreadsheetInfo',
+    {
+      http: {path: '/getSpreadsheetInfo', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
 
   Specimen.remoteMethod(     
     'aggregationByField',
@@ -103,15 +203,25 @@ module.exports = function(Specimen) {
   SpecimenHandler.prototype.setData = function(){
     var self = this;
     self.data = self.table.slice(5,self.table.length);
+    // self.db.collection('monitoring').doc(self.base).set({
+    //   startProcess: new Date(),
+    //   totalSpecimens: self.data.length,                  
+    // },{merge: true});
+
     return this;
   }
   SpecimenHandler.prototype.processData = function(){
     var self = this;
+    // var i = 0;
     console.log("2 - PROCESSING DATA!");
     return new Promise(function(resolve, reject){  
       function processLine(line,callback){
         // console.log("3 - PUSHING LINE!");
         self.processLine(line.line,callback);
+        // i++;
+        // self.db.collection('monitoring').doc(self.base).set({          
+        //   totalProcessedSpecimens: i,                  
+        // },{merge: true});
       }    
       var queue = async.queue(processLine,3);
       queue.drain = function() {        
@@ -132,7 +242,7 @@ module.exports = function(Specimen) {
     this.record = {};
   }
   SpecimenRecord.prototype.defineId = function(){
-    var self = this;    
+    var self = this;        
     self.id = Specimen.app.defineSpecimenID(self.base, self.language,self.line[1],self.line[2],self.line[3]); //definição do id do specimen
     self.record.id = self.id;    
     return self.id;
@@ -164,6 +274,17 @@ module.exports = function(Specimen) {
               return item.trim();
             });
             function processStates(cb){
+              if(String(value).trim().length == 0) {
+                // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+self.base+":"+self.originalLanguage+":"+term+":"+index).set({
+                //       type: "state",
+                //       target: self.base+":"+self.originalLanguage+":"+term+":"+index,
+                //       message: "State is not complete",
+                //       timestamp: new Date()
+                // });                 
+                callbackState();
+                return false;
+              }
+
               var statesValues = value.split("|");
               self.record[fieldId].states = [];
               async.each(statesValues, function(stateVal, callbackState) {
@@ -182,13 +303,24 @@ module.exports = function(Specimen) {
                       Schema.findById(translatedStateId,function(err,translatedState) {                      
                         if(translatedState){
                           self.record[fieldId].states.push(translatedState.toJSON());
-                        } else{
-                          console.log("ERR-001", translatedStateId)
+                        } else {
+                          // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+translatedStateId).set({
+                          //   type: "state",
+                          //   target: translatedStateId,
+                          //   message: "State not found in the glossary",
+                          //   timestamp: new Date()
+                          // });
                         }
                         callbackState();
                       });
                     }                    
-                  } else {                    
+                  } else {   
+                    // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+self.base+":"+self.originalLanguage+":"+term+":"+stateValue).set({
+                    //   type: "state",
+                    //   target: self.base+":"+self.originalLanguage+":"+term+":"+stateValue,
+                    //   message: "State not found in the glossary",
+                    //   timestamp: new Date()
+                    // });                 
                     callbackState();
                   }
                 });                                    
@@ -198,13 +330,20 @@ module.exports = function(Specimen) {
             }
             function processRegularFields(){
               var Collection = Specimen.app.models.Collection;
-              var sID = self.record.id.split(":");
+              var sID = self.record.id.split(":");              
               var cID = sID[1]+":"+sID[2]+":"+sID[3];                        
               Collection.findById(cID, function(err,collection) {                
                 if(err) console.log("ERROR FIND COLLECTION: ",err);          
                 if(collection) {                  
                   self.record.collection = collection.toJSON();                                    
-                } else console.log("ERR-002")
+                } else {                  
+                  // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+cID).set({
+                  //   type: "collection",
+                  //   target: cID,
+                  //   message: "Collection not found in the insitutions sheet",
+                  //   timestamp: new Date()
+                  // });
+                }
                 callback();              
               });
               // EVENT DATE
@@ -283,6 +422,12 @@ module.exports = function(Specimen) {
             }                       
           } else {
             // console.log("field does not exist")
+            // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+fieldId).set({
+            //   type: "field",
+            //   target: fieldId,
+            //   message: "Field not found in the glossary",
+            //   timestamp: new Date()
+            // });
             callback();
           }        
         });
@@ -316,13 +461,14 @@ module.exports = function(Specimen) {
         else resolve();
       });
     });
-  }
+  }  
   SpecimenHandler.prototype.saveRecord = function(language,line){
     // console.log("4 - SAVE RECORD!");
     var self = this;
     return new Promise(function(resolve, reject){
       var Schema = Specimen.app.models.Schema;      
       var record = new SpecimenRecord(self.base,language,self.originalLanguage,line);
+      // record.db = self.db;
       record.schemas = self.schemas;
       record.classes = self.classes;
       record.terms = self.terms;
@@ -362,13 +508,14 @@ module.exports = function(Specimen) {
         console.log("ERR-003", error)
         callback();
       });    
-  }  
+  }
   
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
   Specimen.inputFromURL = function(id,language, base, cb) {
-    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
-    var key = require('key.json');    
+    var key = require('key.json');
+    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
       key.client_email,
       null,
@@ -377,12 +524,20 @@ module.exports = function(Specimen) {
       null
     );
     
+    
     jwtClient.authorize(function (err, tokens) {
       if (err) {
         console.log(err.errorDescription,err.error_description,tokens);
         cb(err,tokens)
         return;
-      }
+      }      
+    //   key.private_key_id = "AIzaSyBSZPz37axCH9r50s7TdrgGdTi0Tt32Vtc"
+    //   if(!admin.apps.length)
+    //     admin.initializeApp({
+    //       credential: admin.credential.cert(key)
+    //     });    
+    //   var db = admin.firestore();
+       
       var service = google.sheets('v4');
       service.spreadsheets.values.get({
             auth: jwtClient,
@@ -398,8 +553,9 @@ module.exports = function(Specimen) {
               console.log("1 - Apagado!");
               var start = new Date();
               var data = d.values;
-              var handler = new SpecimenHandler(base, language, data);
-              handler.setSchemas().setClasses().setTerms().setData();
+              var handler = new SpecimenHandler(base, language, data);              
+              // handler.db = db;
+              handler.setSchemas().setClasses().setTerms().setData();                                          
               handler.processData()
                 .then(function(){
                   var speciesTime = new Date();
@@ -455,7 +611,7 @@ module.exports = function(Specimen) {
           cb();
         });
       }
-      processing = async.queue(processImage,5);      
+      processing = async.queue(processImage,1);      
       processing.push(queue);
       processing.drain = function() {
         resolve()        
@@ -475,6 +631,11 @@ module.exports = function(Specimen) {
              queue.push(img);
             });
         }
+        if(result[base+":pt-BR:rcpol:Image:allSporeImage"]){
+          result[base+":pt-BR:rcpol:Image:allSporeImage"].images.forEach(function (img){
+           queue.push(img);
+          });
+      }
         if(result[base+":pt-BR:rcpol:Image:flowerImage"]){
             result[base+":pt-BR:rcpol:Image:flowerImage"].images.forEach(function (img){
               queue.push(img);
@@ -521,7 +682,7 @@ module.exports = function(Specimen) {
       fields:{}
     };
     console.log("define filtro para pegar apenas imagens que tenham pelo menos uma imagem")
-    var allPollen =  {};
+    var allPollen =  {};    
     allPollen[base+":pt-BR:rcpol:Image:allPollenImage"] = {exists:true};
     var plant =  {};
     plant[base+":pt-BR:rcpol:Image:plantImage"] = {exists:true};
@@ -531,13 +692,20 @@ module.exports = function(Specimen) {
     bee[base+":pt-BR:rcpol:Image:beeImage"] = {exists:true};
     var pollen =  {};
     pollen[base+":pt-BR:rcpol:Image:pollenImage"] = {exists:true};
+
+    var allSporeImage =  {};    
+    allSporeImage[base+":pt-BR:rcpol:Image:allSporeImage"] = {exists:true};
+    
+
     query.where.or.push(allPollen);
+    query.where.or.push(allSporeImage);
     query.where.or.push(plant);
     query.where.or.push(flower);
     query.where.or.push(bee);
     query.where.or.push(pollen);    
     console.log("traz apenas os campos de imagens")
     query.fields[base+":pt-BR:rcpol:Image:allPollenImage"] = true;
+    query.fields[base+":pt-BR:rcpol:Image:allSporeImage"] = true;
     query.fields[base+":pt-BR:rcpol:Image:plantImage"] = true;
     query.fields[base+":pt-BR:rcpol:Image:flowerImage"] = true; 
     query.fields[base+":pt-BR:rcpol:Image:beeImage"] = true;
@@ -555,17 +723,21 @@ module.exports = function(Specimen) {
   ImageDownloader.prototype.downloadImage = function(img) {
     var self =  this;    
     return new Promise(function(resolve, reject){      
-      // console.log("imagem nao existe");            
-      request(img.original, {encoding: 'binary', timeout: 10000}, function(err, response, body){
-        if (err){          
-            console.log("Error to download "+img.original);                        
-            reject({img:img.raw});
-        } else {
-          // console.log("imagem baixada");          
-          img.downloadedContent = body;
-          resolve(img);          
-        }
-      });
+      console.log("imagem nao existe",img.original);  
+      try{
+        request(img.original, {encoding: 'binary'}, function(err, response, body){          
+          if (err){          
+              console.log("Error to download "+img.original);                        
+              reject({img:img.raw});
+          } else {
+            // console.log("imagem baixada");          
+            img.downloadedContent = body;
+            resolve(img);          
+          }
+        });
+      } catch(e){
+        console.log("ERROR: ", e)
+      }               
     });
   }
   ImageDownloader.prototype.transformImage = function(img, source, target, size) {
@@ -601,7 +773,7 @@ module.exports = function(Specimen) {
     return new Promise(function(resolve, reject){      
       var error = function(err){           
         if(err.img){               
-          console.log(err.img.original)             
+          console.log(err.img.original)
           fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
             if(err_) console.log("original não apagado");
             else console.log('original file deleted successfully');                
@@ -697,9 +869,13 @@ module.exports = function(Specimen) {
   Image.prototype.checkIfExist = function(path) {
     var self = this;
     return new Promise(function(resolve, reject){
-      fs.exists(path, function(exists){
-        resolve(exists);        
-      });
+      try{                
+        fs.exists(path, function(exists){
+          resolve(exists);        
+        });
+      } catch(e){
+        console.log("erroooooooooo",e)
+      }      
     });
   }
   Specimen.remoteMethod(

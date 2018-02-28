@@ -130,7 +130,7 @@ span.t-lang img {
 
 /* Contador */
 
-#count {
+.count {
 	color: #EE5859;
 	display: block;
 	float: right;
@@ -141,7 +141,7 @@ span.t-lang img {
 	font-family: 'Roboto Condensed', sans-serif;
 }
 
-#activeUsers {
+.activeUsers {
 	color: #EE5859;
 	display: block;
 	float: right;
@@ -962,4 +962,12 @@ div.sidecontent-d {
 	color: #333696;
 	border:1px solid #003366;
 	width: 415px;
+}
+
+.show-only-eco {
+	display: none!important;
+}
+
+.hide-only-eco {
+	display: inherit;
 }

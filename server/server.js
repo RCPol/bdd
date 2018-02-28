@@ -75,6 +75,11 @@ app.get('/interaction/:plant', function(req, res) {
   var params = {base: "eco",plant:req.params.plant};
   res.send(mustache.render(template, params));
 });
+app.get('/interactions', function(req, res) {
+  var template = fs.readFileSync('./client/interaction-all.mustache', 'utf8');  
+  var params = {base: "interaction"};
+  res.send(mustache.render(template, params));
+});
 app.get('/taxon', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "taxon"};
@@ -83,6 +88,11 @@ app.get('/taxon', function(req, res) {
 app.get('/paleo', function(req, res) {
   var template = fs.readFileSync('./client/index.mustache', 'utf8');  
   var params = {base: "paleo"};
+  res.send(mustache.render(template, params));
+});
+app.get('/spore', function(req, res) {
+  var template = fs.readFileSync('./client/index.mustache', 'utf8');  
+  var params = {base: "spore"};
   res.send(mustache.render(template, params));
 });
 app.get('/interaction-profile/:pollinator', function(req, res) {
@@ -284,8 +294,8 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
   });
 });
 
-app.get('/admin/update', function(req, res) {
-  var template = fs.readFileSync('./client/update.mustache', 'utf8');
+app.get('/admin/data-quality', function(req, res) {
+  var template = fs.readFileSync('./client/data-quality.mustache', 'utf8');
   var params = {base: "eco"};
 
   res.send(mustache.render(template, params));

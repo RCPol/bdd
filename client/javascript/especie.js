@@ -1,8 +1,14 @@
-function readSpecies(id, base_, map){
+function readSpecies(id, base_, map) {
   var lang = localStorage.language?localStorage.language:"pt-BR";
-  var scope = base_ +":"+lang;
-  $.getJSON("/api/Species/"+id, function(data){
-    // titulo    
+  var scope = base_ +":"+lang;  
+  if(base_=="spore") {        
+    $("#rcpol-ProfilesLabel-profilesPollenDescription").hide();
+    $(".info-flor").hide();
+    $(".info-planta").hide();
+    $("#interaction-url").hide();
+  }
+  $.getJSON("/api/Species/"+id, function(data){    
+    // titulo        
     $("#interaction-url").attr("href","/interaction/"+data[scope+":dwc:Taxon:scientificName"].value);
     var name = data[scope+":dwc:Taxon:scientificName"].value + " " + data[scope+":dwc:Taxon:scientificNameAuthorship"].value;
     document.title = "RCPol - "+name;
@@ -17,7 +23,7 @@ function readSpecies(id, base_, map){
           $("#"+base+"").append(data[key].field + ": ");                  
         } else if(term=="palynomorphType"){               
           $("#"+base+"-value").append(" / "+data[key].value + " - ");                  
-        } else if(term=="pollenSize"){        
+        } else if(term=="pollenSize"){
           if(data[key].states){
             $("#"+base+"-label").append(data[key].field+": ");
             if(data[key].states.length==1){
@@ -115,13 +121,13 @@ function readSpecies(id, base_, map){
               }
             }            
           }
-        } else if(parsedId.length==5 && class_!="NumericalDescriptor"){        
+        } else if(parsedId.length==5 && class_!="NumericalDescriptor"){          
           if(data[key].value && !data[key].states && !data[key].months){
             $("#"+base+"-label").append(data[key].field+": ");
             $("#"+base+"-value").append(data[key].value);
           }
-          if(data[key].states){
-            data[key].states.forEach(function(state) {
+          if(data[key].states){            
+            data[key].states.forEach(function(state) {              
               $("#"+base+"-value").append(state.vocabulary).append(", ");
             });
             var aux = $("#"+base+"-value").html() || "";
@@ -160,7 +166,7 @@ function readSpecies(id, base_, map){
             );
           }
         }
-      }      
+      }
     });
     // IMAGES
     if(data[scope+':rcpol:Image:plantImage'] && data[scope+':rcpol:Image:plantImage'].images && data[scope+':rcpol:Image:plantImage'].images.length>0)
@@ -181,6 +187,10 @@ function readSpecies(id, base_, map){
       data[scope+":rcpol:Image:allPollenImage"].images.forEach(function(media){
           $("#foto_polen").append("<img src='" +media.resized+"'/>");
       });
+    if(data[scope+':rcpol:Image:allSporeImage'] && data[scope+':rcpol:Image:allSporeImage'].images && data[scope+':rcpol:Image:allSporeImage'].images.length>0)
+      data[scope+":rcpol:Image:allSporeImage"].images.forEach(function(media){
+          $("#foto_polen").append("<img src='" +media.resized+"'/>");
+      });
     $(".fotorama").fotorama();
     // mapa
     map.attributionControl.addAttribution('<a href="./' + id + '"">Ocorrências de ' + name  +'</a>');
@@ -197,8 +207,7 @@ function readSpecies(id, base_, map){
         var p = [specimen[scope+":dwc:Location:decimalLatitude"].value, specimen[scope+":dwc:Location:decimalLongitude"].value];        
         var marker = L.marker(p, {opacity:0.9}).addTo(map);          
         $.getJSON("/api/Collections/"+lang+"%3A"+specimen[scope+":dwc:RecordLevel:institutionCode"].value+"%3A"+specimen[scope+":dwc:RecordLevel:collectionCode"].value,
-            function(collection){
-              console.log(collection)
+            function(collection){              
               w2ui['grid'].add(
                 {
                 recid: specimen[scope+":dwc:RecordLevel:catalogNumber"].value,

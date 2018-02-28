@@ -241,7 +241,11 @@ textarea { height: 80px; resize: none; }
 			            });
 						//Final do Código da Tabela-Grid
 			        readSpecies(id, base, map);
-					});     
+					});  
+				$.getJSON(`/api/Interactions/pollinators?plant=${id.split(":")[2]}`, function( data ) {					
+					if(data.response.length==0)
+						$("#interaction-url").hide();
+				});				
 			});		  		   
 		    
 		  
@@ -372,7 +376,37 @@ textarea { height: 80px; resize: none; }
 
 		<!-- Início: Descrição Polínica -->
 		<div class="info-polen">
-			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription"></span> <span id="rcpol-ProfilesLabel-profilesPalynomorphDescription"></span>:</h2>            
+			<h2> <span id="rcpol-ProfilesLabel-profilesPollenDescription"></span> <span id="rcpol-ProfilesLabel-profilesSporeDescription"></span>:</h2>            
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-sporePlantHabit-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-sporePlantHabit-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-sporeSize-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-sporeSize-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-sporeLaesura-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-sporeLaesura-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-sporeType-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-sporeType-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-sporeAmbit-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-sporeAmbit-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-sporeSymmetry-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-sporeSymmetry-value"></span>
+							</p>
+							<p>
+								<b><span id="rcpol-CategoricalDescriptor-exineOrnamentation-label"/></b>
+								<span id="rcpol-CategoricalDescriptor-exineOrnamentation-value"></span>
+							</p>
+							
+							
 							<p>
 								<b><span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-label"/></b>
 								<span id="rcpol-CategoricalDescriptor-pollenDispersalUnit-value"></span>
@@ -454,7 +488,7 @@ textarea { height: 80px; resize: none; }
 								<b><span id="rcpol-Sample-palynomorphSpecialInformation-label"/></b>
 								<span id="rcpol-Sample-palynomorphSpecialInformation-value"></span>
 							</p>																		
-		</div>
+		</div>		
 		<!-- Final: Descrição Polínica -->
 
 </div>
@@ -518,14 +552,14 @@ textarea { height: 80px; resize: none; }
 
         <!-- Início: Visitantes -->
 		<!-- Inserir link para a página da interação: ficha_visitantes_especie.html-->
-		<a id="interaction-url">
+		<!-- <a id="interaction-url">
 		  <div class="visitantes">		  	
 			<h2 id="rcpol-ProfilesLabel-profilesKnowFlowerVisitors">
 			  Conheça os visitantes florais dessa espécie
 			</h2>
 
 		  </div>
-		</a>
+		</a>-->
 		<!-- Final: Visitantes -->		
 		<h2 style="margin-bottom:10px" id="rcpol-SiteLabel-howToCite">Como citar:</h2>
 		<p id="rcpol-SiteLabel-citation">Rede de Catálogos Polínicos online. Available in: <<a href=" http://chave.rcpol.gov.br">http://chave.rcpol.gov.br/</a> >. Date of access: </p>
@@ -569,7 +603,7 @@ textarea { height: 80px; resize: none; }
 		<button id="send-feedback" class="formBtn">Enviar</button>
 		<input onclick="exitFeedback();" class="formBtn" type="reset" value="Sair"/>
 	</div>
-  
+	<div id="result"></div>
 </div>
 
 <button id="popup" class="feedback-button" onclick="toggle_visibility()">Reportar</button>
@@ -598,7 +632,7 @@ textarea { height: 80px; resize: none; }
 		// An error happened.
 		});
 	}	
-	$(function() {
+	$(function() {		
 		$("#auth").hide();
 		$(document).mouseup(function (e) {
 			var container = $("#contactForm");
