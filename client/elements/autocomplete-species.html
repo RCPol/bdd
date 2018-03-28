@@ -29,9 +29,12 @@
     search: function(event, ui) {
         var self = this;
         var data = [];
-        if (eval(self.source)) {
-          var currentSource = eval(self.source);
-          data = Object.keys(currentSource).map(function (key) {
+        if (eval(self.source).species) {
+          var ident = eval(self.source);
+          var currentSource = ident.species;
+          data = Object.keys(currentSource).filter(function(key){
+            return ident.eligibleSpecies[key];
+          }).map(function (key) {
             return {value:currentSource[key].scientificName,label:currentSource[key].scientificName+currentSource[key].vernacularName+currentSource[key].family,html:currentSource[key].html};
           });
         }

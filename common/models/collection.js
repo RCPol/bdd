@@ -8,6 +8,51 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
 module.exports = function(Collection) {
+
+  Collection.getSpreadsheetData = function(id, language, cb) {            
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'institution.'+language+'!B:P'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          cb(null,d.values);
+        });
+      });
+  }
+  Collection.remoteMethod(     
+    'getSpreadsheetData',
+    {
+      http: {path: '/getSpreadsheetData', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+
   var log = {};
   var downloadQueue = [];
   function CollectionHelper() {

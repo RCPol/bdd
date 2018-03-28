@@ -11,12 +11,47 @@ var qt = require('quickthumb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
+const requestImageSize = require('request-image-size');
 // var admin = require('firebase-admin');
 var serviceAccount = require("key.json");
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+  Specimen.checkUrl = function(url, cb) {  
+    try{
+      if(url.indexOf("http")==-1){
+        cb(null, false)
+        return false;
+      }
+      requestImageSize(url)
+      .then(size => {                
+        cb(null, size)
+      }).catch(err => {                
+        cb(null, false)
+      });
+      // request(url, function(err, response, body){ 
 
+      //   if (err){          
+      //       cb(err, false)
+      //   } else {  
+      //     var buffer = new Buffer(body, 'base64');          
+      //     cb(null, true)
+      //   }
+      // });
+    } catch(e){      
+      cb(e, false)
+    }           
+  }
+  Specimen.remoteMethod(     
+    'checkUrl',
+    {
+      http: {path: '/checkUrl', verb: 'get'},
+          accepts: [    
+        {arg: 'url', type: 'string', required:true}        
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Specimen.getSpreadsheetInfo = function(id, cb) {            
     var key = require('key.json');
     
@@ -61,7 +96,7 @@ module.exports = function(Specimen) {
       //   });
       // });
   }
-  Specimen.completeness = function(id, language, cb) {            
+  Specimen.getImagesValues = function(id, language, cb) {
     var key = require('key.json');    
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
@@ -81,19 +116,139 @@ module.exports = function(Specimen) {
       service.spreadsheets.values.get({
         auth: jwtClient,
         spreadsheetId: id,
-        range: 'specimen.'+language+'!A:BU'        
+        range: 'specimen.'+language+'!B:DD'        
       }, function(err, d) {
           if (err){
             console.log('The API returned an error: ' + err);    
             cb('The API returned an error: ' + err,null)
             return;          
           }
-          cb(null,d.values);
+          var isCompleteValue = function(value) {
+            return typeof value != "undefined" && String(value).trim().length > 0;
+          }
+          var rs = d.values;          
+          var header = rs.splice(0,5);
+          var images = [];
+          rs.forEach(function(line, index){
+              header[1].forEach(function(col, i){ 
+                if(col == "Image" && String(line[i] || "").trim().length>0 ) {
+                  var img = {
+                    header: header[4][i],
+                    value: line[i],
+                    row: index
+                  };
+                  images.push(img);
+                }                                             
+              });              
+          });		                  
+          cb(null,images);
+        });
+      });
+  }
+  Specimen.completeness = function(id, language, cb) {
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!B:DD'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          var isCompleteValue = function(value) {
+            return typeof value !== 'undefined' && String(value).trim().length > 0;
+          }
+          var rs = d.values;
+          var completeness = 0;
+          var totalCells = 0;    
+          var header = rs.splice(0,5);
+          var report = [];
+          rs.forEach(function(line, index){
+              header[2].forEach(function(col, i){            
+                      if(!isCompleteValue(line[i])){                          
+                          // Exceptions
+                          if(col === 'beeImage' || 
+                              col === 'pollenImage' ||
+                              col === 'pollenShapePE' ||
+                              col === 'polarAxis' ||
+                              col === 'equatorialAxis' ||
+                              col === 'smallerPollenDiameter' ||
+                              col === 'pollenDiameter' ||
+                              col === 'largerPollenDiameter' ||
+                              col === 'espexi' ||
+                              col === 'beePlantTrophicInteraction' ||
+                              col === 'vernacularName') {
+                            completeness++;
+                          } else {
+                            var assertion = {
+                                type: 'amendment',
+                                dimension: 'Completeness',
+                                enhancement: 'Recommend to provide value for an empty field',
+                                specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                ie: header[4][i],
+                                dr: {
+                                    row: index+6, 
+                                    value: String(line[i]).trim(),
+                                    drt:  'record'
+                                },
+                                result: 'Provide some value'
+                            };
+                            report.push(assertion); 
+                          }                     
+                      } else completeness++;
+                      totalCells++;                         
+              });              
+          });		        
+          var finalCompleteness = ((completeness/totalCells)*100);         
+          finalCompleteness = finalCompleteness === 100? finalCompleteness:finalCompleteness.toFixed(2);
+          report.push({
+              type: 'measure',
+              dimension: 'Completeness',
+              specification: `Proportion of values that were provided in the entire sheet. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'All',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              result: finalCompleteness
+          }); 
+          report.push({
+              type: 'validation',
+              criterion: 'Spreadsheet is complete',
+              specification: `The entire sheet must be 100% complete. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'All',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              result: finalCompleteness == 100
+          });
+          cb(null,report);
         });
       });
   }
   Specimen.aggregationByField = function(prefix, base, lang, field, cb) {            
-    var queryMongo = { 'language':lang, base:base }        
+    var queryMongo = { 'language':lang, base:base };        
     var SpecimenCollection = Specimen.getDataSource().connector.collection(Specimen.modelName);
     Specimen.getDataSource().connector.safe = false;     
     console.log(JSON.stringify([
@@ -112,11 +267,11 @@ module.exports = function(Specimen) {
         }
       }
     ], function (err, states) { 
-      console.log("ESTADO/ERROR",err,states)         
+      // console.log("ESTADO/ERROR",err,states)         
       // var results = {values: states};
-      console.log("ERROR: ",err);
+      // console.log("ERROR: ",err);
       var results = {values: []};
-      console.log("STATES: ",states);
+      // console.log("STATES: ",states);
       states.forEach(function(item) {        
         if(item._id){
           item._id.split('|').forEach(function(subItem) {
@@ -133,7 +288,7 @@ module.exports = function(Specimen) {
           });       
         } 
       });
-      console.log("RESULTS: ",results);
+      // console.log("RESULTS: ",results);
       cb(null, results);      
     });   
   }
@@ -149,6 +304,17 @@ module.exports = function(Specimen) {
       returns: {arg: 'response', type: 'object'}
     }
   );
+  Specimen.remoteMethod(     
+    'getImagesValues',
+    {
+      http: {path: '/getImagesValues', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );  
   Specimen.remoteMethod(     
     'getSpreadsheetInfo',
     {

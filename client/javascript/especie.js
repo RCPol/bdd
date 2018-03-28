@@ -6,6 +6,8 @@ function readSpecies(id, base_, map) {
     $(".info-flor").hide();
     $(".info-planta").hide();
     $("#interaction-url").hide();
+  } else {
+    $("#rcpol-ProfilesLabel-profilesSporeDescription").hide();
   }
   $.getJSON("/api/Species/"+id, function(data){    
     // titulo        

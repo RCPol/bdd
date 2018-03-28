@@ -11,7 +11,138 @@ var util = require('util');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
 
+const requestImageSize = require('request-image-size');
+
 module.exports = function(Schema) {  
+  Schema.getSpreadsheetData = function(id, language, cb) {            
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'glossary.'+language+'!A:K'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          cb(null,d.values);
+        });
+      });
+  }
+  Schema.remoteMethod(     
+    'getSpreadsheetData',
+    {
+      http: {path: '/getSpreadsheetData', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+  Schema.checkUrl = function(url, cb) {  
+    try{
+      if(url.indexOf("http")==-1){
+        cb(null, false)
+        return false;
+      }
+      requestImageSize(url)
+      .then(size => {                
+        cb(null, size)
+      }).catch(err => {                
+        cb(null, false)
+      });      
+    } catch(e){      
+      cb(e, false)
+    }           
+  }
+  Schema.remoteMethod(     
+    'checkUrl',
+    {
+      http: {path: '/checkUrl', verb: 'get'},
+          accepts: [    
+        {arg: 'url', type: 'string', required:true}        
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+  Schema.getImagesValues = function(id, language, cb) {
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'glossary.'+language+'!A:J'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          var isCompleteValue = function(value) {
+            return typeof value != "undefined" && String(value).trim().length > 0;
+          }
+          var rs = d.values;          
+          var header = rs.splice(0,1);
+          var images = [];
+          rs.forEach(function(line, index){              
+                if((line[1] == "CategoricalDescriptor" || line[1] == "State")  && isCompleteValue(line[9])) {                  
+                  var img = {
+                    header: header[0][9],
+                    value: line[9],
+                    row: index+2
+                  };
+                  images.push(img);
+                }                                                                     
+          });		                  
+          cb(null,images);
+        });
+      });
+  }
+
+  Schema.remoteMethod(     
+    'getImagesValues',
+    {
+      http: {path: '/getImagesValues', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );  
+
   function GoogleSpreadsheetImportDQ() {
     this.DQStatus = {};
   }
