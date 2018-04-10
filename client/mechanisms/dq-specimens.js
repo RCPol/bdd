@@ -1,13 +1,22 @@
 var Specimen = function(){
     this.report = {
         completeness: [],
-        accessibility: []
+        accessibility: [],
+        conformity: []
     };
 }
 Specimen.prototype.completeness = function(id, lang, cb) {	
     var self = this;					    
-    $.get("/api/Specimens/completeness?id="+id+"&language="+lang,function(rs) {
+    $.get("/api/Specimens/completeness?id="+id+"&language="+lang,function(rs) {        
         self.report.completeness = rs.response;
+        cb()
+    });    
+    return this;
+}
+Specimen.prototype.conformity = function(id, lang, cb) {	
+    var self = this;					    
+    $.get("/api/Specimens/conformity?id="+id+"&language="+lang,function(rs) {        
+        self.report.conformity = rs.response;
         cb()
     });    
     return this;

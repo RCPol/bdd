@@ -1,5 +1,5 @@
  function Internacionalization() {
-  this.language = "pt-BR";  
+  this.language = "en-US";  
   this.base = 'eco';
   if(localStorage){
     this.language = typeof localStorage.language!="undefined"?localStorage.language:this.language;

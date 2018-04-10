@@ -121,7 +121,7 @@ module.exports = function(Schema) {
                   var img = {
                     header: header[0][9],
                     value: line[9],
-                    row: index+2
+                    row: index+5
                   };
                   images.push(img);
                 }                                                                     

@@ -172,11 +172,7 @@
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="consistency-glossary-pt-BR" class="badge" style="font-size:80%"></span>													
 													Consistency 
-												</a>
-												<a href="#!" class="collection-item" style="text-align:left">
-													<span id="conformity-glossary-pt-BR" class="badge" style="font-size:80%"></span>													
-													Conformity 
-												</a>
+												</a>												
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="accessibility-glossary-pt-BR" class="badge" style="font-size:80%"></span>													
 													Accessibility 
@@ -229,11 +225,7 @@
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="consistency-glossary-en-US" class="badge" style="font-size:80%"></span>													
 													Consistency 
-												</a>
-												<a href="#!" class="collection-item" style="text-align:left">
-													<span id="conformity-glossary-en-US" class="badge" style="font-size:80%"></span>													
-													Conformity 
-												</a>
+												</a>												
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="accessibility-glossary-en-US" class="badge" style="font-size:80%"></span>													
 													Accessibility 
@@ -286,11 +278,7 @@
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="consistency-glossary-es-ES" class="badge" style="font-size:80%"></span>													
 													Consistency 
-												</a>
-												<a href="#!" class="collection-item" style="text-align:left">
-													<span id="conformity-glossary-es-ES" class="badge" style="font-size:80%"></span>													
-													Conformity 
-												</a>
+												</a>												
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="accessibility-glossary-es-ES" class="badge" style="font-size:80%"></span>													
 													Accessibility 
@@ -328,47 +316,58 @@
 								</div>
 							</li>
 							<li>
+
 							<div id="institution-tab" class="collapsible-header"><i class="material-icons">account_balance</i>Institutions</div>
-							<div class="collapsible-body">																										
-								<div class="row">
-									<div class="input-field col s12">											
-										<h3 style="font-size: 150%; margin:0px">DQ Measurements</h3> 
-									</div>
-									<div class="input-field col s3">											
-										<a style="font-size:80%" class="waves-effect waves-light btn-large" id="completeness-institution">Completeness </a> 
-									</div>
-									<div class="input-field col s3">											
-										<a style="font-size:80%" class="waves-effect waves-light btn-large">Consistency <span id="consistency-institution"></span></a> 
-									</div>
-									<div class="input-field col s3">											
-										<a style="font-size:80%" class="waves-effect waves-light btn-large">Conformity <span id="conformity-institution"></span></a> 
-									</div>
-									<div class="input-field col s3">											
-										<a style="font-size:80%" class="waves-effect waves-light btn-large">Accessibility <span id="accessibility-institution"></span></a> 
-									</div>
-									<div class="input-field col s12">											
-										<h3 style="font-size: 150%; margin:0px">DQ Amendments</h3> 
-									</div>
-									<div class="col s12">											
-											<table>
-											<thead>
-											<tr>
-												<th>Amendment</th>
-												<th>Field</th>
-												<th>Row</th>
-												<th>Current value</th>
-											</tr>
-											</thead>
-
-											<tbody id="institution-amendment">
-
-											</tbody>
-										</table>
-										
-
-									</div>
+							<div class="collapsible-body">																	
 									
-								</div>
+									<div class="row">
+										<div class="input-field col s12">											
+											<h3 style="font-size: 150%; margin:0px">DQ Measurements</h3> 
+										</div>
+										<div class="col s12" >											
+											<div class="collection">
+												<a href="#!" class="collection-item" style="text-align:left">
+													<span id="completeness-institution" class="badge" style="font-size:80%"></span>													
+													Completeness
+												</a>
+												<a href="#!" class="collection-item" style="text-align:left">
+													<span id="consistency-institution" class="badge" style="font-size:80%"></span>													
+													Consistency 
+												</a>												
+												<a href="#!" class="collection-item" style="text-align:left">
+													<span id="accessibility-institution" class="badge" style="font-size:80%"></span>													
+													Accessibility 
+												</a>
+												<a href="#!" class="collection-item" style="text-align:left">
+													<span id="uniqueness-institution" class="badge" style="font-size:80%"></span>													
+													Uniqueness 
+												</a>
+											</div>
+										</div>																				
+										<div class="input-field col s12">											
+											<h3 style="font-size: 150%; margin:0px">DQ Amendments</h3> 
+										</div>
+										<div class="col s12">											
+											 <table>
+												<thead>
+												<tr>
+													<th>Amendment</th>
+													<th>Improvement</th>
+													<th>Field</th>
+													<th>Row</th>
+													<th>Current value</th>
+												</tr>
+												</thead>
+
+												<tbody id="institution-amendment">
+
+												</tbody>
+											</table>
+											
+
+										</div>
+										
+									</div>
 								
 							</div>
 							</li>
@@ -420,11 +419,52 @@
 					$("#specimen-tab").removeClass("green-text");
 					$("#specimen-tab").removeClass("red-text");					
 					
-					$("#completeness-specimen").html(`loading...`);
+					$("#completeness-specimen").html(`loading...`);					
 					$("#completeness-specimen").removeClass("red");
 					$("#completeness-specimen").removeClass("green");
 					$("#completeness-specimen").removeClass("white-text");
 
+					$("#conformity-specimen").html(`loading...`);					
+					$("#conformity-specimen").removeClass("red");
+					$("#conformity-specimen").removeClass("green");
+					$("#conformity-specimen").removeClass("white-text");
+
+					specimen.conformity(id, lang, function(){
+						specimen.report.conformity.forEach(function(assertion, i){											
+							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+							$("#specimen-amendment").prepend(`<tr id="i-sp-conformity-${i}">
+									<td>${assertion.result}</td>
+									<td>${assertion.dimension}</td>
+									<td>${assertion.ie}</td>
+									<td>${assertion.dr.row}</td>
+									<td>${assertion.dr.value}</td>													
+								</tr>`);								
+							var elem = document.querySelector('#i-sp-conformity-'+i);							
+							var instance = M.Tooltip.init(elem, {
+								position:"left",
+								html:`
+									<div style="width:20em; padding:1em">
+										<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+										<br>
+										<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+									</div>
+								`
+								});
+						} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Conformity") {
+								$("#conformity-specimen").html(`<a class="waves-effect waves-light modal-trigger white-text" href="#details">${assertion.result}% conform</a>`);									
+								$("#d-content").val(JSON.stringify(assertion,null,4));								
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is conform") {								
+								if(!$("#specimen-tab").hasClass("red-text")){
+									$("#specimen-tab").removeClass("green-text");
+									$("#specimen-tab").removeClass("red-text");					
+									$("#specimen-tab").addClass(assertion.result?"green-text":"red-text");
+								}									
+								$("#conformity-specimen").addClass(assertion.result?"green":"red");
+								$("#conformity-specimen").addClass("white-text");
+							}
+						});
+					});
 					specimen.completeness(id, lang, function(){
 						specimen.report.completeness.forEach(function(assertion, i){											
 							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
@@ -696,59 +736,6 @@
 					$("#accessibility-glossary-es-ES").removeClass("green");
 					$("#accessibility-glossary-es-ES").removeClass("white-text");
 					
-					//en-US
-					$.get("/api/Schemas/getImagesValues?id="+id+"&language=en-US", function(rs) {						
-						glossaryUS.accessibility(rs, id, function individualCb(i, assertion){
-							if($("#accessibility-glossary-en-US").html() == "loading..." || Number($("#accessibility-glossary-en-US").html().split(" ")[0])<i)
-								$("#accessibility-glossary-en-US").html(`${i} records assessed`);								
-							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
-								$("#glossary-en-US-amendment").prepend(`<tr id="i-sp-access-${i}">
-										<td>${assertion.result}</td>
-										<td>${assertion.dimension}</td>
-										<td>${assertion.ie}</td>
-										<td>${assertion.dr.row}</td>
-										<td>${assertion.dr.value}</td>													
-									</tr>`);	
-								var elem = document.querySelector('#i-sp-access-'+i);							
-								var instance = M.Tooltip.init(elem, {
-									position:"left",
-									html:`
-										<div style="width:20em; padding:1em">
-											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-											<br>
-											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-										</div>
-									`
-									});
-								}
-						}, function finalCb(){
-							glossaryUS.report.accessibility.forEach(function(assertion, i){											
-								if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
-									$("#accessibility-glossary-en-US").html(`${assertion.result}% accessible`);	
-									var elem = document.querySelector('#accessibility-glossary-en-US');
-									var instance = M.Tooltip.init(elem, {									
-										position: "top",
-										html:`
-											<div style="width:20em; padding:1em">
-												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-												<br>
-												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-											</div>
-										`
-										});
-
-								} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
-									if(!$("#glossary-en-US-tab").hasClass("red-text")){
-										$("#glossary-en-US-tab").removeClass("green-text");
-										$("#glossary-en-US-tab").removeClass("red-text");														
-										$("#glossary-en-US-tab").addClass(assertion.result?"green-text":"red-text");
-									}	
-									$("#accessibility-glossary-en-US").addClass(assertion.result?"green":"red");								
-									$("#accessibility-glossary-en-US").addClass("white-text");
-								}
-							});
-						});	
-					});
 					//pt-BR
 					$.get("/api/Schemas/getImagesValues?id="+id+"&language=pt-BR", function(rs) {						
 						glossaryBR.accessibility(rs, id, function individualCb(i, assertion){							
@@ -802,6 +789,59 @@
 							});
 						});	
 					});
+					//en-US
+					$.get("/api/Schemas/getImagesValues?id="+id+"&language=en-US", function(rs) {						
+						glossaryUS.accessibility(rs, id, function individualCb(i, assertion){
+							if($("#accessibility-glossary-en-US").html() == "loading..." || Number($("#accessibility-glossary-en-US").html().split(" ")[0])<i)
+								$("#accessibility-glossary-en-US").html(`${i} records assessed`);								
+							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-en-US-amendment").prepend(`<tr id="i-sp-access-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);	
+								var elem = document.querySelector('#i-sp-access-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+								}
+						}, function finalCb(){
+							glossaryUS.report.accessibility.forEach(function(assertion, i){											
+								if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+									$("#accessibility-glossary-en-US").html(`${assertion.result}% accessible`);	
+									var elem = document.querySelector('#accessibility-glossary-en-US');
+									var instance = M.Tooltip.init(elem, {									
+										position: "top",
+										html:`
+											<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`
+										});
+
+								} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+									if(!$("#glossary-en-US-tab").hasClass("red-text")){
+										$("#glossary-en-US-tab").removeClass("green-text");
+										$("#glossary-en-US-tab").removeClass("red-text");														
+										$("#glossary-en-US-tab").addClass(assertion.result?"green-text":"red-text");
+									}	
+									$("#accessibility-glossary-en-US").addClass(assertion.result?"green":"red");								
+									$("#accessibility-glossary-en-US").addClass("white-text");
+								}
+							});
+						});	
+					});					
 					// es-ES
 					$.get("/api/Schemas/getImagesValues?id="+id+"&language=es-ES", function(rs) {						
 						glossaryES.accessibility(rs, id, function individualCb(i, assertion){							
@@ -859,19 +899,31 @@
 
 					// INSTITUTION
 
+					
+
+
 					$("#institution-amendment").html("");
 					
 					$("#institution-tab").removeClass("green-text");
 					$("#institution-tab").removeClass("red-text");
-					$("#completeness-institution").removeClass("red-text");	
-					$("#completeness-institution").removeClass("green-text");	
+					
+					$("#completeness-institution").html(`loading...`);					
+					$("#completeness-institution").removeClass("red");
+					$("#completeness-institution").removeClass("green");
+					$("#completeness-institution").removeClass("white-text");
+
+					$("#accessibility-institution").html(`loading...`);					
+					$("#accessibility-institution").removeClass("red");
+					$("#accessibility-institution").removeClass("green");
+					$("#accessibility-institution").removeClass("white-text");
 			
 					$.get("/api/Collections/getSpreadsheetData?id="+id+"&language=pt-BR",function(rs) {						
 						institution.completeness(rs, id);						
-						institution.report.forEach(function(assertion, i){											
+						institution.report.completeness.forEach(function(assertion, i){											
 							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
 								$("#institution-amendment").append(`<tr id="i-sp-${i}">
 										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
 										<td>${assertion.ie}</td>
 										<td>${assertion.dr.row}</td>
 										<td>${assertion.dr.value}</td>													
@@ -902,11 +954,69 @@
 									`
 									});
 
-							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {								
-								$("#institution-tab").addClass(assertion.result?"green-text":"red-text");
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {																
+								if(!$("#institution-tab").hasClass("red-text")){
+									$("#institution-tab").removeClass("green-text");
+									$("#institution-tab").removeClass("red-text");														
+									$("#institution-tab").addClass(assertion.result?"green-text":"red-text");
+								}	
 								$("#completeness-institution").addClass(assertion.result?"green":"red");								
+								$("#completeness-institution").addClass("white-text");
 							}
 						});
+					});
+					
+					$.get("/api/Collections/getImagesValues?id="+id+"&language=pt-BR", function(rs) {						
+						institution.accessibility(rs, id, function individualCb(i, assertion){							
+							if($("#accessibility-institution").html() == "loading..." || Number($("#accessibility-institution").html().split(" ")[0])<i)
+								$("#accessibility-institution").html(`${i} records assessed`);								
+							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#institution-amendment").prepend(`<tr id="i-sp-access-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);	
+								var elem = document.querySelector('#i-sp-access-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+								}
+						}, function finalCb(){
+							institution.report.accessibility.forEach(function(assertion, i){											
+								if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+									$("#accessibility-institution").html(`${assertion.result}% accessible`);	
+									var elem = document.querySelector('#accessibility-institution');
+									var instance = M.Tooltip.init(elem, {									
+										position: "top",
+										html:`
+											<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`
+										});
+
+								} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+									if(!$("#institution-tab").hasClass("red-text")){
+										$("#institution-tab").removeClass("green-text");
+										$("#institution-tab").removeClass("red-text");														
+										$("#institution-tab").addClass(assertion.result?"green-text":"red-text");
+									}	
+									$("#accessibility-institution").addClass(assertion.result?"green":"red");								
+									$("#accessibility-institution").addClass("white-text");
+								}
+							});
+						});	
 					});
 				});
 			});

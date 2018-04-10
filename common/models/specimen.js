@@ -145,6 +145,223 @@ module.exports = function(Specimen) {
         });
       });
   }
+  Specimen.conformity = function(id, language, cb) {
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!B:DD'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          var isCompleteValue = function(value) {
+            return typeof value !== 'undefined' && String(value).trim().length > 0;
+          }
+          var rs = d.values;
+          var conformity = 0;
+          var totalCells = 0;    
+          var header = rs.splice(0,5);
+          var report = [];
+          rs.forEach(function(line, index){
+              header[2].forEach(function(col, i){
+                      if(isCompleteValue(line[i])){                          
+                          if(col === 'decimalLatitude') {  
+                            var n = Number(line[i])                            
+                            if ( isNaN(n) ) {
+                              var gms = String(line[i]);
+                              var numberPattern = /\d+/g;
+                              var letterPattern = /[WwOoNnSsLlEe]/g;  
+                              var parser = gms.match(numberPattern);
+                              var decimal = false;                              
+                              if( parser && parser.length >= 3 ) {              
+                                var g = Number(parser[0]);
+                                var m = Number(parser[1]);
+                                var s = Number(parser[2]+(parser.length > 3?(parser[3]/1000):0));
+                                var sig = String(gms.match(letterPattern)).toUpperCase()=="W" || String(gms.match(letterPattern)).toUpperCase()=="O" || String(gms.match(letterPattern)).toUpperCase()=="S"?-1:1;
+                                decimal = sig*(g + ((m / 60) + (s / 3600))).toFixed(4);                                
+                              }                              
+                              if(decimal){
+                                var assertion = {
+                                  type: 'amendment',
+                                  dimension: 'Conformity',
+                                  enhancement: 'Recommend to transform from DMS format to decimal format',
+                                  specification: 'More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                  mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                  ie: header[4][i],
+                                  dr: {
+                                      row: index+6, 
+                                      value: String(line[i]).trim(),
+                                      drt:  'record'
+                                  },
+                                  result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'
+                                };
+                                report.push(assertion); 
+                              }                                
+                            } else if (n >= -90 && n <= 90) {
+                              conformity++;
+                            } else {
+                              var assertion = {
+                                  type: 'amendment',
+                                  dimension: 'Conformity',
+                                  enhancement: 'Recommend to provide value in the range of decimal latitude',
+                                  specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                  mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                  ie: header[4][i],
+                                  dr: {
+                                      row: index+6, 
+                                      value: String(line[i]).trim(),
+                                      drt:  'record'
+                                  },
+                                  result: 'Modify latitude to a numeric value between -90 and 90'
+                              };
+                              report.push(assertion); 
+                          }                                           
+                          totalCells++;
+                        } else if(col === 'decimalLongitude') {  
+                          var n = Number(line[i])                            
+                          if ( isNaN(n) ) {
+                            var gms = String(line[i]);
+                            var numberPattern = /\d+/g;
+                            var letterPattern = /[WwOoNnSsLlEe]/g;  
+                            var parser = gms.match(numberPattern);
+                            var decimal = false;                              
+                            if( parser && parser.length >= 3 ) {              
+                              var g = Number(parser[0]);
+                              var m = Number(parser[1]);
+                              var s = Number(parser[2]+(parser.length > 3?(parser[3]/1000):0));
+                              var sig = String(gms.match(letterPattern)).toUpperCase()=="W" || String(gms.match(letterPattern)).toUpperCase()=="O" || String(gms.match(letterPattern)).toUpperCase()=="S"?-1:1;
+                              decimal = sig*(g + ((m / 60) + (s / 3600))).toFixed(4);                                
+                            }                            
+                            if(decimal){
+                              var assertion = {
+                                type: 'amendment',
+                                dimension: 'Conformity',
+                                enhancement: 'Recommend to transform from DMS format to decimal format',
+                                specification: 'More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                ie: header[4][i],
+                                dr: {
+                                    row: index+6, 
+                                    value: String(line[i]).trim(),
+                                    drt:  'record'
+                                },
+                                result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'
+                              };
+                              report.push(assertion); 
+                            }                              
+                          } else if (n >= -90 && n <= 90) {
+                            conformity++;
+                          } else {
+                            var assertion = {
+                                type: 'amendment',
+                                dimension: 'Conformity',
+                                enhancement: 'Recommend to provide value in the range of decimal longitude',
+                                specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                ie: header[4][i],
+                                dr: {
+                                    row: index+6, 
+                                    value: String(line[i]).trim(),
+                                    drt:  'record'
+                                },
+                                result: 'Modify longitude to a numeric value between -180 and 180'
+                            };
+                            report.push(assertion); 
+                        }                                           
+                        totalCells++;
+                      } else if(col === 'eventDate') {
+                        var parsedDate = String(line[i]).split("-");
+                        if(parsedDate.length==3){
+                          if(
+                            Number(parsedDate[0].trim())>=0 && Number(parsedDate[0].trim())<2100 &&
+                            parsedDate[0].trim().length == 4 && 
+                            Number(parsedDate[1].trim())>=0 && Number(parsedDate[1].trim())<=12 &&
+                            parsedDate[1].trim().length == 2 &&
+                            Number(parsedDate[2].trim())>=0 && Number(parsedDate[2].trim())<=31 &&
+                            parsedDate[2].trim().length == 2
+                          )
+                          conformity++;
+                        } else {
+                          var assertion = {
+                              type: 'amendment',
+                              dimension: 'Conformity',
+                              enhancement: 'Recommend to change the date value to the ISO 8601 format',
+                              specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                              mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                              ie: header[4][i],
+                              dr: {
+                                  row: index+6, 
+                                  value: String(line[i]).trim(),
+                                  drt:  'record'
+                              },
+                              result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'
+                          };
+                          report.push(assertion); 
+                      }                                           
+                      totalCells++;
+                    } 
+                      }
+              });              
+          });		        
+          var finalConformity = ((conformity/totalCells)*100);         
+          finalConformity = finalConformity === 100? finalConformity:finalConformity.toFixed(2);
+          report.push({
+              type: 'measure',
+              dimension: 'Conformity',
+              specification: `Proportion of latitude that are conformity in the entire sheet. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'All',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              result: finalConformity
+          }); 
+          report.push({
+              type: 'validation',
+              criterion: 'Spreadsheet is conform',
+              specification: `The entire sheet must be 100% conform. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'All',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              result: finalConformity == 100
+          });
+          cb(null,report);
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'conformity',
+    {
+      http: {path: '/conformity', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Specimen.completeness = function(id, language, cb) {
     var key = require('key.json');    
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
@@ -184,17 +401,43 @@ module.exports = function(Specimen) {
               header[2].forEach(function(col, i){            
                       if(!isCompleteValue(line[i])){                          
                           // Exceptions
+
                           if(col === 'beeImage' || 
                               col === 'pollenImage' ||
-                              col === 'pollenShapePE' ||
-                              col === 'polarAxis' ||
-                              col === 'equatorialAxis' ||
-                              col === 'smallerPollenDiameter' ||
-                              col === 'pollenDiameter' ||
-                              col === 'largerPollenDiameter' ||
+                              col === 'pollenShapePE' ||                              
                               col === 'espexi' ||
                               col === 'beePlantTrophicInteraction' ||
-                              col === 'vernacularName') {
+                              col === 'vernacularName' || 
+                              col === 'pollenBibliographicCitation' ||   
+                              col === 'palynomorphSpecialInformation' ||                                                             
+                              
+                              // Quando “Tipo de abertura do pólen” for “Inaperturado” a coluna “Número de aberturas” fica vazia
+                              (col === 'numberOfApertures' && String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Inaperturado'.toUpperCase() || String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Inaperturate'.toUpperCase()) ||
+
+                              // Quando “Forma do pólen” for somente esferoidal deve-se estar preenchido “Tamanho do diâmetro” e os outros tamanhos podem estar vazios
+                              (col === 'smallerPollenDiameter' && String(line[header[2].indexOf("pollenShape")]).trim().toUpperCase() === 'Esferoidal'.toUpperCase() || String(line[header[2].indexOf("pollenShape")]).trim().toUpperCase() === 'Spheroidal'.toUpperCase()) ||
+                              (col === 'largerPollenDiameter' && String(line[header[2].indexOf("pollenShape")]).trim().toUpperCase() === 'Esferoidal'.toUpperCase() || String(line[header[2].indexOf("pollenShape")]).trim().toUpperCase() === 'Spheroidal'.toUpperCase()) ||
+
+                              // Quando “Unidade de dispersão do pólen” for “Tétrade” ou “ Políade” podem estar vazias as colunas de “Simetria do pólen”, “Polaridade do pólen”, “Tipo de abertura do pólen”, “Característica do colpo”, “Característica do poro”, “Número de aberturas”
+                              (col === 'pollenSymmetry' && String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tétrade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tetrad'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Políade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Polyad'.toUpperCase()) ||                              
+                              (col === 'pollenPolarity' && String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tétrade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tetrad'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Políade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Polyad'.toUpperCase()) ||                              
+                              (col === 'pollenAperture' && String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tétrade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tetrad'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Políade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Polyad'.toUpperCase()) ||                              
+                              (col === 'colpeFeature' && String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tétrade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tetrad'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Políade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Polyad'.toUpperCase()) ||                              
+                              (col === 'poreFeature' && String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tétrade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tetrad'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Políade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Polyad'.toUpperCase()) ||                              
+                              (col === 'numberOfApertures' && String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tétrade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Tetrad'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Políade'.toUpperCase() || String(line[header[2].indexOf("pollenDispersalUnit")]).trim().toUpperCase() === 'Polyad'.toUpperCase()) ||                              
+
+                              // Quando “Tipo de abertura do pólen” for “Sulco” pode ficar vazio em “Tamanho do eixo equatorial” e “Tamanho do diâmetro”
+                              (col === 'equatorialAxis' && String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Sulco'.toUpperCase() || String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Sulcus'.toUpperCase()) ||
+                              (col === 'pollenDiameter' && String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Sulco'.toUpperCase() || String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Sulcus'.toUpperCase()) ||
+
+                              // quando preenchido “Tamanho do diâmetro menor” e “Tamanho do diâmetro maior” os outros campos podem ficar vazios.
+                              (col === 'pollenDiameter' && String(line[header[2].indexOf("smallerPollenDiameter")] || "").trim().length > 0 && String(line[header[2].indexOf("largerPollenDiameter")] || "").trim().length > 0) ||
+
+                              //Quando preenchido “Tamanho do eixo polar” e “Tamanho do eixo equatorial” podem ser vazios os campos de “Tamanho do diâmetro menor”, “Tamanho do diâmetro” e “Tamanho do diâmetro maior”
+                              (col === 'smallerPollenDiameter' && String(line[header[2].indexOf("polarAxis")] || "").trim().length > 0 && String(line[header[2].indexOf("equatorialAxis")] || "").trim().length > 0) ||
+                              (col === 'pollenDiameter' && String(line[header[2].indexOf("polarAxis")] || "").trim().length > 0 && String(line[header[2].indexOf("equatorialAxis")] || "").trim().length > 0) ||
+                              (col === 'largerPollenDiameter' && String(line[header[2].indexOf("polarAxis")] || "").trim().length > 0 && String(line[header[2].indexOf("equatorialAxis")] || "").trim().length > 0) 
+                            ) {
                             completeness++;
                           } else {
                             var assertion = {
