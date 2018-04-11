@@ -409,7 +409,21 @@ module.exports = function(Specimen) {
                               col === 'beePlantTrophicInteraction' ||
                               col === 'vernacularName' || 
                               col === 'pollenBibliographicCitation' ||   
-                              col === 'palynomorphSpecialInformation' ||                                                             
+                              col === 'palynomorphSpecialInformation' ||   
+                              
+                              // paleo
+                              (col === 'pollenShape' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'numberOfApertures' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'pollenPolarity' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'pollenAmbit' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'pollenSymmetry' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'poreFeature' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'colpeFeature' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'palynomorphSpecialInformation' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'pollenAperture' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'pollenBibliographicCitation' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'palynomorphAdditionalInformation' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'exineOrnamentation' && header[3][i].trim() === 'Palynomorph')||   
                               
                               // Quando “Tipo de abertura do pólen” for “Inaperturado” a coluna “Número de aberturas” fica vazia
                               (col === 'numberOfApertures' && String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Inaperturado'.toUpperCase() || String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Inaperturate'.toUpperCase()) ||
