@@ -411,12 +411,35 @@ module.exports = function(Specimen) {
                               col === 'pollenBibliographicCitation' ||   
                               col === 'palynomorphSpecialInformation' ||   
                               
+
+                              // spore
+                              col === 'sporeBibliographicCitation' ||   
+                              col === 'sporeAdditionalInformation' ||   
+                              col === 'sporeSpecialInformation' ||   
+                              col === 'largerSporeDiameter' ||   
+                              col === 'sporeDiameter' ||   
+                              col === 'smallerSporeDiameter' ||   
+                              col === 'perineOrnamentation' ||   
+                              col === 'sporePerispore' ||   
+                              col === 'polarAxis' ||   
+                              col === 'equatorialAxis' ||   
+                              col === 'sporeSize' ||   
+                              col === 'sporeLaesura' ||   
+                              
+                              // taxon
+                              col === 'pollenAmbit' ||   
+                              col === 'largerPollenDiameter' ||   
+                              col === 'smallerPollenDiameter' ||   
+                              col === 'pollenDiameter' ||   
+                              col === 'pollenPolarity' ||   
+                              col === 'pollenSymmetry' ||                                 
+
                               // paleo
                               (col === 'pollenShape' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'numberOfApertures' && header[3][i].trim() === 'Palynomorph')||   
-                              (col === 'pollenPolarity' && header[3][i].trim() === 'Palynomorph')||   
+                              // (col === 'pollenPolarity' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'pollenAmbit' && header[3][i].trim() === 'Palynomorph')||   
-                              (col === 'pollenSymmetry' && header[3][i].trim() === 'Palynomorph')||   
+                              // (col === 'pollenSymmetry' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'poreFeature' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'colpeFeature' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'palynomorphSpecialInformation' && header[3][i].trim() === 'Palynomorph')||   
@@ -424,6 +447,12 @@ module.exports = function(Specimen) {
                               (col === 'pollenBibliographicCitation' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'palynomorphAdditionalInformation' && header[3][i].trim() === 'Palynomorph')||   
                               (col === 'exineOrnamentation' && header[3][i].trim() === 'Palynomorph')||   
+
+                              // (col === 'largerPollenDiameter' && header[3][i].trim() === 'Palynomorph')||   
+                              // (col === 'smallerPollenDiameter' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'equatorialAxis' && header[3][i].trim() === 'Palynomorph')||   
+                              (col === 'polarAxis' && header[3][i].trim() === 'Palynomorph')||   
+                              // (col === 'pollenDiameter' && header[3][i].trim() === 'Palynomorph')||                                
                               
                               // Quando “Tipo de abertura do pólen” for “Inaperturado” a coluna “Número de aberturas” fica vazia
                               (col === 'numberOfApertures' && String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Inaperturado'.toUpperCase() || String(line[header[2].indexOf("pollenAperture")]).trim().toUpperCase() === 'Inaperturate'.toUpperCase()) ||
