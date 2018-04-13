@@ -7,7 +7,140 @@ var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
+const requestImageSize = require('request-image-size');
+
 module.exports = function(Collection) {
+
+  Collection.getSpreadsheetData = function(id, language, cb) {            
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'institution.'+language+'!B:P'
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          cb(null,d.values);
+        });
+      });
+  }
+  Collection.remoteMethod(     
+    'getSpreadsheetData',
+    {
+      http: {path: '/getSpreadsheetData', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+  Collection.checkUrl = function(url, cb) {  
+    try{
+      if(url.indexOf("http")==-1){
+        cb(null, false)
+        return false;
+      }
+      requestImageSize(url)
+      .then(size => {                
+        cb(null, size)
+      }).catch(err => {                
+        cb(null, false)
+      });      
+    } catch(e){      
+      cb(e, false)
+    }           
+  }
+  Collection.remoteMethod(     
+    'checkUrl',
+    {
+      http: {path: '/checkUrl', verb: 'get'},
+          accepts: [    
+        {arg: 'url', type: 'string', required:true}        
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+  Collection.getImagesValues = function(id, language, cb) {
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'institution.'+language+'!P:P'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          var isCompleteValue = function(value) {
+            return typeof value != "undefined" && String(value).trim().length > 0;
+          }
+          var rs = d.values;          
+          var header = rs.splice(0,4);
+          var images = [];
+          rs.forEach(function(line, index){               
+                if(isCompleteValue(line[0])) {                  
+                  var img = {
+                    header: header[3][0],
+                    value: line[0],
+                    row: index+2
+                  };
+                  images.push(img);
+                }                                                                     
+          });		                  
+          cb(null,images);
+        });
+      });
+  }
+
+  Collection.remoteMethod(     
+    'getImagesValues',
+    {
+      http: {path: '/getImagesValues', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );  
+
+
   var log = {};
   var downloadQueue = [];
   function CollectionHelper() {

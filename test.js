@@ -1,65 +1,723 @@
-var google = require('googleapis');
-function test (){
-    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];    
-    var key = require('./node_modules/key.json');    
-    var id = "1--i87_wNuoy6v2jQJsGxoG1OAnp2alFJFIsUyP12nCs";
+var data = `Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Palynomorph shape
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph amb
+Palynomorph shape
+Colpus feature
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph shape
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph shape
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph shape
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph shape
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Palynomorph amb
+Palynomorph shape
+Palynomorph amb
+Palynomorph shape
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Palynomorph amb
+Pore feature
+Palynomorph amb
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Pore feature
+Pore feature
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Colpus feature
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Colpus feature
+Palynomorph amb
+Pore feature
+Palynomorph shape
+Palynomorph amb
+Pore feature
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph amb
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph amb
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Colpus feature
+Pore feature
+Pore feature
+Pore feature
+Colpus feature
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Pore feature
+Pore feature
+Colpus feature
+Pore feature
+Colpus feature
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Colpus feature
+Pore feature
+Pore feature
+Colpus feature
+Colpus feature
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph amb
+Pore feature
+Pore feature
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Palynomorph shape
+Number of apertures
+Palynomorph amb
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph shape
+Number of apertures
+Palynomorph amb
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Pore feature
+Colpus feature
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph polarity
+Palynomorph symmetry
+Palynomorph polarity
+Palynomorph symmetry
+Pore feature
+Colpus feature
+Palynomorph polarity
+Palynomorph symmetry
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph polarity
+Palynomorph symmetry
+Larger diameter
+Palynomorph diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Exine ornamentation / sporoderm
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Pore feature
+Palynomorph amb
+Pore feature
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Pore feature
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Exine ornamentation / sporoderm
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Equatorial diameter size
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Palynomorph amb
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Equatorial diameter size
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Pore feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Pore feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Exine ornamentation / sporoderm
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph shape
+Pore feature
+Colpus feature
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph amb
+Palynomorph symmetry
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Exine ornamentation / sporoderm
+Palynomorph amb
+Palynomorph symmetry
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Palynomorph amb
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph amb
+Palynomorph polarity
+Palynomorph symmetry
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph shape
+Number of apertures
+Palynomorph amb
+Palynomorph polarity
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph aperture type
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Palynomorph aperture type
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Palynomorph polarity
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Pore feature
+Palynomorph amb
+Larger diameter
+Smaller diameter
+Equatorial diameter size
+Polar diameter size
+Palynomorph shape
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Number of apertures
+Pore feature
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape
+Pore feature
+Colpus feature
+Larger diameter
+Palynomorph diameter
+Smaller diameter
+Polar diameter size
+Palynomorph shape`; 
 
-    var jwtClient = new google.auth.JWT(
-      key.client_email,
-      null,
-      key.private_key,
-      [SCOPES],
-      null
-    );
-    
-    jwtClient.authorize(function (err, tokens) {
-      if (err) {
-        console.log(err,tokens);
-        // cb(err,tokens)
-        return;
-      }
-      var service = google.sheets('v4');
-    //   Interaction.destroyAll({dataset:id},function(err,data){
-        service.spreadsheets.values.get({
-            auth: jwtClient,
-            spreadsheetId: id,
-            range: 'A:J'        
-          }, function(err, rs) {
-            if (err){
-              console.log('The API returned an error: ' + err);    
-              return;          
-            }        
-            var data = [];
-            rs.values.shift();
-            rs.values.forEach(function(item){
-              var i = {};
-              i.dataset = id;
-              i.modified = new Date();
-              i.collection = item[0];
-              i.plant = item[1];
-              i.type = item[2];
-              i.pollinator = item[3];
-              i.percentual = Number(item[4]);
-              i.author = item[5];
-              i.municipality = item[6];
-              i.state = item[7];
-              i.region = item[8];
-              i.reference = item[9];
-              data.push(i);  
-            });       
-            console.log(rs.values);     
-            // Interaction.create(data,function(err,saved){
-            //   if (err) {
-            //     console.log('The API returned an error: ' + err);    
-            //     cb(err,saved);
-            //   }            
-            //   Interaction.downloadImages(id,function(){
-            //     console.log("Images downloaded.");
-            //   });
-            //   cb(err,saved);
-            // });                                 
-        });
-    //   });
-    });
-}
-test();
+var rs = {};
+
+data.split(`
+`).forEach(function(item){
+rs[item.trim()] = true;
+});
+console.log(rs);
+
