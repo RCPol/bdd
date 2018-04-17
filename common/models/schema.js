@@ -376,7 +376,7 @@ module.exports = function(Schema) {
               console.log('The API returned an error: ' + err);    
               return;          
             }
-            console.log(rs)
+            
             rs.values.shift();
             Schema.destroyAll({base:base, language:language},function(err,d){     
               var response = {};     

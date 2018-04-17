@@ -16,7 +16,7 @@ app.start = function() {
     state = (typeof state == 'undefined' || state == null)?'':String(state).trim();
     if(base && base.trim().length>0 && language && language.trim().length>0 && schema.trim().length>0 && class_.trim().length>0 && term.trim().length>0){
       var id = base.trim().concat(":").concat(language.trim()).concat(":").concat(schema.trim()).concat(":").concat(class_.trim()).concat(":").concat(term.trim());
-      if(state.trim().length>0)
+      if(state.trim().length>0 && class_!="CategoricalDescriptor")
         id = id+":"+state.trim();
       return id;
     }             
@@ -114,6 +114,7 @@ app.get('/profile/specimen/:base/:id', function(req, res) {
   params.id =req.params.id;
   params.language = req.params.id.split(":")[1];
   params.value = {};
+  params.base = req.params.id.split(":")[0];
   async.parallel([
     function(callback) {
       siteLabel(params,callback);
@@ -388,10 +389,10 @@ function profilesDwc(params,callback) {
 function profilesLabel(params,callback) {
   params.label = params.label?params.label:{};
   var Schema = app.models.Schema;  
-  Schema.find({where:{"class":"ProfilesLabel",language:params.language}},function(err,profilesLabel) {
+  Schema.find({where:{"class":"ProfilesLabel",language:params.language, base:params.base}},function(err,profilesLabel) {
     profilesLabel.forEach(function(item) {
       var parsedId = item.id.split(":");
-      var domId = parsedId[2]+":"+parsedId[3]+":"+parsedId[4]
+      var domId = parsedId[2]+":"+parsedId[3]+":"+parsedId[4];      
       params.label[domId] = item.field;
       // console.log(item);
       // console.log(params.label[domId]);
