@@ -15,6 +15,8 @@
 	<script src="/mechanisms/dq-specimens.js"></script>
 	<script src="/mechanisms/dq-glossary.js"></script>
 	<script src="/mechanisms/dq-institution.js"></script>
+	<script src="/mechanisms/ui-printer.js"></script>
+	<script src="/mechanisms/bdq.js"></script>	
 	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
 
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -78,7 +80,10 @@
 					<div class="input-field col s12">
 						<input id="url-specimen" value="" placeholder="https://docs.google.com/spreadsheets/d/1gH0aa2qqnAgfAixGom3Gnx6Qp91ZvWhUHPb_QeoIreQ/edit#gid=765248797" id="url" type="text" class="validate">
 						<label class="active" for="url">Spreadsheet URL:</label>
-					</div>										
+					</div>
+					<div class="col s12">
+						<a id="updateReport"class="waves-effect waves-light btn right"><i class="material-icons left">cached</i>Report</a>
+					</div>
 				</div>
 				<div class="row" style="padding: 0em 2em 0em 0.3em">
 					<div class="title col s12">											
@@ -141,6 +146,7 @@
 													<th>Field</th>
 													<th>Row</th>
 													<th>Current value</th>
+													<th>Details</th>
 												</tr>
 												</thead>
 
@@ -376,7 +382,54 @@
 				</div>			
 			</article>	
 		</div>
-	
+
+
+		<nav> <!-- navbar content here  --> </nav>
+
+		<ul id="slide-out" class="sidenav">		
+				<h5 style="margin-left:0.5em">DQ Assertion</h5>											
+				<div style="margin:1em" >
+					<div class="card-content " style="margin-top:0em; margin-bottom:0em; padding-bottom: 1em; padding-top: 1em;">
+						<span class="card-title">Enhancement</span>					
+						<textarea disabled style="border:dashed 2px orange; height:5em; resize: none;" id="detail-enhancement"></textarea>
+					</div>					
+				
+					<div class="card-content " style="margin-top:0em; margin-bottom:0em; padding-bottom: 1em; padding-top: 1em;">
+						<span class="card-title">Result</span>										
+						<textarea disabled style="border:dashed 2px orange; height:5em; resize: none;" id="detail-result"></textarea>
+					</div>
+				
+					<div class="card-content " style="margin-top:0em; margin-bottom:0em; padding-bottom: 1em; padding-top: 1em;">
+						<span class="card-title">Information Element</span>										
+						<textarea disabled style="border:dashed 2px orange; height:5em; resize: none;" id="detail-ie"></textarea>
+					</div>
+				
+					<div class="card-content " style="margin-top:0em; margin-bottom:0em; padding-bottom: 1em; padding-top: 1em;">
+						<span class="card-title">Specification</span>										
+						<textarea disabled style="border:dashed 2px orange; height:5em; resize: none;" id="detail-specification"></textarea>
+					</div>					
+				
+					<div class="card-content " style="margin-top:0em; margin-bottom:0em; padding-bottom: 1em; padding-top: 1em;">
+						<span class="card-title">Mechanism</span>										
+						<textarea disabled style="border:dashed 2px orange; height:5em; resize: none;" id="detail-mechanism"></textarea>
+					</div>													
+				</div>
+			
+			<!--<li><div class="divider"></div></li>
+			<li><a class="subheader">Information Element</a></li>
+			<li>
+				<a class="waves-effect" href="#!" >
+					<textarea style="height:15em" id="detail-ie"></textarea>
+				</a>				
+			</li>
+			<li><a class="subheader">Specification</a></li>
+			<li><a class="waves-effect" href="#!" id="detail-specification"></a></li>
+			<li><a class="subheader">Mechanism</a></li>
+			<li><a class="waves-effect" href="#!" id="detail-mechanism"></a></li>			
+			-->
+		</ul>		
+				
+				
 	<!-- Final das informações da Palinoteca -->		
 	<!-- Início do Rodapé -->
 	<footer>
@@ -391,175 +444,79 @@
 		var glossaryBR;		
 		var glossaryES;		
 		var institution;
+		var bdq;
 		$(document).ready(function(){	
 			var elem = document.querySelector('.modal');
   			var instance = M.Modal.init(elem, {});			
-
+			$('.sidenav').sidenav();
+			
 			$('.collapsible').collapsible();
+			
 			$('.tabs').tabs();			 
-			$("#url-specimen").change(function() {
-				specimen = new Specimen();		
+			$("#updateReport").click(function() {
+				$("#updateReport").html("Running...")
+					
 				glossaryUS = new Glossary();			
 				glossaryBR = new Glossary();		
 				glossaryES = new Glossary();		
-				institution = new Institution();			
-				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];
+				institution = new Institution();
+				bdq = new BDQ();			
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
 				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {					
 					if(!rs.response.properties) return null;					
 					var base = rs.response.properties.title.split("[")[1].split("]")[0]
 					var lang = rs.response.properties.title.split("[")[2].split("]")[0]
+					bdq.getDatasetHash(id, lang, function(hash) {						
+						bdq.specimenDatasetHash = hash;						
+						bdq.getReportByHash(hash,function(data){
+							if(data){
+								if(data.reportUpdate) {									
+									if(data.report.measure.CONFORMITY_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.CONFORMITY_SPECIMEN_DATASET, "specimen", "conformity");
+									if(data.report.measure.COMPLETENESS_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.COMPLETENESS_SPECIMEN_DATASET, "specimen", "completeness");
+									if(data.report.measure.UNIQUENESS_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.UNIQUENESS_SPECIMEN_DATASET, "specimen", "uniqueness");
+									if(data.report.measure.ACCESSIBILITY_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.ACCESSIBILITY_SPECIMEN_DATASET, "specimen", "accessibility");
+									
+									if(data.report.validation.IS_CONFORM_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_CONFORM_SPECIMEN_DATASET, "specimen", "conformity");
+									if(data.report.validation.IS_COMPLETE_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_COMPLETE_SPECIMEN_DATASET, "specimen", "completeness");
+									if(data.report.validation.IS_UNIQUE_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_UNIQUE_SPECIMEN_DATASET, "specimen", "uniqueness");
+									if(data.report.validation.IS_ACCESSIBLE_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_ACCESSIBLE_SPECIMEN_DATASET, "specimen", "accessibility");
+									
+									bdq.getRecordReportByDatasetHash(hash, function(records){
+										var i = 0
+										records.forEach(function(record){											
+											Object.keys(record.report.amendment).forEach(function(key){											
+												i++;												
+												bdq.printer.specimenAmendment(record.report.amendment[key], "specimen", record.report.amendment[key].dimension.toLowerCase(), i);											
+											});
+											
+										});										
+									});									
+								} else {
+									console.log("Report must be generated");
+									bdq.generateSpecimenReport(id, lang);
+								}
+							} else {
+								bdq.recordDataResource(hash, "multi", id, {identifier: "specimen."+lang+":"+id, url: $("#url-specimen").val()}, function(rs){
+									console.log("A", rs)
+									console.log("Report must be generated");
+									bdq.generateSpecimenReport(id, lang);
+								});
+							}						
+						});
+					});
+
 					$("#title-specimen").html(rs.response.properties.title);
 					$("#base-specimen").html(base);
 					$("#lang-specimen").html(lang);		
-					
-
-					// SPECIMEN
-					$("#specimen-amendment").html("");
-					
-					$("#specimen-tab").removeClass("green-text");
-					$("#specimen-tab").removeClass("red-text");					
-					
-					$("#completeness-specimen").html(`loading...`);					
-					$("#completeness-specimen").removeClass("red");
-					$("#completeness-specimen").removeClass("green");
-					$("#completeness-specimen").removeClass("white-text");
-
-					$("#conformity-specimen").html(`loading...`);					
-					$("#conformity-specimen").removeClass("red");
-					$("#conformity-specimen").removeClass("green");
-					$("#conformity-specimen").removeClass("white-text");
-
-					specimen.conformity(id, lang, function(){
-						specimen.report.conformity.forEach(function(assertion, i){											
-							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
-							$("#specimen-amendment").prepend(`<tr id="i-sp-conformity-${i}">
-									<td>${assertion.result}</td>
-									<td>${assertion.dimension}</td>
-									<td>${assertion.ie}</td>
-									<td>${assertion.dr.row}</td>
-									<td>${assertion.dr.value}</td>													
-								</tr>`);								
-							var elem = document.querySelector('#i-sp-conformity-'+i);							
-							var instance = M.Tooltip.init(elem, {
-								position:"left",
-								html:`
-									<div style="width:20em; padding:1em">
-										<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-										<br>
-										<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-									</div>
-								`
-								});
-						} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Conformity") {
-								$("#conformity-specimen").html(`<a class="waves-effect waves-light modal-trigger white-text" href="#details">${assertion.result}% conform</a>`);									
-								$("#d-content").val(JSON.stringify(assertion,null,4));								
-
-							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is conform") {								
-								if(!$("#specimen-tab").hasClass("red-text")){
-									$("#specimen-tab").removeClass("green-text");
-									$("#specimen-tab").removeClass("red-text");					
-									$("#specimen-tab").addClass(assertion.result?"green-text":"red-text");
-								}									
-								$("#conformity-specimen").addClass(assertion.result?"green":"red");
-								$("#conformity-specimen").addClass("white-text");
-							}
-						});
-					});
-					specimen.completeness(id, lang, function(){
-						specimen.report.completeness.forEach(function(assertion, i){											
-							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
-							$("#specimen-amendment").prepend(`<tr id="i-sp-completeness-${i}">
-									<td>${assertion.result}</td>
-									<td>${assertion.dimension}</td>
-									<td>${assertion.ie}</td>
-									<td>${assertion.dr.row}</td>
-									<td>${assertion.dr.value}</td>													
-								</tr>`);								
-							var elem = document.querySelector('#i-sp-completeness-'+i);							
-							var instance = M.Tooltip.init(elem, {
-								position:"left",
-								html:`
-									<div style="width:20em; padding:1em">
-										<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-										<br>
-										<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-									</div>
-								`
-								});
-						} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Completeness") {
-								$("#completeness-specimen").html(`<a class="waves-effect waves-light modal-trigger white-text" href="#details">${assertion.result}% complete</a>`);									
-								$("#d-content").val(JSON.stringify(assertion,null,4));								
-
-							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {								
-								if(!$("#specimen-tab").hasClass("red-text")){
-									$("#specimen-tab").removeClass("green-text");
-									$("#specimen-tab").removeClass("red-text");					
-									$("#specimen-tab").addClass(assertion.result?"green-text":"red-text");
-								}									
-								$("#completeness-specimen").addClass(assertion.result?"green":"red");
-								$("#completeness-specimen").addClass("white-text");
-							}
-						});
-					});
-
-
-					$("#accessibility-specimen").html(`loading...`);
-					$("#accessibility-specimen").removeClass("red");
-					$("#accessibility-specimen").removeClass("green");
-					$("#accessibility-specimen").removeClass("white-text");
-
-					$.get("/api/Specimens/getImagesValues?id="+id+"&language="+lang, function(rs) {						
-						specimen.accessibility(rs, id, function individualCb(i, assertion){
-							if($("#accessibility-specimen").html() == "loading..." || Number($("#accessibility-specimen").html().split(" ")[0])<i)
-								$("#accessibility-specimen").html(`${i} records assessed`);								
-							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
-								$("#specimen-amendment").prepend(`<tr id="i-sp-access-${i}">
-										<td>${assertion.result}</td>
-										<td>${assertion.dimension}</td>
-										<td>${assertion.ie}</td>
-										<td>${assertion.dr.row}</td>
-										<td>${assertion.dr.value}</td>													
-									</tr>`);	
-								var elem = document.querySelector('#i-sp-access-'+i);							
-								var instance = M.Tooltip.init(elem, {
-									position:"left",
-									html:`
-										<div style="width:20em; padding:1em">
-											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-											<br>
-											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-										</div>
-									`
-									});
-								}
-						}, function finalCb(){
-							specimen.report.accessibility.forEach(function(assertion, i){											
-								if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
-									$("#accessibility-specimen").html(`${assertion.result}% accessible`);	
-									var elem = document.querySelector('#accessibility-specimen');
-									var instance = M.Tooltip.init(elem, {									
-										position: "top",
-										html:`
-											<div style="width:20em; padding:1em">
-												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-												<br>
-												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-											</div>
-										`
-										});
-
-								} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
-									if(!$("#specimen-tab").hasClass("red-text")){
-										$("#specimen-tab").removeClass("green-text");
-										$("#specimen-tab").removeClass("red-text");					
-										$("#specimen-tab").addClass(assertion.result?"green-text":"red-text");
-									}									
-									$("#accessibility-specimen").addClass(assertion.result?"green":"red");								
-									$("#accessibility-specimen").addClass("white-text");
-								}
-							});
-						});	
-					});																						
+				
 					
 					// GLOSSARY
 					$("#glossary-en-US-amendment").html("");
@@ -578,8 +535,16 @@
 					$("#completeness-glossary-pt-BR").removeClass("green");
 					$("#completeness-glossary-pt-BR").removeClass("red");				
 					$("#completeness-glossary-en-US").removeClass("green");
-					$("#completeness-glossary-en-US").removeClass("red");				
+					$("#completeness-glossary-en-US").removeClass("red");
 
+					$("#uniqueness-glossary-en-US").removeClass("green");
+					$("#uniqueness-glossary-en-US").removeClass("red");				
+					$("#uniqueness-glossary-pt-BR").removeClass("green");
+					$("#uniqueness-glossary-pt-BR").removeClass("red");				
+					$("#uniqueness-glossary-en-US").removeClass("green");
+					$("#uniqueness-glossary-en-US").removeClass("red");				
+
+					/*					
 					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=en-US",function(rs) {						
 						glossaryUS.completeness(rs, id);
 
@@ -1018,6 +983,8 @@
 							});
 						});	
 					});
+					*/
+					
 				});
 			});
 			// Grupo de aplicação da tecnologia Blockchain

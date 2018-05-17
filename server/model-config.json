@@ -84,6 +84,12 @@
     "$promise": {},
     "$resolved": true
   },
+  "Bdq": {
+    "dataSource": "BDD",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
   "storage": {
     "dataSource": "files-storage",
     "public": true

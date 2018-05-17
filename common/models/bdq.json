@@ -1,0 +1,25 @@
+{
+  "name": "Bdq",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "generated": false
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {},
+  "indexes": {
+    "lastUpdate": {
+      "keys": {"dataUpdate": -1, "identifier": 1}
+    },"_id": {"keys":{"id":-1}}
+  }
+}

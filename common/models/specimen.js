@@ -17,6 +17,114 @@ var serviceAccount = require("key.json");
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+
+  Specimen.uniqueness = function(id, language, cb) {
+    var key = require('key.json');
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!B:D'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }          
+          var rs = d.values;
+          var completeness = 0;
+          var totalCells = 0;    
+          var header = rs.splice(0,5);
+          var report = [];
+          var individuals = {};
+          
+          rs.forEach(function(line, index){
+            if(String(line[0] || "").trim().length > 0 &&
+              String(line[1] || "").trim().length > 0 &&
+              String(line[2] || "").trim().length > 0) {                
+                var id = [String(line[0] || "").trim().toUpperCase(), String(line[1] || "").trim().toUpperCase(), String(line[2] || "").trim().toUpperCase()].join(", ");
+                individuals[id] = {
+                  count: individuals[id] && individuals[id].count ? individuals[id].count+1:1,
+                  rows: individuals[id] && individuals[id].rows ? individuals[id].rows.concat([index+6]):[index+6]
+                }
+            }
+          });
+          Object.keys(individuals).map(function(id){
+            if(individuals[id].count>1) {
+              var assertion = {
+                  type: 'amendment',
+                  hash: hash(individuals[id]),
+                  dimension: 'Uniqueness',
+                  enhancement: 'Recommend to remove duplicated records',
+                  specification: '[TO DO]',
+                  mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                  ie: "Unique identifier",
+                  dr: {
+                      row: individuals[id].rows, 
+                      value: id,
+                      drt:  'record'
+                  },
+                  response: {result: `Rows ${individuals[id].rows} have the same identifier (${id})`}
+              };
+              report.push(assertion);
+            }            
+          });
+          var finalUniqueness = ((Object.keys(individuals).length/rs.length)*100);         
+          finalUniqueness = finalUniqueness === 100? finalUniqueness:finalUniqueness.toFixed(2);
+          report.push({
+              type: 'measure',              
+              dimension: 'Uniqueness',
+              specification: `[TO DO]`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'Unique identifier',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              response: {result: finalUniqueness}
+          }); 
+          report.push({
+              type: 'validation',              
+              criterion: 'Spreadsheet has unique records',
+              specification: `[TO DO]`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'Unique identifier',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              response: {result: finalUniqueness == 100}
+          });
+          cb(null,report);
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'uniqueness',
+    {
+      http: {path: '/uniqueness', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
   Specimen.checkUrl = function(url, cb) {  
     try{
       if(url.indexOf("http")==-1){
@@ -53,8 +161,7 @@ module.exports = function(Specimen) {
     }
   );
   Specimen.getSpreadsheetInfo = function(id, cb) {            
-    var key = require('key.json');
-    
+    var key = require('key.json');    
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
       key.client_email,
@@ -133,6 +240,7 @@ module.exports = function(Specimen) {
               header[1].forEach(function(col, i){ 
                 if(col == "Image" && String(line[i] || "").trim().length>0 ) {
                   var img = {
+                    hash: hash(line),
                     header: header[4][i],
                     value: line[i],
                     row: index
@@ -145,6 +253,48 @@ module.exports = function(Specimen) {
         });
       });
   }
+  Specimen.getHash = function(id, language, cb) {
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!B:DD'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }                    
+          cb(null,hash(d.values));
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'getHash',
+    {
+      http: {path: '/getHash', verb: 'get'},
+          accepts: [    
+            {arg: 'id', type: 'string', required:true},   
+            {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Specimen.conformity = function(id, language, cb) {
     var key = require('key.json');    
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
@@ -201,6 +351,7 @@ module.exports = function(Specimen) {
                               if(decimal){
                                 var assertion = {
                                   type: 'amendment',
+                                  hash: hash(line),
                                   dimension: 'Conformity',
                                   enhancement: 'Recommend to transform from DMS format to decimal format',
                                   specification: 'More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -211,7 +362,7 @@ module.exports = function(Specimen) {
                                       value: String(line[i]).trim(),
                                       drt:  'record'
                                   },
-                                  result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'
+                                  response: {result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'}
                                 };
                                 report.push(assertion); 
                               }                                
@@ -220,6 +371,7 @@ module.exports = function(Specimen) {
                             } else {
                               var assertion = {
                                   type: 'amendment',
+                                  hash: hash(line),
                                   dimension: 'Conformity',
                                   enhancement: 'Recommend to provide value in the range of decimal latitude',
                                   specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -230,7 +382,7 @@ module.exports = function(Specimen) {
                                       value: String(line[i]).trim(),
                                       drt:  'record'
                                   },
-                                  result: 'Modify latitude to a numeric value between -90 and 90'
+                                  response: {result: 'Modify latitude to a numeric value between -90 and 90'}
                               };
                               report.push(assertion); 
                           }                                           
@@ -253,6 +405,7 @@ module.exports = function(Specimen) {
                             if(decimal){
                               var assertion = {
                                 type: 'amendment',
+                                hash: hash(line),
                                 dimension: 'Conformity',
                                 enhancement: 'Recommend to transform from DMS format to decimal format',
                                 specification: 'More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -263,7 +416,7 @@ module.exports = function(Specimen) {
                                     value: String(line[i]).trim(),
                                     drt:  'record'
                                 },
-                                result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'
+                                response: {result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'}
                               };
                               report.push(assertion); 
                             }                              
@@ -272,6 +425,7 @@ module.exports = function(Specimen) {
                           } else {
                             var assertion = {
                                 type: 'amendment',
+                                hash: hash(line),
                                 dimension: 'Conformity',
                                 enhancement: 'Recommend to provide value in the range of decimal longitude',
                                 specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -282,7 +436,7 @@ module.exports = function(Specimen) {
                                     value: String(line[i]).trim(),
                                     drt:  'record'
                                 },
-                                result: 'Modify longitude to a numeric value between -180 and 180'
+                                response: {result: 'Modify longitude to a numeric value between -180 and 180'}
                             };
                             report.push(assertion); 
                         }                                           
@@ -297,11 +451,31 @@ module.exports = function(Specimen) {
                             parsedDate[1].trim().length == 2 &&
                             Number(parsedDate[2].trim())>=0 && Number(parsedDate[2].trim())<=31 &&
                             parsedDate[2].trim().length == 2
-                          )
-                          conformity++;
+                          ){
+                            conformity++;
+                          }                          
+                          else {
+                            var assertion = {
+                              type: 'amendment',
+                                hash: hash(line),
+                                dimension: 'Conformity',
+                                enhancement: 'Recommend to change the date value to the ISO 8601 format',
+                                specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                ie: header[4][i],
+                                dr: {
+                                    row: index+6, 
+                                    value: String(line[i]).trim(),
+                                    drt:  'record'
+                                },
+                                response: {result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'}
+                            };
+                            report.push(assertion); 
+                          }
                         } else {
                           var assertion = {
                               type: 'amendment',
+                              hash: hash(line),
                               dimension: 'Conformity',
                               enhancement: 'Recommend to change the date value to the ISO 8601 format',
                               specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -312,7 +486,7 @@ module.exports = function(Specimen) {
                                   value: String(line[i]).trim(),
                                   drt:  'record'
                               },
-                              result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'
+                              response: {result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'}
                           };
                           report.push(assertion); 
                       }                                           
@@ -333,7 +507,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalConformity
+              response: {result: finalConformity}
           }); 
           report.push({
               type: 'validation',
@@ -345,7 +519,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalConformity == 100
+              response: {result: finalConformity == 100}
           });
           cb(null,report);
         });
@@ -485,6 +659,7 @@ module.exports = function(Specimen) {
                           } else {
                             var assertion = {
                                 type: 'amendment',
+                                hash: hash(line),
                                 dimension: 'Completeness',
                                 enhancement: 'Recommend to provide value for an empty field',
                                 specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -495,7 +670,7 @@ module.exports = function(Specimen) {
                                     value: String(line[i]).trim(),
                                     drt:  'record'
                                 },
-                                result: 'Provide some value'
+                                response: {result: 'Provide some value'}
                             };
                             report.push(assertion); 
                           }                     
@@ -515,7 +690,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalCompleteness
+              response: {result: finalCompleteness}
           }); 
           report.push({
               type: 'validation',
@@ -527,7 +702,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalCompleteness == 100
+              response: {result: finalCompleteness == 100}
           });
           cb(null,report);
         });
@@ -1118,7 +1293,7 @@ module.exports = function(Specimen) {
       Specimen.find(query, function(err,result){
         if(err) reject(err)        
         else{
-          var data = {result:result, base: base}
+          var data = {response: {result:result, base: base}}
           resolve(data);
         }
       });
