@@ -20,7 +20,7 @@ Institution.prototype.uniqueness = function(rs, id) {
             }        
     });
     
-    Object.keys(individuals).map(function(id){        
+    Object.keys(individuals).map(function(id) {
         if(individuals[id].count>1) {
           var assertion = {
               type: 'amendment',              
