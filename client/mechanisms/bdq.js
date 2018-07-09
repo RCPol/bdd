@@ -53,16 +53,18 @@ BDQ.prototype.recordDataResource = function(hash, type, identifier, resourceLoca
 }
 
 BDQ.prototype.recordAssertion = function(hash, assertionId, type, dr, specification, mechanism, ie, response, dimension, criterion, enhancement, cb) {
-    $.post("/api/Bdqs/recordAssertion",{hash:hash, assertionId: assertionId, type:type, dr:dr, specification:specification, mechanism:mechanism, ie:ie, response:response, dimension:dimension, criterion:criterion, enhancement:enhancement}).done(
-        function(rs) {            
-            cb(rs);
-        }).fail(function(err){
-            console.log("err recordAssertion", err)
-        });
+    cb("recorded")
+    // $.post("/api/Bdqs/recordAssertion",{hash:hash, assertionId: assertionId, type:type, dr:dr, specification:specification, mechanism:mechanism, ie:ie, response:response, dimension:dimension, criterion:criterion, enhancement:enhancement}).done(
+    //     function(rs) {            
+    //         cb(rs);
+    //     }).fail(function(err){
+    //         console.log("err recordAssertion", err)
+    //     });
 }
 
 BDQ.prototype.generateSpecimenReport = function(id, lang) {
     var self = this;
+    self.specimenProcess = 0;
     self.createdRecords = {};    
     self.specimen.conformity(id, lang, function(){
         self.specimen.report.conformity.forEach(function(assertion, i){
@@ -86,7 +88,13 @@ BDQ.prototype.generateSpecimenReport = function(id, lang) {
                         console.log("recorded conformity measure", rs)                    
                     });
             } else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is conform") {
-                self.printer.specimenValidation(assertion, "specimen", "conformity");
+                self.printer.specimenValidation(assertion, "specimen", "conformity");                
+                self.specimenProcess++;								
+                if(self.specimenProcess == 5) {
+                    M.toast({html: 'DQ report is ready: Specimen'});
+                    $("#updateReportSpecimen").hide();
+                }
+                
                 self.recordAssertion(self.specimenDatasetHash, "IS_CONFORM_SPECIMEN_DATASET", "validation", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, null, assertion.criterion, null, function(rs){
                     console.log("recorded conformity criterion", rs)                    
                 });
@@ -116,6 +124,13 @@ BDQ.prototype.generateSpecimenReport = function(id, lang) {
                 });
             } else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {								
                 self.printer.specimenValidation(assertion, "specimen", "completeness");
+                self.specimenProcess++;								
+                if(self.specimenProcess == 5) {
+                    M.toast({html: 'DQ report is ready: Specimen'});
+                    $("#updateReportSpecimen").hide();
+                }
+                
+                
                 self.recordAssertion(self.specimenDatasetHash, "IS_COMPLETE_SPECIMEN_DATASET", "validation", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, null, assertion.criterion, null, function(rs){
                     console.log("recorded complete criterion")                    
                 });
@@ -129,12 +144,12 @@ BDQ.prototype.generateSpecimenReport = function(id, lang) {
                     self.createdRecords[assertion.hash] = true;
                     self.recordDataResource(assertion.hash, "single", "row: "+assertion.dr.row, {row:assertion.dr.row, datasetHash: self.specimenDatasetHash}, function(rs){
                         self.recordAssertion(assertion.hash, "UNIQUE_SPECIMEN_RECORD_"+assertion.ie, "amendment", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, assertion.dimension, null, assertion.enhancement, function(rs){
-                            // console.log("recorded conformity criterion", rs)                    
+                            console.log("recorded uniqueness criterion", rs)                    
                         });
                     });
                 } else {
                     self.recordAssertion(assertion.hash, "UNIQUE_SPECIMEN_RECORD_"+assertion.ie, "amendment", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, assertion.dimension, null, assertion.enhancement, function(rs){
-                        // console.log("recorded conformity criterion", rs)                    
+                        console.log("recorded uniqueness criterion", rs)                    
                     });
                 }
                 self.printer.specimenAmendment(assertion, "specimen", "uniqueness",i);                            
@@ -145,8 +160,52 @@ BDQ.prototype.generateSpecimenReport = function(id, lang) {
                 });
             } else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet has unique records") {								
                 self.printer.specimenValidation(assertion, "specimen", "uniqueness");
+                self.specimenProcess++;								
+                if(self.specimenProcess == 5) {
+                    M.toast({html: 'DQ report is ready: Specimen'});
+                    $("#updateReportSpecimen").hide();
+                }
+                
+                
                 self.recordAssertion(self.specimenDatasetHash, "IS_UNIQUE_SPECIMEN_DATASET", "validation", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, null, assertion.criterion, null, function(rs){
-                    console.log("recorded complete criterion")                    
+                    console.log("recorded unique criterion")                    
+                });
+            }
+        });
+    }); 
+    self.specimen.consistency(id, lang, function(){
+        self.specimen.report.consistency.forEach(function(assertion, i){											
+            if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){                
+                if(!self.createdRecords[assertion.hash]) {                    
+                    self.createdRecords[assertion.hash] = true;
+                    self.recordDataResource(assertion.hash, "single", "row: "+assertion.dr.row, {row:assertion.dr.row, datasetHash: self.specimenDatasetHash}, function(rs){
+                        self.recordAssertion(assertion.hash, "CONSISTENT_SPECIMEN_RECORD_"+assertion.ie, "amendment", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, assertion.dimension, null, assertion.enhancement, function(rs){
+                            console.log("recorded consistency criterion", rs)                    
+                        });
+                    });
+                } else {
+                    self.recordAssertion(assertion.hash, "CONSISTENT_SPECIMEN_RECORD_"+assertion.ie, "amendment", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, assertion.dimension, null, assertion.enhancement, function(rs){
+                        console.log("recorded consistency criterion", rs)                    
+                    });
+                }
+                self.printer.specimenAmendment(assertion, "specimen", "consistency",i);                            
+        } else if(assertion.dr.drt == "dataset" && assertion.dimension == "Consistency") {
+                console.log(assertion)
+                self.printer.specimenMeasure(assertion, "specimen", "consistency");
+                self.recordAssertion(self.specimenDatasetHash, "CONSISTENCY_SPECIMEN_DATASET", "measure", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, assertion.dimension, null, null, function(rs){
+                    console.log("recorded consistency measure")                    
+                });
+            } else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet has consistent records") {								
+                self.printer.specimenValidation(assertion, "specimen", "consistency");
+                self.specimenProcess++;								
+                if(self.specimenProcess == 5) {
+                    M.toast({html: 'DQ report is ready: Specimen'});
+                    $("#updateReportSpecimen").hide();
+                }
+                
+                
+                self.recordAssertion(self.specimenDatasetHash, "IS_CONSISTENT_SPECIMEN_DATASET", "validation", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, null, assertion.criterion, null, function(rs){
+                    console.log("recorded consistent criterion")                    
                 });
             }
         });
@@ -181,6 +240,13 @@ BDQ.prototype.generateSpecimenReport = function(id, lang) {
 
                 } else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								                    
                     self.printer.specimenValidation(assertion, "specimen", "accessibility");
+                    self.specimenProcess++;								
+                if(self.specimenProcess == 5) {
+                    M.toast({html: 'DQ report is ready: Specimen'});
+                    $("#updateReportSpecimen").hide();
+                }
+                
+                    
                     self.recordAssertion(self.specimenDatasetHash, "IS_ACCESSIBLE_SPECIMEN_DATASET", "validation", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, null, assertion.criterion, null, function(rs){
                         console.log("recorded access criterion")                    
                     });

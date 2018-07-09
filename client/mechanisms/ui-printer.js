@@ -21,6 +21,11 @@ var UIPrinter = function(){
     $("#conformity-specimen").removeClass("green");
     $("#conformity-specimen").removeClass("white-text");
 
+    $("#consistency-specimen").html(`loading...`);					
+    $("#consistency-specimen").removeClass("red");
+    $("#consistency-specimen").removeClass("green");
+    $("#consistency-specimen").removeClass("white-text");
+
     $("#uniqueness-specimen").html(`loading...`);					
     $("#uniqueness-specimen").removeClass("red");
     $("#uniqueness-specimen").removeClass("green");
@@ -60,7 +65,7 @@ UIPrinter.prototype.specimenAmendment = function(assertion, target, dimension, i
     //     `
     //     });
 }
-UIPrinter.prototype.specimenMeasure = function(assertion, target, dimension) {
+UIPrinter.prototype.specimenMeasure = function(assertion, target, dimension) {    
     $("#"+dimension+"-"+target).html(`<a class="waves-effect waves-light modal-trigger white-text" href="#details">${assertion.response.result}% of `+dimension+`</a>`);									
     $("#d-content").val(JSON.stringify(assertion,null,4));                                
 }
@@ -69,7 +74,9 @@ UIPrinter.prototype.specimenValidation = function(assertion, target,dimension) {
         $("#"+target+"-tab").removeClass("green-text");
         $("#"+target+"-tab").removeClass("red-text");					
         $("#"+target+"-tab").addClass(assertion.response.result?"green-text":"red-text");
-    }									
+    }
+    // console.log("#"+dimension+"-"+target, assertion.response.result)
     $("#"+dimension+"-"+target).addClass(assertion.response.result?"green":"red");
     $("#"+dimension+"-"+target).addClass("white-text");
+    
 }

@@ -3,7 +3,8 @@ var Specimen = function(){
         completeness: [],
         accessibility: [],
         conformity: [],
-        uniqueness: []
+        uniqueness: [],
+        consistency: []
     };
 }
 Specimen.prototype.completeness = function(id, lang, cb) {	
@@ -18,6 +19,14 @@ Specimen.prototype.uniqueness = function(id, lang, cb) {
     var self = this;					    
     $.get("/api/Specimens/uniqueness?id="+id+"&language="+lang,function(rs) {        
         self.report.uniqueness = rs.response;
+        cb()
+    });    
+    return this;
+}
+Specimen.prototype.consistency = function(id, lang, cb) {	
+    var self = this;					    
+    $.get("/api/Specimens/consistency?id="+id+"&language="+lang,function(rs) {        
+        self.report.consistency = rs.response;
         cb()
     });    
     return this;

@@ -18,7 +18,9 @@ var serviceAccount = require("key.json");
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
 
-  Specimen.consistency = function(id, language, cb) {
+  Specimen.consistency = function(req, id, language, cb) {
+    var report = [];
+    req.setTimeout(0);    
     var key = require('key.json');
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
@@ -53,11 +55,91 @@ module.exports = function(Specimen) {
             var term = toString(line[2]).trim().toUpperCase();              
             var vocabulary = toString(line[6]).trim().toUpperCase();
             if (schema.length>0 && class_.length>0 && term.length>0 && vocabulary.length>0 && class_ == "STATE") {              
-              validValues[`${schema}-${class_}-${term}`] = {}
-              validValues[`${schema}-${class_}-${term}`][vocabulary] = true;
+              validValues[`${schema}-${term}`] = validValues[`${schema}-${term}`]?validValues[`${schema}-${term}`]:{}
+              validValues[`${schema}-${term}`][vocabulary] = true;
             }                        
           });
-          cb(null,validValues);
+
+          service.spreadsheets.values.get({
+            auth: jwtClient,
+            spreadsheetId: id,
+            range: 'specimen.'+language+'!A:BU'        
+          }, function(err, d) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              cb('The API returned an error: ' + err,null)
+              return;          
+            }           
+            var totalValues = 0;
+            var totalValidValues = 0;                                                      
+            var data = d.values;
+            var handler = new SpecimenHandler(null, language, data);                          
+            handler.setSchemas().setClasses().setTerms().setData();            
+            delete handler.table;
+            var result = {};            
+            handler.terms.forEach(function(item, i){              
+              var schema = toString(handler.schemas[i]).trim().toUpperCase();
+              var class_ = toString(handler.classes[i]).trim().toUpperCase();
+              var term = toString(item).trim().toUpperCase();
+              var column = `${schema}-${term}`;                  
+              if (schema.length>0 && class_.length>0 && term.length>0 && validValues[column] && class_=="CategoricalDescriptor".toUpperCase()) {           
+                result[column] = {};
+                handler.data.forEach(function(line, index){
+                  line[i].split("|").forEach(function(value){
+                    totalValues++;
+                    if(!validValues[column][toString(value).trim().toUpperCase()] && toString(value).trim().length>0){                      
+                      result[column][index] = value;
+                      var assertion = {
+                          type: 'amendment',
+                          hash: hash(line),
+                          dimension: 'Consistency',
+                          enhancement: `Recommend to use a value defined in the glossary`,
+                          specification: '[TO DO]',
+                          mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                          ie: item,
+                          dr: {
+                              row: index+6, 
+                              value: value,
+                              drt:  'record'
+                          },
+                          response: {result: `The value "${value.trim().toUpperCase()}" was not found in the field "${item}" of the glossary. Change this value or add it in the glossary.`}
+                      };
+                      report.push(assertion);
+                    } else {
+                      totalValidValues++;
+                    }
+                  });                  
+                });                
+              }              
+            });
+            var consistency = (totalValidValues/totalValues)*100;
+            consistency = consistency === 100? consistency:consistency.toFixed(2);            
+            report.push({
+                type: 'measure',              
+                dimension: 'Consistency',
+                specification: `[TO DO]`,
+                mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                ie: 'All',
+                dr: {
+                    id: id,
+                    drt:  'dataset'
+                },
+                response: {result: consistency}
+            }); 
+            report.push({
+                type: 'validation',              
+                criterion: 'Spreadsheet has consistent records',
+                specification: `[TO DO]`,
+                mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                ie: 'All',
+                dr: {
+                    id: id,
+                    drt:  'dataset'
+                },
+                response: {result: consistency == 100}
+            });
+            cb(null,report);                        
+          });          
         });
       });
   }
@@ -66,6 +148,7 @@ module.exports = function(Specimen) {
     {
       http: {path: '/consistency', verb: 'get'},
           accepts: [    
+        { arg: "req", type: "object", http: { source: "req" } },
         {arg: 'id', type: 'string', required:true},   
         {arg: 'language', type: 'string', required:true},                
       ],
