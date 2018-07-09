@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+
+	<!-- Google fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic|Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+	<!-- Css Documento -->
+	<link rel="stylesheet" href="/css/data_quality.css">
+
+	<!-- jQuery -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+	<script src="/mechanisms/dq-specimens.js"></script>
+	<script src="/mechanisms/dq-glossary.js"></script>
+	<script src="/mechanisms/dq-institution.js"></script>
+	<script src="/mechanisms/ui-printer.js"></script>
+	<script src="/mechanisms/bdq.js"></script>	
+	<link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<!--Import materialize.css-->
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/css/materialize.min.css"  media="screen,projection"/>	
+
+	<!--Let browser know website is optimized for mobile-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <style>
+		ul {
+			width:100%			
+		}
+		li {
+			width:100%
+		}
+		a {}
+	</style>
+
+	<title>RCPol - Data Update</title>
+</head>
+<body>
+<div class="contem">
+	<!-- Modal Structure -->
+	<div id="details" class="modal bottom-sheet">
+		<div class="modal-content">
+		<h4>Assertion Details</h4>
+		<div>
+			<textarea style="height:15em" id="d-content"></textarea>
+		</div>
+		</div>
+		<div class="modal-footer">
+		<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">OK</a>
+		</div>
+	</div>
+	<!-- Início Header: Menu e Logotipo -->
+	<header>
+		<!-- Menu: início -->
+		
+		<!-- Menu: fim -->
+		<!-- logotipo -->
+		<div class="logo">
+			<img src="/img/logo.png" alt="RCPol - Rede de Cat&aacute;logos Pol&iacute;nicos online" height="150px">
+		</div>
+		<!-- logotipo -->
+
+	</header>
+	<!-- Fim Header: Menu e Logotipo -->
+	
+		<div class="container" style="width:100%">
+			<article>
+				<div class="row">
+					<div class="col s12">
+						<h1 class="glo-tit" id="rcpol-Admin-siteGlossary" style="margin-bottom: 0px">Data Update</h1>
+					</div>
+				</div>
+				<div class="row" style="padding: 0em 2em 0em 0em">
+					<div class="title col s12">											
+						<h3 style="font-size: 150%; margin:0px margin-bottom:1em">Spreadsheet Input</h3> 
+					</div>
+					<div class="input-field col s12">
+						<input id="url-specimen" value="" placeholder="https://docs.google.com/spreadsheets/d/1gH0aa2qqnAgfAixGom3Gnx6Qp91ZvWhUHPb_QeoIreQ/edit#gid=765248797" id="url" type="text" class="validate">
+						<label class="active" for="url">Spreadsheet URL:</label>
+					</div>
+					
+				</div>
+				<div class="row">
+					<div class="input-field col s12">											
+						<h3 style="font-size: 150%; margin:0px">Sheets</h3> 
+					</div>
+					<div class="col s12" >											
+						<div class="collection">
+							<a href="#!" class="collection-item" style="text-align:left">
+								<span id="glossary-pt-br" class="badge green white-text" style="font-size:80%">								
+									<i class="material-icons left">cached</i> <span id="glossary-pt-br-label">Update</span>
+								</span>													
+								1. Glossary (pt-BR)
+								
+							</a>
+							<a href="#!" class="collection-item" style="text-align:left">
+								<span id="glossary-en-us" class="badge green white-text" style="font-size:80%">								
+									<i class="material-icons left">cached</i> <span id="glossary-en-us-label">Update</span>
+								</span>
+								2. Glossary (en-US)
+							</a>
+							<a href="#!" class="collection-item" style="text-align:left">
+								<span id="glossary-es-es" class="badge green white-text" style="font-size:80%">								
+									<i class="material-icons left">cached</i> <span id="glossary-es-es-label">Update</span>
+								</span>
+								3. Glossary (es-ES)
+							</a>
+							<a href="#!" class="collection-item" style="text-align:left">
+								<span id="institution" class="badge green white-text" style="font-size:80%">								
+									<i class="material-icons left">cached</i> <span id="institution-label">Update</span>
+								</span>
+								4. Institutions
+							</a>
+							<a href="#!" class="collection-item" style="text-align:left">
+								<span id="specimen" class="badge green white-text" style="font-size:80%">								
+									<i class="material-icons left">cached</i> <span id="specimen-label">Update</span>
+								</span>
+								5. Specimens / Species
+							</a>
+							<a href="#!" class="collection-item" style="text-align:left">
+								<span id="key" class="badge green white-text" style="font-size:80%">								
+									<i class="material-icons left">cached</i> <span id="key-label">Update</span>
+								</span>
+								6. Keys
+							</a>
+						</div>
+					</div>																																		
+				</div>							
+			</article>	
+		</div>		
+				
+	<!-- Final das informações da Palinoteca -->		
+	<!-- Início do Rodapé -->
+	<footer>
+		<p>Copyright &copy; 2018 RCPol - Todos os direitos reservados e outras informa&ccedil;&otilde;es</p>
+	</footer>
+	<!-- Final do Rodapé -->	
+</div>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/js/materialize.min.js"></script>
+	<script type="text/javascript">		
+		var base;
+		var lang;		
+		$(document).ready(function(){	
+			$("#glossary-pt-br").click(function() {
+				$("#glossary-pt-br").removeClass("green");
+				$("#glossary-pt-br").addClass("orange");
+				$("#glossary-pt-br-label").html("Loading...");
+
+				$("#glossary-en-us").hide();
+				$("#glossary-es-es").hide();
+				$("#specimen").hide();
+				$("#institution").hide();
+				$("#key").hide();
+
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {
+					if(!rs.response.properties) return null;					
+					base = rs.response.properties.title.split("[")[1].split("]")[0];
+					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
+					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+						$("#glossary-pt-br-label").html("Done!");
+						$("#glossary-pt-br").removeClass("orange");
+						$("#glossary-pt-br").addClass("blue");
+
+						$("#glossary-en-us").show();
+						$("#glossary-es-es").show();
+						$("#specimen").show();
+						$("#institution").show();
+						$("#key").show();
+					});
+				});
+			});
+
+			$("#glossary-en-us").click(function() {
+				$("#glossary-en-us").removeClass("green");
+				$("#glossary-en-us").addClass("orange");
+				$("#glossary-en-us-label").html("Loading...");
+
+				$("#glossary-pt-br").hide();
+				$("#glossary-es-es").hide();
+				$("#specimen").hide();
+				$("#institution").hide();
+				$("#key").hide();
+
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {
+					if(!rs.response.properties) return null;					
+					base = rs.response.properties.title.split("[")[1].split("]")[0];
+					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
+					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+						$("#glossary-en-us-label").html("Done!");
+						$("#glossary-en-us").removeClass("orange");
+						$("#glossary-en-us").addClass("blue");
+
+						$("#glossary-pt-br").show();
+						$("#glossary-es-es").show();
+						$("#specimen").show();
+						$("#institution").show();
+						$("#key").show();
+					});
+				});
+			});
+
+			$("#glossary-es-es").click(function() {
+				$("#glossary-es-es").removeClass("green");
+				$("#glossary-es-es").addClass("orange");
+				$("#glossary-es-es-label").html("Loading...");
+
+				$("#glossary-pt-br").hide();
+				$("#glossary-en-us").hide();
+				$("#specimen").hide();
+				$("#institution").hide();
+				$("#key").hide();
+
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {
+					if(!rs.response.properties) return null;					
+					base = rs.response.properties.title.split("[")[1].split("]")[0];
+					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
+					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+						$("#glossary-es-es-label").html("Done!");
+						$("#glossary-es-es").removeClass("orange");
+						$("#glossary-es-es").addClass("blue");
+
+						$("#glossary-pt-br").show();
+						$("#glossary-en-us").show();
+						$("#specimen").show();
+						$("#institution").show();
+						$("#key").show();
+					});
+				});
+			});
+
+			$("#institution").click(function() {
+				$("#institution").removeClass("green");
+				$("#institution").addClass("orange");
+				$("#institution-label").html("Loading...");
+
+				$("#glossary-pt-br").hide();
+				$("#glossary-en-us").hide();
+				$("#specimen").hide();
+				$("#glossary-es-es").hide();
+				$("#key").hide();
+
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {
+					if(!rs.response.properties) return null;					
+					base = rs.response.properties.title.split("[")[1].split("]")[0];
+					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
+					$.get("/api/Collections/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+						$("#institution-label").html("Done!");
+						$("#institution").removeClass("orange");
+						$("#institution").addClass("blue");
+
+						$("#glossary-pt-br").show();
+						$("#glossary-en-us").show();
+						$("#specimen").show();
+						$("#glossary-es-es").show();
+						$("#key").show();
+					});
+				});
+			});
+
+			$("#specimen").click(function() {
+				$("#specimen").removeClass("green");
+				$("#specimen").addClass("orange");
+				$("#specimen-label").html("Loading...");
+
+				$("#glossary-pt-br").hide();
+				$("#glossary-en-us").hide();
+				$("#institution").hide();
+				$("#glossary-es-es").hide();
+				$("#key").hide();
+
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {
+					if(!rs.response.properties) return null;					
+					base = rs.response.properties.title.split("[")[1].split("]")[0];
+					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
+					$.get("/api/Specimens/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {						
+						$("#specimen-label").html("Done!");
+						$("#specimen").removeClass("orange");
+						$("#specimen").addClass("blue");
+
+						$("#glossary-pt-br").show();
+						$("#glossary-en-us").show();
+						$("#institution").show();
+						$("#glossary-es-es").show();
+						$("#key").show();
+					});
+				});
+			});
+
+			$("#key").click(function() {
+				$("#key").removeClass("green");
+				$("#key").addClass("orange");
+				$("#key-label").html("Loading...");
+
+				$("#glossary-pt-br").hide();
+				$("#glossary-en-us").hide();
+				$("#institution").hide();
+				$("#glossary-es-es").hide();
+				$("#specimen").hide();
+
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];												
+				$.get("/api/Identification/populate",function(rs) {
+					$("#key-label").html("Done!");
+					$("#key").removeClass("orange");
+					$("#key").addClass("blue");
+					$("#glossary-pt-br").show();
+					$("#glossary-en-us").show();
+					$("#institution").show();
+					$("#glossary-es-es").show();
+					$("#specimen").show();
+				});				
+			});
+
+		});
+			/* $("#updateReport").click(function() {
+				$("#updateReport").html("Running...")					
+				glossaryUS = new Glossary();			
+				glossaryBR = new Glossary();		
+				glossaryES = new Glossary();		
+				institution = new Institution();
+				bdq = new BDQ();			
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {					
+					if(!rs.response.properties) return null;					
+					var base = rs.response.properties.title.split("[")[1].split("]")[0]
+					var lang = rs.response.properties.title.split("[")[2].split("]")[0]
+					bdq.getDatasetHash(id, lang, function(hash) {						
+						bdq.specimenDatasetHash = hash;						
+						bdq.getReportByHash(hash,function(data){
+							if(data){
+								if(data.reportUpdate) {									
+									if(data.report.measure.CONFORMITY_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.CONFORMITY_SPECIMEN_DATASET, "specimen", "conformity");
+									if(data.report.measure.COMPLETENESS_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.COMPLETENESS_SPECIMEN_DATASET, "specimen", "completeness");
+									if(data.report.measure.UNIQUENESS_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.UNIQUENESS_SPECIMEN_DATASET, "specimen", "uniqueness");
+									if(data.report.measure.ACCESSIBILITY_SPECIMEN_DATASET)
+										bdq.printer.specimenMeasure(data.report.measure.ACCESSIBILITY_SPECIMEN_DATASET, "specimen", "accessibility");
+									
+									if(data.report.validation.IS_CONFORM_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_CONFORM_SPECIMEN_DATASET, "specimen", "conformity");
+									if(data.report.validation.IS_COMPLETE_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_COMPLETE_SPECIMEN_DATASET, "specimen", "completeness");
+									if(data.report.validation.IS_UNIQUE_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_UNIQUE_SPECIMEN_DATASET, "specimen", "uniqueness");
+									if(data.report.validation.IS_ACCESSIBLE_SPECIMEN_DATASET)
+										bdq.printer.specimenValidation(data.report.validation.IS_ACCESSIBLE_SPECIMEN_DATASET, "specimen", "accessibility");
+									
+									bdq.getRecordReportByDatasetHash(hash, function(records){
+										var i = 0
+										records.forEach(function(record){											
+											Object.keys(record.report.amendment).forEach(function(key){											
+												i++;												
+												bdq.printer.specimenAmendment(record.report.amendment[key], "specimen", record.report.amendment[key].dimension.toLowerCase(), i);											
+											});
+											
+										});										
+									});									
+								} else {
+									console.log("Report must be generated");
+									bdq.generateSpecimenReport(id, lang);
+								}
+							} else {
+								bdq.recordDataResource(hash, "multi", id, {identifier: "specimen."+lang+":"+id, url: $("#url-specimen").val()}, function(rs){
+									console.log("A", rs)
+									console.log("Report must be generated");
+									bdq.generateSpecimenReport(id, lang);
+								});
+							}						
+						});
+					});
+
+					$("#title-specimen").html(rs.response.properties.title);
+					$("#base-specimen").html(base);
+					$("#lang-specimen").html(lang);		
+				
+					
+					// GLOSSARY
+					$("#glossary-en-US-amendment").html("");
+					$("#glossary-pt-BR-amendment").html("");
+					$("#glossary-es-ES-amendment").html("");
+
+					$("#glossary-en-US-tab").removeClass("green-text");
+					$("#glossary-en-US-tab").removeClass("red-text");				
+					$("#glossary-pt-BR-tab").removeClass("green-text");
+					$("#glossary-pt-BR-tab").removeClass("red-text");				
+					$("#glossary-en-US-tab").removeClass("green-text");
+					$("#glossary-en-US-tab").removeClass("red-text");	
+
+					$("#completeness-glossary-en-US").removeClass("green");
+					$("#completeness-glossary-en-US").removeClass("red");				
+					$("#completeness-glossary-pt-BR").removeClass("green");
+					$("#completeness-glossary-pt-BR").removeClass("red");				
+					$("#completeness-glossary-en-US").removeClass("green");
+					$("#completeness-glossary-en-US").removeClass("red");
+
+					$("#uniqueness-glossary-en-US").removeClass("green");
+					$("#uniqueness-glossary-en-US").removeClass("red");				
+					$("#uniqueness-glossary-pt-BR").removeClass("green");
+					$("#uniqueness-glossary-pt-BR").removeClass("red");				
+					$("#uniqueness-glossary-en-US").removeClass("green");
+					$("#uniqueness-glossary-en-US").removeClass("red");				
+
+									
+					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=en-US",function(rs) {
+						glossaryUS.completeness(rs, id);
+
+						glossaryUS.report.completeness.forEach(function(assertion, i){														
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-en-US-amendment").append(`<tr id="i-g-en-US-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-en-US-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Completeness") {
+								$("#completeness-glossary-en-US").html(`Completeness: ${assertion.result}%`);	
+								var elem = document.querySelector('#completeness-glossary-en-US');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {																
+								if(!$("#glossary-en-US-tab").hasClass("red-text")){
+									$("#glossary-en-US-tab").removeClass("green-text");
+									$("#glossary-en-US-tab").removeClass("red-text");					
+									$("#glossary-en-US-tab").addClass(assertion.result?"green-text":"red-text");
+								}																	
+								$("#completeness-glossary-en-US").addClass(assertion.result?"green":"red");
+								$("#completeness-glossary-en-US").addClass("white-text");
+							}
+						});
+
+						glossaryUS.uniqueness(rs, id);
+
+						glossaryUS.report.uniqueness.forEach(function(assertion, i){														
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-en-US-amendment").append(`<tr id="i-g-en-US-${i}">
+										<td>${assertion.response.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-en-US-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Uniqueness") {
+								$("#uniqueness-glossary-en-US").html(`Uniqueness: ${assertion.response.result}%`);	
+								var elem = document.querySelector('#uniqueness-glossary-en-US');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet has unique records") {																
+								if(!$("#glossary-en-US-tab").hasClass("red-text")){
+									$("#glossary-en-US-tab").removeClass("green-text");
+									$("#glossary-en-US-tab").removeClass("red-text");					
+									$("#glossary-en-US-tab").addClass(assertion.response.result?"green-text":"red-text");
+								}																	
+								$("#uniqueness-glossary-en-US").addClass(assertion.response.result?"green":"red");
+								$("#uniqueness-glossary-en-US").addClass("white-text");
+							}
+						});
+					});
+					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=pt-BR",function(rs) {
+						glossaryBR.completeness(rs, id);
+						
+						glossaryBR.report.completeness.forEach(function(assertion, i){
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-pt-BR-amendment").append(`<tr id="i-g-pt-BR-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-pt-BR-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Completeness") {
+								$("#completeness-glossary-pt-BR").html(`Completeness: ${assertion.result}%`);	
+								var elem = document.querySelector('#completeness-glossary-pt-BR');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {																
+								if(!$("#glossary-pt-BR-tab").hasClass("red-text")){
+									$("#glossary-pt-BR-tab").removeClass("green-text");
+									$("#glossary-pt-BR-tab").removeClass("red-text");	
+												
+									$("#glossary-pt-BR-tab").addClass(assertion.result?"green-text":"red-text");
+								}	
+								$("#completeness-glossary-pt-BR").addClass(assertion.result?"green":"red");
+								$("#completeness-glossary-pt-BR").addClass("white-text");
+							}
+						});
+
+
+						glossaryBR.uniqueness(rs, id);
+
+						glossaryBR.report.uniqueness.forEach(function(assertion, i){														
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-pt-BR-amendment").append(`<tr id="i-g-pt-BR-${i}">
+										<td>${assertion.response.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-pt-BR-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Uniqueness") {
+								$("#uniqueness-glossary-pt-BR").html(`Uniqueness: ${assertion.response.result}%`);	
+								var elem = document.querySelector('#uniqueness-glossary-pt-BR');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet has unique records") {																
+								if(!$("#glossary-pt-BR-tab").hasClass("red-text")){
+									$("#glossary-pt-BR-tab").removeClass("green-text");
+									$("#glossary-pt-BR-tab").removeClass("red-text");					
+									$("#glossary-pt-BR-tab").addClass(assertion.response.result?"green-text":"red-text");
+								}																	
+								$("#uniqueness-glossary-pt-BR").addClass(assertion.response.result?"green":"red");
+								$("#uniqueness-glossary-pt-BR").addClass("white-text");
+							}
+						});
+					});
+					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=es-ES",function(rs) {
+						glossaryES.completeness(rs, id);
+
+						glossaryES.report.completeness.forEach(function(assertion, i){
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-es-ES-amendment").append(`<tr id="i-g-es-ES-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-es-ES-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Completeness") {
+								$("#completeness-glossary-es-ES").html(`Completeness: ${assertion.result}%`);	
+								var elem = document.querySelector('#completeness-glossary-es-ES');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {								
+								if(!$("#glossary-es-ES-tab").hasClass("red-text")){
+									$("#glossary-es-ES-tab").removeClass("green-text");
+									$("#glossary-es-ES-tab").removeClass("red-text");					
+									$("#glossary-es-ES-tab").addClass(assertion.result?"green-text":"red-text");
+								}	
+								$("#completeness-glossary-es-ES").addClass(assertion.result?"green":"red");
+								$("#completeness-glossary-es-ES").addClass("white-text");
+							}
+						});
+
+						glossaryES.uniqueness(rs, id);
+
+						glossaryES.report.uniqueness.forEach(function(assertion, i){														
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-es-ES-amendment").append(`<tr id="i-g-es-ES-${i}">
+										<td>${assertion.response.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-es-ES-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Uniqueness") {
+								$("#uniqueness-glossary-es-ES").html(`Uniqueness: ${assertion.response.result}%`);	
+								var elem = document.querySelector('#uniqueness-glossary-es-ES');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet has unique records") {																
+								if(!$("#glossary-es-ES-tab").hasClass("red-text")){
+									$("#glossary-es-ES-tab").removeClass("green-text");
+									$("#glossary-es-ES-tab").removeClass("red-text");					
+									$("#glossary-es-ES-tab").addClass(assertion.response.result?"green-text":"red-text");
+								}																	
+								$("#uniqueness-glossary-es-ES").addClass(assertion.response.result?"green":"red");
+								$("#uniqueness-glossary-es-ES").addClass("white-text");
+							}
+						});
+
+					});
+
+					// GLOSSARY - ACCESSIBILITY
+					$("#accessibility-glossary-en-US").html(`loading...`);
+					$("#accessibility-glossary-en-US").removeClass("red");
+					$("#accessibility-glossary-en-US").removeClass("green");
+					$("#accessibility-glossary-en-US").removeClass("white-text");
+					
+					$("#accessibility-glossary-pt-BR").html(`loading...`);
+					$("#accessibility-glossary-pt-BR").removeClass("red");
+					$("#accessibility-glossary-pt-BR").removeClass("green");
+					$("#accessibility-glossary-pt-BR").removeClass("white-text");
+
+					$("#accessibility-glossary-es-ES").html(`loading...`);
+					$("#accessibility-glossary-es-ES").removeClass("red");
+					$("#accessibility-glossary-es-ES").removeClass("green");
+					$("#accessibility-glossary-es-ES").removeClass("white-text");
+					
+					//pt-BR
+					setTimeout(function () {            				
+						$.get("/api/Schemas/getImagesValues?id="+id+"&language=pt-BR", function(rs) {						
+							glossaryBR.accessibility(rs, id, function individualCb(i, assertion){							
+								if($("#accessibility-glossary-pt-BR").html() == "loading..." || Number($("#accessibility-glossary-pt-BR").html().split(" ")[0])<i)
+									$("#accessibility-glossary-pt-BR").html(`${i} records assessed`);								
+								if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+									$("#glossary-pt-BR-amendment").prepend(`<tr id="i-sp-access-${i}">
+											<td>${assertion.result}</td>
+											<td>${assertion.dimension}</td>
+											<td>${assertion.ie}</td>
+											<td>${assertion.dr.row}</td>
+											<td>${assertion.dr.value}</td>													
+										</tr>`);	
+									var elem = document.querySelector('#i-sp-access-'+i);							
+									var instance = M.Tooltip.init(elem, {
+										position:"left",
+										html:`
+											<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`
+										});
+									}
+							}, function finalCb(){
+								glossaryBR.report.accessibility.forEach(function(assertion, i){											
+									if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+										$("#accessibility-glossary-pt-BR").html(`${assertion.result}% accessible`);	
+										var elem = document.querySelector('#accessibility-glossary-pt-BR');
+										var instance = M.Tooltip.init(elem, {									
+											position: "top",
+											html:`
+												<div style="width:20em; padding:1em">
+													<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+													<br>
+													<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+												</div>
+											`
+											});
+
+									} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+										if(!$("#glossary-pt-BR-tab").hasClass("red-text")){
+											$("#glossary-pt-BR-tab").removeClass("green-text");
+											$("#glossary-pt-BR-tab").removeClass("red-text");														
+											$("#glossary-pt-BR-tab").addClass(assertion.result?"green-text":"red-text");
+										}	
+										$("#accessibility-glossary-pt-BR").addClass(assertion.result?"green":"red");								
+										$("#accessibility-glossary-pt-BR").addClass("white-text");
+									}
+								});
+							});	
+						});
+						//en-US
+						$.get("/api/Schemas/getImagesValues?id="+id+"&language=en-US", function(rs) {						
+							glossaryUS.accessibility(rs, id, function individualCb(i, assertion){
+								if($("#accessibility-glossary-en-US").html() == "loading..." || Number($("#accessibility-glossary-en-US").html().split(" ")[0])<i)
+									$("#accessibility-glossary-en-US").html(`${i} records assessed`);								
+								if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+									$("#glossary-en-US-amendment").prepend(`<tr id="i-sp-access-${i}">
+											<td>${assertion.result}</td>
+											<td>${assertion.dimension}</td>
+											<td>${assertion.ie}</td>
+											<td>${assertion.dr.row}</td>
+											<td>${assertion.dr.value}</td>													
+										</tr>`);	
+									var elem = document.querySelector('#i-sp-access-'+i);							
+									var instance = M.Tooltip.init(elem, {
+										position:"left",
+										html:`
+											<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`
+										});
+									}
+							}, function finalCb(){
+								glossaryUS.report.accessibility.forEach(function(assertion, i){											
+									if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+										$("#accessibility-glossary-en-US").html(`${assertion.result}% accessible`);	
+										var elem = document.querySelector('#accessibility-glossary-en-US');
+										var instance = M.Tooltip.init(elem, {									
+											position: "top",
+											html:`
+												<div style="width:20em; padding:1em">
+													<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+													<br>
+													<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+												</div>
+											`
+											});
+
+									} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+										if(!$("#glossary-en-US-tab").hasClass("red-text")){
+											$("#glossary-en-US-tab").removeClass("green-text");
+											$("#glossary-en-US-tab").removeClass("red-text");														
+											$("#glossary-en-US-tab").addClass(assertion.result?"green-text":"red-text");
+										}	
+										$("#accessibility-glossary-en-US").addClass(assertion.result?"green":"red");								
+										$("#accessibility-glossary-en-US").addClass("white-text");
+									}
+								});
+							});	
+						});					
+						// es-ES
+						$.get("/api/Schemas/getImagesValues?id="+id+"&language=es-ES", function(rs) {						
+							glossaryES.accessibility(rs, id, function individualCb(i, assertion){							
+								if($("#accessibility-glossary-es-ES").html() == "loading..." || Number($("#accessibility-glossary-es-ES").html().split(" ")[0])<i)
+									$("#accessibility-glossary-es-ES").html(`${i} records assessed`);								
+								if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+									$("#glossary-es-ES-amendment").prepend(`<tr id="i-sp-access-${i}">
+											<td>${assertion.result}</td>
+											<td>${assertion.dimension}</td>
+											<td>${assertion.ie}</td>
+											<td>${assertion.dr.row}</td>
+											<td>${assertion.dr.value}</td>													
+										</tr>`);	
+									var elem = document.querySelector('#i-sp-access-'+i);							
+									var instance = M.Tooltip.init(elem, {
+										position:"left",
+										html:`
+											<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`
+										});
+									}
+							}, function finalCb(){
+								glossaryES.report.accessibility.forEach(function(assertion, i){											
+									if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+										$("#accessibility-glossary-es-ES").html(`${assertion.result}% accessible`);	
+										var elem = document.querySelector('#accessibility-glossary-es-ES');
+										var instance = M.Tooltip.init(elem, {									
+											position: "top",
+											html:`
+												<div style="width:20em; padding:1em">
+													<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+													<br>
+													<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+												</div>
+											`
+											});
+
+									} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+										if(!$("#glossary-es-ES-tab").hasClass("red-text")){
+											$("#glossary-es-ES-tab").removeClass("green-text");
+											$("#glossary-es-ES-tab").removeClass("red-text");														
+											$("#glossary-es-ES-tab").addClass(assertion.result?"green-text":"red-text");
+										}	
+										$("#accessibility-glossary-es-ES").addClass(assertion.result?"green":"red");								
+										$("#accessibility-glossary-es-ES").addClass("white-text");
+									}
+								});
+							});	
+						});
+					}, 4000);
+					// INSTITUTION
+
+					
+
+
+					$("#institution-amendment").html("");
+					
+					$("#institution-tab").removeClass("green-text");
+					$("#institution-tab").removeClass("red-text");
+					
+					$("#completeness-institution").html(`loading...`);					
+					$("#completeness-institution").removeClass("red");
+					$("#completeness-institution").removeClass("green");
+					$("#completeness-institution").removeClass("white-text");
+
+					$("#accessibility-institution").html(`loading...`);					
+					$("#accessibility-institution").removeClass("red");
+					$("#accessibility-institution").removeClass("green");
+					$("#accessibility-institution").removeClass("white-text");
+			
+					$.get("/api/Collections/getSpreadsheetData?id="+id+"&language=pt-BR",function(rs) {						
+						institution.completeness(rs, id);						
+						institution.report.completeness.forEach(function(assertion, i){											
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#institution-amendment").append(`<tr id="i-sp-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);	
+								var elem = document.querySelector('#i-sp-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Completeness") {
+								$("#completeness-institution").html(`Completeness: ${assertion.result}%`);
+									
+								var elem = document.querySelector('#completeness-institution');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is complete") {																
+								if(!$("#institution-tab").hasClass("red-text")){
+									$("#institution-tab").removeClass("green-text");
+									$("#institution-tab").removeClass("red-text");														
+									$("#institution-tab").addClass(assertion.result?"green-text":"red-text");
+								}	
+								$("#completeness-institution").addClass(assertion.result?"green":"red");								
+								$("#completeness-institution").addClass("white-text");
+							}
+						});
+
+						institution.uniqueness(rs, id);
+
+						institution.report.uniqueness.forEach(function(assertion, i){														
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#institution-amendment").append(`<tr id="i-g-es-ES-${i}">
+										<td>${assertion.response.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-es-ES-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Uniqueness") {
+								$("#uniqueness-institution").html(`Uniqueness: ${assertion.response.result}%`);	
+								var elem = document.querySelector('#uniqueness-institution');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet has unique records") {																
+								if(!$("#institution-tab").hasClass("red-text")){
+									$("#institution-tab").removeClass("green-text");
+									$("#institution-tab").removeClass("red-text");					
+									$("#institution-tab").addClass(assertion.response.result?"green-text":"red-text");
+								}																	
+								$("#uniqueness-institution").addClass(assertion.response.result?"green":"red");
+								$("#uniqueness-institution").addClass("white-text");
+							}
+						});
+					});
+					
+					$.get("/api/Collections/getImagesValues?id="+id+"&language=pt-BR", function(rs) {						
+						institution.accessibility(rs, id, function individualCb(i, assertion){							
+							if($("#accessibility-institution").html() == "loading..." || Number($("#accessibility-institution").html().split(" ")[0])<i)
+								$("#accessibility-institution").html(`${i} records assessed`);								
+							if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#institution-amendment").prepend(`<tr id="i-sp-access-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);	
+								var elem = document.querySelector('#i-sp-access-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+								}
+						}, function finalCb(){
+							institution.report.accessibility.forEach(function(assertion, i){											
+								if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+									$("#accessibility-institution").html(`${assertion.result}% accessible`);	
+									var elem = document.querySelector('#accessibility-institution');
+									var instance = M.Tooltip.init(elem, {									
+										position: "top",
+										html:`
+											<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`
+										});
+
+								} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+									if(!$("#institution-tab").hasClass("red-text")){
+										$("#institution-tab").removeClass("green-text");
+										$("#institution-tab").removeClass("red-text");														
+										$("#institution-tab").addClass(assertion.result?"green-text":"red-text");
+									}	
+									$("#accessibility-institution").addClass(assertion.result?"green":"red");								
+									$("#accessibility-institution").addClass("white-text");
+								}
+							});
+						});	
+					});
+
+					
+				});
+			});
+			// Grupo de aplicação da tecnologia Blockchain
+		});  */
+	</script>
+</body>
+</html>

@@ -278,7 +278,7 @@ module.exports = function(Collection) {
         service.spreadsheets.values.get({
               auth: jwtClient,
               spreadsheetId: id,
-              range: 'institution.'+language+'!A:P'        
+              range: 'institution.'+language+'!A:Q'        
             }, function(err, d) {
               if (err){
                 console.log('The API returned an error: ' + err);    

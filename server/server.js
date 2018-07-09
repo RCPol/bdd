@@ -302,6 +302,13 @@ app.get('/admin/data-quality', function(req, res) {
   res.send(mustache.render(template, params));
 });
 
+app.get('/admin', function(req, res) {
+  var template = fs.readFileSync('./client/admin.mustache', 'utf8');
+  var params = {base: "eco"};
+
+  res.send(mustache.render(template, params));
+});
+
 app.get('/profile/palinoteca/:base/:id', function(req, res) {
   var params = {base: req.params.base?req.params.base:"eco"};
   params.id =req.params.id;

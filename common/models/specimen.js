@@ -18,6 +18,61 @@ var serviceAccount = require("key.json");
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
 
+  Specimen.consistency = function(id, language, cb) {
+    var key = require('key.json');
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'glossary.'+language+'!A:K'
+      }, function(err, rs) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          var validValues = {}
+          rs.values.shift();
+          async.each(rs.values, function iterator(line, callback){                                                
+            var schema = toString(line[0]).trim().toUpperCase();
+            var class_ = toString(line[1]).trim().toUpperCase();
+            var term = toString(line[2]).trim().toUpperCase();              
+            var vocabulary = toString(line[6]).trim().toUpperCase();
+            if (schema.length>0 && class_.length>0 && term.length>0 && vocabulary.length>0 && class_ == "STATE") {              
+              validValues[`${schema}-${class_}-${term}`] = {}
+              validValues[`${schema}-${class_}-${term}`][vocabulary] = true;
+            }                        
+          });
+          cb(null,validValues);
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'consistency',
+    {
+      http: {path: '/consistency', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
   Specimen.uniqueness = function(id, language, cb) {
     var key = require('key.json');
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
@@ -1139,7 +1194,8 @@ module.exports = function(Specimen) {
   
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
-  Specimen.inputFromURL = function(id,language, base, cb) {
+  Specimen.inputFromURL = function(req,id,language, base, cb) {
+    req.setTimeout(0);
     var key = require('key.json');
     
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
@@ -1556,6 +1612,7 @@ module.exports = function(Specimen) {
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
         {arg: 'id', type: 'string', required:true, description: 'link para tabela de espécimes'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR ou es-ES'},
         {arg: 'base', type: 'string', required:true, description: 'eco ou taxon'}

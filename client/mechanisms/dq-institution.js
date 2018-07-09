@@ -202,3 +202,5 @@ Institution.prototype.accessibility = function(rs, id, icb, cb) {
 Institution.prototype.isCompleteValue = function(value) {
     return typeof value != "undefined" && String(value).trim().length > 0;
 }
+
+
