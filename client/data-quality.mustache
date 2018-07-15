@@ -348,19 +348,11 @@
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="completeness-institution" class="badge" style="font-size:80%"></span>													
 													Completeness
-												</a>
-												<a href="#!" class="collection-item" style="text-align:left">
-													<span id="consistency-institution" class="badge" style="font-size:80%"></span>													
-													Consistency 
 												</a>												
 												<a href="#!" class="collection-item" style="text-align:left">
 													<span id="accessibility-institution" class="badge" style="font-size:80%"></span>													
 													Accessibility 
-												</a>
-												<a href="#!" class="collection-item" style="text-align:left">
-													<span id="uniqueness-institution" class="badge" style="font-size:80%"></span>													
-													Uniqueness 
-												</a>
+												</a>												
 											</div>
 										</div>																				
 										<div class="input-field col s12">											
@@ -397,7 +389,7 @@
 		</div>
 
 
-		<nav> <!-- navbar content here  --> </nav>
+		
 
 		<ul id="slide-out" class="sidenav">		
 				<h5 style="margin-left:0.5em">DQ Assertion</h5>											
@@ -540,16 +532,26 @@
 					$("#glossary-en-US-amendment").html("");
 					$("#glossary-en-US-tab").removeClass("green-text");
 					$("#glossary-en-US-tab").removeClass("red-text");
+
+					$("#completeness-glossary-en-US").html(`loading...`);
 					$("#completeness-glossary-en-US").removeClass("green");
 					$("#completeness-glossary-en-US").removeClass("red");	
+
+					$("#uniqueness-glossary-en-US").html(`loading...`);
 					$("#uniqueness-glossary-en-US").removeClass("green");
 					$("#uniqueness-glossary-en-US").removeClass("red");	
+
 					$("#accessibility-glossary-en-US").html(`loading...`);
 					$("#accessibility-glossary-en-US").removeClass("red");
 					$("#accessibility-glossary-en-US").removeClass("green");
 					$("#accessibility-glossary-en-US").removeClass("white-text");
 
-					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=en-US",function(rs) {
+					$("#consistency-glossary-en-US").html(`loading...`);
+					$("#consistency-glossary-en-US").removeClass("red");
+					$("#consistency-glossary-en-US").removeClass("green");
+					$("#consistency-glossary-en-US").removeClass("white-text");
+					
+					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=en-US",function(rs) {						
 						glossaryUS.completeness(rs, id);
 						glossaryUS.report.completeness.forEach(function(assertion, i){														
 							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
@@ -592,7 +594,7 @@
 								$("#completeness-glossary-en-US").addClass(assertion.result?"green":"red");
 								$("#completeness-glossary-en-US").addClass("white-text");
 								glossaryUSProcess++;								
-								if(glossaryUSProcess == 3) {
+								if(glossaryUSProcess == 4) {
 									M.toast({html: 'DQ report is ready: Glossary (en-US)'});
 									$("#updateReportGlossaryUS").hide();
 								}
@@ -642,13 +644,64 @@
 								$("#uniqueness-glossary-en-US").addClass(assertion.response.result?"green":"red");
 								$("#uniqueness-glossary-en-US").addClass("white-text");
 								glossaryUSProcess++;								
-								if(glossaryUSProcess == 3) {
+								if(glossaryUSProcess == 4) {
+									M.toast({html: 'DQ report is ready: Glossary (en-US)'});
+									$("#updateReportGlossaryUS").hide();
+								}
+							}
+						});	
+					});
+					glossaryUS.consistency(id,function(report){
+						report.forEach(function(assertion, i){
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-en-US-amendment").append(`<tr id="i-g-en-US-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-en-US-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Consistency") {
+								$("#consistency-glossary-en-US").html(`Consistency: ${assertion.result}%`);	
+								var elem = document.querySelector('#consistency-glossary-en-US');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
+
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is consistent") {																
+								if(!$("#glossary-en-US-tab").hasClass("red-text")){
+									$("#glossary-en-US-tab").removeClass("green-text");
+									$("#glossary-en-US-tab").removeClass("red-text");					
+									$("#glossary-en-US-tab").addClass(assertion.result?"green-text":"red-text");
+								}																	
+								$("#consistency-glossary-en-US").addClass(assertion.result?"green":"red");
+								$("#consistency-glossary-en-US").addClass("white-text");
+								glossaryUSProcess++;								
+								if(glossaryUSProcess == 4) {
 									M.toast({html: 'DQ report is ready: Glossary (en-US)'});
 									$("#updateReportGlossaryUS").hide();
 								}
 							}
 						});
 
+
+						// IMAGES
 						$.get("/api/Schemas/getImagesValues?id="+id+"&language=en-US", function(rs) {						
 							glossaryUS.accessibility(rs, id, function individualCb(i, assertion){
 								if($("#accessibility-glossary-en-US").html() == "loading..." || Number($("#accessibility-glossary-en-US").html().split(" ")[0])<i)
@@ -695,18 +748,20 @@
 											$("#glossary-en-US-tab").removeClass("red-text");														
 											$("#glossary-en-US-tab").addClass(assertion.result?"green-text":"red-text");
 										}	
+										$("#accessibility-glossary-en-US").removeClass("green");								
+										$("#accessibility-glossary-en-US").removeClass("red");								
 										$("#accessibility-glossary-en-US").addClass(assertion.result?"green":"red");								
 										$("#accessibility-glossary-en-US").addClass("white-text");
 										glossaryUSProcess++;								
-										if(glossaryUSProcess == 3) {
+										if(glossaryUSProcess == 4) {
 											M.toast({html: 'DQ report is ready: Glossary (en-US)'});
 											$("#updateReportGlossaryUS").hide();
 										}
 									}
 								});
 							});	
-						});	
-					});			
+						});
+					});	
 				});		
 			});
 
@@ -724,14 +779,24 @@
 					$("#glossary-pt-BR-amendment").html("");
 					$("#glossary-pt-BR-tab").removeClass("green-text");
 					$("#glossary-pt-BR-tab").removeClass("red-text");	
+					
+					$("#completeness-glossary-pt-BR").html(`loading...`);
 					$("#completeness-glossary-pt-BR").removeClass("green");
 					$("#completeness-glossary-pt-BR").removeClass("red");
+					
+					$("#uniqueness-glossary-pt-BR").html(`loading...`);
 					$("#uniqueness-glossary-pt-BR").removeClass("green");
 					$("#uniqueness-glossary-pt-BR").removeClass("red");		
+
 					$("#accessibility-glossary-pt-BR").html(`loading...`);
 					$("#accessibility-glossary-pt-BR").removeClass("red");
 					$("#accessibility-glossary-pt-BR").removeClass("green");
 					$("#accessibility-glossary-pt-BR").removeClass("white-text");
+
+					$("#consistency-glossary-pt-BR").html(`loading...`);
+					$("#consistency-glossary-pt-BR").removeClass("red");
+					$("#consistency-glossary-pt-BR").removeClass("green");
+					$("#consistency-glossary-pt-BR").removeClass("white-text");
 
 
 					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=pt-BR",function(rs) {
@@ -837,38 +902,72 @@
 							}
 						});
 					});
+					glossaryBR.consistency(id,function(report){
+						report.forEach(function(assertion, i){
+							if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+								$("#glossary-pt-BR-amendment").append(`<tr id="i-g-pt-BR-${i}">
+										<td>${assertion.result}</td>
+										<td>${assertion.dimension}</td>
+										<td>${assertion.ie}</td>
+										<td>${assertion.dr.row}</td>
+										<td>${assertion.dr.value}</td>													
+									</tr>`);								
+								var elem = document.querySelector('#i-g-pt-BR-'+i);							
+								var instance = M.Tooltip.init(elem, {
+									position:"left",
+									html:`<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`});
+							} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Consistency") {
+								$("#consistency-glossary-pt-BR").html(`Consistency: ${assertion.result}%`);	
+								var elem = document.querySelector('#consistency-glossary-pt-BR');
+								var instance = M.Tooltip.init(elem, {									
+									position: "top",
+									html:`
+										<div style="width:20em; padding:1em">
+											<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+											<br>
+											<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+										</div>
+									`
+									});
 
-					$.get("/api/Schemas/getImagesValues?id="+id+"&language=pt-BR", function(rs) {						
-							glossaryBR.accessibility(rs, id, function individualCb(i, assertion){							
-								if($("#accessibility-glossary-pt-BR").html() == "loading..." || Number($("#accessibility-glossary-pt-BR").html().split(" ")[0])<i)
-									$("#accessibility-glossary-pt-BR").html(`${i} records assessed`);								
-								if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
-									$("#glossary-pt-BR-amendment").prepend(`<tr id="i-sp-access-${i}">
-											<td>${assertion.result}</td>
-											<td>${assertion.dimension}</td>
-											<td>${assertion.ie}</td>
-											<td>${assertion.dr.row}</td>
-											<td>${assertion.dr.value}</td>													
-										</tr>`);	
-									var elem = document.querySelector('#i-sp-access-'+i);							
-									var instance = M.Tooltip.init(elem, {
-										position:"left",
-										html:`
-											<div style="width:20em; padding:1em">
-												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
-												<br>
-												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
-											</div>
-										`
-										});
-									}
-							}, function finalCb(){
-								glossaryBR.report.accessibility.forEach(function(assertion, i){											
-									if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
-										$("#accessibility-glossary-pt-BR").html(`${assertion.result}% accessible`);	
-										var elem = document.querySelector('#accessibility-glossary-pt-BR');
-										var instance = M.Tooltip.init(elem, {									
-											position: "top",
+							} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is consistent") {																
+								if(!$("#glossary-pt-BR-tab").hasClass("red-text")){
+									$("#glossary-pt-BR-tab").removeClass("green-text");
+									$("#glossary-pt-BR-tab").removeClass("red-text");					
+									$("#glossary-pt-BR-tab").addClass(assertion.result?"green-text":"red-text");
+								}																	
+								$("#consistency-glossary-pt-BR").addClass(assertion.result?"green":"red");
+								$("#consistency-glossary-pt-BR").addClass("white-text");
+								glossaryBRProcess++;								
+								if(glossaryBRProcess == 4) {
+									M.toast({html: 'DQ report is ready: Glossary (en-BR)'});
+									$("#updateReportGlossaryBR").hide();
+								}
+							}
+						});
+
+
+						// IMAGES
+						$.get("/api/Schemas/getImagesValues?id="+id+"&language=pt-BR", function(rs) {						
+								glossaryBR.accessibility(rs, id, function individualCb(i, assertion){							
+									if($("#accessibility-glossary-pt-BR").html() == "loading..." || Number($("#accessibility-glossary-pt-BR").html().split(" ")[0])<i)
+										$("#accessibility-glossary-pt-BR").html(`${i} records assessed`);								
+									if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+										$("#glossary-pt-BR-amendment").prepend(`<tr id="i-sp-access-${i}">
+												<td>${assertion.result}</td>
+												<td>${assertion.dimension}</td>
+												<td>${assertion.ie}</td>
+												<td>${assertion.dr.row}</td>
+												<td>${assertion.dr.value}</td>													
+											</tr>`);	
+										var elem = document.querySelector('#i-sp-access-'+i);							
+										var instance = M.Tooltip.init(elem, {
+											position:"left",
 											html:`
 												<div style="width:20em; padding:1em">
 													<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
@@ -877,23 +976,42 @@
 												</div>
 											`
 											});
-
-									} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
-										if(!$("#glossary-pt-BR-tab").hasClass("red-text")){
-											$("#glossary-pt-BR-tab").removeClass("green-text");
-											$("#glossary-pt-BR-tab").removeClass("red-text");														
-											$("#glossary-pt-BR-tab").addClass(assertion.result?"green-text":"red-text");
-										}	
-										$("#accessibility-glossary-pt-BR").addClass(assertion.result?"green":"red");								
-										$("#accessibility-glossary-pt-BR").addClass("white-text");
-										glossaryBRProcess++;								
-										if(glossaryBRProcess == 3) {
-											M.toast({html: 'DQ report is ready: Glossary (pt-BR)'});
-											$("#updateReportGlossaryBR").hide();
 										}
-									}
-								});
-							});	
+								}, function finalCb(){
+									glossaryBR.report.accessibility.forEach(function(assertion, i){											
+										if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+											$("#accessibility-glossary-pt-BR").html(`${assertion.result}% accessible`);	
+											var elem = document.querySelector('#accessibility-glossary-pt-BR');
+											var instance = M.Tooltip.init(elem, {									
+												position: "top",
+												html:`
+													<div style="width:20em; padding:1em">
+														<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+														<br>
+														<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+													</div>
+												`
+												});
+
+										} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+											if(!$("#glossary-pt-BR-tab").hasClass("red-text")){
+												$("#glossary-pt-BR-tab").removeClass("green-text");
+												$("#glossary-pt-BR-tab").removeClass("red-text");														
+												$("#glossary-pt-BR-tab").addClass(assertion.result?"green-text":"red-text");
+											}	
+											$("#accessibility-glossary-pt-BR").removeClass("green");								
+											$("#accessibility-glossary-pt-BR").removeClass("red");								
+											$("#accessibility-glossary-pt-BR").addClass(assertion.result?"green":"red");								
+											$("#accessibility-glossary-pt-BR").addClass("white-text");
+											glossaryBRProcess++;								
+											if(glossaryBRProcess == 3) {
+												M.toast({html: 'DQ report is ready: Glossary (pt-BR)'});
+												$("#updateReportGlossaryBR").hide();
+											}
+										}
+									});
+								});	
+							});
 						});
 				});
 			});
@@ -912,14 +1030,24 @@
 					$("#glossary-es-ES-amendment").html("");
 					$("#glossary-es-ES-tab").removeClass("green-text");
 					$("#glossary-es-ES-tab").removeClass("red-text");	
+					
+					$("#completeness-glossary-es-ES").html(`loading...`);
 					$("#completeness-glossary-es-ES").removeClass("green");
 					$("#completeness-glossary-es-ES").removeClass("red");					
+					
+					$("#uniqueness-glossary-es-ES").html(`loading...`);
 					$("#uniqueness-glossary-es-ES").removeClass("green");
 					$("#uniqueness-glossary-es-ES").removeClass("red");	
-					$("#accessibility-glossary-es-ES").html(`loading...`);
+
+					$("#accessibility-glossary-es-ES").html(`loading...`);					
 					$("#accessibility-glossary-es-ES").removeClass("red");
 					$("#accessibility-glossary-es-ES").removeClass("green");
 					$("#accessibility-glossary-es-ES").removeClass("white-text");
+
+					$("#consistency-glossary-es-ES").html(`loading...`);
+					$("#consistency-glossary-es-ES").removeClass("red");
+					$("#consistency-glossary-es-ES").removeClass("green");
+					$("#consistency-glossary-es-ES").removeClass("white-text");
 
 
 					$.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=es-ES",function(rs) {
@@ -1022,22 +1150,30 @@
 								}
 							}
 						});
-
-						$.get("/api/Schemas/getImagesValues?id="+id+"&language=es-ES", function(rs) {						
-							glossaryES.accessibility(rs, id, function individualCb(i, assertion){							
-								if($("#accessibility-glossary-es-ES").html() == "loading..." || Number($("#accessibility-glossary-es-ES").html().split(" ")[0])<i)
-									$("#accessibility-glossary-es-ES").html(`${i} records assessed`);								
-								if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
-									$("#glossary-es-ES-amendment").prepend(`<tr id="i-sp-access-${i}">
+						glossaryES.consistency(id,function(report){
+							report.forEach(function(assertion, i){
+								if(assertion.dr.drt == "record" && assertion.type == "amendment"){
+									$("#glossary-es-ES-amendment").append(`<tr id="i-g-es-ES-${i}">
 											<td>${assertion.result}</td>
 											<td>${assertion.dimension}</td>
 											<td>${assertion.ie}</td>
 											<td>${assertion.dr.row}</td>
 											<td>${assertion.dr.value}</td>													
-										</tr>`);	
-									var elem = document.querySelector('#i-sp-access-'+i);							
+										</tr>`);								
+									var elem = document.querySelector('#i-g-es-ES-'+i);							
 									var instance = M.Tooltip.init(elem, {
 										position:"left",
+										html:`<div style="width:20em; padding:1em">
+												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+												<br>
+												<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+											</div>
+										`});
+								} else if(assertion.dr.drt == "dataset" && assertion.dimension == "Consistency") {
+									$("#consistency-glossary-es-ES").html(`Consistency: ${assertion.result}%`);	
+									var elem = document.querySelector('#consistency-glossary-es-ES');
+									var instance = M.Tooltip.init(elem, {									
+										position: "top",
 										html:`
 											<div style="width:20em; padding:1em">
 												<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
@@ -1046,14 +1182,40 @@
 											</div>
 										`
 										});
+
+								} else if(assertion.dr.drt == "dataset" && assertion.criterion == "Spreadsheet is consistent") {																
+									if(!$("#glossary-es-ES-tab").hasClass("red-text")){
+										$("#glossary-es-ES-tab").removeClass("green-text");
+										$("#glossary-es-ES-tab").removeClass("red-text");					
+										$("#glossary-es-ES-tab").addClass(assertion.result?"green-text":"red-text");
+									}																	
+									$("#consistency-glossary-es-ES").addClass(assertion.result?"green":"red");
+									$("#consistency-glossary-es-ES").addClass("white-text");
+									glossaryESProcess++;								
+									if(glossaryESProcess == 4) {
+										M.toast({html: 'DQ report is ready: Glossary (es-ES)'});
+										$("#updateReportGlossaryES").hide();
 									}
-							}, function finalCb(){
-								glossaryES.report.accessibility.forEach(function(assertion, i){											
-									if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
-										$("#accessibility-glossary-es-ES").html(`${assertion.result}% accessible`);	
-										var elem = document.querySelector('#accessibility-glossary-es-ES');
-										var instance = M.Tooltip.init(elem, {									
-											position: "top",
+								}
+							});
+
+
+							// IMAGES
+							$.get("/api/Schemas/getImagesValues?id="+id+"&language=es-ES", function(rs) {						
+								glossaryES.accessibility(rs, id, function individualCb(i, assertion){							
+									if($("#accessibility-glossary-es-ES").html() == "loading..." || Number($("#accessibility-glossary-es-ES").html().split(" ")[0])<i)
+										$("#accessibility-glossary-es-ES").html(`${i} records assessed`);								
+									if(assertion && assertion.dr.drt == "record" && assertion.type == "amendment"){
+										$("#glossary-es-ES-amendment").prepend(`<tr id="i-sp-access-${i}">
+												<td>${assertion.result}</td>
+												<td>${assertion.dimension}</td>
+												<td>${assertion.ie}</td>
+												<td>${assertion.dr.row}</td>
+												<td>${assertion.dr.value}</td>													
+											</tr>`);	
+										var elem = document.querySelector('#i-sp-access-'+i);							
+										var instance = M.Tooltip.init(elem, {
+											position:"left",
 											html:`
 												<div style="width:20em; padding:1em">
 													<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
@@ -1062,23 +1224,42 @@
 												</div>
 											`
 											});
-
-									} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
-										if(!$("#glossary-es-ES-tab").hasClass("red-text")){
-											$("#glossary-es-ES-tab").removeClass("green-text");
-											$("#glossary-es-ES-tab").removeClass("red-text");														
-											$("#glossary-es-ES-tab").addClass(assertion.result?"green-text":"red-text");
-										}	
-										$("#accessibility-glossary-es-ES").addClass(assertion.result?"green":"red");								
-										$("#accessibility-glossary-es-ES").addClass("white-text");
-										glossaryESProcess++;								
-										if(glossaryESProcess == 3) {
-											M.toast({html: 'DQ report is ready: Glossary (es-ES)'});
-											$("#updateReportGlossaryES").hide();
 										}
-									}
-								});
-							});	
+								}, function finalCb(){
+									glossaryES.report.accessibility.forEach(function(assertion, i){											
+										if(assertion.dr.drt == "dataset" && assertion.dimension == "Accessibility") {
+											$("#accessibility-glossary-es-ES").html(`${assertion.result}% accessible`);	
+											var elem = document.querySelector('#accessibility-glossary-es-ES');
+											var instance = M.Tooltip.init(elem, {									
+												position: "top",
+												html:`
+													<div style="width:20em; padding:1em">
+														<b style="font-size:110%">Specification</b><p style="font-size:70%">${assertion.specification}</p>
+														<br>
+														<b style="font-size:110%">Mechanism</b><p style="font-size:70%">${assertion.mechanism}</p>
+													</div>
+												`
+												});
+
+										} else if(assertion.dr.drt == "dataset" && assertion.criterion == "All of the images must be publicly available in Internet") {								
+											if(!$("#glossary-es-ES-tab").hasClass("red-text")){
+												$("#glossary-es-ES-tab").removeClass("green-text");
+												$("#glossary-es-ES-tab").removeClass("red-text");																										
+												$("#glossary-es-ES-tab").addClass(assertion.result?"green-text":"red-text");
+											}	
+											$("#accessibility-glossary-es-ES").removeClass("green");								
+											$("#accessibility-glossary-es-ES").removeClass("red");								
+											$("#accessibility-glossary-es-ES").addClass(assertion.result?"green":"red");								
+											$("#accessibility-glossary-es-ES").addClass("white-text");
+											glossaryESProcess++;								
+											if(glossaryESProcess == 3) {
+												M.toast({html: 'DQ report is ready: Glossary (es-ES)'});
+												$("#updateReportGlossaryES").hide();
+											}
+										}
+									});
+								});	
+							});
 						});
 
 					});

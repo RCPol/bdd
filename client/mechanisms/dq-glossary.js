@@ -2,7 +2,8 @@ var Glossary = function(){
     this.report = {
         completeness: [],
         accessibility: [],
-        uniqueness: []
+        uniqueness: [],
+        consistency: []
     };
 }
 Glossary.prototype.uniqueness = function(rs, id) {
@@ -68,6 +69,90 @@ Glossary.prototype.uniqueness = function(rs, id) {
           },
           response: {result: finalUniqueness == 100}
       });         
+}
+Glossary.prototype.consistency = function(id,cb) {
+    var self = this;    
+    var consistency = 0;
+    var totalCells = 0; 
+    var us = {};
+    var br = {};
+    var es = {};
+    var all = {}
+    $.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=en-US",function(rsUS) {
+        var header = rsUS.response.splice(0,1);
+        rsUS.response.forEach(function(line, index){
+            var key = `${String(line[0]).trim().toLocaleLowerCase()}:${String(line[1]).trim().toLocaleLowerCase()}:${String(line[2]).trim().toLocaleLowerCase()}:${String(line[3]).trim().toLocaleLowerCase()}`;
+            us[key] = true;
+            all[key] = true;
+        }); 
+        $.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=pt-BR",function(rsBR) {
+            var header = rsBR.response.splice(0,1);
+            rsBR.response.forEach(function(line, index){
+                var key = `${String(line[0]).trim().toLocaleLowerCase()}:${String(line[1]).trim().toLocaleLowerCase()}:${String(line[2]).trim().toLocaleLowerCase()}:${String(line[3]).trim().toLocaleLowerCase()}`;
+                br[key] = true;
+                all[key] = true;
+            }); 
+            $.get("/api/Schemas/getSpreadsheetData?id="+id+"&language=es-ES",function(rsES) {
+                var header = rsES.response.splice(0,1);
+                rsES.response.forEach(function(line, index){
+                    var key = `${String(line[0]).trim().toLocaleLowerCase()}:${String(line[1]).trim().toLocaleLowerCase()}:${String(line[2]).trim().toLocaleLowerCase()}:${String(line[3]).trim().toLocaleLowerCase()}`;
+                    es[key] = true;
+                    all[key] = true;
+                });
+                Object.keys(all).forEach(function(key) {
+                    var inUS = us[key];
+                    var inBR = br[key];
+                    var inES = es[key];
+                    totalCells++;
+                    if(inUS && inBR && inES){
+                        consistency++;
+                    } else {
+                        self.report.consistency.push({
+                            type: "amendment",
+                            dimension: "Consistency",
+                            enhancement: "Recommending to keep the consistency of the terms of glossary among all of the languages",
+                            specification: "[TODO]",
+                            mechanism: "RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
+                            ie: "Glossary terms",
+                            dr: {
+                                row: "", 
+                                value: key,
+                                drt:  "record"
+                            },
+                            result:`The term "<b style="color:red">${key}</b>" is not defined in all of the languages: [${inUS?"en-US: YES":"<span style=\"color:red\">en-US: NO</span>"}] [${inBR?"pt-BR: YES":"<span style=\"color:red\">pt-BR: NO</span>"}] [${inES?"es-ES: YES":"<span style=\"color:red\">es-ES: NO</span>"}].`
+                        });
+                    }                    
+                });
+                var finalConsistency = ((consistency/totalCells)*100);
+                finalConsistency = finalConsistency == 100? finalConsistency:finalConsistency.toFixed(2);
+                self.report.consistency.push({
+                    type: "measure",
+                    dimension: "Consistency",
+                    specification: `[TODO]`,
+                    mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-glossary.js`,
+                    ie: "Glossary terms",
+                    dr: {
+                        id: id,
+                        drt:  "dataset"
+                    },
+                    result: finalConsistency
+                }); 
+                self.report.consistency.push({
+                    type: "validation",
+                    criterion: "Spreadsheet is consistent",
+                    specification: `[TODO]`,
+                    mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-glossary.js`,
+                    ie: "Glossary terms",
+                    dr: {
+                        id: id,
+                        drt:  "dataset"
+                    },
+                    result: finalConsistency == 100
+                });   
+                cb(self.report.consistency)                                 
+            });
+        });
+    });
 }
 Glossary.prototype.completeness = function(rs, id) {
     var self = this;
@@ -363,74 +448,137 @@ Glossary.prototype.completeness = function(rs, id) {
     
 }
 
+
+Glossary.prototype.getCache = function(url) {
+    if (typeof(Storage) !== "undefined") {
+        if(localStorage[url]){            
+            var hours = (new Date - new Date(localStorage[url])) / 36e5;            
+            return hours<0.5;
+        }            
+        else {            
+            return false;
+        } 
+            
+    } else {        
+        return false;
+    }
+}
+Glossary.prototype.setCache = function(url) {
+    if (typeof(Storage) !== "undefined") {        
+        localStorage[url] = new Date();        
+    }
+}
 Glossary.prototype.accessibility = function(rs, id, icb, cb) {	
     var self = this;					    
     var accessibility = 0;
     var totalChecks = 0;    
     var totalUrls = 0;    
+    var finalAccessibility = 0;
     
     rs.response.forEach(function(img, index){
         if(!img.value)
             console.log(img)
         img.value.split("|").forEach(function(url){
             totalUrls++;
-            url = url.replace("https://drive.google.com/open?id=", "https://docs.google.com/uc?id=").trim()                
-            $.get("/api/Schemas/checkUrl?url="+url,function(rs) {
-                if(rs.response == false) {
-                    // doble check
-                    $.get("/api/Schemas/checkUrl?url="+url,function(rs) {
-                        if(rs.response == false) {
-                            var assertion = {
-                                type: "amendment",
-                                enhancement: "Recommend to check the address of the image",
-                                dimension: "accessibility",
-                                specification: "If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
-                                mechanism: "RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
-                                ie: img.header,
-                                dr: {
-                                    row: img.row,
-                                    value: String(img.value).trim(),
-                                    drt:  "record"
-                                },
-                                result: "Check the URL address"
-                            };
-                            self.report.accessibility.push(assertion);
-                            icb(img.row, assertion);
-                        } else accessibility++;                       
-                    });                    
-                } else accessibility++;
+            url = url.replace("https://drive.google.com/open?id=", "https://docs.google.com/uc?id=").trim();            
+            // cache
+            if(self.getCache(url)){
+                accessibility++;
                 totalChecks++;            
-                icb(img.row, null);
-                if(totalChecks>=index && totalChecks == totalUrls) {
-                    var finalAccessibility = ((accessibility/totalUrls)*100)                        
-                    finalAccessibility = finalAccessibility == 100? finalAccessibility:finalAccessibility.toFixed(2);
-                    self.report.accessibility.push({
-                        type: "measure",
-                        dimension: "Accessibility",
-                        specification: `Proportion of values that were provided in the entire sheet. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
-                        mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
-                        ie: "All",
-                        dr: {
-                            id: id,
-                            drt:  "dataset"
-                        },
-                        result: finalAccessibility
-                    }); 
-                    self.report.accessibility.push({
-                        type: "validation",
-                        criterion: "All of the images must be publicly available in Internet",
-                        specification: `The entire sheet must be 100% complete. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
-                        mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
-                        ie: "All",
-                        dr: {
-                            id: id,
-                            drt:  "dataset"
-                        },
-                        result: finalAccessibility == 100
-                    }); 
-                    cb();
-                }                                            
-            });
+                icb(img.row, null);                
+            } else {
+                $.get("/api/Schemas/checkUrl?url="+url,function(rs) {
+                    if(rs.response == false) {
+                        // doble check
+                        $.get("/api/Schemas/checkUrl?url="+url,function(rs) {
+                            if(rs.response == false) {
+                                var assertion = {
+                                    type: "amendment",
+                                    enhancement: "Recommend to check the address of the image",
+                                    dimension: "accessibility",
+                                    specification: "If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
+                                    mechanism: "RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
+                                    ie: img.header,
+                                    dr: {
+                                        row: img.row,
+                                        value: String(img.value).trim(),
+                                        drt:  "record"
+                                    },
+                                    result: "Check the URL address"
+                                };
+                                self.report.accessibility.push(assertion);
+                                icb(img.row, assertion);
+                            } else {
+                                self.setCache(url)
+                                accessibility++
+                            };                       
+                        });                    
+                    } else {
+                        accessibility++
+                        self.setCache(url)
+                    };
+                    totalChecks++;   
+                    if(totalChecks>=index && totalChecks == totalUrls) {
+                        finalAccessibility = ((accessibility/totalUrls)*100)                        
+                        finalAccessibility = finalAccessibility == 100? finalAccessibility:finalAccessibility.toFixed(2);
+                        self.report.accessibility.push({
+                            type: "measure",
+                            dimension: "Accessibility",
+                            specification: `Proportion of values that were provided in the entire sheet. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                            mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                            ie: "All",
+                            dr: {
+                                id: id,
+                                drt:  "dataset"
+                            },
+                            result: finalAccessibility
+                        });                        
+                        self.report.accessibility.push({
+                            type: "validation",
+                            criterion: "All of the images must be publicly available in Internet",
+                            specification: `The entire sheet must be 100% complete. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                            mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                            ie: "All",
+                            dr: {
+                                id: id,
+                                drt:  "dataset"
+                            },
+                            result: finalAccessibility == 100
+                        }); 
+                        cb();
+                    }         
+                    icb(img.row, null);
+                });
+            }
+            if(totalChecks>=index && totalChecks == totalUrls) {
+                finalAccessibility = ((accessibility/totalUrls)*100)                        
+                finalAccessibility = finalAccessibility == 100? finalAccessibility:finalAccessibility.toFixed(2);
+                self.report.accessibility.push({
+                    type: "measure",
+                    dimension: "Accessibility",
+                    specification: `Proportion of values that were provided in the entire sheet. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                    mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                    ie: "All",
+                    dr: {
+                        id: id,
+                        drt:  "dataset"
+                    },
+                    result: finalAccessibility
+                });                        
+                self.report.accessibility.push({
+                    type: "validation",
+                    criterion: "All of the images must be publicly available in Internet",
+                    specification: `The entire sheet must be 100% complete. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                    mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                    ie: "All",
+                    dr: {
+                        id: id,
+                        drt:  "dataset"
+                    },
+                    result: finalAccessibility == 100
+                }); 
+                cb();
+            } 
         });                                               
     });    
     return this;					       		

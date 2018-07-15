@@ -93,8 +93,7 @@ BDQ.prototype.generateSpecimenReport = function(id, lang) {
                 if(self.specimenProcess == 5) {
                     M.toast({html: 'DQ report is ready: Specimen'});
                     $("#updateReportSpecimen").hide();
-                }
-                
+                }                
                 self.recordAssertion(self.specimenDatasetHash, "IS_CONFORM_SPECIMEN_DATASET", "validation", assertion.dr, assertion.specification, assertion.mechanism, assertion.ie, assertion.response, null, assertion.criterion, null, function(rs){
                     console.log("recorded conformity criterion", rs)                    
                 });

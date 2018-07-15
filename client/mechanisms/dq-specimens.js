@@ -40,6 +40,26 @@ Specimen.prototype.conformity = function(id, lang, cb) {
     return this;
 }
 
+Specimen.prototype.getCache = function(url) {
+    if (typeof(Storage) !== "undefined") {
+        if(localStorage[url]){            
+            var hours = (new Date - new Date(localStorage[url])) / 36e5;            
+            return hours<0.5;
+        }            
+        else {            
+            return false;
+        } 
+            
+    } else {        
+        return false;
+    }
+}
+Specimen.prototype.setCache = function(url) {
+    if (typeof(Storage) !== "undefined") {        
+        localStorage[url] = new Date();        
+    }
+}
+
 Specimen.prototype.accessibility = function(rs, id, icb, cb) {	
     var self = this;					    
     var accessibility = 0;
