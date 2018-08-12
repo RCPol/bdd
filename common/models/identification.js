@@ -76,7 +76,8 @@ module.exports = function(Identification) {
       }
     });
   } 
-  Identification.populate = function(filter, callback){
+  Identification.populate = function(req, filter, callback){
+    
     req.setTimeout(0);
     console.log("Apagando...");
     Identification.destroyAll(function(e,d){
@@ -284,7 +285,9 @@ module.exports = function(Identification) {
     'populate',
     {
       http: {verb: 'get'},
-      accepts: [{arg: 'filter', type: 'object'}],
+      accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
+        {arg: 'filter', type: 'object'}],
       returns: {arg: 'response', type: 'number'}
     }
   );
