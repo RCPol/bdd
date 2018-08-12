@@ -77,6 +77,7 @@ module.exports = function(Identification) {
     });
   } 
   Identification.populate = function(filter, callback){
+    req.setTimeout(0);
     console.log("Apagando...");
     Identification.destroyAll(function(e,d){
       console.log("Apagado!!!");
