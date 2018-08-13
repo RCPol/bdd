@@ -1429,11 +1429,13 @@ module.exports = function(Specimen) {
   ImageDownloadManager.prototype.getData = function(query,base) {
     var self = this;
     return new Promise(function(resolve, reject){
+      console.log("query",query)
       Specimen.find(query, function(err,result){
         if(err) reject(err)        
         else{
           var data = {response: {result:result, base: base}}
-          resolve(data);
+          
+          resolve(data.response);
         }
       });
     });  
