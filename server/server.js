@@ -303,7 +303,8 @@ app.get('/admin/data-quality', function(req, res) {
 });
 
 app.get('/admin', function(req, res) {
-  var template = fs.readFileSync('./client/admin.mustache', 'utf8');
+  // var template = fs.readFileSync('./client/admin.mustache', 'utf8');
+  var template = fs.readFileSync('./client/data-quality.mustache', 'utf8');
   var params = {base: "eco"};
 
   res.send(mustache.render(template, params));
