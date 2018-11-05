@@ -302,9 +302,9 @@ app.get('/admin/data-quality', function(req, res) {
   res.send(mustache.render(template, params));
 });
 
-app.get('/admin', function(req, res) {
-  // var template = fs.readFileSync('./client/admin.mustache', 'utf8');
-  var template = fs.readFileSync('./client/data-quality.mustache', 'utf8');
+app.get('/admin/E810164B6A9847FD8A9E6', function(req, res) {
+  var template = fs.readFileSync('./client/admin.mustache', 'utf8');
+  // var template = fs.readFileSync('./client/data-quality.mustache', 'utf8');
   var params = {base: "eco"};
 
   res.send(mustache.render(template, params));
@@ -470,3 +470,4 @@ boot(app, __dirname, function(err) {
   if (require.main === module)
     app.start();
 });
+
