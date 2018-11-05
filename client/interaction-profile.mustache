@@ -174,16 +174,24 @@
 			}
 			return -1;        
 		}		
-		function load(){
-			console.log("/api/Interactions/findOne?pollinator="+pollinator)	  
-			$.getJSON("/api/Interactions/findOne?pollinator="+pollinator, function( interaction ) {
-				console.log(interaction)
+		function load(){		
+			console.log(`/api/Interactions/findOne?filter=%7B"where"%3A%7B"pollinator"%3"${pollinator}"%7D%7D`)	
+			$.getJSON(`/api/Interactions?filter=%7B%22where%22%3A%7B%22pollinator%22%3A%22${pollinator}%22%7D%7D`, function( interactions ) {				
+				var interactionsGrouped = {}
+				interactions.forEach( (interaction) => {					
+					interactionsGrouped[interaction.reference] = 0
+				})								
+				var interactionsFinal = Object.keys(interactionsGrouped).map( (key) => {				
+					return {reference:key}
+				})				
+				interactionsFinal.forEach( (interaction) => {				
 					var aux = [];
 					if(interaction.reference)
 							aux.push(interaction.reference.split("|"));  
 					aux.forEach(function(item){
 						$("#vis").append(`<p>${item}</p>`);
 					});
+				})				
 			});
 			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {				
 				// console.log(interactions);

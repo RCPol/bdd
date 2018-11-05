@@ -86,7 +86,7 @@ module.exports = function(Interaction) {
           ]
         }
         });
-      }
+      }      
       q.push({
         $group: {
           _id: {
@@ -102,6 +102,7 @@ module.exports = function(Interaction) {
           // avgQuantity: { $avg: "$percentual" }
         }
       });
+      q.push({ $sort : { "_id.pollinator" : 1 } })
       
       collection.aggregate(q).toArray(function(err, docs) {        
         cb(err,docs);
