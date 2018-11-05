@@ -48,7 +48,7 @@
 	function setLanguage(language){
 			// alert(id + " - "+base);
 			localStorage.language = language;
-			// window.location = "/profile/species/"+base+"/"+id.split(":")[0]+":"+localStorage.language+":"+id.split(":")[2];
+			window.location = "/interaction-profile/"+pollinator;
 		}
 	</script>
 </head>
@@ -153,8 +153,9 @@
 </div>
 </body>
 <script>
+	var pollinator
 	$(document).ready(function(){		  
-		var pollinator = "{{pollinator}}";
+		pollinator = "{{pollinator}}";
 		var region = "Brasil";
 		var vegetalForm = "Todas";
 
