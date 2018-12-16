@@ -464,7 +464,8 @@
 				$("#updateReportSpecimen").html("Running...");
 				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];				
 				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {					
-					if(!rs.response.properties) return null;					
+					if(!rs.response.properties) return null;	
+					console.log(rs)				
 					var base = rs.response.properties.title.split("[")[1].split("]")[0]
 					var lang = rs.response.properties.title.split("[")[2].split("]")[0]
 					//bdq.getDatasetHash(id, lang, function(hash) {						
