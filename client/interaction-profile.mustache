@@ -38,16 +38,19 @@
 	<title>RCPol</title>
 
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/trans.js"></script>
 	<script type="text/javascript">
 	var internacionalization = new Internacionalization();			
 	$(document).ready(function(){		    
 		internacionalization.base = 'interaction';	  					  
 		internacionalization.siteTranslator();		
-		internacionalization.updateLogo();
+		internacionalization.updateLogo();		
+		$("#rcpol-InteractionLabel-selectVegetalForm").html(labels.selectVegetalForm[internacionalization.language])
 	});
 	function setLanguage(language){
 			// alert(id + " - "+base);
 			localStorage.language = language;
+			$("#rcpol-InteractionLabel-selectVegetalForm").html(labels.selectVegetalForm[language])
 			window.location = "/interaction-profile/"+pollinator;
 		}
 	</script>

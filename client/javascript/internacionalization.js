@@ -32,9 +32,9 @@ Internacionalization.prototype.siteTranslator = function(){
   $.getJSON("/api/Schemas?filter=%7B%22where%22%3A%7B%22class%22%3A%22SiteLabel%22%2C%22language%22%3A%22"+self.language+"%22%2C%22base%22%3A%22"+self.base+"%22%7D%7D", function(data){    
     data.forEach(function(label) {
       if(label.term=="baseTaxon"){
-        $('#base_selector').append('<option value="taxon">'+label.field+'</option>');            
+        $('#base_selector').append('<option value="taxon">'+label.field.replace("Palino", "Palyno")+'</option>');            
       } else if(label.term=="baseEco"){
-        $('#base_selector').append('<option value="eco">'+label.field+'</option>');            
+        $('#base_selector').append('<option value="eco">'+label.field.replace("Palino", "Palyno")+'</option>');            
       } else if(label.term=="basePaleo"){
         $('#base_selector').append('<option value="paleo">'+label.field+'</option>');            
       } else if(label.term=="baseSpore"){
