@@ -576,7 +576,8 @@ module.exports = function(Schema) {
   // };  
 
   //Método by Raquel
-  Schema.downloadImages = function (cb) {
+  Schema.downloadImages = function (req, cb) {
+    req.setTimeout(0)
     function error (err){cb(err,null)}
     console.log("serviço chamado");
     var manager = new ImageDownloadManager();
@@ -830,6 +831,7 @@ module.exports = function(Schema) {
     {
       http: {path: '/downloadImages', verb: 'get'},
       accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
         // {arg:'download'}
         // {arg: 'download', type: 'boolean', required:true, description: 'true para baixar todas as imagens. false para baixar somente imagens novas. default: false', default: true}
       ],

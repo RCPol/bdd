@@ -20,7 +20,7 @@ module.exports = function(Specimen) {
 
   Specimen.consistency = function(req, id, language, cb) {
     var report = [];
-    req.setTimeout(0);    
+    req.setTimeout(0);
     var key = require('key.json');
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
@@ -1342,7 +1342,8 @@ module.exports = function(Specimen) {
     });
   };  
 
-  Specimen.downloadImages = function (base,cb) {
+  Specimen.downloadImages = function (req, base,cb) {
+    req.setTimeout(0)
     function error (err){cb(err,null)}
     console.log("serviço chamado");
     var manager = new ImageDownloadManager();
@@ -1651,6 +1652,7 @@ module.exports = function(Specimen) {
     {
       http: {path: '/downloadImages', verb: 'get'},
       accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
         // {arg:'download'}
         {arg: 'base', type: 'string', required:true}
       ],
