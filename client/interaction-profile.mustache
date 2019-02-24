@@ -309,7 +309,12 @@
 				d3.select("#chart").selectAll(".node")[0].forEach(function(g){                
 						if(g.__data__.type=="species"){
 								g.onclick = function(){
-										window.open("/profile/species/eco/eco:"+localStorage.language+":"+g.__data__.name, '_blank');
+									$.ajaxSetup({
+										"error":function() { alert("Sem registro da espécie "+g.__data__.name+" na base")  }
+									});
+									$.getJSON( "/api/Species/eco:"+localStorage.language+":"+g.__data__.name, function(record) {										
+										window.open("/profile/species/eco/eco:"+localStorage.language+":"+g.__data__.name, '_blank');										
+									})
 								}
 								$(g).css("font-style","italic");
 						}                    
