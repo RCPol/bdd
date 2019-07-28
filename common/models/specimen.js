@@ -1363,6 +1363,7 @@ module.exports = function(Specimen) {
     var self = this;
     console.log("processando fila")
     return new Promise(function(resolve, reject){
+      var i = 0
       var processing;
       var processImage = function (img,cb){        
         var downloader = new ImageDownloader();         
@@ -1373,7 +1374,8 @@ module.exports = function(Specimen) {
           console.log("erro ao fazer download de imagem");          
           if(error.img) {
             console.log("adicionou imagem no final da fila")
-            processing.push(img);
+            if(i++ < 200)
+              processing.push(img);
           }
           cb();
         });
