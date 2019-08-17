@@ -10,6 +10,7 @@ var fs = require('fs');
 var qt = require('quickthumb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var nodemailer = require('nodemailer');
 
 const requestImageSize = require('request-image-size');
 // var admin = require('firebase-admin');
@@ -17,7 +18,53 @@ var serviceAccount = require("key.json");
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+  Specimen.sendEmail = (data, cb) => {
+        
+    const subject = `RPCPol ${data.page} report`
+    const text = `
+${data.user.name} has reported a problem with ${data.page} ${data.url}.
+Category: ${data.category}
+Environment: ${data.env}
+Date: ${data.timestamp}
+Message: 
 
+${data.msg}
+`    
+
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'suporte.rcpol@gmail.com',
+        pass: process.env.SUPORTE_MAIL
+      }
+    });
+  
+    var mailOptions = {
+      from: data.user.email,
+      to: 'allan.kv@gmail.com',
+      subject,
+      text
+    };
+  
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+    return cb(null, "sent")
+  }
+  Specimen.remoteMethod(
+    'sendEmail',
+    {
+      http: {path: '/report', verb: 'post'},
+      accepts: [
+        {arg: 'data', type: 'object', http:{source: 'body'}}
+      ],
+      returns: {arg: 'response', type: 'string'}
+    }
+  );
   Specimen.consistency = function(req, id, language, cb) {
     var report = [];
     req.setTimeout(0);

@@ -11,7 +11,8 @@ services:
     ports:
       - "80:3030" 
     environment:    
-      - ENVIRONMENT=docker      
+      - ENVIRONMENT=docker
+      - SUPORTE_MAIL
     container_name: rcpol_node    
   mongo:
     image: mongo

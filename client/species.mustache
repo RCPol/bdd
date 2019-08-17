@@ -707,7 +707,11 @@ textarea { height: 80px; resize: none; }
 			});
 			e.preventDefault();
 		});	
-		
+		const report = data => {
+			$.post("/api/Species/report",data,function(rs) {
+				console.log("sent",rs)
+			});
+		}
 		$("#send-feedback").click(function(e){		
 			var data = {
 				user: {
@@ -733,6 +737,7 @@ textarea { height: 80px; resize: none; }
 				.catch(function(error) {
 					console.error("Error adding document: ", error);
 				});
+				report(data)
 			} else {
 				alert("É necessário preencher todos os campos.")
 			}		

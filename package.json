@@ -33,6 +33,7 @@
     "object-hash": "0.9.5",
     "quickthumb": "0.0.12",
     "read-chunk": "2.1.0",
+    "request-image-size": "^2.1.0",
     "requestretry": "1.6.0",
     "serve-favicon": "2.0.1",
     "sntp": "2.0.2",

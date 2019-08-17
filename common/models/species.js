@@ -1,8 +1,56 @@
 var async = require('async');
 var hash = require('object-hash');
 var request = require('request');
-module.exports = function(Species) {
+var nodemailer = require('nodemailer');
 
+module.exports = function(Species) {
+  Species.sendEmail = (data, cb) => {
+        
+    const subject = `RPCPol ${data.page} report`
+    const text = `
+${data.user.name} has reported a problem with ${data.page} ${data.url}.
+Category: ${data.category}
+Environment: ${data.env}
+Date: ${data.timestamp}
+Message: 
+
+${data.msg}
+`    
+
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'suporte.rcpol@gmail.com',
+        pass: process.env.SUPORTE_MAIL
+      }
+    });
+  
+    var mailOptions = {
+      from: data.user.email,
+      to: 'allan.kv@gmail.com',
+      subject,
+      text
+    };
+  
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+    return cb(null, "sent")
+  }
+  Species.remoteMethod(
+    'sendEmail',
+    {
+      http: {path: '/report', verb: 'post'},
+      accepts: [
+        {arg: 'data', type: 'object', http:{source: 'body'}}
+      ],
+      returns: {arg: 'response', type: 'string'}
+    }
+  );
   Species.mainImage = function(id,cb) {
     Species.findById(id, function (err, data) {
       if(err) throw new Error(err);
