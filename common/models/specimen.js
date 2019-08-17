@@ -23,14 +23,16 @@ module.exports = function(Specimen) {
     const subject = `RPCPol ${data.page} report`
     const text = `
 ${data.user.name} has reported a problem with ${data.page} ${data.url}.
+
 Category: ${data.category}
 Environment: ${data.env}
 Date: ${data.timestamp}
+Email: ${data.user.email}
 Message: 
 
 ${data.msg}
 `    
-
+    console.log(`[${new Date().toISOString()}] Email: `, process.env.SUPORTE_MAIL);
     var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -40,8 +42,8 @@ ${data.msg}
     });
   
     var mailOptions = {
-      from: data.user.email,
-      to: 'allan.kv@gmail.com',
+      from: 'suporte.rcpol@gmail.com',
+      to: process.env.SUPORTE_MAIL_TO || 'suporte.rcpol@gmail.com',
       subject,
       text
     };
