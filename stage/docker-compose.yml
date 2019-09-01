@@ -2,10 +2,10 @@ version: '2'
 
 services:
   web:
-    build: ./
+    build: ../
     privileged: true
     volumes:
-      - ../:/var/www/bdd
+      - ../:/var/www/bdd/
     links:
       - mongo_stage
     ports:
@@ -14,6 +14,7 @@ services:
       - ENVIRONMENT=docker
       - SUPORTE_MAIL
     container_name: rcpol_node_stage
+    command: cp /var/www/bdd/stage/datasources.json /var/www/bdd/server/
   mongo_stage:
     image: mongo
     ports:
