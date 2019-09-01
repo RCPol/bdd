@@ -44,7 +44,9 @@ RUN mkdir -p /var/www/bdd
 WORKDIR /var/www/bdd
 
 ADD . /var/www/bdd
-RUN IF [ -z $DATA_SOURCES ]; THEN echo "Using default datasource"; ELSE cp $DATA_SOURCES /var/www/bdd/server/
+
+
+RUN test -z "$DATA_SOURCES" || cp $DATA_SOURCES /var/www/bdd/server/ && echo "var is not set"
 
 RUN npm i
 RUN npm install --unsafe-perm
