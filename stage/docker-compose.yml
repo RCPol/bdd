@@ -1,8 +1,10 @@
-version: '2'
+version: '3.7'
 
 services:
   web:
-    build: ../
+    build:
+      context: ../
+      dockerfile: Dockerfile-stage
     privileged: true
     volumes:
       - ../:/var/www/bdd/
