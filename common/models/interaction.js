@@ -375,7 +375,7 @@ module.exports = function(Interaction) {
   }
   Image.prototype.writeLocalFile = function() {    
     var self = this;
-    fs.writeFile("client"+self.local, self.downloadedContent, 'binary', function(err){
+    fs.writeFile(__dirname + "/../../client"+self.local, self.downloadedContent, 'binary', function(err){
         if(err){
           if(self.writeLocalErrorCount==10){
             console.log("******** Local: "+self.local);

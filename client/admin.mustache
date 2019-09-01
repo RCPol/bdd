@@ -174,7 +174,7 @@
 					if(!rs.response.properties) return null;					
 					base = rs.response.properties.title.split("[")[1].split("]")[0];
 					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
-					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language=pt-BR&base="+base,function(rs) {
 						$("#glossary-pt-br-label").html("Done!");
 						$("#glossary-pt-br").removeClass("orange");
 						$("#glossary-pt-br").addClass("blue");
@@ -208,7 +208,7 @@
 					if(!rs.response.properties) return null;					
 					base = rs.response.properties.title.split("[")[1].split("]")[0];
 					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
-					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language=en-US&base="+base,function(rs) {
 						$("#glossary-en-us-label").html("Done!");
 						$("#glossary-en-us").removeClass("orange");
 						$("#glossary-en-us").addClass("blue");
@@ -242,7 +242,7 @@
 					if(!rs.response.properties) return null;					
 					base = rs.response.properties.title.split("[")[1].split("]")[0];
 					lang = rs.response.properties.title.split("[")[2].split("]")[0];					
-					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language="+lang+"&base="+base,function(rs) {
+					$.get("/api/Schemas/xlsx/inputFromURL?id="+id+"&language=es-ES&base="+base,function(rs) {
 						$("#glossary-es-es-label").html("Done!");
 						$("#glossary-es-es").removeClass("orange");
 						$("#glossary-es-es").addClass("blue");

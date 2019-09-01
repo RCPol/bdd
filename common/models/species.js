@@ -160,6 +160,9 @@ ${data.msg}
           var specimen = {};
           specimen.id = sp.id;
           specimen.collection = sp.collection;
+          if(!specimen.collection) {
+            console.log(`[${new Date().toISOString()}] ERROR - NO COLLECTION: `,specimen.collection)
+          }
           species.specimens.push(specimen);          
           Object.keys(sp.toJSON()).forEach(function(key,index) {
             if(key!='collection'){
@@ -183,8 +186,8 @@ ${data.msg}
                   var values = sp[key].value.split(";");
                   species[key] = sp[key];
                   if(values.length != 4){
-                    console.log("problema com valor numerico:");
-                    console.log(key);
+                    // console.log("problema com valor numerico:");
+                    // console.log(key);
                     // console.log(species[key]);
                   } else {
                     var min = parseFloat(values[0].trim().slice(4).replace(",","."));
@@ -204,7 +207,10 @@ ${data.msg}
             }
           });
         });
-        species.id = Species.app.defineSpeciesID(language,base,name);        
+        species.id = Species.app.defineSpeciesID(language,base,name);   
+        if(!species.specimens) {
+          console.log(`[${new Date().toISOString()}] ERROR - NO SPECIMENS`,species.specimens)
+        }
         Species.upsert(species,function (err,instance) {
           if(err)
             console.log(err);

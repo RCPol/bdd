@@ -630,7 +630,7 @@ module.exports = function(Schema) {
           console.log("download realizado com sucesso");
           cb();
         }).catch(function(error){
-          console.log("erro ao fazer download de imagem");          
+          console.log("erro ao fazer download de imagem", error);          
           if(error.img) {
             console.log("adicionou imagem no final da fila")
             if(i++ < 200)
@@ -715,8 +715,9 @@ module.exports = function(Schema) {
   ImageDownloader.prototype.writeOriginalImage = function(img) {
     var self =  this;        
     return new Promise(function(resolve, reject){
-      fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
-        if(err){          
+      fs.writeFile(__dirname + "/../../client"+img.local, img.downloadedContent, 'binary', function(err){ 
+        if(err){
+          console.log(`[${new Date().toISOString()}] error to write original`, err, "client"+img.local)
           reject({img:img.raw});
         } else {
           resolve(img);
@@ -729,21 +730,21 @@ module.exports = function(Schema) {
     return new Promise(function(resolve, reject){      
       var error = function(err){
         console.log(err)
-        if(err.img){                            
+        if(err.img){ 
           fs.unlink(__dirname + "/../../client"+err.img.local,function(err_){            
-            if(err_) console.log("original não apagado");
+            if(err_) console.log(`[${new Date().toISOString()}]  original não apagado`);
             else console.log('original file deleted successfully');                
             reject(err);
           });
           fs.unlink(__dirname + "/../../client"+err.img.resized,function(err_){            
-            if(err_) console.log("resized não apagado");
+            if(err_) console.log(`[${new Date().toISOString()}]  resized não apagado`);
             else console.log('resized file deleted successfully');                            
           });
           fs.unlink(__dirname + "/../../client"+err.img.thumbnail,function(err_){            
-            if(err_) console.log("thumbnail não apagado");
+            if(err_) console.log(`[${new Date().toISOString()}]  thumbnail não apagado`);
             else console.log('thumbnail file deleted successfully');                            
           });
-        }        
+        }
       }
       var done = function(){
         resolve();
@@ -764,8 +765,9 @@ module.exports = function(Schema) {
           return new Promise(function(resolve, reject){      
             resolve();          
           });
-        }          
-        else return downloadImage().then(self.writeOriginalImage);
+        }
+        console.log(`[${new Date().toISOString()}] imagem nova`, {exists}) 
+        return downloadImage().then(self.writeOriginalImage);
       }
       // RESIZED
       var isResizedExists = function(){

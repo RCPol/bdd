@@ -1118,6 +1118,7 @@ ${data.msg}
                         if(translatedState){
                           self.record[fieldId].states.push(translatedState.toJSON());
                         } else {
+                          console.log(`[${new Date().toISOString()}] ERROR: not translated state for id `,translatedStateId)
                           // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+translatedStateId).set({
                           //   type: "state",
                           //   target: translatedStateId,
@@ -1148,9 +1149,11 @@ ${data.msg}
               var cID = sID[1]+":"+sID[2]+":"+sID[3];                        
               Collection.findById(cID, function(err,collection) {                
                 if(err) console.log("ERROR FIND COLLECTION: ",err);          
-                if(collection) {                  
+                if(collection) {
+                  
                   self.record.collection = collection.toJSON();                                    
-                } else {                  
+                } else {         
+                  console.log(`[${new Date().toISOString()}] ERROR TO RETRIVE COLLECTION`, cID)         
                   // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+cID).set({
                   //   type: "collection",
                   //   target: cID,
@@ -1235,7 +1238,8 @@ ${data.msg}
               processRegularFields();
             }                       
           } else {
-            // console.log("field does not exist")
+            console.log("field does not exist")
+            console.log(`[${new Date().toISOString()}] `,{fieldId})
             // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+fieldId).set({
             //   type: "field",
             //   target: fieldId,
@@ -1578,7 +1582,7 @@ ${data.msg}
     var self =  this;
     // console.log("writeOriginalImage")
     return new Promise(function(resolve, reject){
-      fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
+      fs.writeFile(__dirname + "/../../client"+img.local, img.downloadedContent, 'binary', function(err){
         if(err){
           console.log("erro para gravar", err);
           reject({img:img.raw});

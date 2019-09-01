@@ -362,7 +362,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             callback2();
           } else if (key == 'specimens'){            
             species.specimens.forEach(function(specimen) {
-              if(specimen.collection)
+              if(specimen.collection) {
                 Object.keys(specimen.collection).forEach(function(collectionKey) {
                   if(
                     specimen.collection[collectionKey].term == 'institutionName' || 
@@ -375,8 +375,10 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
                     identification_item["filter"][collectionKey].push(specimen.collection[collectionKey].value);                    
                   } 
                 });
-              else 
-                console.log("Coleção não existe")              
+              } else {
+                console.log("Coleção não existe", {specimen})
+              }
+                
             });
             callback2();
           } else if (
