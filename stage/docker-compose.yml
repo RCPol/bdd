@@ -7,17 +7,17 @@ services:
     volumes:
       - ../:/var/www/bdd
     links:
-      - mongo
+      - mongo_stage
     ports:
-      - "8080:3030" 
-    environment:    
+      - "8080:3030"
+    environment:
       - ENVIRONMENT=docker
       - SUPORTE_MAIL
-    container_name: rcpol_node    
-  mongo:
+    container_name: rcpol_node_stage
+  mongo_stage:
     image: mongo
     ports:
       - "27018:27017"
     volumes:
       - ../db:/data/db
-    container_name: rcpol_mongo
+    container_name: rcpol_mongo_stage
