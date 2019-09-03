@@ -1237,9 +1237,8 @@ ${data.msg}
             } else {
               processRegularFields();
             }                       
-          } else {
-            console.log("field does not exist")
-            console.log(`[${new Date().toISOString()}] `,{fieldId})
+          } else {            
+            console.log(`[${new Date().toISOString()}] field does not exist`,{fieldId})
             // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+fieldId).set({
             //   type: "field",
             //   target: fieldId,

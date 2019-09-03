@@ -392,19 +392,23 @@
 				$("#specimen").hide();
 				$("#key").hide();
 				$("#glossary-images").hide();
-				
-				$.get("/api/Specimens/downloadImages?base="+base,function(rs) {
-					$("#specimen-images-label").html("Done!");
-					$("#specimen-images").removeClass("orange");
-					$("#specimen-images").addClass("blue");
-					$("#glossary-pt-br").show();
-					$("#glossary-en-us").show();
-					$("#institution").show();
-					$("#glossary-es-es").show();
-					$("#specimen").show();
-					$("#key").show();
-					$("#glossary-images").show();
-				});				
+				var id = $("#url-specimen").val().split("d/")[1].split("/")[0];
+				$.get("/api/Specimens/getSpreadsheetInfo?id="+id,function(rs) {
+					if(!rs.response.properties) return null;					
+					base = rs.response.properties.title.split("[")[1].split("]")[0];
+					$.get("/api/Specimens/downloadImages?base="+base,function(rs) {
+						$("#specimen-images-label").html("Done!");
+						$("#specimen-images").removeClass("orange");
+						$("#specimen-images").addClass("blue");
+						$("#glossary-pt-br").show();
+						$("#glossary-en-us").show();
+						$("#institution").show();
+						$("#glossary-es-es").show();
+						$("#specimen").show();
+						$("#key").show();
+						$("#glossary-images").show();
+					});
+				})
 			});
 
 		});
