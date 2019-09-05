@@ -16,8 +16,7 @@ var google = require('googleapis');
 
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
-module.exports = function(Interaction) {
-  
+module.exports = function(Interaction) {  
   Interaction.plants = function(pollinator,region,vegetalForm,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
@@ -26,6 +25,7 @@ module.exports = function(Interaction) {
       var url = 'mongodb://mongo:27017/bdd'
     else 
       var url = 'mongodb://mongo_stage:27017/bdd'
+    console.log(`[${new Date().toISOString()}] DB`,process.env.ENVIRONMENT, url)
     var q = {};
     q.pollinator = pollinator;
     if(region!="Brasil"){      
@@ -69,7 +69,7 @@ module.exports = function(Interaction) {
       var url = 'mongodb://mongo:27017/bdd';
     else 
       var url = 'mongodb://mongo_stage:27017/bdd';
-    // Use connect method to connect to the Server 
+    console.log(`[${new Date().toISOString()}] DB`,process.env.ENVIRONMENT, url)
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
       var q = [];
