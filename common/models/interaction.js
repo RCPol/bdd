@@ -21,7 +21,7 @@ module.exports = function(Interaction) {
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
     
-    if(process.env.ENVIRONMENT !== "stage")
+    if(process.env.ENVIRONMENT !== `"stage"`)
       var url = 'mongodb://mongo:27017/bdd'
     else 
       var url = 'mongodb://mongo_stage:27017/bdd'
@@ -65,7 +65,7 @@ module.exports = function(Interaction) {
     Interaction.pollinators = function(plant,query,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL     
-    if(process.env.ENVIRONMENT !== "stage")
+    if(process.env.ENVIRONMENT !== `"stage"`)
       var url = 'mongodb://mongo:27017/bdd';
     else 
       var url = 'mongodb://mongo_stage:27017/bdd';
