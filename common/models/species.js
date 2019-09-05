@@ -19,7 +19,7 @@ Message:
 
 ${data.msg}
 `    
-    console.log(`[${new Date().toISOString()}] Email: `, process.env.SUPORTE_MAIL);
+    console.log(`[${new Date().toISOString()}] Email: `, process.env.SUPORTE_MAIL, process.env.SUPORTE_MAIL_TO);
     var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {

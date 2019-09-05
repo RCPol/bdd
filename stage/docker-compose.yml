@@ -13,9 +13,10 @@ services:
     ports:
       - "8080:3030"
     environment:
-      - ENVIRONMENT=docker
+      - ENVIRONMENT="stage"
       - DATA_SOURCES=/var/www/bdd/stage/datasources.json
       - SUPORTE_MAIL
+      - SUPORTE_MAIL_TO
     container_name: rcpol_node_stage    
   mongo_stage:
     image: mongo

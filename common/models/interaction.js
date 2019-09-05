@@ -22,10 +22,10 @@ module.exports = function(Interaction) {
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
     
-    if(process.env.ENVIRONMENT == "docker")
-      var url = 'mongodb://mongo:27017/bdd';
+    if(process.env.ENVIRONMENT !== "stage")
+      var url = 'mongodb://mongo:27017/bdd'
     else 
-      var url = 'mongodb://127.0.0.1:27017/bdd';
+      var url = 'mongodb://mongo_stage:27017/bdd'
     var q = {};
     q.pollinator = pollinator;
     if(region!="Brasil"){      
@@ -65,10 +65,10 @@ module.exports = function(Interaction) {
     Interaction.pollinators = function(plant,query,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL     
-    if(process.env.ENVIRONMENT == "docker")
+    if(process.env.ENVIRONMENT !== "stage")
       var url = 'mongodb://mongo:27017/bdd';
     else 
-      var url = 'mongodb://127.0.0.1:27017/bdd';
+      var url = 'mongodb://mongo_stage:27017/bdd';
     // Use connect method to connect to the Server 
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
