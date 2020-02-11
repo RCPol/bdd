@@ -1146,11 +1146,10 @@ ${data.msg}
             function processRegularFields(){
               var Collection = Specimen.app.models.Collection;
               var sID = self.record.id.split(":");              
-              var cID = sID[1]+":"+sID[2]+":"+sID[3];                        
-              Collection.findById(cID, function(err,collection) {                
+              var cID = sID[1]+":"+sID[2]+":"+sID[3];            
+              Collection.findOne({where:{id:cID, base:sID[0]}}, function(err,collection) {                
                 if(err) console.log("ERROR FIND COLLECTION: ",err);          
-                if(collection) {
-                  
+                if(collection) { 
                   self.record.collection = collection.toJSON();                                    
                 } else {         
                   console.log(`[${new Date().toISOString()}] ERROR TO RETRIVE COLLECTION`, cID)         
