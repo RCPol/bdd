@@ -17,15 +17,15 @@ FROM ubuntu:14.04
 #   apk del native-deps
 
 RUN apt-get update && \
-    apt-get -y install curl && \
-    apt-get -y install git && \
-    apt-get -y install wget && \
+    apt-get -y --force-yes install curl && \
+    apt-get -y --force-yes install git && \
+    apt-get -y --force-yes install wget && \
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && \
-    apt-get install --yes nodejs && \
-    apt-get -y install build-essential && \
-    apt-get -y install imagemagick && \
-    apt-get -y install ntpdate && \
-    apt-get -y install ntp
+    apt-get install -y --force-yes nodejs && \
+    apt-get -y --force-yes install build-essential && \
+    apt-get -y --force-yes install imagemagick && \
+    apt-get -y --force-yes install ntpdate && \
+    apt-get -y --force-yes install ntp
     
 RUN cat /etc/ntp.conf
 RUN echo "server pool.ntp.org" >> /etc/ntp.conf

@@ -248,8 +248,24 @@ textarea { height: 80px; resize: none; }
 				});				
 			});		  		   
 		    
-		  
-		
+
+		const getJBRJSpecies = () => {
+
+			$.getJSON(`http://servicos.jbrj.gov.br/v2/flora/taxon/${id.split(":")[2]}`, function(data){
+				console.log({data})
+				if(data && data[0] && data[0].taxon && data[0].taxon.references) {
+					const content = `
+						<p>
+							<a style="background-color: unset !important;" target="_blank" href="${data[0].taxon.references}">
+								<img style="margin-top: 0.5em" src="http://servicos.jbrj.gov.br/v2/assets/img/reflora.png" height="50"/>
+							</a>
+						</p>
+					`
+					$("#reflora").html(content);
+				}
+			});
+		}
+		getJBRJSpecies()
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
 
@@ -289,12 +305,16 @@ textarea { height: 80px; resize: none; }
 	<article>
 
 	  <!-- Nome da espécie -->
+		<div id="reflora" class="popname" style="float:right; margin-right:1em; text-align:center"></div>
       <h2 class="famesp" id="dwc-Taxon-family-value"></h2>
+			
 	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> <span id="rcpol-Sample-palynomorphType-value"> </span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
 
       <!--Nome popular-->
 	  <h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
 
+		
+		
 		<!-- Início: Textos -->
 	  <div class="infos-txt">
 
