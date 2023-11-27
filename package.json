@@ -21,7 +21,7 @@
     "http-request": "0.7.0",
     "image-type": "3.0.0",
     "loopback": "2.29.1",
-    "loopback-boot": "2.21.0",
+    "loopback-boot": "2.28.0",
     "loopback-component-explorer": "2.5.0",
     "loopback-component-storage": "1.8.1",
     "loopback-connector-mongodb": "1.15.2",
