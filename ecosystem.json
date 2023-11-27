@@ -3,7 +3,8 @@
       {    
       "name"        : "bdd",
       "script"      : ".",          
-      "watch"       : ["common","server"],        
+      "watch"       : ["common","server"], 
+      "ignore_watch": ["server/datasources.json"],       
       "merge_logs"  : true,
       "no_daemon"   : true,
       "cwd"         : "/var/www/bdd",    

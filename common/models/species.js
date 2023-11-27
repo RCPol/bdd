@@ -1,8 +1,59 @@
 var async = require('async');
 var hash = require('object-hash');
 var request = require('request');
-module.exports = function(Species) {
+var nodemailer = require('nodemailer');
 
+module.exports = function(Species) {
+  Species.sendEmail = (data, cb) => {
+        
+    const subject = `RPCPol ${data.page} report`
+    const text = `
+${data.user.name} has reported a problem with ${data.page} ${data.url}.
+
+Category: ${data.category}
+Environment: ${data.env}
+Date: ${data.timestamp}
+Email: ${data.user.email}
+
+Message: 
+
+${data.msg}
+`    
+    console.log(`[${new Date().toISOString()}] Email: `, process.env.SUPORTE_MAIL, process.env.SUPORTE_MAIL_TO);
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'suporte.rcpol@gmail.com',
+        pass: process.env.SUPORTE_MAIL
+      }
+    });
+  
+    var mailOptions = {
+      from: 'suporte.rcpol@gmail.com',
+      to: process.env.SUPORTE_MAIL_TO || 'suporte.rcpol@gmail.com',
+      subject,
+      text
+    };
+  
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+    return cb(null, "sent")
+  }
+  Species.remoteMethod(
+    'sendEmail',
+    {
+      http: {path: '/report', verb: 'post'},
+      accepts: [
+        {arg: 'data', type: 'object', http:{source: 'body'}}
+      ],
+      returns: {arg: 'response', type: 'string'}
+    }
+  );
   Species.mainImage = function(id,cb) {
     Species.findById(id, function (err, data) {
       if(err) throw new Error(err);
@@ -109,6 +160,9 @@ module.exports = function(Species) {
           var specimen = {};
           specimen.id = sp.id;
           specimen.collection = sp.collection;
+          if(!specimen.collection) {
+            console.log(`[${new Date().toISOString()}] ERROR - NO COLLECTION: `,specimen.collection)
+          }
           species.specimens.push(specimen);          
           Object.keys(sp.toJSON()).forEach(function(key,index) {
             if(key!='collection'){
@@ -132,8 +186,8 @@ module.exports = function(Species) {
                   var values = sp[key].value.split(";");
                   species[key] = sp[key];
                   if(values.length != 4){
-                    console.log("problema com valor numerico:");
-                    console.log(key);
+                    // console.log("problema com valor numerico:");
+                    // console.log(key);
                     // console.log(species[key]);
                   } else {
                     var min = parseFloat(values[0].trim().slice(4).replace(",","."));
@@ -153,7 +207,10 @@ module.exports = function(Species) {
             }
           });
         });
-        species.id = Species.app.defineSpeciesID(language,base,name);        
+        species.id = Species.app.defineSpeciesID(language,base,name);   
+        if(!species.specimens) {
+          console.log(`[${new Date().toISOString()}] ERROR - NO SPECIMENS`,species.specimens)
+        }
         Species.upsert(species,function (err,instance) {
           if(err)
             console.log(err);

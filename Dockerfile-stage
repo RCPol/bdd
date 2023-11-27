@@ -15,7 +15,7 @@ FROM ubuntu:14.04
 #   npm install --quiet node-gyp -g &&\
 #   npm install --quiet && \
 #   apk del native-deps
-
+RUN echo "STAGE ENV"
 RUN apt-get update && \
     apt-get -y --force-yes install curl && \
     apt-get -y --force-yes install git && \
@@ -35,7 +35,7 @@ ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install PM2
-RUN npm install -g pm2@2.6.0
+RUN npm install -g pm2
 RUN npm install -g bower
 
 RUN mkdir -p /var/www/bdd
@@ -44,6 +44,8 @@ RUN mkdir -p /var/www/bdd
 WORKDIR /var/www/bdd
 
 ADD . /var/www/bdd
+RUN cp stage/datasources.json server/
+
 RUN npm i
 RUN npm install --unsafe-perm
 RUN npm rebuild grpc --force

@@ -16,6 +16,7 @@
 	<title>RCPol - Interactions</title>
 
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/trans.js"></script>
 
 	<script type="text/javascript">      
       var base = '{{base}}';
@@ -197,7 +198,7 @@
 						content: function() {
 						return `								
 								<div class="popsreft">
-									<h4>Credits:</h4>
+									<h4>${labels.credits[language]}:</h4>
 									<p><span class="popsrefp">${data.image.credits}</span></p>
 								</div>`;
 						}
@@ -207,7 +208,7 @@
 						content: function() {
 						return `								
 								<div class="popsreft">
-									<h4>References:	</h4><br>							
+									<h4>${labels.references[language]}:	</h4><br>							
 									<p><span class="popsrefp">${data.beeBibliographicCitation.split("|").join("<br><br>")}</span></p><br>
 								</div>`;
 						}

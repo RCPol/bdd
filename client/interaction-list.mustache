@@ -14,6 +14,7 @@
 	<title>RCPol - {{plant}}</title>
 
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/trans.js"></script>
 	<script type="text/javascript">			
 	var internacionalization = new Internacionalization();			
 	$(document).ready(function(){		
@@ -98,7 +99,8 @@
 							rs.credits = img.image.credits;                                
 							return false;
 						}
-					});       
+					}); 
+					
 					var content = $(`<div class="visitante">                    
 										<img id="img-${rs.pollinator}" src="${rs.image}" class="visit-img">                        
 										<p class="div-visitante">                    

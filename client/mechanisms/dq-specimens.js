@@ -2,13 +2,31 @@ var Specimen = function(){
     this.report = {
         completeness: [],
         accessibility: [],
-        conformity: []
+        conformity: [],
+        uniqueness: [],
+        consistency: []
     };
 }
 Specimen.prototype.completeness = function(id, lang, cb) {	
     var self = this;					    
     $.get("/api/Specimens/completeness?id="+id+"&language="+lang,function(rs) {        
         self.report.completeness = rs.response;
+        cb()
+    });    
+    return this;
+}
+Specimen.prototype.uniqueness = function(id, lang, cb) {	
+    var self = this;					    
+    $.get("/api/Specimens/uniqueness?id="+id+"&language="+lang,function(rs) {        
+        self.report.uniqueness = rs.response;
+        cb()
+    });    
+    return this;
+}
+Specimen.prototype.consistency = function(id, lang, cb) {	
+    var self = this;					    
+    $.get("/api/Specimens/consistency?id="+id+"&language="+lang,function(rs) {        
+        self.report.consistency = rs.response;
         cb()
     });    
     return this;
@@ -20,6 +38,26 @@ Specimen.prototype.conformity = function(id, lang, cb) {
         cb()
     });    
     return this;
+}
+
+Specimen.prototype.getCache = function(url) {
+    if (typeof(Storage) !== "undefined") {
+        if(localStorage[url]){            
+            var hours = (new Date - new Date(localStorage[url])) / 36e5;            
+            return hours<0.5;
+        }            
+        else {            
+            return false;
+        } 
+            
+    } else {        
+        return false;
+    }
+}
+Specimen.prototype.setCache = function(url) {
+    if (typeof(Storage) !== "undefined") {        
+        localStorage[url] = new Date();        
+    }
 }
 
 Specimen.prototype.accessibility = function(rs, id, icb, cb) {	
@@ -38,8 +76,9 @@ Specimen.prototype.accessibility = function(rs, id, icb, cb) {
                         if(rs.response == false) {
                             var assertion = {
                                 type: "amendment",
+                                hash: img.hash,
                                 enhancement: "Recommend to check the address of the image",
-                                dimension: "accessibility",
+                                dimension: "accessibility",                                
                                 specification: "If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
                                 mechanism: "RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js",
                                 ie: img.header,
@@ -48,7 +87,7 @@ Specimen.prototype.accessibility = function(rs, id, icb, cb) {
                                     value: String(img.value).trim(),
                                     drt:  "record"
                                 },
-                                result: "Check the URL address"
+                                response: {result: "Check the URL address"}
                             };
                             self.report.accessibility.push(assertion);
                             icb(img.row, assertion);
@@ -70,7 +109,7 @@ Specimen.prototype.accessibility = function(rs, id, icb, cb) {
                             id: id,
                             drt:  "dataset"
                         },
-                        result: finalAccessibility
+                        response: {result: finalAccessibility}
                     }); 
                     self.report.accessibility.push({
                         type: "validation",
@@ -82,7 +121,7 @@ Specimen.prototype.accessibility = function(rs, id, icb, cb) {
                             id: id,
                             drt:  "dataset"
                         },
-                        result: finalAccessibility == 100
+                        response: {result: finalAccessibility == 100}
                     }); 
                     cb();
                 }                                            

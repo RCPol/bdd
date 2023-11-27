@@ -38,17 +38,20 @@
 	<title>RCPol</title>
 
 	<script type="text/javascript" src="/javascript/internacionalization.js"></script>
+	<script type="text/javascript" src="/javascript/trans.js"></script>
 	<script type="text/javascript">
 	var internacionalization = new Internacionalization();			
 	$(document).ready(function(){		    
 		internacionalization.base = 'interaction';	  					  
 		internacionalization.siteTranslator();		
-		internacionalization.updateLogo();
+		internacionalization.updateLogo();		
+		$("#rcpol-InteractionLabel-selectVegetalForm").html(labels.selectVegetalForm[internacionalization.language])
 	});
 	function setLanguage(language){
 			// alert(id + " - "+base);
 			localStorage.language = language;
-			// window.location = "/profile/species/"+base+"/"+id.split(":")[0]+":"+localStorage.language+":"+id.split(":")[2];
+			$("#rcpol-InteractionLabel-selectVegetalForm").html(labels.selectVegetalForm[language])
+			window.location = "/interaction-profile/"+pollinator;
 		}
 	</script>
 </head>
@@ -153,8 +156,9 @@
 </div>
 </body>
 <script>
+	var pollinator
 	$(document).ready(function(){		  
-		var pollinator = "{{pollinator}}";
+		pollinator = "{{pollinator}}";
 		var region = "Brasil";
 		var vegetalForm = "Todas";
 
@@ -174,16 +178,24 @@
 			}
 			return -1;        
 		}		
-		function load(){
-			console.log("/api/Interactions/findOne?pollinator="+pollinator)	  
-			$.getJSON("/api/Interactions/findOne?pollinator="+pollinator, function( interaction ) {
-				console.log(interaction)
+		function load(){		
+			console.log(`/api/Interactions/findOne?filter=%7B"where"%3A%7B"pollinator"%3"${pollinator}"%7D%7D`)	
+			$.getJSON(`/api/Interactions?filter=%7B%22where%22%3A%7B%22pollinator%22%3A%22${pollinator}%22%7D%7D`, function( interactions ) {				
+				var interactionsGrouped = {}
+				interactions.forEach( (interaction) => {					
+					interactionsGrouped[interaction.reference] = 0
+				})								
+				var interactionsFinal = Object.keys(interactionsGrouped).map( (key) => {				
+					return {reference:key}
+				})				
+				interactionsFinal.forEach( (interaction) => {				
 					var aux = [];
 					if(interaction.reference)
 							aux.push(interaction.reference.split("|"));  
 					aux.forEach(function(item){
 						$("#vis").append(`<p>${item}</p>`);
 					});
+				})				
 			});
 			$.getJSON( "/api/Interactions/plants?pollinator="+pollinator+"&region="+region+"&vegetalForm="+vegetalForm, function( interactions ) {				
 				// console.log(interactions);
@@ -300,7 +312,12 @@
 				d3.select("#chart").selectAll(".node")[0].forEach(function(g){                
 						if(g.__data__.type=="species"){
 								g.onclick = function(){
-										window.open("/profile/species/eco/eco:"+localStorage.language+":"+g.__data__.name, '_blank');
+									$.ajaxSetup({
+										"error":function() { alert("Sem registro da espécie "+g.__data__.name+" na base")  }
+									});
+									$.getJSON( "/api/Species/eco:"+localStorage.language+":"+g.__data__.name, function(record) {										
+										window.open("/profile/species/eco/eco:"+localStorage.language+":"+g.__data__.name, '_blank');										
+									})
 								}
 								$(g).css("font-style","italic");
 						}                    

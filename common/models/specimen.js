@@ -10,6 +10,7 @@ var fs = require('fs');
 var qt = require('quickthumb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var nodemailer = require('nodemailer');
 
 const requestImageSize = require('request-image-size');
 // var admin = require('firebase-admin');
@@ -17,6 +18,300 @@ var serviceAccount = require("key.json");
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
 module.exports = function(Specimen) {
+  Specimen.sendEmail = (data, cb) => {
+        
+    const subject = `RPCPol ${data.page} report`
+    const text = `
+${data.user.name} has reported a problem with ${data.page} ${data.url}.
+
+Category: ${data.category}
+Environment: ${data.env}
+Date: ${data.timestamp}
+Email: ${data.user.email}
+Message: 
+
+${data.msg}
+`    
+    console.log(`[${new Date().toISOString()}] Email: `, process.env.SUPORTE_MAIL);
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'suporte.rcpol@gmail.com',
+        pass: process.env.SUPORTE_MAIL
+      }
+    });
+  
+    var mailOptions = {
+      from: 'suporte.rcpol@gmail.com',
+      to: process.env.SUPORTE_MAIL_TO || 'suporte.rcpol@gmail.com',
+      subject,
+      text
+    };
+  
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+    return cb(null, "sent")
+  }
+  Specimen.remoteMethod(
+    'sendEmail',
+    {
+      http: {path: '/report', verb: 'post'},
+      accepts: [
+        {arg: 'data', type: 'object', http:{source: 'body'}}
+      ],
+      returns: {arg: 'response', type: 'string'}
+    }
+  );
+  Specimen.consistency = function(req, id, language, cb) {
+    var report = [];
+    req.setTimeout(0);
+    var key = require('key.json');
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'glossary.'+language+'!A:K'
+      }, function(err, rs) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }
+          var validValues = {}
+          rs.values.shift();
+          async.each(rs.values, function iterator(line, callback){                                                
+            var schema = toString(line[0]).trim().toUpperCase();
+            var class_ = toString(line[1]).trim().toUpperCase();
+            var term = toString(line[2]).trim().toUpperCase();              
+            var vocabulary = toString(line[6]).trim().toUpperCase();
+            if (schema.length>0 && class_.length>0 && term.length>0 && vocabulary.length>0 && class_ == "STATE") {              
+              validValues[`${schema}-${term}`] = validValues[`${schema}-${term}`]?validValues[`${schema}-${term}`]:{}
+              validValues[`${schema}-${term}`][vocabulary] = true;
+            }                        
+          });
+
+          service.spreadsheets.values.get({
+            auth: jwtClient,
+            spreadsheetId: id,
+            range: 'specimen.'+language+'!A:BU'        
+          }, function(err, d) {
+            if (err){
+              console.log('The API returned an error: ' + err);    
+              cb('The API returned an error: ' + err,null)
+              return;          
+            }           
+            var totalValues = 0;
+            var totalValidValues = 0;                                                      
+            var data = d.values;
+            var handler = new SpecimenHandler(null, language, data);                          
+            handler.setSchemas().setClasses().setTerms().setData();            
+            delete handler.table;
+            var result = {};            
+            handler.terms.forEach(function(item, i){              
+              var schema = toString(handler.schemas[i]).trim().toUpperCase();
+              var class_ = toString(handler.classes[i]).trim().toUpperCase();
+              var term = toString(item).trim().toUpperCase();
+              var column = `${schema}-${term}`;                  
+              if (schema.length>0 && class_.length>0 && term.length>0 && validValues[column] && class_=="CategoricalDescriptor".toUpperCase()) {           
+                result[column] = {};
+                handler.data.forEach(function(line, index){
+                  line[i].split("|").forEach(function(value){
+                    totalValues++;
+                    if(!validValues[column][toString(value).trim().toUpperCase()] && toString(value).trim().length>0){                      
+                      result[column][index] = value;
+                      var assertion = {
+                          type: 'amendment',
+                          hash: hash(line),
+                          dimension: 'Consistency',
+                          enhancement: `Recommend to use a value defined in the glossary`,
+                          specification: '[TO DO]',
+                          mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                          ie: item,
+                          dr: {
+                              row: index+6, 
+                              value: value,
+                              drt:  'record'
+                          },
+                          response: {result: `The value "${value.trim().toUpperCase()}" was not found in the field "${item}" of the glossary. Change this value or add it in the glossary.`}
+                      };
+                      report.push(assertion);
+                    } else {
+                      totalValidValues++;
+                    }
+                  });                  
+                });                
+              }              
+            });
+            var consistency = (totalValidValues/totalValues)*100;
+            consistency = consistency === 100? consistency:consistency.toFixed(2);            
+            report.push({
+                type: 'measure',              
+                dimension: 'Consistency',
+                specification: `[TO DO]`,
+                mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                ie: 'All',
+                dr: {
+                    id: id,
+                    drt:  'dataset'
+                },
+                response: {result: consistency}
+            }); 
+            report.push({
+                type: 'validation',              
+                criterion: 'Spreadsheet has consistent records',
+                specification: `[TO DO]`,
+                mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+                ie: 'All',
+                dr: {
+                    id: id,
+                    drt:  'dataset'
+                },
+                response: {result: consistency == 100}
+            });
+            cb(null,report);                        
+          });          
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'consistency',
+    {
+      http: {path: '/consistency', verb: 'get'},
+          accepts: [    
+        { arg: "req", type: "object", http: { source: "req" } },
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
+  Specimen.uniqueness = function(id, language, cb) {
+    var key = require('key.json');
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!B:D'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }          
+          var rs = d.values;
+          var completeness = 0;
+          var totalCells = 0;    
+          var header = rs.splice(0,5);
+          var report = [];
+          var individuals = {};
+          
+          rs.forEach(function(line, index){
+            if(String(line[0] || "").trim().length > 0 &&
+              String(line[1] || "").trim().length > 0 &&
+              String(line[2] || "").trim().length > 0) {                
+                var id = [String(line[0] || "").trim().toUpperCase(), String(line[1] || "").trim().toUpperCase(), String(line[2] || "").trim().toUpperCase()].join(", ");
+                individuals[id] = {
+                  count: individuals[id] && individuals[id].count ? individuals[id].count+1:1,
+                  rows: individuals[id] && individuals[id].rows ? individuals[id].rows.concat([index+6]):[index+6]
+                }
+            }
+          });
+          Object.keys(individuals).map(function(id){
+            if(individuals[id].count>1) {
+              var assertion = {
+                  type: 'amendment',
+                  hash: hash(individuals[id]),
+                  dimension: 'Uniqueness',
+                  enhancement: 'Recommend to remove duplicated records',
+                  specification: '[TO DO]',
+                  mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                  ie: "Unique identifier",
+                  dr: {
+                      row: individuals[id].rows, 
+                      value: id,
+                      drt:  'record'
+                  },
+                  response: {result: `Rows ${individuals[id].rows} have the same identifier (${id})`}
+              };
+              report.push(assertion);
+            }            
+          });
+          var finalUniqueness = ((Object.keys(individuals).length/rs.length)*100);         
+          finalUniqueness = finalUniqueness === 100? finalUniqueness:finalUniqueness.toFixed(2);
+          report.push({
+              type: 'measure',              
+              dimension: 'Uniqueness',
+              specification: `[TO DO]`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'Unique identifier',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              response: {result: finalUniqueness}
+          }); 
+          report.push({
+              type: 'validation',              
+              criterion: 'Spreadsheet has unique records',
+              specification: `[TO DO]`,
+              mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+              ie: 'Unique identifier',
+              dr: {
+                  id: id,
+                  drt:  'dataset'
+              },
+              response: {result: finalUniqueness == 100}
+          });
+          cb(null,report);
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'uniqueness',
+    {
+      http: {path: '/uniqueness', verb: 'get'},
+          accepts: [    
+        {arg: 'id', type: 'string', required:true},   
+        {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
+
   Specimen.checkUrl = function(url, cb) {  
     try{
       if(url.indexOf("http")==-1){
@@ -53,8 +348,7 @@ module.exports = function(Specimen) {
     }
   );
   Specimen.getSpreadsheetInfo = function(id, cb) {            
-    var key = require('key.json');
-    
+    var key = require('key.json');    
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
     var jwtClient = new google.auth.JWT(
       key.client_email,
@@ -133,6 +427,7 @@ module.exports = function(Specimen) {
               header[1].forEach(function(col, i){ 
                 if(col == "Image" && String(line[i] || "").trim().length>0 ) {
                   var img = {
+                    hash: hash(line),
                     header: header[4][i],
                     value: line[i],
                     row: index
@@ -145,6 +440,48 @@ module.exports = function(Specimen) {
         });
       });
   }
+  Specimen.getHash = function(id, language, cb) {
+    var key = require('key.json');    
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      [SCOPES],
+      null
+    );    
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        console.log(err.errorDescription,err.error_description,tokens);
+        cb(err,tokens)
+        return;
+      }          
+      var service = google.sheets('v4');      
+      service.spreadsheets.values.get({
+        auth: jwtClient,
+        spreadsheetId: id,
+        range: 'specimen.'+language+'!B:DD'        
+      }, function(err, d) {
+          if (err){
+            console.log('The API returned an error: ' + err);    
+            cb('The API returned an error: ' + err,null)
+            return;          
+          }                    
+          cb(null,hash(d.values));
+        });
+      });
+  }
+  Specimen.remoteMethod(     
+    'getHash',
+    {
+      http: {path: '/getHash', verb: 'get'},
+          accepts: [    
+            {arg: 'id', type: 'string', required:true},   
+            {arg: 'language', type: 'string', required:true},                
+      ],
+      returns: {arg: 'response', type: 'object'}
+    }
+  );
   Specimen.conformity = function(id, language, cb) {
     var key = require('key.json');    
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
@@ -201,6 +538,7 @@ module.exports = function(Specimen) {
                               if(decimal){
                                 var assertion = {
                                   type: 'amendment',
+                                  hash: hash(line),
                                   dimension: 'Conformity',
                                   enhancement: 'Recommend to transform from DMS format to decimal format',
                                   specification: 'More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -211,7 +549,7 @@ module.exports = function(Specimen) {
                                       value: String(line[i]).trim(),
                                       drt:  'record'
                                   },
-                                  result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'
+                                  response: {result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'}
                                 };
                                 report.push(assertion); 
                               }                                
@@ -220,6 +558,7 @@ module.exports = function(Specimen) {
                             } else {
                               var assertion = {
                                   type: 'amendment',
+                                  hash: hash(line),
                                   dimension: 'Conformity',
                                   enhancement: 'Recommend to provide value in the range of decimal latitude',
                                   specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -230,7 +569,7 @@ module.exports = function(Specimen) {
                                       value: String(line[i]).trim(),
                                       drt:  'record'
                                   },
-                                  result: 'Modify latitude to a numeric value between -90 and 90'
+                                  response: {result: 'Modify latitude to a numeric value between -90 and 90'}
                               };
                               report.push(assertion); 
                           }                                           
@@ -253,6 +592,7 @@ module.exports = function(Specimen) {
                             if(decimal){
                               var assertion = {
                                 type: 'amendment',
+                                hash: hash(line),
                                 dimension: 'Conformity',
                                 enhancement: 'Recommend to transform from DMS format to decimal format',
                                 specification: 'More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -263,7 +603,7 @@ module.exports = function(Specimen) {
                                     value: String(line[i]).trim(),
                                     drt:  'record'
                                 },
-                                result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'
+                                response: {result: 'Change from "'+gms+'" (DMS format) to "'+decimal+'" (decimal format)'}
                               };
                               report.push(assertion); 
                             }                              
@@ -272,6 +612,7 @@ module.exports = function(Specimen) {
                           } else {
                             var assertion = {
                                 type: 'amendment',
+                                hash: hash(line),
                                 dimension: 'Conformity',
                                 enhancement: 'Recommend to provide value in the range of decimal longitude',
                                 specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -282,7 +623,7 @@ module.exports = function(Specimen) {
                                     value: String(line[i]).trim(),
                                     drt:  'record'
                                 },
-                                result: 'Modify longitude to a numeric value between -180 and 180'
+                                response: {result: 'Modify longitude to a numeric value between -180 and 180'}
                             };
                             report.push(assertion); 
                         }                                           
@@ -297,11 +638,31 @@ module.exports = function(Specimen) {
                             parsedDate[1].trim().length == 2 &&
                             Number(parsedDate[2].trim())>=0 && Number(parsedDate[2].trim())<=31 &&
                             parsedDate[2].trim().length == 2
-                          )
-                          conformity++;
+                          ){
+                            conformity++;
+                          }                          
+                          else {
+                            var assertion = {
+                              type: 'amendment',
+                                hash: hash(line),
+                                dimension: 'Conformity',
+                                enhancement: 'Recommend to change the date value to the ISO 8601 format',
+                                specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+                                ie: header[4][i],
+                                dr: {
+                                    row: index+6, 
+                                    value: String(line[i]).trim(),
+                                    drt:  'record'
+                                },
+                                response: {result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'}
+                            };
+                            report.push(assertion); 
+                          }
                         } else {
                           var assertion = {
                               type: 'amendment',
+                              hash: hash(line),
                               dimension: 'Conformity',
                               enhancement: 'Recommend to change the date value to the ISO 8601 format',
                               specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -312,7 +673,7 @@ module.exports = function(Specimen) {
                                   value: String(line[i]).trim(),
                                   drt:  'record'
                               },
-                              result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'
+                              response: {result: 'Modify date value to ISO 8601 format: YYYY-MM-DD (e.g.: 2001-03-22)'}
                           };
                           report.push(assertion); 
                       }                                           
@@ -333,7 +694,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalConformity
+              response: {result: finalConformity}
           }); 
           report.push({
               type: 'validation',
@@ -345,7 +706,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalConformity == 100
+              response: {result: finalConformity == 100}
           });
           cb(null,report);
         });
@@ -485,6 +846,7 @@ module.exports = function(Specimen) {
                           } else {
                             var assertion = {
                                 type: 'amendment',
+                                hash: hash(line),
                                 dimension: 'Completeness',
                                 enhancement: 'Recommend to provide value for an empty field',
                                 specification: 'If value is not provided, it is recommended to provide value. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
@@ -495,7 +857,7 @@ module.exports = function(Specimen) {
                                     value: String(line[i]).trim(),
                                     drt:  'record'
                                 },
-                                result: 'Provide some value'
+                                response: {result: 'Provide some value'}
                             };
                             report.push(assertion); 
                           }                     
@@ -515,7 +877,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalCompleteness
+              response: {result: finalCompleteness}
           }); 
           report.push({
               type: 'validation',
@@ -527,7 +889,7 @@ module.exports = function(Specimen) {
                   id: id,
                   drt:  'dataset'
               },
-              result: finalCompleteness == 100
+              response: {result: finalCompleteness == 100}
           });
           cb(null,report);
         });
@@ -756,6 +1118,7 @@ module.exports = function(Specimen) {
                         if(translatedState){
                           self.record[fieldId].states.push(translatedState.toJSON());
                         } else {
+                          console.log(`[${new Date().toISOString()}] ERROR: not translated state for id `,translatedStateId)
                           // self.db.collection('monitoring').doc(self.base).collection("errors").doc("state:"+translatedStateId).set({
                           //   type: "state",
                           //   target: translatedStateId,
@@ -783,12 +1146,13 @@ module.exports = function(Specimen) {
             function processRegularFields(){
               var Collection = Specimen.app.models.Collection;
               var sID = self.record.id.split(":");              
-              var cID = sID[1]+":"+sID[2]+":"+sID[3];                        
-              Collection.findById(cID, function(err,collection) {                
+              var cID = sID[1]+":"+sID[2]+":"+sID[3];            
+              Collection.findOne({where:{id:cID, base:sID[0]}}, function(err,collection) {                
                 if(err) console.log("ERROR FIND COLLECTION: ",err);          
-                if(collection) {                  
+                if(collection) { 
                   self.record.collection = collection.toJSON();                                    
-                } else {                  
+                } else {         
+                  console.log(`[${new Date().toISOString()}] ERROR TO RETRIVE COLLECTION`, cID)         
                   // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+cID).set({
                   //   type: "collection",
                   //   target: cID,
@@ -872,8 +1236,8 @@ module.exports = function(Specimen) {
             } else {
               processRegularFields();
             }                       
-          } else {
-            // console.log("field does not exist")
+          } else {            
+            console.log(`[${new Date().toISOString()}] field does not exist`,{fieldId})
             // self.db.collection('monitoring').doc(self.base).collection("errors").doc("field:"+fieldId).set({
             //   type: "field",
             //   target: fieldId,
@@ -964,7 +1328,8 @@ module.exports = function(Specimen) {
   
  // var downloadQueue = []; //recebe o vetor com as imagens a serem baixadas
   //função que recebe a planilha
-  Specimen.inputFromURL = function(id,language, base, cb) {
+  Specimen.inputFromURL = function(req,id,language, base, cb) {
+    req.setTimeout(0);
     var key = require('key.json');
     
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];        
@@ -1028,7 +1393,8 @@ module.exports = function(Specimen) {
     });
   };  
 
-  Specimen.downloadImages = function (base,cb) {
+  Specimen.downloadImages = function (req, base,cb) {
+    req.setTimeout(0)
     function error (err){cb(err,null)}
     console.log("serviço chamado");
     var manager = new ImageDownloadManager();
@@ -1048,6 +1414,7 @@ module.exports = function(Specimen) {
     var self = this;
     console.log("processando fila")
     return new Promise(function(resolve, reject){
+      var i = 0
       var processing;
       var processImage = function (img,cb){        
         var downloader = new ImageDownloader();         
@@ -1058,7 +1425,8 @@ module.exports = function(Specimen) {
           console.log("erro ao fazer download de imagem");          
           if(error.img) {
             console.log("adicionou imagem no final da fila")
-            processing.push(img);
+            if(i++ < 200)
+              processing.push(img);
           }
           cb();
         });
@@ -1115,11 +1483,13 @@ module.exports = function(Specimen) {
   ImageDownloadManager.prototype.getData = function(query,base) {
     var self = this;
     return new Promise(function(resolve, reject){
+      console.log("query",query)
       Specimen.find(query, function(err,result){
         if(err) reject(err)        
         else{
-          var data = {result:result, base: base}
-          resolve(data);
+          var data = {response: {result:result, base: base}}
+          
+          resolve(data.response);
         }
       });
     });  
@@ -1210,7 +1580,7 @@ module.exports = function(Specimen) {
     var self =  this;
     // console.log("writeOriginalImage")
     return new Promise(function(resolve, reject){
-      fs.writeFile("client"+img.local, img.downloadedContent, 'binary', function(err){
+      fs.writeFile(__dirname + "/../../client"+img.local, img.downloadedContent, 'binary', function(err){
         if(err){
           console.log("erro para gravar", err);
           reject({img:img.raw});
@@ -1335,6 +1705,7 @@ module.exports = function(Specimen) {
     {
       http: {path: '/downloadImages', verb: 'get'},
       accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
         // {arg:'download'}
         {arg: 'base', type: 'string', required:true}
       ],
@@ -1381,6 +1752,7 @@ module.exports = function(Specimen) {
     {
       http: {path: '/xlsx/inputFromURL', verb: 'get'},
       accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
         {arg: 'id', type: 'string', required:true, description: 'link para tabela de espécimes'},
         {arg: 'language', type: 'string', required:true, description: 'en-US, pt-BR ou es-ES'},
         {arg: 'base', type: 'string', required:true, description: 'eco ou taxon'}

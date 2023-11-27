@@ -76,7 +76,10 @@ module.exports = function(Identification) {
       }
     });
   } 
-  Identification.populate = function(filter, callback){
+  
+  Identification.populate = function(req, filter, callback){
+    
+    req.setTimeout(0);
     console.log("Apagando...");
     Identification.destroyAll(function(e,d){
       console.log("Apagado!!!");
@@ -283,7 +286,9 @@ module.exports = function(Identification) {
     'populate',
     {
       http: {verb: 'get'},
-      accepts: [{arg: 'filter', type: 'object'}],
+      accepts: [
+        { arg: "req", type: "object", http: { source: "req" } },
+        {arg: 'filter', type: 'object'}],
       returns: {arg: 'response', type: 'number'}
     }
   );
@@ -357,7 +362,7 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
             callback2();
           } else if (key == 'specimens'){            
             species.specimens.forEach(function(specimen) {
-              if(specimen.collection)
+              if(specimen.collection) {
                 Object.keys(specimen.collection).forEach(function(collectionKey) {
                   if(
                     specimen.collection[collectionKey].term == 'institutionName' || 
@@ -370,8 +375,10 @@ function getIdentificationItems(filter, Identification, Species, Schema, mongoDs
                     identification_item["filter"][collectionKey].push(specimen.collection[collectionKey].value);                    
                   } 
                 });
-              else 
-                console.log("Coleção não existe")              
+              } else {
+                console.log("Coleção não existe", {specimen})
+              }
+                
             });
             callback2();
           } else if (

@@ -16,16 +16,16 @@ var google = require('googleapis');
 
 // var Thumbnail = require('thumbnail');
 // var thumbnail = new Thumbnail(__dirname + "/../../client/images", __dirname + "/../../client/thumbnails");
-module.exports = function(Interaction) {
-  
+module.exports = function(Interaction) {  
   Interaction.plants = function(pollinator,region,vegetalForm,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL 
     
-    if(process.env.ENVIRONMENT == "docker")
-      var url = 'mongodb://mongo:27017/bdd';
+    if(process.env.ENVIRONMENT !== `"stage"`)
+      var url = 'mongodb://mongo:27017/bdd'
     else 
-      var url = 'mongodb://127.0.0.1:27017/bdd';
+      var url = 'mongodb://mongo_stage:27017/bdd'
+    console.log(`[${new Date().toISOString()}] DB`,process.env.ENVIRONMENT, url)
     var q = {};
     q.pollinator = pollinator;
     if(region!="Brasil"){      
@@ -65,11 +65,11 @@ module.exports = function(Interaction) {
     Interaction.pollinators = function(plant,query,cb) {        
     var MongoClient = require('mongodb').MongoClient;    
     // Connection URL     
-    if(process.env.ENVIRONMENT == "docker")
+    if(process.env.ENVIRONMENT !== `"stage"`)
       var url = 'mongodb://mongo:27017/bdd';
     else 
-      var url = 'mongodb://127.0.0.1:27017/bdd';
-    // Use connect method to connect to the Server 
+      var url = 'mongodb://mongo_stage:27017/bdd';
+    console.log(`[${new Date().toISOString()}] DB`,process.env.ENVIRONMENT, url)
     MongoClient.connect(url, function(err, db) {
       var collection = db.collection('Interaction');
       var q = [];
@@ -86,7 +86,7 @@ module.exports = function(Interaction) {
           ]
         }
         });
-      }
+      }      
       q.push({
         $group: {
           _id: {
@@ -102,6 +102,7 @@ module.exports = function(Interaction) {
           // avgQuantity: { $avg: "$percentual" }
         }
       });
+      q.push({ $sort : { "_id.pollinator" : 1 } })
       
       collection.aggregate(q).toArray(function(err, docs) {        
         cb(err,docs);
@@ -374,7 +375,7 @@ module.exports = function(Interaction) {
   }
   Image.prototype.writeLocalFile = function() {    
     var self = this;
-    fs.writeFile("client"+self.local, self.downloadedContent, 'binary', function(err){
+    fs.writeFile(__dirname + "/../../client"+self.local, self.downloadedContent, 'binary', function(err){
         if(err){
           if(self.writeLocalErrorCount==10){
             console.log("******** Local: "+self.local);

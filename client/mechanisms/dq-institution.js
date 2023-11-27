@@ -1,8 +1,71 @@
 var Institution = function(){
     this.report = {
         completeness: [],
-        accessibility: []
+        accessibility: [],
+        uniqueness: []
     };
+}
+Institution.prototype.uniqueness = function(rs, id) {
+    var self = this;        
+    var header = rs.response.splice(0,1);
+    var individuals = {};
+    rs.response.forEach(function(line, index){         
+        if(String(line[1] || "").trim().length > 0 &&
+              String(line[2] || "").trim().length > 0) {                
+                var id = [String(line[0] || "").trim().toUpperCase(), String(line[1] || "").trim().toUpperCase()].join(", ");
+                individuals[id] = {
+                  count: individuals[id] && individuals[id].count ? individuals[id].count+1:1,
+                  rows: individuals[id] && individuals[id].rows ? individuals[id].rows.concat([index+6]):[index+6]
+                }
+            }        
+    });
+    
+    Object.keys(individuals).map(function(id) {
+        if(individuals[id].count>1) {
+          var assertion = {
+              type: 'amendment',              
+              dimension: 'Uniqueness',
+              enhancement: 'Recommend to remove duplicated records',
+              specification: '[TO DO]',
+              mechanism: 'RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js',
+              ie: "Unique identifier",
+              dr: {
+                  row: individuals[id].rows, 
+                  value: id,
+                  drt:  'record'
+              },
+              response: {result: `Leave only one of the rows ${individuals[id].rows}, which have the same identifier (${id})`}
+          };          
+          
+          self.report.uniqueness.push(assertion);
+        }            
+      });    
+      var finalUniqueness = ((Object.keys(individuals).length/rs.response.length)*100);                       
+      finalUniqueness = finalUniqueness === 100? finalUniqueness:finalUniqueness.toFixed(2);      
+      self.report.uniqueness.push({
+          type: 'measure',              
+          dimension: 'Uniqueness',
+          specification: `[TO DO]`,
+          mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+          ie: 'Unique identifier',
+          dr: {
+              id: id,
+              drt:  'dataset'
+          },
+          response: {result: finalUniqueness}
+      }); 
+      self.report.uniqueness.push({
+          type: 'validation',              
+          criterion: 'Spreadsheet has unique records',
+          specification: `[TO DO]`,
+          mechanism: `RCPol Data Quality Tool. More details in: http://chaves.rcpol.org.br/mechanisms/dq-specimens.js`,
+          ie: 'Unique identifier',
+          dr: {
+              id: id,
+              drt:  'dataset'
+          },
+          response: {result: finalUniqueness == 100}
+      });         
 }
 Institution.prototype.completeness = function(rs, id) {	
     var self = this;					    
@@ -139,3 +202,5 @@ Institution.prototype.accessibility = function(rs, id, icb, cb) {
 Institution.prototype.isCompleteValue = function(value) {
     return typeof value != "undefined" && String(value).trim().length > 0;
 }
+
+

@@ -10,5 +10,8 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": {}
+  "methods": {},
+  "indexes": {
+    "identifier":{ "base":1, "language":1, "term":1, "vocabulary":1}
+  }
 }

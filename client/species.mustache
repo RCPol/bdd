@@ -24,10 +24,7 @@
 .feedback-button {
 	height:40px; border:solid 3px #CCCCCC; background:#333; width:100px; line-height:32px; -webkit-transform:rotate(-90deg); font-weight:600; color:white; transform:rotate(-90deg);  -ms-transform:rotate(-90deg);  -moz-transform:rotate(-90deg); text-align:center; font-size:17px; position:fixed; left:-40px; top:45%; font-family: "Roboto", helvetica, arial, sans-serif; z-index:999; 
 	}
-	@import "https://fonts.googleapis.com/css?family=Raleway";
-* { box-sizing: border-box; }
 
-h1{ margin: 0; }
 #contact { 
   -webkit-user-select: none; /* Chrome/Safari */        
   -moz-user-select: none; /* Firefox */
@@ -63,17 +60,6 @@ h1{ margin: 0; }
   
 }
 
-input, textarea { 
-  margin: .8em auto;
-  font-family: inherit; 
-  text-transform: inherit; 
-  font-size: inherit;
-  
-  display: block; 
-  width: 280px; 
-  padding: .4em;
-}
-textarea { height: 80px; resize: none; }
 
 .formBtn { 
   width: 140px;
@@ -248,8 +234,24 @@ textarea { height: 80px; resize: none; }
 				});				
 			});		  		   
 		    
-		  
-		
+
+		const getJBRJSpecies = () => {
+
+			$.getJSON(`http://servicos.jbrj.gov.br/v2/flora/taxon/${id.split(":")[2]}`, function(data){
+				console.log({data})
+				if(data && data[0] && data[0].taxon && data[0].taxon.references) {
+					const content = `
+						<p>
+							<a style="background-color: unset !important;" target="_blank" href="${data[0].taxon.references}">
+								<img style="margin-top: 0.5em" src="http://servicos.jbrj.gov.br/v2/assets/img/reflora.png" height="50"/>
+							</a>
+						</p>
+					`
+					$("#reflora").html(content);
+				}
+			});
+		}
+		getJBRJSpecies()
 	</script>
 	<!-- Final: Códigos para o Mapa e Tabela -->
 
@@ -289,12 +291,16 @@ textarea { height: 80px; resize: none; }
 	<article>
 
 	  <!-- Nome da espécie -->
+		<div id="reflora" class="popname" style="float:right; margin-right:1em; text-align:center"></div>
       <h2 class="famesp" id="dwc-Taxon-family-value"></h2>
+			
 	  <h1> <i> <span id="dwc-Taxon-scientificName-value"></span> <span id="rcpol-Sample-palynomorphType-value"> </span> </i><span id="dwc-Taxon-scientificNameAuthorship-value"></span></h1>
 
       <!--Nome popular-->
 	  <h2 class="popname" id="dwc-Taxon-vernacularName-value"></h2>
 
+		
+		
 		<!-- Início: Textos -->
 	  <div class="infos-txt">
 
@@ -707,7 +713,11 @@ textarea { height: 80px; resize: none; }
 			});
 			e.preventDefault();
 		});	
-		
+		const report = data => {
+			$.post("/api/Species/report",data,function(rs) {
+				console.log("sent",rs)
+			});
+		}
 		$("#send-feedback").click(function(e){		
 			var data = {
 				user: {
@@ -733,6 +743,7 @@ textarea { height: 80px; resize: none; }
 				.catch(function(error) {
 					console.error("Error adding document: ", error);
 				});
+				report(data)
 			} else {
 				alert("É necessário preencher todos os campos.")
 			}		
@@ -741,7 +752,7 @@ textarea { height: 80px; resize: none; }
 	});
 	function toggle_visibility() {
 		$('#contactForm').fadeToggle();       
-    }
+  }
 	
 </script>
 </body>

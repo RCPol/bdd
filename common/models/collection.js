@@ -9,6 +9,7 @@ var util = require('util');
 
 const requestImageSize = require('request-image-size');
 
+
 module.exports = function(Collection) {
 
   Collection.getSpreadsheetData = function(id, language, cb) {            
@@ -100,7 +101,7 @@ module.exports = function(Collection) {
       service.spreadsheets.values.get({
         auth: jwtClient,
         spreadsheetId: id,
-        range: 'institution.'+language+'!P:P'        
+        range: 'institution.'+language+'!Q:Q'        
       }, function(err, d) {
           if (err){
             console.log('The API returned an error: ' + err);    
@@ -278,7 +279,7 @@ module.exports = function(Collection) {
         service.spreadsheets.values.get({
               auth: jwtClient,
               spreadsheetId: id,
-              range: 'institution.'+language+'!A:P'        
+              range: 'institution.'+language+'!A:Q'        
             }, function(err, d) {
               if (err){
                 console.log('The API returned an error: ' + err);    

@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: Dockerfile-stage
+    privileged: true
+    volumes:
+      - ../:/var/www/bdd/
+    links:
+      - mongo_stage
+    ports:
+      - "8080:3030"
+    environment:
+      - ENVIRONMENT="stage"
+      - DATA_SOURCES=/var/www/bdd/stage/datasources.json
+      - SUPORTE_MAIL
+      - SUPORTE_MAIL_TO
+    container_name: rcpol_node_stage    
+  mongo_stage:
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - ../db:/data/db
+    container_name: rcpol_mongo_stage
