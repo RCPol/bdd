@@ -1,0 +1,9 @@
+node_modules
+coverage
+.idea
+.ideatest
+.travis.yml
+.loopbackrc
+.tern-project
+test
+.travis.yml
